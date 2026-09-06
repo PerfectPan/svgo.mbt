@@ -1,0 +1,60 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "perfectpan/svgo/xml"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn decode_entities(String) -> String
+
+pub fn parse(String) -> Document raise ParseError
+
+pub let text_elements : Array[String]
+
+// Errors
+pub suberror ParseError {
+  ParseError(String, Int)
+} derive(@debug.Debug)
+pub impl Show for ParseError
+
+// Types and methods
+pub(all) struct Document {
+  children : Array[Node]
+} derive(@debug.Debug)
+pub fn Document::each_element(Self, (Element, Element?) -> Unit) -> Unit
+pub fn Document::each_element_post(Self, (Element, Element?) -> Unit) -> Unit
+pub fn Document::root(Self) -> Element?
+pub fn Document::to_string(Self, options? : SerializeOptions) -> String
+
+pub(all) struct Element {
+  mut name : String
+  attrs : Map[String, String]
+  children : Array[Node]
+} derive(@debug.Debug)
+pub fn Element::elements(Self) -> Array[Self]
+pub fn Element::get(Self, String) -> String?
+pub fn Element::has(Self, String) -> Bool
+pub fn Element::new(String, attrs? : Map[String, String], children? : Array[Node]) -> Self
+pub fn Element::remove(Self, String) -> Unit
+pub fn Element::set(Self, String, String) -> Unit
+pub fn Element::to_string(Self, options? : SerializeOptions) -> String
+
+pub(all) enum Node {
+  Element(Element)
+  Text(String)
+  Comment(String)
+  CData(String)
+  Doctype(String)
+  ProcInst(String, String)
+} derive(@debug.Debug)
+
+pub(all) struct SerializeOptions {
+  pretty : Bool
+  prolog : Bool
+} derive(@debug.Debug)
+pub fn SerializeOptions::default() -> Self
+
+// Type aliases
+
+// Traits

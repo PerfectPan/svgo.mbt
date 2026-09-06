@@ -1,4 +1,7 @@
 ///|
+/// Knobs of the path optimizer; every field defaults to on except that
+/// `precision` is 3. Disable individual rewrites when a consumer depends on
+/// the exact segment structure (for example markers or animations).
 pub(all) struct Options {
   /// decimal places kept for coordinates
   precision : Int
@@ -13,6 +16,7 @@ pub(all) struct Options {
 } derive(Debug)
 
 ///|
+/// Precision 3 with every rewrite enabled.
 pub fn Options::default() -> Options {
   {
     precision: 3,

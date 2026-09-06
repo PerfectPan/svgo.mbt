@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!-- Generator: Adobe Illustrator -->
+<!--! Copyright 2026, keep me -->
+<svg xmlns="http://www.w3.org/2000/svg">
+  <!-- a comment -->
+  <rect width="1" height="1"/><!-- trailing -->
+</svg>
+
+@@@
+
+<?xml version="1.0"?>
+<!--! Copyright 2026, keep me -->
+<svg xmlns="http://www.w3.org/2000/svg">
+  <rect width="1" height="1"/>
+</svg>

@@ -408,6 +408,7 @@ fn attr_is_plain(e : @xml.Element, name : String) -> Bool {
 }
 
 ///|
+/// `<ellipse>` with `rx == ry` (or one radius `auto`) is a `<circle>`.
 pub let convert_ellipse_to_circle : Plugin = {
   name: "convertEllipseToCircle",
   description: "convert ellipses with equal radii to circles",
@@ -631,6 +632,7 @@ pub let remove_dimensions : Plugin = {
 }
 
 ///|
+/// Drop `<title>` (optional: titles are accessible names, keep them for UI icons).
 pub let remove_title : Plugin = {
   name: "removeTitle",
   description: "remove <title>",

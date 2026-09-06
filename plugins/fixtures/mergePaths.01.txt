@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <path fill="red" d="M0 0h10v10H0z"/>
+  <path fill="red" d="M20 0h10v10H20z"/>
+  <path fill="red" d="M25 0h10v10H25z"/>
+  <path fill="blue" d="M50 0h10v10H50z"/>
+  <path fill="blue" id="a" d="M70 0h10v10H70z"/>
+  <path fill="blue" d="M90 0h10v10H90z"/>
+  <path fill="url(#g)" d="M0 50h10v10H0z"/>
+  <path fill="url(#g)" d="M20 50h10v10H20z"/>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg">
+  <path fill="red" d="M0 0h10v10H0zM20 0h10v10H20z"/>
+  <path fill="red" d="M25 0h10v10H25z"/>
+  <path fill="blue" d="M50 0h10v10H50z"/>
+  <path fill="blue" id="a" d="M70 0h10v10H70z"/>
+  <path fill="blue" d="M90 0h10v10H90z"/>
+  <path fill="url(#g)" d="M0 50h10v10H0z"/>
+  <path fill="url(#g)" d="M20 50h10v10H20z"/>
+</svg>

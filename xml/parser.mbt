@@ -1,4 +1,6 @@
 ///|
+/// Malformed input; carries a message and the code unit offset where
+/// parsing stopped.
 pub suberror ParseError {
   ParseError(String, Int)
 } derive(Debug)

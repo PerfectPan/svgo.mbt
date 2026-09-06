@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g"/>
+    <linearGradient/>
+    <g><path id="p" d="M0 0h1"/><path d="M0 0h2"/></g>
+    <style>.a{fill:red}</style>
+  </defs>
+  <rect fill="url(#g)" width="1" height="1"/>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g"/>
+    <path id="p" d="M0 0h1"/>
+    <style>.a{fill:red}</style>
+  </defs>
+  <rect fill="url(#g)" width="1" height="1"/>
+</svg>

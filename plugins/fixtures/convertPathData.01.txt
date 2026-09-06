@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <path d="M 10,10 L 20,10 L 20,20 L 10,20 L 10,10 Z"/>
+  <path d="M0 0 C 10 10, 20 20, 30 30"/>
+  <path d="M0 0 c 1 1 2 2 3 3 s 2 2 3 3"/>
+  <path d="M 1.23456 2.34567 l 0.00001 0 l 5 5"/>
+  <path d="M0 0 A 10 10 0 1 0 20 0 a 0 5 0 0 1 10 10"/>
+  <path d="M5 5 m 1 1 M 2 2 h 3 v 3 h -3 z m 10 10"/>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg">
+  <path d="M10 10h10v10H10z"/>
+  <path d="M0 0l30 30"/>
+  <path d="M0 0l3 3 3 3"/>
+  <path d="M1.235 2.346l5 5"/>
+  <path d="M0 0a10 10 0 1 0 20 0l10 10"/>
+  <path d="M2 2h3v3H2z"/>
+</svg>

@@ -106,6 +106,9 @@ pub let convert_colors : Plugin = {
 }
 
 ///|
+/// Shortest equivalent spelling of a color: `rgb()` and names become hex,
+/// `#rrggbb` collapses to `#rgb` when possible, and a color name wins when
+/// it is shorter than the hex form (`#ff0000` -> `red`).
 pub fn shorten_color(v : String) -> String {
   let t = v.trim().to_owned()
   let lower = t.to_lower()

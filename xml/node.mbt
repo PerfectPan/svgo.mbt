@@ -6,6 +6,8 @@ pub(all) struct Document {
 } derive(Debug)
 
 ///|
+/// One node of the tree. Text is stored decoded (entities resolved);
+/// comments, CDATA, doctype and processing instructions keep their raw body.
 pub(all) enum Node {
   Element(Element)
   Text(String)
@@ -17,6 +19,8 @@ pub(all) enum Node {
 } derive(Debug)
 
 ///|
+/// An element with its tag name, attributes and child nodes. Plugins mutate
+/// elements in place; `name` is mutable so shapes can be turned into paths.
 pub(all) struct Element {
   mut name : String
   /// attributes in source order; MoonBit maps preserve insertion order
@@ -25,6 +29,7 @@ pub(all) struct Element {
 } derive(Debug)
 
 ///|
+/// Create an element; attributes and children default to empty.
 pub fn Element::new(
   name : String,
   attrs? : Map[String, String] = Map([]),
@@ -34,21 +39,25 @@ pub fn Element::new(
 }
 
 ///|
+/// Attribute value by name.
 pub fn Element::get(self : Element, name : String) -> String? {
   self.attrs.get(name)
 }
 
 ///|
+/// Set (or append) an attribute.
 pub fn Element::set(self : Element, name : String, value : String) -> Unit {
   self.attrs[name] = value
 }
 
 ///|
+/// Remove an attribute if present.
 pub fn Element::remove(self : Element, name : String) -> Unit {
   self.attrs.remove(name)
 }
 
 ///|
+/// Whether the attribute is present.
 pub fn Element::has(self : Element, name : String) -> Bool {
   self.attrs.contains(name)
 }

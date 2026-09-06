@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <g></g>
+  <defs/>
+  <g><g/></g>
+  <mask id="m"/>
+  <pattern href="#p"/>
+  <switch><g/></switch>
+  <g filter="url(#f)"/>
+  <rect width="1" height="1"/>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg">
+  <mask id="m"/>
+  <pattern href="#p"/>
+  <switch>
+    <g/>
+  </switch>
+  <g filter="url(#f)"/>
+  <rect width="1" height="1"/>
+</svg>

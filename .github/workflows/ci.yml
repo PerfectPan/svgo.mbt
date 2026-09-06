@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  test:
+  verify:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
@@ -16,25 +16,19 @@ jobs:
         run: |
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
           echo "$HOME/.moon/bin" >> $GITHUB_PATH
-      - name: Check
-        run: moon check
-      - name: Format check
-        run: moon fmt --check
-      - name: Test (wasm-gc)
-        run: moon test --target wasm-gc
-      - name: Test (js)
-        run: moon test --target js
-      - name: Test (native)
-        run: moon test --target native
-      - name: Build wasm artifact
-        run: scripts/build-wasm.sh
-      - name: Size benchmark against svgo
-        run: harness/compare.sh
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Render diff (resvg + pixelmatch)
+      - name: Check, format, interfaces, fixtures, tests on wasm-gc / js / native
+        run: scripts/verify.sh
+      - name: Wasm artifact, size comparison, render diff, speed
         run: |
+          scripts/build-wasm.sh
+          moon build --target native --release -q
           cd harness && npm install --no-audit --no-fund && cd ..
+          harness/compare.sh
           node harness/render-diff.mjs
           node harness/wasm-speed.mjs
+      - name: Benchmarks (native)
+        if: matrix.os == 'macos-latest'
+        run: scripts/bench.sh

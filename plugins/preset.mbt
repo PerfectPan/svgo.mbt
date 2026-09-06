@@ -15,6 +15,7 @@ pub let preset_default : Array[Plugin] = [
 pub let optional_plugins : Array[Plugin] = [remove_dimensions, remove_title]
 
 ///|
+/// Look a plugin up by its svgo name (for example `"convertPathData"`).
 pub fn find_plugin(name : String) -> Plugin? {
   for p in preset_default {
     if p.name == name {

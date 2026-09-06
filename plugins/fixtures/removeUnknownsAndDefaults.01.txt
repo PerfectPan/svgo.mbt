@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" baseProfile="full">
+  <rect x="0" y="0" width="1" height="1" fill="#000" stroke="none" opacity="1" fill-rule="nonzero" xml:space="default"/>
+  <rect x="0" y="0" rx="0" ry="5" width="1" height="1" fill="black"/>
+  <g stroke="red"><rect width="1" height="1" stroke="none" stroke-width="1"/></g>
+  <g fill="red"><rect width="1" height="1" fill="#000"/></g>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg">
+  <rect width="1" height="1"/>
+  <rect rx="0" ry="5" width="1" height="1"/>
+  <g stroke="red">
+    <rect width="1" height="1" stroke="none"/>
+  </g>
+  <g fill="red">
+    <rect width="1" height="1" fill="#000"/>
+  </g>
+</svg>

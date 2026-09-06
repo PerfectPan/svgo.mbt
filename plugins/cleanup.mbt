@@ -1,4 +1,5 @@
 ///|
+/// `<!DOCTYPE ...>` carries nothing a renderer needs.
 pub let remove_doctype : Plugin = {
   name: "removeDoctype",
   description: "remove the doctype declaration",
@@ -6,6 +7,7 @@ pub let remove_doctype : Plugin = {
 }
 
 ///|
+/// `<?xml ...?>` is optional for UTF-8 documents.
 pub let remove_xml_proc_inst : Plugin = {
   name: "removeXMLProcInst",
   description: "remove the <?xml ...?> declaration",
@@ -28,6 +30,7 @@ pub let remove_comments : Plugin = {
 }
 
 ///|
+/// `<metadata>` holds RDF/Dublin Core data from editors.
 pub let remove_metadata : Plugin = {
   name: "removeMetadata",
   description: "remove <metadata>",
@@ -69,6 +72,8 @@ pub let editor_namespaces : Array[String] = [
 ]
 
 ///|
+/// Drop the namespace declarations, elements and attributes of the editors
+/// listed in `editor_namespaces`.
 pub let remove_editors_ns_data : Plugin = {
   name: "removeEditorsNSData",
   description: "remove editor namespaces, elements and attributes",
@@ -152,6 +157,7 @@ fn collapse_space(v : String) -> String {
 }
 
 ///|
+/// Attributes with an empty value, except `id` and `d`.
 pub let remove_empty_attrs : Plugin = {
   name: "removeEmptyAttrs",
   description: "remove attributes with empty values",
@@ -169,6 +175,7 @@ pub let remove_empty_attrs : Plugin = {
 }
 
 ///|
+/// `<text>`/`<tspan>` without content and `<tref>` without a target.
 pub let remove_empty_text : Plugin = {
   name: "removeEmptyText",
   description: "remove empty <text>, <tspan> and <tref>",
@@ -185,6 +192,8 @@ pub let remove_empty_text : Plugin = {
 }
 
 ///|
+/// Container elements (`<g>`, `<defs>`, ...) with no children, unless they
+/// are referenced or otherwise meaningful (masks, `<switch>` branches, filters).
 pub let remove_empty_containers : Plugin = {
   name: "removeEmptyContainers",
   description: "remove empty container elements",
@@ -282,6 +291,7 @@ pub let cleanup_ids : Plugin = {
 }
 
 ///|
+/// Children of `<defs>` that have no id can never be referenced.
 pub let remove_useless_defs : Plugin = {
   name: "removeUselessDefs",
   description: "remove <defs> children without an id",
@@ -317,6 +327,7 @@ pub let remove_useless_defs : Plugin = {
 }
 
 ///|
+/// `xmlns:prefix` declarations whose prefix appears on no element or attribute.
 pub let remove_unused_ns : Plugin = {
   name: "removeUnusedNS",
   description: "remove unused namespace declarations",

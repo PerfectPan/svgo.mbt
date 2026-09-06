@@ -1,4 +1,6 @@
 ///|
+/// How `Document::to_string` prints: compact or indented, with or without
+/// the XML prolog.
 pub(all) struct SerializeOptions {
   /// indent with newlines and two spaces per level
   pretty : Bool
@@ -7,6 +9,7 @@ pub(all) struct SerializeOptions {
 } derive(Debug)
 
 ///|
+/// Compact output including the prolog.
 pub fn SerializeOptions::default() -> SerializeOptions {
   { pretty: false, prolog: true, }
 }
@@ -70,6 +73,7 @@ pub fn Document::to_string(
 }
 
 ///|
+/// Serialize a single element (and its subtree).
 pub fn Element::to_string(
   self : Element,
   options? : SerializeOptions = SerializeOptions::default(),

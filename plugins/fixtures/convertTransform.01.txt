@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(0, 0)"><rect width="1" height="1"/></g>
+  <g transform="translate(10.00001, 0)  scale(2 2) rotate(0) matrix(1 0 0 1 0 0)"><rect width="1" height="1"/></g>
+  <g transform="rotate(45 0 0) skewX(0) translate(1,2)"><rect width="1" height="1"/></g>
+  <linearGradient gradientTransform="scale(1)"/>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg">
+  <g>
+    <rect width="1" height="1"/>
+  </g>
+  <g transform="translate(10) scale(2)">
+    <rect width="1" height="1"/>
+  </g>
+  <g transform="rotate(45) translate(1 2)">
+    <rect width="1" height="1"/>
+  </g>
+  <linearGradient/>
+</svg>

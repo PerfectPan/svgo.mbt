@@ -1,0 +1,124 @@
+# Architecture
+
+svgo.mbt is a pipeline: **parse → plugins (repeat until stable) → serialize**.
+Every stage is a separate MoonBit package with a small public surface, so
+each can be used, tested and benchmarked on its own.
+
+```
+          ┌────────┐    Document     ┌──────────────────┐   Document   ┌───────────┐
+  String ─┤  @xml  ├────────────────▶│ @plugins (×pass) ├─────────────▶│   @xml    ├─▶ String
+          │ parse  │                 │ 25 × run(doc,ctx)│              │ serialize │
+          └────────┘                 └───────┬──────────┘              └───────────┘
+                                             │ d="..."
+                                       ┌─────▼─────┐
+                                       │   @path   │  parse → optimize → stringify
+                                       └───────────┘
+```
+
+## Packages
+
+### `xml` — a DOM for SVG, not a general XML parser
+
+`Document { children }` holds the prolog nodes and one root `Element`.
+`Element { mut name, attrs : Map[String, String], children : Array[Node] }`.
+`Map` preserves insertion order, so attribute order survives round trips
+until `sortAttrs` decides otherwise.
+
+Design decisions:
+
+- **Whitespace policy is svgo's.** Text between tags is dropped unless the
+  element is text-like (`text`, `tspan`, `style`, `title`, ...), in which
+  case it is kept verbatim. This is what makes compact output safe.
+- **Entities are decoded on input and re-escaped on output**, so plugins see
+  real characters (`&` not `&amp;`) and never need to think about escaping.
+- **Comments, CDATA, doctype and processing instructions are nodes**, so the
+  removal plugins are one-liners and legal comments (`<!--! ... -->`) can be
+  kept.
+- Parsing dispatches on the code unit after `<`, slices tokens as
+  substrings, and never backtracks: 68 KB parses in about 0.25 ms.
+
+### `path` — the numeric core
+
+`Segment { cmd : Char, args : Array[Double] }` is the canonical form; implicit
+command repetition is expanded on parse and re-folded on print.
+
+`optimize` walks the segments keeping two current points: the **exact** one
+from the input, and the **rounded** one the consumer of the output will be
+at. Relative coordinates are computed against the rounded point, so rounding
+error never accumulates along a long path (the classic drift bug when
+converting to relative coordinates). For every segment it measures the
+absolute and the relative spelling and emits the shorter one; `M` prefers
+absolute on ties because it usually starts a subpath far from the current
+point.
+
+`number.mbt` is why the optimizer is fast:
+
+- `scan_number` folds up to 15 significant digits into an `Int64` and applies
+  a single exact power-of-ten division. No substring, no general float parser.
+- `decompose` turns a double into sign / integer part / fraction digits once;
+  `write_number_shaped` prints from that and returns a packed "shape" (length,
+  starts with `-`, starts with `.`, has `.`) so the separator rules and the
+  abs-vs-rel length comparison never build strings.
+
+### `plugins` — svgo's preset-default as values
+
+```moonbit
+pub(all) struct Plugin { name : String; description : String; run : (Document, Context) -> Bool }
+```
+
+A plugin is data, not a class: the preset is an array literal, the CLI and
+the wasm export list it, and tests run any subset in any order. `run`
+returns whether it changed the tree; the driver repeats the whole pipeline
+while any plugin reports a change (at most 10 passes). Multipass is on by
+default because plugins unlock each other: `collapseGroups` exposes
+attributes that `removeUnknownsAndDefaults` can then drop, `convertShapeToPath`
+produces paths that `mergePaths` can join.
+
+`Context` carries the precision and one run-level cache: path data that
+`convertPathData` already left unchanged. The optimizer is idempotent on such
+data, so later passes skip it; this is what keeps a 3-pass run on a
+path-heavy file close to the cost of a single pass.
+
+Safety rules that recur across plugins:
+
+- anything with an `id` that is referenced (`url(#id)`, `href="#id"`,
+  `begin="id.click"`, `<style>` text) is never removed or restyled;
+- inherited presentation attributes equal to their default are only dropped
+  when no ancestor overrides them;
+- `mergePaths` requires identical attributes and non-overlapping bounding
+  boxes, so fill rules cannot interact.
+
+### `svgo` (root) — the API
+
+`optimize(svg, config?) -> Result raise` wires the three packages together.
+`Config` is a plain struct (plugin names in order, precision, multipass,
+pretty); `Result` has the output plus byte sizes, pass count and the plugins
+that did something. `utf8_length` counts bytes without encoding.
+
+### Delivery forms
+
+| form | package | notes |
+| --- | --- | --- |
+| wasm-gc module + JS loader | `wasm/`, `npm/` | JS String Builtins: MoonBit `String` *is* a JS string, so the boundary is two string arguments and one JSON string back. 160 KB. |
+| native CLI | `cmd/main/` | C file I/O via two `extern "C"` functions; `--json` for tooling. |
+| MoonBit library | root | `moon add perfectpan/svgo`. |
+
+## Verification layers
+
+1. **Unit and snapshot tests** in each package (`moon test`, 3 backends).
+2. **Fixtures** (`plugins/fixtures/*.txt`, svgo's `@@@` format) generated into
+   a test file; one plugin at a time.
+3. **Corpus regression** (`scripts/regress.sh`): byte-identical output across
+   refactors.
+4. **Render diff** (`harness/render-diff.mjs`): resvg rasterizes before and
+   after, pixelmatch counts differences.
+5. **Benchmarks** (`moon bench`, `scripts/bench.sh`): per-file and
+   per-plugin timings; `harness/wasm-speed.mjs` for the same-process
+   comparison with svgo-js.
+
+## What is deliberately not here
+
+- A CSS parser. `inlineStyles`/`minifyStyles` need one; until then style
+  attributes are only colour-normalised and `<style>` text is kept verbatim.
+- Matrix folding in `convertTransform` and `applyTransforms` on path data.
+  Both are correctness-sensitive; they come with render-diff coverage or not at all.

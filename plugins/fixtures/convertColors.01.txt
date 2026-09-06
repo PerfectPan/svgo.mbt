@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <rect fill="#FF0000" stroke="rgb(0, 0, 255)" width="1" height="1"/>
+  <rect fill="BLACK" stroke="rgb(100%, 100%, 100%)" width="1" height="1"/>
+  <rect fill="#abcdef" stroke="darkgray" style="fill:#00FF00;stroke:none" width="1" height="1"/>
+  <rect fill="none" stroke="currentColor" width="1" height="1"/>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg">
+  <rect fill="red" stroke="#00f" width="1" height="1"/>
+  <rect fill="#000" stroke="#fff" width="1" height="1"/>
+  <rect fill="#abcdef" stroke="#a9a9a9" style="fill:#0f0;stroke:none" width="1" height="1"/>
+  <rect fill="none" stroke="currentColor" width="1" height="1"/>
+</svg>

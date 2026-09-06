@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <linearGradient id="g"/>
+    <linearGradient id="unused"/>
+    <clipPath id="c"><rect id="inner" width="1" height="1"/></clipPath>
+    <filter id="f"/>
+  </defs>
+  <style>.a { fill: url(#g2) }</style>
+  <rect id="r1" fill="url(#g)" width="1" height="1"/>
+  <rect id="r2" clip-path="url(#c)" style="filter:url(#f)" width="1" height="1"/>
+  <use xlink:href="#r1"/>
+  <linearGradient id="g2"/>
+  <animate begin="r2.click" attributeName="x"/>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <linearGradient id="g"/>
+    <linearGradient/>
+    <clipPath id="c">
+      <rect width="1" height="1"/>
+    </clipPath>
+    <filter id="f"/>
+  </defs>
+  <style>.a { fill: url(#g2) }</style>
+  <rect id="r1" fill="url(#g)" width="1" height="1"/>
+  <rect id="r2" clip-path="url(#c)" style="filter:url(#f)" width="1" height="1"/>
+  <use xlink:href="#r1"/>
+  <linearGradient id="g2"/>
+  <animate begin="r2.click" attributeName="x"/>
+</svg>

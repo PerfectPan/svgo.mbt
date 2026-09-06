@@ -1,0 +1,9 @@
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <rect stroke-width="2" fill="red" id="r" y="1" x="1" height="1" width="1" stroke="blue" data-z="1" class="c" opacity=".5"/>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <rect id="r" width="1" height="1" x="1" y="1" fill="red" stroke="blue" stroke-width="2" class="c" data-z="1" opacity=".5"/>
+</svg>

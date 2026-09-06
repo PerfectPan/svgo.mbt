@@ -1,4 +1,7 @@
 ///|
+/// What to run and how to print: the plugin list in execution order,
+/// numeric precision, multipass and pretty printing. Start from
+/// `Config::default()` and override fields with record update syntax.
 pub(all) struct Config {
   /// names of plugins to run, in order; defaults to the preset
   plugins : Array[String]
@@ -11,6 +14,7 @@ pub(all) struct Config {
 } derive(Debug)
 
 ///|
+/// svgo's preset-default plugins, 3 decimal places, multipass on, compact output.
 pub fn Config::default() -> Config {
   {
     plugins: @plugins.preset_default.map(p => p.name),
@@ -21,6 +25,8 @@ pub fn Config::default() -> Config {
 }
 
 ///|
+/// Outcome of `optimize`: the optimized document plus size statistics and
+/// the list of plugins that changed something.
 pub(all) struct Result {
   data : String
   /// UTF-8 byte sizes before and after
@@ -32,6 +38,7 @@ pub(all) struct Result {
 } derive(Debug)
 
 ///|
+/// Bytes saved as a percentage of the original size (0 for an empty input).
 pub fn Result::saved_percent(self : Result) -> Double {
   if self.original_size == 0 {
     0.0
@@ -43,6 +50,7 @@ pub fn Result::saved_percent(self : Result) -> Double {
 }
 
 ///|
+/// Raised by `optimize` when `Config::plugins` names a plugin that does not exist.
 pub suberror UnknownPlugin {
   UnknownPlugin(String)
 } derive(Debug)

@@ -12,7 +12,9 @@ const USAGE =
   #|  --no-multipass          run the plugin pipeline once
   #|  --disable <plugin>      skip a plugin (repeatable)
   #|  --enable <plugin>       add an optional plugin such as removeDimensions (repeatable)
+  #|  --plugins <a,b,c>       run exactly these plugins, in this order
   #|  --stats                 print size statistics
+  #|  --json                  print a JSON object {data, originalSize, size, passes, applied}
   #|  --bench <n>             optimize the input n times in-process and report timing
 
 ///|
@@ -44,9 +46,11 @@ fn main {
   let mut pretty = false
   let mut multipass = true
   let mut stats = false
+  let mut json = false
   let mut bench = 0
   let disabled : Array[String] = []
   let enabled : Array[String] = []
+  let mut explicit : Array[String]? = None
   let mut i = 0
   while i < args.length() {
     match args[i] {
@@ -63,6 +67,7 @@ fn main {
       "--pretty" => pretty = true
       "--no-multipass" => multipass = false
       "--stats" => stats = true
+      "--json" => json = true
       "--bench" => {
         bench = @string.parse_int(args.get(i + 1).unwrap_or("0")) catch {
           _ => 0
@@ -75,6 +80,18 @@ fn main {
       }
       "--enable" => {
         enabled.push(args.get(i + 1).unwrap_or(""))
+        i += 1
+      }
+      "--plugins" => {
+        explicit = Some(
+          args
+          .get(i + 1)
+          .unwrap_or("")
+          .split(",")
+          .map(p => p.trim().to_owned())
+          .filter(p => !p.is_empty())
+          .to_array(),
+        )
         i += 1
       }
       a =>
@@ -96,10 +113,16 @@ fn main {
     return
   }
   let source = @utf8.decode_lossy(bytes[:])
-  let plugins = @svgo.Config::default().plugins.filter(p => {
-    !disabled.contains(p)
-  })
-  plugins.append(enabled[:])
+  let plugins = match explicit {
+    Some(list) => list
+    None => {
+      let list = @svgo.Config::default().plugins.filter(p => {
+        !disabled.contains(p)
+      })
+      list.append(enabled[:])
+      list
+    }
+  }
   if bench > 0 {
     let config : @svgo.Config = { plugins, precision, multipass, pretty, }
     // warm up once, then time the loop (@env.now is milliseconds)
@@ -130,16 +153,21 @@ fn main {
         println("svgo: cannot write \{out}")
         return
       }
-      if stats {
+      if json {
+        println(to_json(result, data=false))
+      } else if stats {
         report(path, result)
       }
     }
-    None => {
-      println(result.data)
-      if stats {
-        report(path, result)
+    None =>
+      if json {
+        println(to_json(result, data=true))
+      } else {
+        println(result.data)
+        if stats {
+          report(path, result)
+        }
       }
-    }
   }
 }
 
@@ -149,4 +177,19 @@ fn report(path : String, r : @svgo.Result) -> Unit {
   println(
     "\{path}: \{r.original_size} -> \{r.size} bytes (-\{pct}%), \{r.passes} pass(es), plugins: \{r.applied.join(", ")}",
   )
+}
+
+///|
+/// Machine readable result, the same shape the wasm build returns.
+fn to_json(r : @svgo.Result, data~ : Bool) -> String {
+  let obj : Map[String, Json] = {
+    "originalSize": r.original_size.to_json(),
+    "size": r.size.to_json(),
+    "passes": r.passes.to_json(),
+    "applied": r.applied.map(s => s.to_json()).to_json(),
+  }
+  if data {
+    obj["data"] = r.data.to_json()
+  }
+  Json::object(obj).stringify()
 }

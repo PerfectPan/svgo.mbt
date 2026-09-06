@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" xmlns:xlink="http://www.w3.org/1999/xlink" inkscape:version="1.2" sketch:type="MSPage">
+  <sodipodi:namedview xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" id="base"/>
+  <inkscape:grid type="xygrid"/>
+  <rect width="1" height="1" inkscape:label="r" sketch:type="MSShapeGroup"/>
+  <use xlink:href="#x"/>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <rect width="1" height="1"/>
+  <use xlink:href="#x"/>
+</svg>

@@ -3,6 +3,7 @@ import {
   "moonbitlang/core/env",
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/string",
+  "moonbitlang/core/json",
 }
 
 pkgtype(kind: "executable")

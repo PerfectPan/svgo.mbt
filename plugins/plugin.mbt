@@ -9,6 +9,7 @@ pub struct Context {
 } derive(Debug)
 
 ///|
+/// A fresh context; create one per `optimize` run.
 pub fn Context::new(precision? : Int = 3) -> Context {
   { precision, optimized_paths: Set([]), }
 }
@@ -122,6 +123,8 @@ pub fn referenced_ids(doc : @xml.Document) -> Set[String] {
         if v.has_prefix("#") {
           ids.add(v[1:].to_owned())
         }
+      } else if k == "begin" || k == "end" {
+        collect_timing_refs(v, ids)
       } else if reference_attrs.contains(k) && v.contains_code_unit(35) {
         // 35 is '#'
         collect_url_refs(v, ids)
@@ -158,5 +161,27 @@ fn collect_url_refs(v : String, ids : Set[String]) -> Unit {
       ids.add(v[start:end].to_owned())
     }
     i = end
+  }
+}
+
+///|
+/// SMIL timing values reference elements as `id.event` or `id.begin+2s`
+/// (several values are separated by `;`).
+fn collect_timing_refs(v : String, ids : Set[String]) -> Unit {
+  for part in v.split(";") {
+    let t = part.trim()
+    guard t.find(".") is Some(dot) && dot > 0 else { continue }
+    let id = t[:dot]
+    let mut ok = true
+    for c in id {
+      if !is_id_char(c) {
+        ok = false
+        break
+      }
+    }
+    // "0.5s" is a clock value, not a reference
+    if ok && !id.get_char(0).unwrap().is_ascii_digit() {
+      ids.add(id.to_owned())
+    }
   }
 }

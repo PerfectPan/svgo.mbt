@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <g><g><rect width="1" height="1"/></g></g>
+  <g fill="red" transform="translate(1)"><rect width="1" height="1" transform="scale(2)"/></g>
+  <g fill="red"><rect fill="blue" width="1" height="1"/></g>
+  <g id="keep"><rect width="1" height="1"/></g>
+  <g clip-path="url(#c)"><rect width="1" height="1"/></g>
+  <g fill="red"><rect width="1" height="1"/><rect width="1" height="1"/></g>
+  <switch><g><rect width="1" height="1"/></g></switch>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg">
+  <rect width="1" height="1"/>
+  <rect width="1" height="1" transform="translate(1) scale(2)" fill="red"/>
+  <rect fill="blue" width="1" height="1"/>
+  <g id="keep">
+    <rect width="1" height="1"/>
+  </g>
+  <g clip-path="url(#c)">
+    <rect width="1" height="1"/>
+  </g>
+  <g fill="red">
+    <rect width="1" height="1"/>
+    <rect width="1" height="1"/>
+  </g>
+  <switch>
+    <g>
+      <rect width="1" height="1"/>
+    </g>
+  </switch>
+</svg>

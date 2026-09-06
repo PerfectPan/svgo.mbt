@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <rect width="1" height="1" stroke="none" stroke-width="3" stroke-linecap="round"/>
+  <rect width="1" height="1" stroke-width="3" stroke-dasharray="1 2"/>
+  <rect width="1" height="1" fill="none" fill-opacity=".5" fill-rule="evenodd"/>
+  <g stroke="red"><rect width="1" height="1" stroke="none" stroke-width="3"/></g>
+  <rect id="used" width="1" height="1" stroke="none" stroke-width="3"/>
+  <use href="#used"/>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg">
+  <rect width="1" height="1"/>
+  <rect width="1" height="1"/>
+  <rect width="1" height="1" fill="none"/>
+  <g stroke="red">
+    <rect width="1" height="1" stroke="none"/>
+  </g>
+  <rect id="used" width="1" height="1" stroke="none" stroke-width="3"/>
+  <use href="#used"/>
+</svg>

@@ -7,6 +7,7 @@ pub(all) struct Segment {
 } derive(Debug, Eq)
 
 ///|
+/// Malformed path data: a number or command was expected at the given offset.
 pub suberror PathError {
   PathError(String)
 } derive(Debug)

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <rect x="1.23456" y="9.87654" width="10" height="10"/>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg">
+  <rect x="1.2" y="9.9" width="10" height="10"/>
+</svg>
+
+@@@
+
+{"precision": 1}

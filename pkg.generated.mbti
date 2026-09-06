@@ -10,6 +10,8 @@ pub fn list_plugins() -> Array[(String, String, Bool)]
 
 pub fn optimize(String, config? : Config) -> Result raise
 
+pub fn utf8_length(String) -> Int
+
 // Errors
 pub suberror UnknownPlugin {
   UnknownPlugin(String)

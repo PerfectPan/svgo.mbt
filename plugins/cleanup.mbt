@@ -77,15 +77,14 @@ pub let remove_editors_ns_data : Plugin = {
     let mut changed = false
     // find prefixes bound to editor namespaces and drop the declarations
     doc.each_element((e, _) => {
-      let drop : Array[String] = []
-      for k, v in e.attrs {
-        if k.has_prefix("xmlns:") && editor_namespaces.contains(v) {
-          prefixes.push(k[6:].to_owned())
-          drop.push(k)
-        }
-      }
-      for k in drop {
-        e.attrs.remove(k)
+      if remove_attrs(e, (k, v) => {
+          if k.has_prefix("xmlns:") && editor_namespaces.contains(v) {
+            prefixes.push(k[6:].to_owned())
+            true
+          } else {
+            false
+          }
+        }) {
         changed = true
       }
     })
@@ -102,14 +101,7 @@ pub let remove_editors_ns_data : Plugin = {
       changed = true
     }
     doc.each_element((e, _) => {
-      let drop : Array[String] = []
-      for k, _ in e.attrs {
-        if is_editor(k) {
-          drop.push(k)
-        }
-      }
-      for k in drop {
-        e.attrs.remove(k)
+      if remove_attrs(e, (k, _) => is_editor(k)) {
         changed = true
       }
     })
@@ -172,16 +164,10 @@ pub let remove_empty_attrs : Plugin = {
   run: (doc, _) => {
     let mut changed = false
     doc.each_element((e, _) => {
-      for kv in e.attrs.to_array() {
-        let (k, v) = kv
-        if v.is_empty() &&
-          !(k == "class" || k == "id" || k == "style" || k == "d") {
-          e.attrs.remove(k)
-          changed = true
-        } else if v.is_empty() && (k == "class" || k == "style") {
-          e.attrs.remove(k)
-          changed = true
-        }
+      // an empty id may still be a target and an empty d is handled by
+      // removeHiddenElems; everything else empty is noise
+      if remove_attrs(e, (k, v) => v.is_empty() && k != "id" && k != "d") {
+        changed = true
       }
     })
     changed
@@ -353,15 +339,9 @@ pub let remove_unused_ns : Plugin = {
         }
       }
     })
-    let mut changed = false
-    for kv in root.attrs.to_array() {
-      let (k, _) = kv
-      if k.has_prefix("xmlns:") && !used.contains(k[6:].to_owned()) {
-        root.attrs.remove(k)
-        changed = true
-      }
-    }
-    changed
+    remove_attrs(root, (k, _) => {
+      k.has_prefix("xmlns:") && !used.contains(k[6:].to_owned())
+    })
   },
 }
 
@@ -371,49 +351,70 @@ pub let sort_attrs : Plugin = {
   name: "sortAttrs",
   description: "sort attributes",
   run: (doc, _) => {
-    let order = [
-      "id", "width", "height", "x", "x1", "x2", "y", "y1", "y2", "cx", "cy", "r",
-      "fill", "stroke", "marker", "d", "points",
-    ]
-    let rank = fn(k : String) -> (Int, String) {
-      if k.has_prefix("xmlns") {
-        return (0, k)
-      }
-      for i, o in order {
-        if k == o || k.has_prefix(o + "-") {
-          return (1 + i, k)
-        }
-      }
-      (100, k)
-    }
     let mut changed = false
     doc.each_element((e, _) => {
+      guard e.attrs.length() > 1 else { return }
       let items = e.attrs.to_array()
-      let sorted = items.copy()
-      sorted.sort_by((a, b) => {
-        let (ra, ka) = rank(a.0)
-        let (rb, kb) = rank(b.0)
-        if ra != rb {
-          ra - rb
+      // (rank, key, value); rank computed once per attribute, not per comparison
+      let keyed = items.map(kv => (attr_rank(kv.0), kv.0, kv.1))
+      keyed.sort_by((a, b) => {
+        if a.0 != b.0 {
+          a.0 - b.0
         } else {
           // String::compare orders by length first; we want dictionary order
-          ka.lexical_compare(kb)
+          a.1.lexical_compare(b.1)
         }
       })
       let mut same = true
       for i, it in items {
-        if it.0 != sorted[i].0 {
+        if it.0 != keyed[i].1 {
           same = false
+          break
         }
       }
       if !same {
         e.attrs.clear()
-        for it in sorted {
-          e.attrs[it.0] = it.1
+        for it in keyed {
+          e.attrs[it.1] = it.2
         }
         changed = true
       }
     })
     changed
   },
+}
+
+///|
+/// Sort order of well known attributes; `xmlns*` first, then this list (an
+/// attribute like `stroke-width` sorts with `stroke`), then the rest.
+let attr_order : Map[String, Int] = {
+  "id": 1,
+  "width": 2,
+  "height": 3,
+  "x": 4,
+  "x1": 5,
+  "x2": 6,
+  "y": 7,
+  "y1": 8,
+  "y2": 9,
+  "cx": 10,
+  "cy": 11,
+  "r": 12,
+  "fill": 13,
+  "stroke": 14,
+  "marker": 15,
+  "d": 16,
+  "points": 17,
+}
+
+///|
+fn attr_rank(k : String) -> Int {
+  if k.has_prefix("xmlns") {
+    return 0
+  }
+  let base = match k.find("-") {
+    Some(i) => k[:i].to_owned()
+    None => k
+  }
+  attr_order.get(base).unwrap_or(100)
 }

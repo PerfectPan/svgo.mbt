@@ -16,7 +16,7 @@ pub let cleanup_numeric_values : Plugin
 
 pub let collapse_groups : Plugin
 
-pub let container_elements : Array[String]
+pub let container_elements : @set.Set[String]
 
 pub let convert_colors : Plugin
 
@@ -32,17 +32,11 @@ pub let editor_namespaces : Array[String]
 
 pub fn find_plugin(String) -> Plugin?
 
-pub fn is_number(String) -> Bool
-
 pub let merge_paths : Plugin
 
 pub let optional_plugins : Array[Plugin]
 
-pub fn physical_eq(@xml.Element, @xml.Element) -> Bool
-
 pub let preset_default : Array[Plugin]
-
-pub let reference_attrs : Array[String]
 
 pub fn referenced_ids(@xml.Document) -> @set.Set[String]
 
@@ -87,9 +81,11 @@ pub fn split_unit(String) -> (Double, String)?
 // Errors
 
 // Types and methods
-pub(all) struct Context {
+pub struct Context {
   precision : Int
+  optimized_paths : @set.Set[String]
 } derive(@debug.Debug)
+pub fn Context::new(precision? : Int) -> Self
 
 pub(all) struct Plugin {
   name : String

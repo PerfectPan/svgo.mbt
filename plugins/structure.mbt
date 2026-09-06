@@ -139,13 +139,13 @@ pub let remove_unknowns_and_defaults : Plugin = {
           _ => ()
         }
       }
-      let next = chain.copy()
-      next.push(e)
+      chain.push(e)
       for c in e.children {
         if c is Element(child) {
-          walk(child, next)
+          walk(child, chain)
         }
       }
+      ignore(chain.pop())
     }
     if doc.root() is Some(root) {
       walk(root, [])
@@ -210,13 +210,13 @@ pub let remove_useless_stroke_and_fill : Plugin = {
           }
         }
       }
-      let next = chain.copy()
-      next.push(e)
+      chain.push(e)
       for c in e.children {
         if c is Element(child) {
-          walk(child, next)
+          walk(child, chain)
         }
       }
+      ignore(chain.pop())
     }
     if doc.root() is Some(root) {
       walk(root, [])
@@ -275,7 +275,9 @@ pub let collapse_groups : Plugin = {
       }
       if g.attrs.length() == 0 {
         // splice children into the parent
-        let idx = p.children.search_by(c => c is Element(x) && physical_eq(x, g))
+        let idx = p.children.search_by(c => {
+          c is Element(x) && physical_equal(x, g)
+        })
         match idx {
           Some(i) => {
             ignore(p.children.remove(i))
@@ -448,6 +450,11 @@ pub let convert_path_data : Plugin = {
         let has_markers = e.attrs.contains("marker-start") ||
           e.attrs.contains("marker-mid") ||
           e.attrs.contains("marker-end")
+        // data the optimizer already left unchanged in an earlier pass is a
+        // fixpoint; skip it
+        if !has_markers && ctx.optimized_paths.contains(d) {
+          return
+        }
         let opts = if has_markers {
           { ..options, remove_useless: false, }
         } else {
@@ -462,6 +469,8 @@ pub let convert_path_data : Plugin = {
           if out != d {
             e.attrs["d"] = out
             changed = true
+          } else if !has_markers {
+            ctx.optimized_paths.add(d)
           }
         } catch {
           _ => ()

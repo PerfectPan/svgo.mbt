@@ -1,5 +1,4 @@
 import {
   "perfectpan/svgo/xml",
   "perfectpan/svgo/plugins",
-  "moonbitlang/core/encoding/utf8",
 }

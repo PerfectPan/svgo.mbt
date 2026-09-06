@@ -68,7 +68,7 @@ pub fn optimize(
       None => raise UnknownPlugin(name)
     }
   }
-  let ctx : @plugins.Context = { precision: config.precision, }
+  let ctx = @plugins.Context::new(precision=config.precision)
   let applied : Set[String] = Set([])
   let mut passes = 0
   for ;; {
@@ -87,8 +87,8 @@ pub fn optimize(
   let data = doc.to_string(options={ pretty: config.pretty, prolog: true, })
   {
     data,
-    original_size: @utf8.encode(svg).length(),
-    size: @utf8.encode(data).length(),
+    original_size: utf8_length(svg),
+    size: utf8_length(data),
     passes,
     applied: applied.iter().to_array(),
   }
@@ -105,4 +105,25 @@ pub fn list_plugins() -> Array[(String, String, Bool)] {
     out.push((p.name, p.description, false))
   }
   out
+}
+
+///|
+/// Number of bytes of the UTF-8 encoding of `s`, without encoding it.
+pub fn utf8_length(s : String) -> Int {
+  let mut n = 0
+  for c in s.code_units() {
+    let u = c.to_int()
+    n += if u < 0x80 {
+      1
+    } else if u < 0x800 {
+      2
+    } else if u >= 0xD800 && u <= 0xDBFF {
+      4 // high surrogate: the pair encodes to four bytes, low one adds nothing
+    } else if u >= 0xDC00 && u <= 0xDFFF {
+      0
+    } else {
+      3
+    }
+  }
+  n
 }

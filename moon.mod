@@ -21,6 +21,6 @@ license = "MIT"
 
 keywords = [ "svg", "svgo", "optimizer", "minifier", "wasm", "frontend" ]
 
-preferred_target = "wasm"
+preferred_target = "wasm-gc"
 
 description = "SVG optimizer in pure MoonBit: svgo-compatible plugin pipeline with path data optimization, colour and number cleanup, and render-diff verification"

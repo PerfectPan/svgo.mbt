@@ -10,4 +10,8 @@ pkgtype(kind: "executable")
 options(
   supported_targets: "native",
   "native-stub": [ "io.c" ],
+  targets: {
+    "io_native.mbt": [ "native" ],
+    "io_stub.mbt": [ "wasm", "wasm-gc", "js" ],
+  },
 )

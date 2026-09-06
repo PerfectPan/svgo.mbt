@@ -12,19 +12,27 @@ pub fn optimize_json(svg : String, config_json : String) -> String {
     } else {
       @json.parse(config_json)
     }
-    let plugins = match j.value("plugins") {
-      Some(Array(items)) => items.filter_map(v => v.as_string())
+    let field = fn(key : String) -> Json? {
+      if j is Object(obj) {
+        obj.get(key)
+      } else {
+        None
+      }
+    }
+    let plugins = match field("plugins") {
+      Some(Array(items)) =>
+        items.filter_map(v => if v is String(s) { Some(s) } else { None })
       _ => base.plugins
     }
-    let precision = match j.value("precision") {
+    let precision = match field("precision") {
       Some(Number(n, ..)) => n.to_int()
       _ => base.precision
     }
-    let multipass = match j.value("multipass") {
+    let multipass = match field("multipass") {
       Some(False) => false
       _ => true
     }
-    let pretty = match j.value("pretty") {
+    let pretty = match field("pretty") {
       Some(True) => true
       _ => false
     }

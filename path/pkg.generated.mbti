@@ -1,0 +1,44 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "perfectpan/svgo/path"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn format_number(Double, Int) -> String
+
+pub fn optimize(Array[Segment], options? : Options) -> Array[Segment]
+
+pub fn optimize_string(String, options? : Options) -> String raise PathError
+
+pub fn parse(String) -> Array[Segment] raise PathError
+
+pub fn round_to(Double, Int) -> Double
+
+pub fn stringify(Array[Segment], precision? : Int) -> String
+
+// Errors
+pub suberror PathError {
+  PathError(String)
+} derive(@debug.Debug)
+pub impl Show for PathError
+
+// Types and methods
+pub(all) struct Options {
+  precision : Int
+  utilize_absolute : Bool
+  remove_useless : Bool
+  straight_curves : Bool
+  smooth_shorthands : Bool
+} derive(@debug.Debug)
+pub fn Options::default() -> Self
+
+pub(all) struct Segment {
+  cmd : Char
+  args : Array[Double]
+} derive(Eq, @debug.Debug)
+
+// Type aliases
+
+// Traits

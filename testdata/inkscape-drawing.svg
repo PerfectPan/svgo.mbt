@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   sodipodi:docname="drawing.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false" />
+  <defs
+     id="defs2">
+    <linearGradient id="unusedGradient"><stop offset="0" stop-color="#000000"/></linearGradient>
+    <linearGradient id="usedGradient"><stop offset="0" stop-color="rgb(255, 0, 0)"/><stop offset="1" stop-color="#0000FF"/></linearGradient>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <circle
+       style="fill:#FF0000;stroke:#000000;stroke-width:0.264583"
+       id="path111"
+       cx="52.916668"
+       cy="76.729164"
+       r="26.458334" />
+    <ellipse id="e1" cx="120.5" cy="80.123456" rx="10.000" ry="10.000" fill="url(#usedGradient)"/>
+    <path
+       style="fill:none;stroke:#0000ff;stroke-width:1.5"
+       d="m 20.123456,150.654321 c 10.5,-20.25 30.75,-20.25 41.25,0 c 10.5,20.25 30.75,20.25 41.25,0"
+       id="path222"
+       sodipodi:nodetypes="csc" />
+    <g id="g1"><g id="g2"><path d="M 10 200 L 60 200 L 60 250 L 10 250 L 10 200 Z" fill="#00FF00" stroke="none" stroke-width="3"/></g></g>
+    <polygon points="100,200 150,200 150,250 100,250" fill="black" opacity="1"/>
+    <rect x="160" y="200" width="0" height="50" fill="#123456"/>
+    <text id="t1" x="20" y="280" style="font-size:12px;fill:#000000">Hello   world</text>
+    <text></text>
+  </g>
+</svg>

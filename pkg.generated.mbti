@@ -1,0 +1,39 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "perfectpan/svgo"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn list_plugins() -> Array[(String, String, Bool)]
+
+pub fn optimize(String, config? : Config) -> Result raise
+
+// Errors
+pub suberror UnknownPlugin {
+  UnknownPlugin(String)
+} derive(@debug.Debug)
+pub impl Show for UnknownPlugin
+
+// Types and methods
+pub(all) struct Config {
+  plugins : Array[String]
+  precision : Int
+  multipass : Bool
+  pretty : Bool
+} derive(@debug.Debug)
+pub fn Config::default() -> Self
+
+pub(all) struct Result {
+  data : String
+  original_size : Int
+  size : Int
+  passes : Int
+  applied : Array[String]
+} derive(@debug.Debug)
+pub fn Result::saved_percent(Self) -> Double
+
+// Type aliases
+
+// Traits

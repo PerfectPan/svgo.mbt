@@ -1,31 +1,31 @@
-// Build the static site into _build/site:
+// Build the static site into _build/app:
 //   - copies the landing page, playground and styles
 //   - copies the wasm build and its loader (packages/svgo-mbt)
 //   - renders api.html from `moon doc` output (_build/doc/**/package_data.json)
 //   - fills the before/after gallery on the landing page from svgo/testdata/
-// Usage: scripts/build-wasm.sh && moon -C svgo doc && node site/build.mjs   (pnpm install once)
+// Usage: scripts/build-wasm.sh && moon -C svgo doc && node app/build.mjs   (pnpm install once)
 import { readFileSync, writeFileSync, mkdirSync, copyFileSync, readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { optimize, init } from "svgo-mbt";
 
 const ROOT = new URL("..", import.meta.url).pathname;
-const OUT = join(ROOT, "_build/site");
+const OUT = join(ROOT, "_build/app");
 const REPO = "https://github.com/PerfectPan/svgo.mbt/blob/main/svgo";
 mkdirSync(OUT, { recursive: true });
 
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 // ---------- static files ----------
-// Tailwind v4: site/src/style.css -> _build/site/style.css (needs `cd site && npm install` once)
-const tw = spawnSync(join(ROOT, "site/node_modules/.bin/tailwindcss"), ["-i", join(ROOT, "site/src/style.css"), "-o", join(OUT, "style.css"), "--minify"], { stdio: "inherit" });
+// Tailwind v4: app/src/style.css -> _build/app/style.css (needs `cd site && npm install` once)
+const tw = spawnSync(join(ROOT, "app/node_modules/.bin/tailwindcss"), ["-i", join(ROOT, "app/src/style.css"), "-o", join(OUT, "style.css"), "--minify"], { stdio: "inherit" });
 if (tw.status !== 0) {
   console.error("site: tailwind build failed (run `pnpm install` at the repo root)");
   process.exit(1);
 }
 for (const f of ["app.js", "playground.html", "playground.js", "favicon.svg", "data.json", "hero.mp4", "hero-poster.jpg"]) {
-  if (existsSync(join(ROOT, "site", f))) copyFileSync(join(ROOT, "site", f), join(OUT, f));
-  else console.warn(`site: ${f} missing (hero animation: pnpm -C site motion:render)`);
+  if (existsSync(join(ROOT, "app", f))) copyFileSync(join(ROOT, "app", f), join(OUT, f));
+  else console.warn(`site: ${f} missing (hero animation: pnpm -C app motion:render)`);
 }
 copyFileSync(join(ROOT, "packages/svgo-mbt/index.mjs"), join(OUT, "svgo.mjs"));
 copyFileSync(join(ROOT, "packages/svgo-mbt/svgo.wasm"), join(OUT, "svgo.wasm"));
@@ -41,7 +41,7 @@ for (const f of readdirSync(join(ROOT, "svgo/testdata")).filter((f) => f.endsWit
   shots.push(`<div class="shot"><div class="pair"><div>${src}</div><div>${r.data}</div></div>
     <div class="meta"><code>${esc(f)}</code><span>${r.originalSize} → <b>${r.size} B</b> · <span class="pill">−${pct}%</span></span></div></div>`);
 }
-let index = readFileSync(join(ROOT, "site/index.html"), "utf8").replace("<!--GALLERY-->", shots.join("\n"));
+let index = readFileSync(join(ROOT, "app/index.html"), "utf8").replace("<!--GALLERY-->", shots.join("\n"));
 writeFileSync(join(OUT, "index.html"), index);
 
 // ---------- API reference from moon doc ----------
@@ -106,11 +106,11 @@ for (const { dir, rel } of packages) {
   main += `<h2 id="${id}" class="display">perfectpan/svgo${rel ? "/" + rel : ""}</h2>${pkgdoc}` + items.map(([k, m]) => member(rel, k, m)).join("");
 }
 
-const nav = readFileSync(join(ROOT, "site/playground.html"), "utf8").match(/<nav class="nav">[\s\S]*?<\/nav>/)[0]
+const nav = readFileSync(join(ROOT, "app/playground.html"), "utf8").match(/<nav class="nav">[\s\S]*?<\/nav>/)[0]
   .replace('font-medium text-muted">playground</small>', 'font-medium text-muted">API</small>')
   .replace(/(<a class="nav-link" href="playground.html") aria-current="page">/, "$1>")
   .replace(/(<a class="nav-link" href="api.html")>/, '$1 aria-current="page">');
-const head = readFileSync(join(ROOT, "site/playground.html"), "utf8").match(/<head>[\s\S]*?<\/head>/)[0]
+const head = readFileSync(join(ROOT, "app/playground.html"), "utf8").match(/<head>[\s\S]*?<\/head>/)[0]
   .replace(/<title>.*<\/title>/, "<title>svgo.mbt API reference</title>")
   .replace(/<meta name="description"[^>]*>/, '<meta name="description" content="Public API of perfectpan/svgo: optimize, Config, Result, the xml, path and plugins packages.">');
 writeFileSync(join(OUT, "api.html"), `<!doctype html>

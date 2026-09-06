@@ -14,7 +14,7 @@ pnpm install                                                      # svgo-js, res
 scripts/verify.sh --full                                          # + wasm, sizes, pixel diffs
 
 The MoonBit module lives in `svgo/`; `packages/` holds the npm package and the
-comparison suite; `site/` the website. `moon` commands run from the root.
+comparison suite; `app/` the website. `moon` commands run from the root.
 ```
 
 The repository ships a pre-commit hook that runs `moon check`:

@@ -8,27 +8,7 @@ importers:
 
   .: {}
 
-  packages/compare:
-    dependencies:
-      '@resvg/resvg-js':
-        specifier: ^2.6.2
-        version: 2.6.2
-      pixelmatch:
-        specifier: ^6.0.0
-        version: 6.0.0
-      pngjs:
-        specifier: ^7.0.0
-        version: 7.0.0
-      svgo:
-        specifier: ^4.1.0
-        version: 4.1.0
-      svgo-mbt:
-        specifier: workspace:*
-        version: link:../svgo-mbt
-
-  packages/svgo-mbt: {}
-
-  site:
+  app:
     dependencies:
       svgo-mbt:
         specifier: workspace:*
@@ -61,6 +41,26 @@ importers:
       typescript:
         specifier: ^5.6.0
         version: 5.9.3
+
+  packages/compare:
+    dependencies:
+      '@resvg/resvg-js':
+        specifier: ^2.6.2
+        version: 2.6.2
+      pixelmatch:
+        specifier: ^6.0.0
+        version: 6.0.0
+      pngjs:
+        specifier: ^7.0.0
+        version: 7.0.0
+      svgo:
+        specifier: ^4.1.0
+        version: 4.1.0
+      svgo-mbt:
+        specifier: workspace:*
+        version: link:../svgo-mbt
+
+  packages/svgo-mbt: {}
 
 packages:
 
@@ -2746,7 +2746,7 @@ snapshots:
 
   '@svgr/hast-util-to-babel-ast@8.0.0':
     dependencies:
-      '@babel/types': 7.24.0
+      '@babel/types': 7.29.8
       entities: 4.5.0
 
   '@svgr/plugin-jsx@8.1.0(@svgr/core@8.1.0(typescript@5.9.3))':

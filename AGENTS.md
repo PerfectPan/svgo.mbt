@@ -27,10 +27,11 @@ root installs every JS package.
 | native CLI | `moon run --target native svgo/cmd/main -- file.svg --stats` (`--json`, `--plugins a,b`) |
 | wasm artifact for `packages/svgo-mbt` and the site | `scripts/build-wasm.sh` |
 | compare with svgo-js (sizes, render diff, speed) | `pnpm compare` (or the scripts in `packages/compare/`) |
-| refresh the numbers on the site | `node packages/compare/collect.mjs` → `site/data.json` |
+| refresh the numbers on the site | `node packages/compare/collect.mjs` → `app/data.json` |
 | API docs data (also what mooncakes.io renders) | `moon -C svgo doc` → `_build/doc/` |
-| build the site into `_build/site` | `pnpm site` (= `moon -C svgo doc && node site/build.mjs`) |
-| re-render the hero animation | `pnpm -C site motion:render` |
+| build the site into `_build/app` | `pnpm site` (= `moon -C svgo doc && node app/build.mjs`) |
+| dev server with rebuild on change | `pnpm dev` → http://localhost:4173 |
+| re-render the hero animation | `pnpm -C app motion:render` |
 | publish the MoonBit module | `cd svgo && moon publish` |
 
 ## Layout
@@ -54,9 +55,9 @@ svgo/                         the MoonBit module perfectpan/svgo
   testdata/                   editor exports used by tests, the render diff and the site gallery
 packages/svgo-mbt/            npm package: JS loader + svgo.wasm (built by scripts/build-wasm.sh)
 packages/compare/             svgo-js comparison: sizes, resvg pixel diff, same-process speed, collect.mjs
-site/                         landing page + playground + API reference (Tailwind v4, built by build.mjs)
+app/                          landing page + playground + API reference (Tailwind v4, built by build.mjs)
   src/style.css               Tailwind entry: @theme tokens + component layer used by the JS-rendered markup
-  motion/                     Remotion composition for the hero video (pnpm -C site motion:render)
+  motion/                     Remotion composition for the hero video (pnpm -C app motion:render)
 scripts/                      build-wasm, verify, bench, regress, gen-fixtures
 docs/ARCHITECTURE.md          design notes
 ```

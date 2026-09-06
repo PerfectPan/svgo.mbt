@@ -1,12 +1,13 @@
 {
-  "name": "@svgo-mbt/site",
+  "name": "@svgo-mbt/app",
   "private": true,
   "type": "module",
   "description": "Landing page, playground and API reference (Tailwind CSS v4) plus the Remotion hero animation",
   "scripts": {
+    "dev": "node dev.mjs",
     "build": "node build.mjs",
-    "css": "tailwindcss -i src/style.css -o ../_build/site/style.css --minify",
-    "css:watch": "tailwindcss -i src/style.css -o ../_build/site/style.css --watch",
+    "css": "tailwindcss -i src/style.css -o ../_build/app/style.css --minify",
+    "css:watch": "tailwindcss -i src/style.css -o ../_build/app/style.css --watch",
     "motion:studio": "remotion studio motion/src/index.ts",
     "motion:render": "remotion render motion/src/index.ts Hero hero.mp4 --codec h264 --crf 22 && remotion still motion/src/index.ts Hero hero-poster.jpg --frame 150 --image-format jpeg --jpeg-quality 85"
   },

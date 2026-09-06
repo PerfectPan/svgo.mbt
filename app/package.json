@@ -2,14 +2,14 @@
   "name": "@svgo-mbt/app",
   "private": true,
   "type": "module",
-  "description": "Landing page, playground and API reference (Tailwind CSS v4) plus the Remotion hero animation",
+  "description": "svgo.mbt website: MoonBit (Rabbita) app with Tailwind CSS v4 and a Remotion hero animation",
   "scripts": {
     "dev": "node dev.mjs",
     "build": "node build.mjs",
-    "css": "tailwindcss -i src/style.css -o ../_build/app/style.css --minify",
-    "css:watch": "tailwindcss -i src/style.css -o ../_build/app/style.css --watch",
+    "gen": "node gen.mjs",
+    "css": "tailwindcss -i src/style.css -o public/style.css --minify",
     "motion:studio": "remotion studio motion/src/index.ts",
-    "motion:render": "remotion render motion/src/index.ts Hero hero.mp4 --codec h264 --crf 22 && remotion still motion/src/index.ts Hero hero-poster.jpg --frame 150 --image-format jpeg --jpeg-quality 85"
+    "motion:render": "remotion render motion/src/index.ts Hero public/hero.mp4 --codec h264 --crf 22 && remotion still motion/src/index.ts Hero public/hero-poster.jpg --frame 150 --image-format jpeg --jpeg-quality 85"
   },
   "dependencies": {
     "svgo-mbt": "workspace:*"
@@ -23,6 +23,7 @@
     "react-dom": "^19.0.0",
     "remotion": "^4.0.0",
     "tailwindcss": "^4.1.0",
+    "terser": "^5.51.2",
     "typescript": "^5.6.0"
   }
 }

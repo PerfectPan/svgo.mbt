@@ -1,0 +1,116 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "perfectpan/svgo-app/ui"
+
+import {
+  "moonbit-community/rabbita",
+  "moonbit-community/rabbita/html",
+}
+
+// Values
+pub const MOONCAKES_URL : String = "https://mooncakes.io/docs/perfectpan/svgo"
+
+pub const NPM_URL : String = "https://www.npmjs.com/package/svgo-mbt"
+
+pub const REPO_URL : String = "https://github.com/PerfectPan/svgo.mbt"
+
+pub let api_packages : Array[ApiPackage]
+
+pub fn api_page() -> @rabbita.Val[@html.Html]
+
+pub fn app() -> @rabbita.Val[@html.Html]
+
+pub let bench_rows : Array[BenchRow]
+
+pub fn fmt_int(Int) -> String
+
+pub fn fmt_kb(Int) -> String
+
+pub fn fmt_ms(Double) -> String
+
+pub fn fmt_pct(Double, digits? : Int) -> String
+
+pub let generated_on : String
+
+pub fn landing_page() -> @rabbita.Val[@html.Html]
+
+pub fn logo(size? : String) -> @html.Html
+
+pub fn page_footer() -> @html.Html
+
+pub fn playground_page() -> @rabbita.Val[@html.Html]
+
+pub fn run_optimize(String, plugins? : Array[String], precision? : Int, multipass? : Bool, pretty? : Bool) -> Outcome
+
+pub let samples : Array[Sample]
+
+pub fn stats_bar(Outcome, String) -> @html.Html
+
+pub fn svg_preview(String, class? : String) -> @html.Html
+
+pub let svgo_js_version : String
+
+pub fn top_nav(Route, String) -> @html.Html
+
+pub let wasm_bytes : Int
+
+// Errors
+
+// Types and methods
+pub(all) struct ApiItem {
+  kind : String
+  name : String
+  signature : String
+  doc : String
+  file : String
+  methods : Array[ApiMethod]
+  impls : Array[String]
+} derive(Eq)
+
+pub(all) struct ApiMethod {
+  name : String
+  signature : String
+  doc : String
+} derive(Eq)
+
+pub(all) struct ApiPackage {
+  path : String
+  short : String
+  items : Array[ApiItem]
+} derive(Eq)
+
+pub(all) struct BenchRow {
+  file : String
+  original : Int
+  mbt : Int
+  js : Int
+  mbt_ms : Double
+  js_ms : Double
+} derive(Eq)
+
+pub(all) struct Outcome {
+  data : String
+  original_size : Int
+  size : Int
+  passes : Int
+  applied : Array[String]
+  ms : Double
+  error : String
+} derive(Eq)
+pub fn Outcome::empty() -> Self
+pub fn Outcome::saved_percent(Self) -> Double
+
+pub(all) enum Route {
+  Landing
+  Playground
+  Api
+} derive(Eq)
+
+pub(all) struct Sample {
+  name : String
+  file : String
+  svg : String
+} derive(Eq)
+
+// Type aliases
+
+// Traits

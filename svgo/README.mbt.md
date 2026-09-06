@@ -190,7 +190,7 @@ A MoonBit workspace (`moon.work`) and a pnpm workspace side by side:
 svgo/                 the MoonBit module: xml/ path/ plugins/ (+ fixtures) svgo.mbt cmd/main wasm/ benchmark/ testdata/
 packages/svgo-mbt/    npm package: JS loader + svgo.wasm
 packages/compare/     svgo-js comparison, resvg render diff, same-process speed, site numbers
-app/                  website and playground (Tailwind v4) + Remotion hero animation
+app/                  the website: a MoonBit (Rabbita) app that imports svgo/, Tailwind v4, Remotion hero
 scripts/              build-wasm, verify, bench, regress, gen-fixtures
 ```
 

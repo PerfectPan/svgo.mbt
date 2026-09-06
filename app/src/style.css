@@ -1,6 +1,9 @@
 /* svgo.mbt site — Tailwind CSS v4 entry. Build: npm run css (or node build.mjs). */
 @import "tailwindcss";
 
+/* class names live in the MoonBit views */
+@source "../ui";
+
 /* Design tokens. Utilities reference these as CSS variables, so overriding
    them in the dark-scheme block below switches the whole page. */
 @theme {

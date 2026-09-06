@@ -1,0 +1,111 @@
+///|
+/// A row of the benchmark table (see data.mbt, generated).
+pub(all) struct BenchRow {
+  file : String
+  original : Int
+  mbt : Int
+  js : Int
+  mbt_ms : Double
+  js_ms : Double
+} derive(Eq)
+
+///|
+/// An editor export bundled with the site (see samples.mbt, generated).
+pub(all) struct Sample {
+  name : String
+  file : String
+  svg : String
+} derive(Eq)
+
+///|
+pub(all) struct ApiMethod {
+  name : String
+  signature : String
+  doc : String
+} derive(Eq)
+
+///|
+pub(all) struct ApiItem {
+  kind : String
+  name : String
+  signature : String
+  doc : String
+  file : String
+  methods : Array[ApiMethod]
+  impls : Array[String]
+} derive(Eq)
+
+///|
+pub(all) struct ApiPackage {
+  path : String
+  short : String
+  items : Array[ApiItem]
+} derive(Eq)
+
+///|
+/// What one optimize() call produced, in a form the views can compare.
+pub(all) struct Outcome {
+  data : String
+  original_size : Int
+  size : Int
+  passes : Int
+  applied : Array[String]
+  ms : Double
+  error : String
+} derive(Eq)
+
+///|
+pub fn Outcome::empty() -> Outcome {
+  {
+    data: "",
+    original_size: 0,
+    size: 0,
+    passes: 0,
+    applied: [],
+    ms: 0.0,
+    error: "",
+  }
+}
+
+///|
+pub fn Outcome::saved_percent(self : Outcome) -> Double {
+  if self.original_size == 0 {
+    0.0
+  } else {
+    (self.original_size - self.size).to_double() *
+    100.0 /
+    self.original_size.to_double()
+  }
+}
+
+///|
+/// Run the optimizer in the browser and time it.
+pub fn run_optimize(
+  svg : String,
+  plugins? : Array[String],
+  precision? : Int = 3,
+  multipass? : Bool = true,
+  pretty? : Bool = false,
+) -> Outcome {
+  let base = @svgo.Config::default()
+  let config : @svgo.Config = {
+    plugins: plugins.unwrap_or(base.plugins),
+    precision,
+    multipass,
+    pretty,
+  }
+  let t0 = perf_now()
+  let r = @svgo.optimize(svg, config~) catch {
+    e => return { ..Outcome::empty(), error: e.to_string(), }
+  }
+  let ms = perf_now() - t0
+  {
+    data: r.data,
+    original_size: r.original_size,
+    size: r.size,
+    passes: r.passes,
+    applied: r.applied,
+    ms,
+    error: "",
+  }
+}

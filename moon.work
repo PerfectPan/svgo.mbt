@@ -1,3 +1,4 @@
 members = [
   "./svgo",
+  "./app",
 ]

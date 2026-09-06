@@ -1,0 +1,19 @@
+import {
+  "moonbit-community/rabbita",
+  "moonbit-community/rabbita/html",
+  "moonbit-community/rabbita/sub",
+  "moonbit-community/rabbita/nav",
+  "moonbit-community/rabbita/url",
+  "moonbit-community/rabbita/js",
+  "perfectpan/svgo",
+  "moonbitlang/core/math",
+  "moonbitlang/core/string",
+}
+
+// the previews render SVG text the user typed, on purpose
+
+warnings = "-alert_xss_vulnerable"
+
+supported_targets = "js"
+
+formatter(ignore: [ "data.mbt", "samples.mbt", "api_data.mbt" ])

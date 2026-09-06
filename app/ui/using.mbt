@@ -1,0 +1,47 @@
+///|
+/// `using` is package wide in MoonBit, so every HTML helper the views need
+/// is imported once here.
+using @html {
+  a,
+  aside,
+  b,
+  br,
+  button,
+  code,
+  div,
+  footer,
+  h1,
+  h2,
+  h3,
+  h4,
+  header,
+  i,
+  img,
+  input,
+  label,
+  main_,
+  nav,
+  node,
+  nothing,
+  option,
+  p,
+  pre,
+  section,
+  select,
+  small,
+  span,
+  table,
+  tbody,
+  td,
+  text,
+  textarea,
+  th,
+  thead,
+  tr,
+  video,
+  type Html,
+  type Attrs,
+}
+
+///|
+using @rabbita {type Val, type Emit, none}

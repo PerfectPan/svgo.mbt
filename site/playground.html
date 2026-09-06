@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>svgo.mbt playground</title>
+<meta name="description" content="Optimize SVGs in your browser with svgo.mbt (MoonBit, WebAssembly). Toggle plugins, set precision, compare before and after.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="./">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="#5b45ff"/><path d="M7 15.5c1 1.2 2.4 1.8 4 1.8 2.3 0 3.8-1.1 3.8-2.9 0-3.6-7.2-1.6-7.2-5.6C7.6 7.2 9 6 11.2 6c1.5 0 2.8.5 3.7 1.4" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round"/></svg>
+      svgo.mbt <small>playground</small>
+    </a>
+    <div class="nav-links">
+      <a href="./">Home</a>
+      <a href="playground.html" aria-current="page">Playground</a>
+      <a href="api.html">API</a>
+      <a class="gh" href="https://github.com/PerfectPan/svgo.mbt">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<div class="pg">
+  <aside class="pg-side">
+    <h4>Options</h4>
+    <label class="opt">precision <input type="number" id="precision" value="3" min="0" max="8"></label>
+    <label class="opt">multipass <input type="checkbox" id="multipass" checked></label>
+    <label class="opt">pretty print <input type="checkbox" id="pretty"></label>
+    <h4>Plugins <button class="chip" id="reset" style="float:right;margin-top:-4px">reset</button></h4>
+    <div id="plugins" class="muted" style="font-size:12px">loading wasm…</div>
+  </aside>
+
+  <main class="pg-main">
+    <div class="pg-bar">
+      <select id="sample" aria-label="sample">
+        <option value="">Samples…</option>
+      </select>
+      <label class="btn small-btn" for="file">Open .svg<input id="file" type="file" accept=".svg,image/svg+xml" hidden></label>
+      <span class="spacer"></span>
+      <button class="btn small-btn" id="copy">Copy output</button>
+      <button class="btn small-btn" id="download">Download</button>
+      <button class="btn small-btn" id="share" title="URL with the current input and options">Share link</button>
+    </div>
+    <div class="pg-editors">
+      <div class="pane">
+        <div style="position:relative;min-height:0"><span class="pane-label">input</span><textarea id="in" spellcheck="false" placeholder="Paste SVG, drop a file, or pick a sample" aria-label="SVG input"></textarea></div>
+        <div class="preview" id="pin"></div>
+      </div>
+      <div class="pane">
+        <div style="position:relative;min-height:0"><span class="pane-label">output</span><textarea id="out" readonly aria-label="optimized SVG"></textarea></div>
+        <div class="preview" id="pout"></div>
+      </div>
+    </div>
+    <div class="pg-stats">
+      <div class="stats">
+        <span class="stat"><b id="s-before">—</b><span>B in</span></span>
+        <span class="stat"><b id="s-after">—</b><span>B out</span></span>
+        <span class="saved" id="s-saved">—</span>
+        <span class="sizebar"><i id="s-bar" style="width:100%"></i></span>
+        <span class="stat"><b id="s-ms">—</b><span>ms</span></span>
+        <span class="stat muted" id="s-applied" style="font-size:12.5px"></span>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script type="module" src="playground.js"></script>
+</body>
+</html>

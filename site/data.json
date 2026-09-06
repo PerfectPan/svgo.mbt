@@ -1,0 +1,235 @@
+{
+  "generated": "2026-09-06",
+  "node": "v24.18.0",
+  "svgoVersion": "4.1.0",
+  "wasmBytes": 165702,
+  "plugins": [
+    {
+      "name": "removeDoctype",
+      "description": "remove the doctype declaration",
+      "enabled": true
+    },
+    {
+      "name": "removeXMLProcInst",
+      "description": "remove the <?xml ...?> declaration",
+      "enabled": true
+    },
+    {
+      "name": "removeComments",
+      "description": "remove comments",
+      "enabled": true
+    },
+    {
+      "name": "removeMetadata",
+      "description": "remove <metadata>",
+      "enabled": true
+    },
+    {
+      "name": "removeEditorsNSData",
+      "description": "remove editor namespaces, elements and attributes",
+      "enabled": true
+    },
+    {
+      "name": "cleanupAttrs",
+      "description": "clean up whitespace in attribute values",
+      "enabled": true
+    },
+    {
+      "name": "removeDesc",
+      "description": "remove editor generated <desc>",
+      "enabled": true
+    },
+    {
+      "name": "cleanupIds",
+      "description": "remove unused ids",
+      "enabled": true
+    },
+    {
+      "name": "removeUselessDefs",
+      "description": "remove <defs> children without an id",
+      "enabled": true
+    },
+    {
+      "name": "cleanupNumericValues",
+      "description": "round numeric values and remove px units",
+      "enabled": true
+    },
+    {
+      "name": "convertColors",
+      "description": "convert colors to the shortest form",
+      "enabled": true
+    },
+    {
+      "name": "removeUnknownsAndDefaults",
+      "description": "remove default attribute values",
+      "enabled": true
+    },
+    {
+      "name": "removeUselessStrokeAndFill",
+      "description": "remove useless stroke and fill attributes",
+      "enabled": true
+    },
+    {
+      "name": "removeHiddenElems",
+      "description": "remove elements that are not rendered",
+      "enabled": true
+    },
+    {
+      "name": "removeEmptyText",
+      "description": "remove empty <text>, <tspan> and <tref>",
+      "enabled": true
+    },
+    {
+      "name": "convertShapeToPath",
+      "description": "convert rect, line, polyline and polygon to path",
+      "enabled": true
+    },
+    {
+      "name": "convertEllipseToCircle",
+      "description": "convert ellipses with equal radii to circles",
+      "enabled": true
+    },
+    {
+      "name": "collapseGroups",
+      "description": "collapse useless groups",
+      "enabled": true
+    },
+    {
+      "name": "convertPathData",
+      "description": "optimize path data",
+      "enabled": true
+    },
+    {
+      "name": "convertTransform",
+      "description": "simplify transform lists",
+      "enabled": true
+    },
+    {
+      "name": "mergePaths",
+      "description": "merge adjacent non-overlapping paths with the same attributes",
+      "enabled": true
+    },
+    {
+      "name": "removeEmptyAttrs",
+      "description": "remove attributes with empty values",
+      "enabled": true
+    },
+    {
+      "name": "removeEmptyContainers",
+      "description": "remove empty container elements",
+      "enabled": true
+    },
+    {
+      "name": "removeUnusedNS",
+      "description": "remove unused namespace declarations",
+      "enabled": true
+    },
+    {
+      "name": "sortAttrs",
+      "description": "sort attributes",
+      "enabled": true
+    },
+    {
+      "name": "removeDimensions",
+      "description": "remove width/height from the root when viewBox is present",
+      "enabled": false
+    },
+    {
+      "name": "removeTitle",
+      "description": "remove <title>",
+      "enabled": false
+    }
+  ],
+  "rows": [
+    {
+      "file": "figma-export.svg",
+      "original": 570,
+      "mbt": 458,
+      "js": 442,
+      "mbtMs": 0.132,
+      "jsMs": 0.29,
+      "passes": 2
+    },
+    {
+      "file": "illustrator-logo.svg",
+      "original": 1149,
+      "mbt": 635,
+      "js": 528,
+      "mbtMs": 0.105,
+      "jsMs": 0.581,
+      "passes": 2
+    },
+    {
+      "file": "inkscape-drawing.svg",
+      "original": 2078,
+      "mbt": 663,
+      "js": 640,
+      "mbtMs": 0.116,
+      "jsMs": 0.661,
+      "passes": 2
+    },
+    {
+      "file": "sketch-icon.svg",
+      "original": 836,
+      "mbt": 276,
+      "js": 288,
+      "mbtMs": 0.066,
+      "jsMs": 0.295,
+      "passes": 3
+    },
+    {
+      "file": "Ghostscript_Tiger.svg",
+      "original": 68630,
+      "mbt": 53712,
+      "js": 68101,
+      "mbtMs": 7.751,
+      "jsMs": 38.08,
+      "passes": 3
+    },
+    {
+      "file": "Python_logo_and_wordmark.svg",
+      "original": 5419,
+      "mbt": 4664,
+      "js": 4551,
+      "mbtMs": 0.537,
+      "jsMs": 2.829,
+      "passes": 3
+    },
+    {
+      "file": "React-icon.svg",
+      "original": 366,
+      "mbt": 302,
+      "js": 302,
+      "mbtMs": 0.041,
+      "jsMs": 0.171,
+      "passes": 2
+    },
+    {
+      "file": "SVG_logo.svg",
+      "original": 4019,
+      "mbt": 3799,
+      "js": 3584,
+      "mbtMs": 0.265,
+      "jsMs": 1.719,
+      "passes": 2
+    },
+    {
+      "file": "Tux.svg",
+      "original": 49983,
+      "mbt": 41279,
+      "js": 35983,
+      "mbtMs": 3.531,
+      "jsMs": 14.54,
+      "passes": 2
+    },
+    {
+      "file": "World_map_-_low_resolution.svg",
+      "original": 84823,
+      "mbt": 49499,
+      "js": 46706,
+      "mbtMs": 9.085,
+      "jsMs": 53.032,
+      "passes": 3
+    }
+  ]
+}

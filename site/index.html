@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>svgo.mbt — SVG optimizer in MoonBit, shipped as WebAssembly</title>
+<meta name="description" content="An svgo-compatible SVG optimizer written in MoonBit. 165 KB of wasm-gc, no Node runtime, 4 to 6 times faster than svgo, verified with pixel diffs.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="./">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="#5b45ff"/><path d="M7 15.5c1 1.2 2.4 1.8 4 1.8 2.3 0 3.8-1.1 3.8-2.9 0-3.6-7.2-1.6-7.2-5.6C7.6 7.2 9 6 11.2 6c1.5 0 2.8.5 3.7 1.4" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round"/></svg>
+      svgo.mbt <small>0.1</small>
+    </a>
+    <div class="nav-links">
+      <a href="#numbers">Numbers</a>
+      <a href="#plugins">Plugins</a>
+      <a href="#use">Use it</a>
+      <a href="playground.html">Playground</a>
+      <a href="api.html">API</a>
+      <a class="gh" href="https://github.com/PerfectPan/svgo.mbt"><svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow"><span class="dot"></span> MoonBit · WebAssembly · <span data-wasm-kb>165</span> KB</div>
+    <h1 class="display">Smaller SVGs, <em>no Node required.</em></h1>
+    <p class="lede">
+      svgo.mbt is an SVG optimizer written in MoonBit and compiled to a single
+      wasm-gc module. Same plugin pipeline as svgo's preset-default, a fraction of
+      the runtime: it runs in the browser, in Node 22+, or as a 1 MB native binary,
+      and every optimisation is checked with pixel diffs before it ships.
+    </p>
+    <div class="cta">
+      <a class="btn primary" href="playground.html">Open the playground</a>
+      <span class="install"><code>npm i svgo-mbt</code><button data-copy="npm i svgo-mbt" title="copy"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="8" height="8" rx="1.5"/><path d="M3 11V3.5A.5.5 0 0 1 3.5 3H11"/></svg></button></span>
+      <span class="install"><code>moon add perfectpan/svgo</code><button data-copy="moon add perfectpan/svgo" title="copy"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="8" height="8" rx="1.5"/><path d="M3 11V3.5A.5.5 0 0 1 3.5 3H11"/></svg></button></span>
+    </div>
+
+    <div class="demo" id="demo">
+      <div class="demo-head">
+        <div class="tabs" role="tablist" id="samples"></div>
+        <span class="muted" style="font-size:13px">running in your browser · edit the left side</span>
+      </div>
+      <div class="demo-grid">
+        <div class="pane">
+          <span class="pane-label">input</span>
+          <textarea id="in" spellcheck="false" aria-label="SVG input"></textarea>
+          <div class="preview" id="pin"></div>
+        </div>
+        <div class="pane">
+          <span class="pane-label">svgo.mbt output</span>
+          <textarea id="out" readonly aria-label="optimized SVG"></textarea>
+          <div class="preview" id="pout"></div>
+        </div>
+      </div>
+      <div class="stats" id="stats">
+        <span class="stat"><b id="s-before">—</b><span>B in</span></span>
+        <span class="stat"><b id="s-after">—</b><span>B out</span></span>
+        <span class="saved" id="s-saved">—</span>
+        <span class="sizebar"><i id="s-bar" style="width:100%"></i></span>
+        <span class="stat"><b id="s-ms">—</b><span>ms</span></span>
+        <span class="stat muted" id="s-passes" style="font-size:13px"></span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="numbers">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 class="display">Same pipeline, one fifth of the time.</h2>
+      <p>
+        Measured in one Node process against svgo <span data-svgo-version>4.1</span>,
+        both with multipass, on real editor exports and the classic large test files.
+        The MoonBit side pays for JSON serialisation of the result; the JS side is warm.
+        Numbers regenerate from <code>harness/collect.mjs</code>.
+      </p>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><b data-kpi-speed>5×</b><span>median speedup over svgo-js, same process</span></div>
+      <div class="kpi"><b data-wasm-kb>165</b><span>KB of wasm-gc, no dependencies, streams and instantiates in milliseconds</span></div>
+      <div class="kpi"><b>0 px</b><span>rendering differences on every editor export in the corpus (resvg + pixelmatch)</span></div>
+    </div>
+    <div class="bench">
+      <div class="card">
+        <h3>Time per optimisation</h3>
+        <div class="sub">milliseconds, lower is better · log scale</div>
+        <div class="rows" id="bench-rows"></div>
+        <div class="legend"><span class="a"><i></i>svgo.mbt (wasm-gc)</span><span class="b"><i></i>svgo-js</span></div>
+      </div>
+      <div class="card">
+        <h3>Output size</h3>
+        <div class="sub">bytes after optimisation</div>
+        <table class="sizes" id="size-rows"></table>
+        <p class="muted" style="font-size:12.5px;margin-top:14px">
+          Where svgo-js wins it is through <code>inlineStyles</code>/<code>minifyStyles</code>, which need a CSS parser and are on the roadmap.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="plugins">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 class="display">Every optimisation is a value.</h2>
+      <p>
+        A plugin is <code>{ name, description, run }</code>. The preset is an array
+        literal in svgo's order, the CLI and the playground list it, and each one
+        reports whether it changed the tree so multipass knows when to stop.
+        <span data-plugin-count>25</span> plugins ship today.
+      </p>
+    </div>
+    <div class="plugins" id="plugin-grid"></div>
+  </div>
+</section>
+
+<section id="use">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 class="display">Three ways in, one codebase.</h2>
+      <p>The wasm build is the primary artifact. The same source also produces a native CLI and a MoonBit library you can embed in your own tooling.</p>
+    </div>
+    <div class="uses">
+      <div class="use">
+        <h3>JavaScript · npm</h3>
+        <div class="sub">Node 22+, Chrome 130+, Firefox 134+, Safari 18.4+ (JS String Builtins).</div>
+<pre><span class="k">import</span> { optimize } <span class="k">from</span> "svgo-mbt";
+
+<span class="k">const</span> r = <span class="k">await</span> optimize(svg, { precision: 3 });
+r.data          <span class="c">// optimized SVG</span>
+r.originalSize  <span class="c">// 836</span>
+r.size          <span class="c">// 276</span>
+r.applied       <span class="c">// ["convertPathData", ...]</span></pre>
+      </div>
+      <div class="use">
+        <h3>Command line · native</h3>
+        <div class="sub">A single binary; cold start is about 40× faster than the svgo CLI.</div>
+<pre>svgo icon.svg --stats
+svgo icon.svg -o out.svg -p 2 --pretty
+svgo icon.svg --json <span class="c">| jq .size</span>
+svgo icon.svg --plugins convertPathData,sortAttrs
+svgo --list</pre>
+      </div>
+      <div class="use">
+        <h3>MoonBit · library</h3>
+        <div class="sub">Plain structs, no globals; parse, plugins and path packages are usable on their own.</div>
+<pre><span class="k">let</span> r = @svgo.optimize(svg, config={
+  ..@svgo.Config::default(),
+  precision: 2,
+})
+r.saved_percent()  <span class="c">// 67.0</span>
+
+<span class="c">// or just the path optimizer</span>
+@path.optimize_string("M 0,0 L 10,10")  <span class="c">// "M0 0l10 10"</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="verified">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 class="display">Verified, not just smaller.</h2>
+      <p>
+        Every fixture is rasterised before and after with resvg and compared pixel by
+        pixel. Plugin behaviour is locked in svgo-style fixture files, performance
+        changes must reproduce the corpus byte for byte, and <code>moon test</code>
+        runs on wasm-gc, JS and native. Left: editor export. Right: svgo.mbt output.
+      </p>
+    </div>
+    <div class="gallery" id="gallery"><!--GALLERY--></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>svgo.mbt · MIT · plugin semantics follow <a href="https://github.com/svg/svgo">svgo</a> (MIT) · built with <a href="https://www.moonbitlang.com">MoonBit</a></div>
+    <div class="links">
+      <a href="https://github.com/PerfectPan/svgo.mbt">GitHub</a>
+      <a href="https://mooncakes.io/docs/perfectpan/svgo">mooncakes.io</a>
+      <a href="https://www.npmjs.com/package/svgo-mbt">npm</a>
+      <a href="api.html">API reference</a>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

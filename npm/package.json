@@ -1,0 +1,12 @@
+{
+  "name": "svgo-mbt",
+  "version": "0.1.0",
+  "description": "SVG optimizer written in MoonBit, shipped as WebAssembly (wasm-gc)",
+  "type": "module",
+  "main": "index.mjs",
+  "exports": { ".": "./index.mjs" },
+  "files": ["index.mjs", "svgo.wasm", "README.md"],
+  "engines": { "node": ">=22" },
+  "license": "MIT",
+  "keywords": ["svg", "svgo", "optimizer", "minifier", "wasm", "moonbit"]
+}

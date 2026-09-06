@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh">
+<meta charset="utf-8">
+<title>svgo.mbt playground</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 14px/1.5 -apple-system, system-ui, sans-serif; margin: 0; padding: 24px; max-width: 1200px; margin-inline: auto; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .sub { color: #777; margin-bottom: 16px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  textarea { width: 100%; height: 260px; font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; box-sizing: border-box; }
+  .preview { height: 220px; border: 1px solid #ccc4; display: flex; align-items: center; justify-content: center; background:
+    repeating-conic-gradient(#8882 0 25%, transparent 0 50%) 0 0 / 16px 16px; }
+  .preview svg { max-width: 100%; max-height: 100%; }
+  .bar { display: flex; gap: 12px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
+  .stat { font-variant-numeric: tabular-nums; }
+  .stat b { font-size: 18px; }
+  label { display: inline-flex; gap: 4px; align-items: center; }
+  input[type=number] { width: 4em; }
+  #plugins { columns: 3; font-size: 12px; margin-top: 8px; }
+  button { padding: 6px 14px; }
+</style>
+<h1>svgo.mbt playground</h1>
+<div class="sub">SVG 优化器，MoonBit 编写，编译为 WebAssembly（wasm-gc）在你的浏览器里运行。</div>
+<div class="bar">
+  <input type="file" id="file" accept=".svg,image/svg+xml">
+  <label>precision <input type="number" id="precision" value="3" min="0" max="8"></label>
+  <label><input type="checkbox" id="multipass" checked> multipass</label>
+  <label><input type="checkbox" id="pretty"> pretty</label>
+  <button id="run">Optimize</button>
+  <span class="stat" id="stat"></span>
+</div>
+<div class="grid">
+  <div><textarea id="in" spellcheck="false"></textarea><div class="preview" id="pin"></div></div>
+  <div><textarea id="out" readonly></textarea><div class="preview" id="pout"></div></div>
+</div>
+<details><summary>plugins</summary><div id="plugins"></div></details>
+<script type="module">
+  import { init, optimize, plugins } from "../npm/index.mjs";
+  const $ = (id) => document.getElementById(id);
+  const wasmUrl = new URL("../npm/svgo.wasm", import.meta.url);
+  $("in").value = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <!-- Generator: Sketch 60.1 (88133) - https://sketch.com -->
+    <title>icon/close</title>
+    <g id="icon/close" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group" transform="translate(2.000000, 2.000000)" fill="#FF0000">
+            <path d="M 4.000000,4.000000 L 16.000000,16.000000 M 16.000000,4.000000 L 4.000000,16.000000" stroke="#FF0000" stroke-width="2.000000"></path>
+            <rect x="0" y="0" width="20" height="20" rx="0"></rect>
+        </g>
+    </g>
+</svg>`;
+  await init(wasmUrl);
+  const enabled = new Set();
+  const list = await plugins();
+  $("plugins").innerHTML = list.map((p) =>
+    `<label title="${p.description}"><input type="checkbox" data-plugin="${p.name}" ${p.enabled ? "checked" : ""}> ${p.name}</label><br>`).join("");
+  const render = (el, svg) => { el.innerHTML = svg; };
+  async function run() {
+    const src = $("in").value;
+    render($("pin"), src);
+    const selected = [...document.querySelectorAll("[data-plugin]")].filter((c) => c.checked).map((c) => c.dataset.plugin);
+    const t0 = performance.now();
+    try {
+      const r = await optimize(src, {
+        plugins: selected,
+        precision: Number($("precision").value),
+        multipass: $("multipass").checked,
+        pretty: $("pretty").checked,
+      });
+      const ms = (performance.now() - t0).toFixed(2);
+      $("out").value = r.data;
+      render($("pout"), r.data);
+      const pct = ((1 - r.size / r.originalSize) * 100).toFixed(1);
+      $("stat").innerHTML = `${r.originalSize} B → <b>${r.size} B</b> (−${pct}%) · ${r.passes} pass · ${ms} ms`;
+    } catch (e) {
+      $("out").value = String(e.message || e);
+      $("stat").textContent = "error";
+    }
+  }
+  $("run").onclick = run;
+  $("in").oninput = run;
+  document.addEventListener("change", (e) => { if (e.target.closest("#plugins, #precision, #multipass, #pretty")) run(); });
+  $("file").onchange = async (e) => { const f = e.target.files[0]; if (f) { $("in").value = await f.text(); run(); } };
+  run();
+</script>
+</html>

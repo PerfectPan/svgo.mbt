@@ -1,0 +1,16 @@
+import {
+  "perfectpan/svgo",
+  "moonbitlang/core/json",
+}
+
+pkgtype(kind: "foreign_library")
+
+options(
+  link: {
+    "wasm-gc": {
+      "use-js-builtin-string": true,
+      "imported-string-constants": "_",
+    },
+    "js": { "format": "esm" },
+  },
+)

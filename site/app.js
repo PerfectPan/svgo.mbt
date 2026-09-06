@@ -99,7 +99,11 @@ async function demo() {
     };
     tabs.append(b);
   });
-  input.value = SAMPLES["Sketch icon"];
+  // ?sample=Inkscape%20drawing preselects a tab
+  const wanted = new URLSearchParams(location.search).get("sample");
+  const initial = wanted && SAMPLES[wanted] ? wanted : "Sketch icon";
+  input.value = SAMPLES[initial];
+  tabs.querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-selected", c.textContent === initial));
 
   let timer;
   async function run() {

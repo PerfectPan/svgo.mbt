@@ -16,8 +16,9 @@ mkdirSync(OUT, { recursive: true });
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 // ---------- static files ----------
-for (const f of ["style.css", "app.js", "playground.html", "playground.js", "favicon.svg", "data.json"]) {
-  copyFileSync(join(ROOT, "site", f), join(OUT, f));
+for (const f of ["style.css", "app.js", "playground.html", "playground.js", "favicon.svg", "data.json", "hero.mp4", "hero-poster.jpg"]) {
+  if (existsSync(join(ROOT, "site", f))) copyFileSync(join(ROOT, "site", f), join(OUT, f));
+  else console.warn(`site: ${f} missing (hero animation: cd site/motion && npm install && npm run render)`);
 }
 copyFileSync(join(ROOT, "npm/index.mjs"), join(OUT, "svgo.mjs"));
 copyFileSync(join(ROOT, "npm/svgo.wasm"), join(OUT, "svgo.wasm"));

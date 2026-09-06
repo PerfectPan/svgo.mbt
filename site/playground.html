@@ -8,7 +8,7 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -51,11 +51,11 @@
     </div>
     <div class="pg-editors">
       <div class="pane">
-        <div style="position:relative;min-height:0"><span class="pane-label">input</span><textarea id="in" spellcheck="false" placeholder="Paste SVG, drop a file, or pick a sample" aria-label="SVG input"></textarea></div>
+        <span class="pane-label">input</span><textarea id="in" spellcheck="false" placeholder="Paste SVG, drop a file, or pick a sample" aria-label="SVG input"></textarea>
         <div class="preview" id="pin"></div>
       </div>
       <div class="pane">
-        <div style="position:relative;min-height:0"><span class="pane-label">output</span><textarea id="out" readonly aria-label="optimized SVG"></textarea></div>
+        <span class="pane-label">output</span><textarea id="out" readonly aria-label="optimized SVG"></textarea>
         <div class="preview" id="pout"></div>
       </div>
     </div>

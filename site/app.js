@@ -3,6 +3,7 @@ import { init, optimize, plugins } from "./svgo.mjs";
 
 const $ = (s, el = document) => el.querySelector(s);
 const fmt = (n) => n.toLocaleString("en-US");
+const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 // ---------- samples for the hero demo ----------
 const SAMPLES = {
@@ -174,7 +175,7 @@ async function numbers() {
 
   // plugin grid comes from the same JSON so it always matches the build
   $("#plugin-grid").innerHTML = data.plugins.map((p) =>
-    `<div class="plugin${p.enabled ? "" : " optional"}"><code>${p.name}</code><p>${p.description}</p></div>`).join("");
+    `<div class="plugin${p.enabled ? "" : " optional"}"><code>${esc(p.name)}</code><p>${esc(p.description)}</p></div>`).join("");
   document.querySelectorAll("[data-plugin-count]").forEach((el) => (el.textContent = data.plugins.filter((p) => p.enabled).length));
 }
 

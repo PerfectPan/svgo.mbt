@@ -3,6 +3,7 @@ import { init, optimize, plugins } from "./svgo.mjs";
 
 const $ = (s) => document.querySelector(s);
 const fmt = (n) => n.toLocaleString("en-US");
+const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const input = $("#in"), out = $("#out");
 
 const SAMPLES = {
@@ -90,7 +91,7 @@ const schedule = () => { clearTimeout(timer); timer = setTimeout(run, 80); };
 function renderPlugins(enabledSet) {
   $("#plugins").innerHTML = list.map((p) => `
     <label class="pl"><input type="checkbox" data-plugin="${p.name}" ${enabledSet.has(p.name) ? "checked" : ""}>
-      <span>${p.name}<small>${p.description}</small></span></label>`).join("");
+      <span>${esc(p.name)}<small>${esc(p.description)}</small></span></label>`).join("");
 }
 
 // ---------- share links: #v1;precision;multipass;pretty;plugins;base64url(input) ----------

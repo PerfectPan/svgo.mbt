@@ -1,0 +1,102 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "perfectpan/svgo/plugins"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/set",
+  "perfectpan/svgo/xml",
+}
+
+// Values
+pub let cleanup_attrs : Plugin
+
+pub let cleanup_ids : Plugin
+
+pub let cleanup_numeric_values : Plugin
+
+pub let collapse_groups : Plugin
+
+pub let container_elements : Array[String]
+
+pub let convert_colors : Plugin
+
+pub let convert_ellipse_to_circle : Plugin
+
+pub let convert_path_data : Plugin
+
+pub let convert_shape_to_path : Plugin
+
+pub let convert_transform : Plugin
+
+pub let editor_namespaces : Array[String]
+
+pub fn find_plugin(String) -> Plugin?
+
+pub fn is_number(String) -> Bool
+
+pub let merge_paths : Plugin
+
+pub let optional_plugins : Array[Plugin]
+
+pub fn physical_eq(@xml.Element, @xml.Element) -> Bool
+
+pub let preset_default : Array[Plugin]
+
+pub let reference_attrs : Array[String]
+
+pub fn referenced_ids(@xml.Document) -> @set.Set[String]
+
+pub let remove_comments : Plugin
+
+pub let remove_desc : Plugin
+
+pub let remove_dimensions : Plugin
+
+pub let remove_doctype : Plugin
+
+pub let remove_editors_ns_data : Plugin
+
+pub let remove_empty_attrs : Plugin
+
+pub let remove_empty_containers : Plugin
+
+pub let remove_empty_text : Plugin
+
+pub let remove_hidden_elems : Plugin
+
+pub let remove_metadata : Plugin
+
+pub let remove_title : Plugin
+
+pub let remove_unknowns_and_defaults : Plugin
+
+pub let remove_unused_ns : Plugin
+
+pub let remove_useless_defs : Plugin
+
+pub let remove_useless_stroke_and_fill : Plugin
+
+pub let remove_xml_proc_inst : Plugin
+
+pub fn shorten_color(String) -> String
+
+pub let sort_attrs : Plugin
+
+pub fn split_unit(String) -> (Double, String)?
+
+// Errors
+
+// Types and methods
+pub(all) struct Context {
+  precision : Int
+} derive(@debug.Debug)
+
+pub(all) struct Plugin {
+  name : String
+  description : String
+  run : (@xml.Document, Context) -> Bool
+}
+
+// Type aliases
+
+// Traits

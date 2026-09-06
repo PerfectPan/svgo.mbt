@@ -1,0 +1,11 @@
+import {
+  "perfectpan/svgo/xml",
+  "perfectpan/svgo/path",
+  "moonbitlang/core/string",
+  "moonbitlang/core/math",
+  "moonbitlang/core/cmp",
+}
+
+import {
+  "perfectpan/svgo/xml",
+} for "test"

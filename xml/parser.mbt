@@ -18,6 +18,7 @@ pub let text_elements : Array[String] = [
 
 ///|
 priv struct Parser {
+  text : String
   src : ArrayView[UInt16]
   mut pos : Int
 }
@@ -53,9 +54,7 @@ fn Parser::starts_with(self : Parser, s : String) -> Bool {
 
 ///|
 fn Parser::slice(self : Parser, start : Int, end : Int) -> String {
-  String::from_iter(
-    self.src[start:end].iter().map(u => u.to_int().unsafe_to_char()),
-  )
+  self.text[start:end].to_string()
 }
 
 ///|
@@ -118,7 +117,7 @@ fn Parser::name(self : Parser) -> String raise ParseError {
 ///|
 /// Parse an SVG/XML document.
 pub fn parse(source : String) -> Document raise ParseError {
-  let p : Parser = { src: source.code_units(), pos: 0, }
+  let p : Parser = { text: source, src: source.code_units(), pos: 0, }
   // skip BOM
   if p.peek() == 0xFEFF {
     p.pos += 1
@@ -143,11 +142,32 @@ fn Parser::parse_children(
   keep_space~ : Bool,
 ) -> Unit raise ParseError {
   while !self.eof() {
-    if self.starts_with("</") {
+    if self.peek() != 60 {
+      // text run up to the next markup
+      let start = self.pos
+      while !self.eof() && self.peek() != 60 {
+        self.pos += 1
+      }
+      let raw = self.slice(start, self.pos)
+      if keep_space {
+        out.push(Text(decode_entities(raw)))
+      } else if !raw.is_blank() {
+        // collapse surrounding whitespace like svgo does
+        out.push(Text(decode_entities(raw.trim().to_owned())))
+      }
+      continue
+    }
+    let next = self.peek(offset=1)
+    if next == 47 {
+      // "</"
       guard parent is Some(_) else {
         raise self.error("unexpected closing tag")
       }
       return
+    }
+    if next != 33 && next != 63 {
+      out.push(Element(self.parse_element()))
+      continue
     }
     if self.starts_with("<!--") {
       self.pos += 4
@@ -175,26 +195,14 @@ fn Parser::parse_children(
       let body = self.slice(start, self.pos).trim().to_owned()
       self.pos += 1
       out.push(Doctype(body))
-    } else if self.starts_with("<?") {
+    } else if next == 63 {
       self.pos += 2
       let target = self.name()
       self.skip_space()
       let data = self.read_until("?>")
       out.push(ProcInst(target, data.trim_end().to_owned()))
-    } else if self.peek() == 60 {
-      out.push(Element(self.parse_element()))
     } else {
-      let start = self.pos
-      while !self.eof() && self.peek() != 60 {
-        self.pos += 1
-      }
-      let raw = self.slice(start, self.pos)
-      if keep_space {
-        out.push(Text(decode_entities(raw)))
-      } else if !raw.is_blank() {
-        // collapse surrounding whitespace like svgo does
-        out.push(Text(decode_entities(raw.trim().to_owned())))
-      }
+      raise self.error("unexpected markup declaration")
     }
   }
   if parent is Some(name) {

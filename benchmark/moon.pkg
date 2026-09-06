@@ -1,0 +1,12 @@
+import {
+  "perfectpan/svgo",
+  "moonbitlang/core/bench",
+}
+
+import {
+  "perfectpan/svgo/xml",
+  "perfectpan/svgo/path",
+  "perfectpan/svgo/plugins",
+} for "test"
+
+formatter(ignore: [ "corpus.mbt" ])

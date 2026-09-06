@@ -1,0 +1,13 @@
+import {
+  "perfectpan/svgo",
+  "moonbitlang/core/env",
+  "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/string",
+}
+
+pkgtype(kind: "executable")
+
+options(
+  supported_targets: "native",
+  "native-stub": [ "io.c" ],
+)

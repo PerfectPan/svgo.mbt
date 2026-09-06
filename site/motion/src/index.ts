@@ -1,3 +1,4 @@
+import "./style.css";
 import { registerRoot } from "remotion";
 import { Root } from "./Root";
 

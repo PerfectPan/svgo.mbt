@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+/* the same tokens as the site (site/src/style.css) so the video matches the page */
+@theme {
+  --color-ink: #0b0d12;
+  --color-ink-2: #3b4150;
+  --color-muted: #6b7280;
+  --color-line: #e9ebf2;
+  --color-accent: #6d5dfc;
+  --color-mint: #16c79a;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}

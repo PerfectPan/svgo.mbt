@@ -1,0 +1,178 @@
+/* svgo.mbt site — Tailwind CSS v4 entry. Build: npm run css (or node build.mjs). */
+@import "tailwindcss";
+
+/* Design tokens. Utilities reference these as CSS variables, so overriding
+   them in the dark-scheme block below switches the whole page. */
+@theme {
+  --color-bg: #ffffff;
+  --color-bg-2: #f6f7fb;
+  --color-surface: #ffffff;
+  --color-surface-2: #f3f4f9;
+  --color-ink: #0b0d12;
+  --color-ink-2: #3b4150;
+  --color-muted: #6b7280;
+  --color-line: #e9ebf2;
+  --color-line-2: #d9dce6;
+  --color-accent: #6d5dfc;
+  --color-accent-soft: #eeecff;
+  --color-mint: #16c79a;
+  --color-mint-soft: #e3f8f1;
+  --color-warn: #d97706;
+  --color-check: #eceef4;
+  --color-bar-b: #dcdfe8;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Space Grotesk", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --radius-card: 18px;
+  --shadow-card: 0 30px 80px -40px rgb(40 30 120 / 0.35), 0 1px 0 rgb(0 0 0 / 0.03);
+  --background-image-grad: linear-gradient(90deg, var(--color-accent), var(--color-mint));
+  --background-image-checker: repeating-conic-gradient(var(--color-check) 0 25%, transparent 0 50%);
+}
+
+@layer base {
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --color-bg: #0f1117;
+      --color-bg-2: #13161d;
+      --color-surface: #161922;
+      --color-surface-2: #1d212c;
+      --color-ink: #f2f3f7;
+      --color-ink-2: #c8ccd8;
+      --color-muted: #8b93a5;
+      --color-line: #262b38;
+      --color-line-2: #333949;
+      --color-accent: #8f82ff;
+      --color-accent-soft: #262353;
+      --color-mint: #2dd4a6;
+      --color-mint-soft: #123a30;
+      --color-warn: #f59e0b;
+      --color-check: #222634;
+      --color-bar-b: #343a4a;
+      --shadow-card: 0 30px 80px -40px rgb(0 0 0 / 0.8);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --color-bg: #0f1117; --color-bg-2: #13161d; --color-surface: #161922; --color-surface-2: #1d212c;
+    --color-ink: #f2f3f7; --color-ink-2: #c8ccd8; --color-muted: #8b93a5; --color-line: #262b38; --color-line-2: #333949;
+    --color-accent: #8f82ff; --color-accent-soft: #262353; --color-mint: #2dd4a6; --color-mint-soft: #123a30;
+    --color-warn: #f59e0b; --color-check: #222634; --color-bar-b: #343a4a;
+    --shadow-card: 0 30px 80px -40px rgb(0 0 0 / 0.8); color-scheme: dark;
+  }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body { @apply bg-bg font-sans text-[15px] leading-relaxed text-ink antialiased; }
+  ::selection { @apply bg-accent-soft; }
+  code, pre, kbd { @apply font-mono text-[0.92em]; }
+  a:hover { @apply text-accent; }
+}
+
+/* Repeated pieces, several of them rendered from JavaScript. */
+@layer components {
+  .wrap { @apply mx-auto w-[min(1140px,calc(100%-48px))]; }
+  .display { @apply font-display font-bold tracking-[-0.03em]; }
+  .grad { @apply bg-grad bg-clip-text text-transparent; }
+  .eyebrow { @apply inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.1em] text-accent; }
+  .eyebrow .dot { @apply size-2 rounded-full bg-[linear-gradient(135deg,var(--color-accent),var(--color-mint))]; }
+
+  .nav { @apply sticky top-0 z-10 border-b border-line bg-[color-mix(in_srgb,var(--color-bg)_78%,transparent)] backdrop-blur-md backdrop-saturate-150; }
+  .nav-link { @apply rounded-full px-3 py-1.5 text-sm text-ink-2 hover:bg-surface-2 hover:text-ink; }
+  .nav-link[aria-current] { @apply bg-surface-2 font-semibold text-ink; }
+
+  .btn { @apply inline-flex cursor-pointer items-center gap-2 rounded-full border border-line-2 bg-surface px-[18px] py-[11px] text-sm font-semibold transition hover:-translate-y-px hover:border-accent hover:text-ink hover:shadow-[0_8px_24px_-12px_var(--color-accent)]; }
+  .btn-primary { @apply border-transparent bg-[linear-gradient(135deg,var(--color-accent),#8b7cff)] text-white shadow-[0_10px_30px_-12px_var(--color-accent)] hover:text-white hover:saturate-110; }
+  .btn-sm { @apply px-[13px] py-[7px] text-[13px]; }
+  .install { @apply inline-flex items-center gap-2.5 rounded-full border border-line bg-surface py-[9px] pl-3.5 pr-3 text-[13px]; }
+  .install code { @apply text-[13px]; }
+  .install button { @apply inline-flex cursor-pointer border-0 bg-transparent p-0.5 text-muted hover:text-accent; }
+  .install button svg { @apply size-3.5; }
+  .chip { @apply cursor-pointer rounded-full border border-transparent bg-transparent px-3 py-1.5 text-[13px] font-medium text-ink-2 hover:bg-surface hover:text-ink; }
+  .chip[aria-selected="true"] { @apply bg-ink text-bg; }
+
+  .card { @apply rounded-card border border-line bg-surface p-6; }
+  .card h3 { @apply mb-1 text-[15px] font-bold; }
+  .card .sub { @apply mb-[18px] text-[13px] text-muted; }
+  .kpi { @apply rounded-card border border-line bg-surface px-[22px] py-5; }
+  .kpi b { @apply block font-display text-4xl font-bold leading-[1.1] tracking-[-0.03em]; }
+  .kpi span { @apply text-[13px] text-muted; }
+
+  /* demo / playground editor panes */
+  .pane { @apply flex min-h-0 min-w-0 flex-col; }
+  .pane-label { @apply flex h-8 flex-none items-center border-b border-line bg-surface px-3.5 text-[11px] font-bold uppercase tracking-[0.1em] text-muted; }
+  .pane textarea { @apply block h-[210px] w-full flex-none resize-none whitespace-pre border-0 bg-transparent px-3.5 py-3 font-mono text-[12.5px] leading-[1.55] text-ink-2 outline-none focus:bg-accent-soft/40; }
+  .preview { @apply flex h-[150px] flex-none items-center justify-center overflow-hidden border-t border-line bg-checker bg-[length:14px_14px] p-2.5; }
+  .preview svg { @apply block h-full w-auto max-h-full max-w-full; }
+  .stats { @apply flex flex-wrap items-center gap-[22px] border-t border-line px-4 py-3.5 tabular-nums; }
+  .stat b { @apply font-display text-lg font-bold tracking-[-0.01em]; }
+  .stat span { @apply ml-1 text-[13px] text-muted; }
+  .saved { @apply inline-flex items-center gap-1.5 rounded-full bg-mint-soft px-[11px] py-1 text-[13px] font-bold text-mint; }
+  .sizebar { @apply relative h-2 min-w-[140px] flex-1 overflow-hidden rounded-full bg-surface-2; }
+  .sizebar i { @apply absolute inset-y-0 left-0 rounded-full bg-grad transition-[width] duration-300 ease-out; }
+  .drop { @apply outline-2 outline-dashed outline-accent -outline-offset-8; }
+
+  /* benchmark rows (app.js) */
+  .row { @apply grid grid-cols-[200px_1fr_64px] items-center gap-3 text-[13px] max-sm:grid-cols-1; }
+  .row .name { @apply truncate text-ink-2; }
+  .row .name small { @apply ml-1.5 text-muted; }
+  .bars { @apply grid gap-1; }
+  .bar { @apply relative h-2.5 rounded-[5px] after:absolute after:left-[calc(100%+8px)] after:-top-[3px] after:whitespace-nowrap after:text-[11px] after:text-muted after:tabular-nums after:content-[attr(data-label)]; }
+  .bar-a { @apply bg-grad; }
+  .bar-b { @apply bg-bar-b; }
+  .ratio { @apply text-right font-display font-bold tabular-nums text-accent max-sm:text-left; }
+  .legend { @apply mt-4 flex gap-4 text-xs text-muted; }
+  .legend i { @apply mr-1.5 inline-block size-2.5 -translate-y-px rounded-[3px]; }
+  .sizes { @apply w-full border-collapse text-[13px] tabular-nums; }
+  .sizes th { @apply border-b border-line py-1.5 text-left text-xs font-semibold text-muted; }
+  .sizes td { @apply border-b border-line py-2; }
+  .sizes tr:last-child td { @apply border-b-0; }
+  .sizes td:not(:first-child), .sizes th:not(:first-child) { @apply text-right; }
+  .sizes .win { @apply font-bold text-mint; }
+  .sizes .lose { @apply text-warn; }
+
+  /* plugin grid (app.js) and sidebar list (playground.js) */
+  .plugin { @apply rounded-[10px] border border-line bg-surface px-4 py-3.5 transition hover:-translate-y-0.5 hover:border-accent; }
+  .plugin code { @apply text-[12.5px] font-bold text-ink; }
+  .plugin p { @apply mt-1 text-[13px] leading-[1.45] text-muted; }
+  .plugin-optional { @apply border-dashed bg-transparent; }
+  .plugin-optional code::after { @apply font-normal text-muted content-['_optional']; }
+  .pl { @apply flex cursor-pointer items-start gap-2 py-[5px] text-[12.5px] leading-[1.35]; }
+  .pl input { @apply mt-[3px] accent-accent; }
+  .pl span { @apply text-ink-2; }
+  .pl small { @apply block text-[11.5px] text-muted; }
+
+  /* usage snippets */
+  .use { @apply flex flex-col overflow-hidden rounded-card border border-line bg-surface; }
+  .use h3 { @apply px-[18px] pt-4 text-[15px] font-bold; }
+  .use .sub { @apply px-[18px] pb-3.5 pt-0.5 text-[13px] text-muted; }
+  .use pre { @apply mt-auto bg-ink px-[18px] py-4 text-[12.5px] leading-relaxed text-[#e5e7ef]; }
+  .use pre .c { @apply text-[#8b93a5]; }
+  .use pre .k { @apply text-[#b4a9ff]; }
+
+  /* before/after gallery (build.mjs) */
+  .shot { @apply overflow-hidden rounded-card border border-line bg-surface; }
+  .shot .pair { @apply grid grid-cols-2; }
+  .shot .pair div { @apply flex h-[130px] items-center justify-center overflow-hidden bg-checker bg-[length:12px_12px] p-3; }
+  .shot .pair div + div { @apply border-l border-line; }
+  .shot .pair svg { @apply block h-full w-auto max-h-full max-w-full; }
+  .shot .meta { @apply flex items-baseline justify-between border-t border-line px-3.5 py-2.5 text-[12.5px]; }
+  .shot .meta code { @apply text-xs; }
+  .shot .meta b { @apply font-bold text-mint; }
+  .pill { @apply inline-flex items-center gap-1.5 rounded-full bg-mint-soft px-[9px] py-[3px] text-xs font-bold text-mint; }
+
+  /* API reference (build.mjs) */
+  .api-side a { @apply block truncate py-[3px] text-ink-2 hover:text-accent; }
+  .api-side h4 { @apply mb-1.5 mt-[18px] text-[11px] font-bold uppercase tracking-[0.1em] text-muted; }
+  .api-main h2 { @apply mb-2 mt-12 border-t border-line pt-6 text-[28px] first:mt-0 first:border-t-0 first:pt-0; }
+  .member { @apply my-[26px]; }
+  .member h3 { @apply flex items-baseline gap-2.5 text-[15px] font-bold; }
+  .member .kind { @apply text-[11px] font-bold uppercase tracking-[0.08em] text-accent; }
+  .member .src { @apply ml-auto text-xs font-normal text-muted; }
+  .member pre { @apply my-2 rounded-[10px] border border-line bg-bg-2 px-3.5 py-3 text-[12.5px] leading-[1.55]; }
+  .member pre a { @apply text-accent; }
+  .member .doc { @apply max-w-[72ch] text-sm text-ink-2; }
+  .member .doc p { @apply my-1.5; }
+  .member .doc code { @apply rounded bg-surface-2 px-[5px] py-px; }
+  .member .methods { @apply ml-[18px] mt-2 border-l-2 border-line pl-3.5; }
+  .member .methods h4 { @apply mb-1 mt-3.5 text-[13.5px] font-bold; }
+}

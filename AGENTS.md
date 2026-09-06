@@ -19,6 +19,8 @@ Human-facing docs: `README.mbt.md` (usage), `docs/ARCHITECTURE.md` (design),
 | regenerate `plugins/fixtures_test.mbt` from `plugins/fixtures/*.txt` | `python3 scripts/gen-fixtures.py` |
 | native CLI | `moon run --target native cmd/main -- file.svg --stats` (`--json`, `--plugins a,b`) |
 | wasm artifact for npm/ and the site | `scripts/build-wasm.sh` |
+| build the site into `_build/site` | `cd site && npm install` once, then `moon doc && node site/build.mjs` |
+| re-render the hero animation | `cd site/motion && npm install && npm run render` |
 | API docs data (also what mooncakes.io renders) | `moon doc` → `_build/doc/` |
 
 Node scripts under `harness/` need `cd harness && npm install` once
@@ -42,7 +44,9 @@ wasm/                     foreign_library exporting optimize/plugins/version as 
 npm/                      JS loader for the wasm-gc build (svgo-mbt on npm)
 benchmark/                moon bench tests over an embedded corpus (corpus.mbt is generated)
 harness/                  Node: size comparison with svgo-js, resvg pixel diff, speed
-site/                     landing page + playground + API reference generator (GitHub Pages)
+site/                     landing page + playground + API reference (Tailwind v4, built by build.mjs)
+  src/style.css           Tailwind entry: @theme tokens + component layer used by the JS-rendered markup
+  motion/                 Remotion composition for the hero video (npm run render -> site/hero.mp4)
 ```
 
 ## Invariants (tests enforce these; keep them)

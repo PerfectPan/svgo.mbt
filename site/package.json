@@ -1,0 +1,15 @@
+{
+  "name": "svgo-mbt-site",
+  "private": true,
+  "type": "module",
+  "description": "Landing page, playground and API reference for svgo.mbt (Tailwind CSS v4)",
+  "scripts": {
+    "build": "node build.mjs",
+    "css": "tailwindcss -i src/style.css -o ../_build/site/style.css --minify",
+    "watch": "tailwindcss -i src/style.css -o ../_build/site/style.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.0",
+    "tailwindcss": "^4.1.0"
+  }
+}

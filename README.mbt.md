@@ -189,7 +189,7 @@ xml/        parser and serializer        path/       path data parser, optimizer
 plugins/    the 27 plugins + fixtures     svgo.mbt    optimize(), Config, Result
 cmd/main/   native CLI                    wasm/ npm/  wasm-gc build and its JS loader
 benchmark/  moon bench suite              harness/    svgo-js comparison, render diff (Node)
-site/       website, playground, API docs  scripts/    build-wasm, verify, bench, regress, fixtures
+site/       website (Tailwind v4, Remotion)  scripts/    build-wasm, verify, bench, regress, fixtures
 ```
 
 `AGENTS.md` is the guide for coding agents (commands, invariants, conventions);

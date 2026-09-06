@@ -30,6 +30,7 @@ jobs:
         run: |
           scripts/build-wasm.sh
           moon doc
+          cd site && npm install --no-audit --no-fund && cd ..
           node site/build.mjs
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -6,6 +6,7 @@
 // Usage: scripts/build-wasm.sh && moon doc && node site/build.mjs
 import { readFileSync, writeFileSync, mkdirSync, copyFileSync, readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
+import { spawnSync } from "node:child_process";
 import { optimize, init } from "../npm/index.mjs";
 
 const ROOT = new URL("..", import.meta.url).pathname;
@@ -16,7 +17,13 @@ mkdirSync(OUT, { recursive: true });
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 // ---------- static files ----------
-for (const f of ["style.css", "app.js", "playground.html", "playground.js", "favicon.svg", "data.json", "hero.mp4", "hero-poster.jpg"]) {
+// Tailwind v4: site/src/style.css -> _build/site/style.css (needs `cd site && npm install` once)
+const tw = spawnSync(join(ROOT, "site/node_modules/.bin/tailwindcss"), ["-i", join(ROOT, "site/src/style.css"), "-o", join(OUT, "style.css"), "--minify"], { stdio: "inherit" });
+if (tw.status !== 0) {
+  console.error("site: tailwind build failed (run `cd site && npm install`)");
+  process.exit(1);
+}
+for (const f of ["app.js", "playground.html", "playground.js", "favicon.svg", "data.json", "hero.mp4", "hero-poster.jpg"]) {
   if (existsSync(join(ROOT, "site", f))) copyFileSync(join(ROOT, "site", f), join(OUT, f));
   else console.warn(`site: ${f} missing (hero animation: cd site/motion && npm install && npm run render)`);
 }
@@ -100,9 +107,9 @@ for (const { dir, rel } of packages) {
 }
 
 const nav = readFileSync(join(ROOT, "site/playground.html"), "utf8").match(/<nav class="nav">[\s\S]*?<\/nav>/)[0]
-  .replace('<small>playground</small>', '<small>API</small>')
-  .replace('<a href="playground.html" aria-current="page">', '<a href="playground.html">')
-  .replace('<a href="api.html">', '<a href="api.html" aria-current="page">');
+  .replace('font-medium text-muted">playground</small>', 'font-medium text-muted">API</small>')
+  .replace(/(<a class="nav-link" href="playground.html") aria-current="page">/, "$1>")
+  .replace(/(<a class="nav-link" href="api.html")>/, '$1 aria-current="page">');
 const head = readFileSync(join(ROOT, "site/playground.html"), "utf8").match(/<head>[\s\S]*?<\/head>/)[0]
   .replace(/<title>.*<\/title>/, "<title>svgo.mbt API reference</title>")
   .replace(/<meta name="description"[^>]*>/, '<meta name="description" content="Public API of perfectpan/svgo: optimize, Config, Result, the xml, path and plugins packages.">');
@@ -111,12 +118,12 @@ writeFileSync(join(OUT, "api.html"), `<!doctype html>
 ${head}
 <body>
 ${nav}
-<div class="wrap api">
-  <aside class="api-side">
-    <p class="muted" style="font-size:12px;margin-bottom:6px">Generated from <code>moon doc</code>. Also on <a href="https://mooncakes.io/docs/perfectpan/svgo">mooncakes.io</a>.</p>
+<div class="wrap grid gap-10 pb-20 pt-10 min-[901px]:grid-cols-[240px_1fr]">
+  <aside class="api-side text-[13px] min-[901px]:sticky min-[901px]:top-20 min-[901px]:max-h-[calc(100vh-100px)] min-[901px]:self-start min-[901px]:overflow-auto">
+    <p class="mb-1.5 text-xs text-muted">Generated from <code>moon doc</code>. Also on <a class="text-ink-2" href="https://mooncakes.io/docs/perfectpan/svgo">mooncakes.io</a>.</p>
     ${side}
   </aside>
-  <main class="api-main">
+  <main class="api-main min-w-0">
     ${main || "<p>Run <code>moon doc</code> before building the site.</p>"}
   </main>
 </div>

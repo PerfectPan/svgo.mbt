@@ -165,8 +165,8 @@ async function numbers() {
     <div class="row">
       <div class="name" title="${r.file}">${r.file.replace(/_/g, " ").replace(".svg", "")}<small>${kb(r.original)}</small></div>
       <div class="bars">
-        <div class="bar a" style="width:${width(r.mbtMs)}" data-label="${r.mbtMs.toFixed(r.mbtMs < 1 ? 2 : 1)} ms"></div>
-        <div class="bar b" style="width:${width(r.jsMs)}" data-label="${r.jsMs.toFixed(r.jsMs < 1 ? 2 : 1)} ms"></div>
+        <div class="bar bar-a" style="width:${width(r.mbtMs)}" data-label="${r.mbtMs.toFixed(r.mbtMs < 1 ? 2 : 1)} ms"></div>
+        <div class="bar bar-b" style="width:${width(r.jsMs)}" data-label="${r.jsMs.toFixed(r.jsMs < 1 ? 2 : 1)} ms"></div>
       </div>
       <div class="ratio">${(r.jsMs / r.mbtMs).toFixed(1)}×</div>
     </div>`).join("");
@@ -179,7 +179,7 @@ async function numbers() {
 
   // plugin grid comes from the same JSON so it always matches the build
   $("#plugin-grid").innerHTML = data.plugins.map((p) =>
-    `<div class="plugin${p.enabled ? "" : " optional"}"><code>${esc(p.name)}</code><p>${esc(p.description)}</p></div>`).join("");
+    `<div class="plugin${p.enabled ? "" : " plugin-optional"}"><code>${esc(p.name)}</code><p>${esc(p.description)}</p></div>`).join("");
   document.querySelectorAll("[data-plugin-count]").forEach((el) => (el.textContent = data.plugins.filter((p) => p.enabled).length));
 }
 

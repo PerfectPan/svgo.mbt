@@ -1,0 +1,8 @@
+.DS_Store
+_build/
+target/
+.mooncakes/
+.moonagent/
+npm/svgo.wasm
+harness/node_modules/
+bench/corpus/World_map_x12.svg

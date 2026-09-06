@@ -54,7 +54,7 @@ fn Parser::starts_with(self : Parser, s : String) -> Bool {
 
 ///|
 fn Parser::slice(self : Parser, start : Int, end : Int) -> String {
-  self.text[start:end].to_string()
+  self.text[start:end].to_owned()
 }
 
 ///|

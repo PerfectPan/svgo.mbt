@@ -132,13 +132,7 @@ pub let cleanup_attrs : Plugin = {
 
 ///|
 fn collapse_space(v : String) -> String {
-  if !v.contains("\n") &&
-    !v.contains("\t") &&
-    !v.contains("  ") &&
-    !v.has_prefix(" ") &&
-    !v.has_suffix(" ") {
-    return v
-  }
+  guard needs_collapse(v) else { return v }
   let sb = StringBuilder()
   let mut pending_space = false
   let mut started = false
@@ -417,4 +411,30 @@ fn attr_rank(k : String) -> Int {
     None => k
   }
   attr_order.get(base).unwrap_or(100)
+}
+
+///|
+/// One scan: true when the value has leading/trailing whitespace, runs of
+/// spaces, or any whitespace other than a plain space.
+fn needs_collapse(v : String) -> Bool {
+  let cu = v.code_units()
+  let n = cu.length()
+  if n == 0 {
+    return false
+  }
+  if cu[0] == 32 || cu[n - 1] == 32 {
+    return true
+  }
+  let mut prev_space = false
+  for c in cu {
+    if c == 9 || c == 10 || c == 13 {
+      return true
+    }
+    let space = c == 32
+    if space && prev_space {
+      return true
+    }
+    prev_space = space
+  }
+  false
 }

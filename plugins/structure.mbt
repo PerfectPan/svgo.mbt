@@ -102,13 +102,10 @@ pub let remove_unknowns_and_defaults : Plugin = {
           changed = true
           continue
         }
-        let normalized = if k == "fill" && v.trim().to_lower() == "black" {
-          "#000"
-        } else {
-          v.trim().to_owned()
-        }
         match default_values.get(k) {
-          Some(d) if d == normalized =>
+          Some(d) if d == v ||
+            (k == "fill" && v.trim().to_lower() == "black") ||
+            d[:] == v.trim() =>
             // an inherited attribute may be shadowing an ancestor's value
             if !inheritable.contains(k) || !ancestors_define(chain, k) {
               // stroke="none" is the default but keep it when an ancestor strokes

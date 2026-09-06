@@ -176,24 +176,48 @@ pub fn format_number(v : Double, precision : Int) -> String {
 ///|
 /// Append `format_number(v, precision)` to `sb` without intermediate strings.
 pub fn write_number(sb : StringBuilder, v : Double, precision : Int) -> Unit {
+  ignore(write_number_shaped(sb, v, precision))
+}
+
+///|
+fn write_digits(sb : StringBuilder, v : Int64) -> Unit {
+  if v >= 10 {
+    write_digits(sb, v / 10)
+  }
+  sb.write_char(((v % 10).to_int() + 48).unsafe_to_char())
+}
+
+///|
+/// Write the number and return its shape (see `number_shape`) in one pass.
+fn write_number_shaped(sb : StringBuilder, v : Double, precision : Int) -> Int {
   let (neg, int_part, frac, frac_len) = decompose(v, precision)
   if int_part == 0 && frac == 0 {
     sb.write_char('0')
-    return
+    return 1 << 3
   }
+  let mut len = 0
+  let mut flags = 0
   if neg {
     sb.write_char('-')
+    len += 1
+    flags = flags | 1
   }
   if int_part != 0 {
-    sb.write_string(int_part.to_string())
+    write_digits(sb, int_part)
+    len += digits_of(int_part)
+  } else if !neg {
+    flags = flags | 2
   }
   if frac != 0 {
     sb.write_char('.')
     for _ in digits_of(frac)..<frac_len {
       sb.write_char('0')
     }
-    sb.write_string(frac.to_string())
+    write_digits(sb, frac)
+    len += 1 + frac_len
+    flags = flags | 4
   }
+  (len << 3) | flags
 }
 
 ///|

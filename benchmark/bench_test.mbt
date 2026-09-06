@@ -58,3 +58,31 @@ test "path optimize Tiger paths" (b : @bench.T) {
     }
   })
 }
+
+///|
+test "path parse Tiger paths" (b : @bench.T) {
+  let doc = @xml.parse(corpus_item("Ghostscript_Tiger.svg"))
+  let ds : Array[String] = []
+  doc.each_element((e, _) => if e.attrs.get("d") is Some(d) { ds.push(d) })
+  b.bench(() => {
+    for d in ds {
+      b.keep(@path.parse(d) catch { _ => abort("path") })
+    }
+  })
+}
+
+///|
+test "path stringify Tiger paths" (b : @bench.T) {
+  let doc = @xml.parse(corpus_item("Ghostscript_Tiger.svg"))
+  let segs : Array[Array[@path.Segment]] = []
+  doc.each_element((e, _) => {
+    if e.attrs.get("d") is Some(d) {
+      segs.push(@path.parse(d) catch { _ => abort("path") })
+    }
+  })
+  b.bench(() => {
+    for s in segs {
+      b.keep(@path.stringify(s))
+    }
+  })
+}

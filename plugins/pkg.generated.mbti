@@ -38,6 +38,8 @@ pub let optional_plugins : Array[Plugin]
 
 pub let preset_default : Array[Plugin]
 
+pub let reference_attrs : @set.Set[String]
+
 pub fn referenced_ids(@xml.Document) -> @set.Set[String]
 
 pub let remove_comments : Plugin

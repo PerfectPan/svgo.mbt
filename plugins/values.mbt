@@ -1,12 +1,12 @@
 ///|
 /// Attributes that take a plain number or length.
-let numeric_attrs : Array[String] = [
+let numeric_attrs : Set[String] = Set([
   "x", "y", "x1", "y1", "x2", "y2", "cx", "cy", "r", "rx", "ry", "width", "height",
   "dx", "dy", "fx", "fy", "offset", "opacity", "fill-opacity", "stroke-opacity",
   "stroke-width", "stroke-miterlimit", "stroke-dashoffset", "font-size", "letter-spacing",
   "word-spacing", "refX", "refY", "markerWidth", "markerHeight", "stdDeviation",
   "k1", "k2", "k3", "k4", "startOffset", "textLength", "pathLength",
-]
+])
 
 ///|
 /// Round numbers in attribute values and drop the default `px` unit.
@@ -59,9 +59,9 @@ pub let cleanup_numeric_values : Plugin = {
 
 ///|
 /// Attributes that carry colors.
-let color_attrs : Array[String] = [
+let color_attrs : Set[String] = Set([
   "fill", "stroke", "stop-color", "flood-color", "lighting-color", "color",
-]
+])
 
 ///|
 /// Convert colors to their shortest equivalent form.

@@ -104,6 +104,14 @@ pub let container_elements : Set[String] = Set([
 ])
 
 ///|
+/// Attributes whose value may reference an element: `url(#id)` in paint
+/// servers and effects, `#id` in links, `id.event` in animation timing.
+pub let reference_attrs : Set[String] = Set([
+  "fill", "stroke", "filter", "clip-path", "mask", "marker", "marker-start", "marker-mid",
+  "marker-end", "cursor", "color-profile", "begin", "end", "style",
+])
+
+///|
 /// Collect every id referenced anywhere in the document: `href="#id"`,
 /// `url(#id)` in attributes and `<style>` text, and `begin="id.click"`.
 pub fn referenced_ids(doc : @xml.Document) -> Set[String] {
@@ -114,7 +122,8 @@ pub fn referenced_ids(doc : @xml.Document) -> Set[String] {
         if v.has_prefix("#") {
           ids.add(v[1:].to_owned())
         }
-      } else if k == "begin" || v.contains("url(") {
+      } else if reference_attrs.contains(k) && v.contains_code_unit(35) {
+        // 35 is '#'
         collect_url_refs(v, ids)
       }
     }

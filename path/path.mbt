@@ -149,20 +149,22 @@ pub fn write_path(
         prev_was_flag = true
         continue
       }
-      let shape = number_shape(a, precision)
       if prev_shape != 0 {
         // a separator is needed unless the number starts with '-', or starts
         // with '.' after a number that already has a '.'
-        let starts_neg = (shape & 1) != 0 && !prev_was_flag
-        let starts_dot = (shape & 2) != 0 &&
+        let (neg, int_part, frac, _) = decompose(a, precision)
+        let nonzero = int_part != 0 || frac != 0
+        let starts_neg = nonzero && neg && !prev_was_flag
+        let starts_dot = nonzero &&
+          !neg &&
+          int_part == 0 &&
           (prev_shape & 4) != 0 &&
           !prev_was_flag
         if !(starts_neg || starts_dot) {
           sb.write_char(' ')
         }
       }
-      write_number(sb, a, precision)
-      prev_shape = shape
+      prev_shape = write_number_shaped(sb, a, precision)
       prev_was_flag = false
     }
     prev_cmd = cmd

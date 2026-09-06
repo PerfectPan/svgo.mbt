@@ -1,9 +1,9 @@
 import {
-  "perfectpan/svgo",
   "moonbitlang/core/bench",
 }
 
 import {
+  "perfectpan/svgo",
   "perfectpan/svgo/xml",
   "perfectpan/svgo/path",
   "perfectpan/svgo/plugins",

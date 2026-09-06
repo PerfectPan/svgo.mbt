@@ -121,7 +121,7 @@ priv struct Emitter {
 
 ///|
 fn Emitter::seg_len(self : Emitter, seg : Segment) -> Int {
-  stringify([seg], precision=self.options.precision).length()
+  segment_len(seg, self.options.precision)
 }
 
 ///|

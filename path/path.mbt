@@ -54,53 +54,6 @@ pub fn parse(d : String) -> Array[Segment] raise PathError {
     }
     i
   }
-  // read a number starting at i; returns (value, new index)
-  fn number(i : Int, flag : Bool) -> (Double, Int) raise PathError {
-    let start = i
-    let mut j = i
-    if flag {
-      // arc flags are single digits that may be glued together: "10" is two flags
-      guard j < n && (cu[j] == 48 || cu[j] == 49) else {
-        raise PathError("expected arc flag at \{j}")
-      }
-      return ((cu[j].to_int() - 48).to_double(), j + 1)
-    }
-    if j < n && (cu[j] == 43 || cu[j] == 45) {
-      j += 1
-    }
-    let mut digits = 0
-    while j < n && cu[j] >= 48 && cu[j] <= 57 {
-      j += 1
-      digits += 1
-    }
-    if j < n && cu[j] == 46 {
-      j += 1
-      while j < n && cu[j] >= 48 && cu[j] <= 57 {
-        j += 1
-        digits += 1
-      }
-    }
-    guard digits > 0 else { raise PathError("expected number at \{start}") }
-    if j < n && (cu[j] == 101 || cu[j] == 69) {
-      let mut k = j + 1
-      if k < n && (cu[k] == 43 || cu[k] == 45) {
-        k += 1
-      }
-      if k < n && cu[k] >= 48 && cu[k] <= 57 {
-        while k < n && cu[k] >= 48 && cu[k] <= 57 {
-          k += 1
-        }
-        j = k
-      }
-    }
-    let text = String::from_iter(
-      cu[start:j].iter().map(u => u.to_int().unsafe_to_char()),
-    )
-    let v = @string.parse_double(text) catch {
-      _ => raise PathError("bad number '\{text}'")
-    }
-    (v, j)
-  }
   i = skip(i)
   while i < n {
     let c = cu[i].to_int().unsafe_to_char()
@@ -131,9 +84,18 @@ pub fn parse(d : String) -> Array[Segment] raise PathError {
     for k in 0..<count {
       i = skip(i)
       let is_flag = cmd.to_ascii_lowercase() == 'a' && (k == 3 || k == 4)
-      let (v, ni) = number(i, is_flag)
-      args.push(v)
-      i = skip(ni)
+      if is_flag {
+        // arc flags are single digits that may be glued together: "10" is two flags
+        guard i < n && (cu[i] == 48 || cu[i] == 49) else {
+          raise PathError("expected arc flag at \{i}")
+        }
+        args.push((cu[i].to_int() - 48).to_double())
+        i = skip(i + 1)
+      } else {
+        let (v, ni) = scan_number(cu, i)
+        args.push(v)
+        i = skip(ni)
+      }
     }
     out.push({ cmd, args, })
   }
@@ -141,67 +103,24 @@ pub fn parse(d : String) -> Array[Segment] raise PathError {
 }
 
 ///|
-/// Round to `precision` decimal places.
-pub fn round_to(v : Double, precision : Int) -> Double {
-  if precision >= 15 {
-    return v
-  }
-  let m = @math.pow(10.0, precision.to_double())
-  let r = @math.round(v * m) / m
-  if r == 0.0 {
-    0.0
-  } else {
-    r
-  }
-}
-
-///|
-/// Shortest decimal representation of a number for path data:
-/// no trailing zeros, no leading zero before the decimal point.
-pub fn format_number(v : Double, precision : Int) -> String {
-  let v = round_to(v, precision)
-  if v.is_nan() || v.is_inf() {
-    return "0"
-  }
-  if v == v.trunc() && v.abs() < 1.0e15 {
-    return v.to_int64().to_string()
-  }
-  let neg = v < 0.0
-  let av = v.abs()
-  // fixed notation with `precision` decimals, then strip trailing zeros
-  let m = @math.pow(10.0, precision.to_double())
-  let scaled = @math.round(av * m).to_int64()
-  let int_part = scaled / m.to_int64()
-  let frac_part = scaled % m.to_int64()
-  let mut frac = frac_part.to_string().pad_start(precision, '0')
-  let mut end = frac.length()
-  while end > 0 && frac.get_char(end - 1) == Some('0') {
-    end -= 1
-  }
-  frac = frac[:end].to_owned()
+/// Serialize segments to the shortest valid path data string.
+pub fn stringify(segments : Array[Segment], precision? : Int = 3) -> String {
   let sb = StringBuilder()
-  if neg {
-    sb.write_char('-')
-  }
-  if int_part != 0 {
-    sb.write_string(int_part.to_string())
-  }
-  if frac.length() > 0 {
-    sb.write_char('.')
-    sb.write_string(frac)
-  } else if int_part == 0 {
-    sb.write_char('0')
-  }
+  write_path(sb, segments, precision)
   sb.to_string()
 }
 
 ///|
-/// Serialize segments to the shortest valid path data string.
-pub fn stringify(segments : Array[Segment], precision? : Int = 3) -> String {
-  let sb = StringBuilder()
+/// Append the path data for `segments` to `sb`.
+pub fn write_path(
+  sb : StringBuilder,
+  segments : Array[Segment],
+  precision : Int,
+) -> Unit {
   let mut prev_cmd : Char = ' '
-  // last number written in the current command, "" right after a command letter
-  let mut prev_num = ""
+  // shape of the last number written in the current command, 0 right after
+  // a command letter
+  let mut prev_shape = 0
   let mut prev_was_flag = false
   for seg in segments {
     let cmd = seg.cmd
@@ -213,39 +132,39 @@ pub fn stringify(segments : Array[Segment], precision? : Int = 3) -> String {
       (prev_cmd == 'm' && cmd == 'l')
     if !implicit {
       sb.write_char(cmd)
-      prev_num = ""
+      prev_shape = 0
       prev_was_flag = false
     }
     let is_arc = cmd == 'a' || cmd == 'A'
     for k, a in seg.args {
       let is_flag = is_arc && (k == 3 || k == 4)
-      let s = if is_flag {
-        if a != 0.0 {
-          "1"
-        } else {
-          "0"
+      if is_flag {
+        // arc flags are always separated: gluing them is valid but trips up
+        // older renderers
+        if prev_shape != 0 {
+          sb.write_char(' ')
         }
-      } else {
-        format_number(a, precision)
+        sb.write_char(if a != 0.0 { '1' } else { '0' })
+        prev_shape = 1 << 3
+        prev_was_flag = true
+        continue
       }
-      if prev_num.length() > 0 {
+      let shape = number_shape(a, precision)
+      if prev_shape != 0 {
         // a separator is needed unless the number starts with '-', or starts
-        // with '.' after a number that already has a '.'. Arc flags are always
-        // separated: gluing them is valid but trips up older renderers.
-        let starts_neg = s.has_prefix("-") && !prev_was_flag
-        let starts_dot = s.has_prefix(".") &&
-          prev_num.contains(".") &&
-          !prev_num.contains("e") &&
+        // with '.' after a number that already has a '.'
+        let starts_neg = (shape & 1) != 0 && !prev_was_flag
+        let starts_dot = (shape & 2) != 0 &&
+          (prev_shape & 4) != 0 &&
           !prev_was_flag
         if !(starts_neg || starts_dot) {
           sb.write_char(' ')
         }
       }
-      sb.write_string(s)
-      prev_num = s
-      prev_was_flag = is_flag
+      write_number(sb, a, precision)
+      prev_shape = shape
+      prev_was_flag = false
     }
     prev_cmd = cmd
   }
-  sb.to_string()
 }

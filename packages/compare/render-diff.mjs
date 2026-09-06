@@ -1,21 +1,25 @@
-// Rasterize every testdata SVG before and after optimisation and report the
-// number of differing pixels. Usage: node harness/render-diff.mjs
+// Rasterize every svgo/testdata SVG before and after optimisation and report the
+// number of differing pixels. Usage: node packages/compare/render-diff.mjs
 import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
+
+const ROOT = new URL("../../", import.meta.url).pathname;
+const TESTDATA = join(ROOT, "svgo/testdata");
 import { execFileSync } from "node:child_process";
 import { Resvg } from "@resvg/resvg-js";
 import pixelmatch from "pixelmatch";
 import { PNG } from "pngjs";
 
-const bin = "_build/native/debug/build/cmd/main/main.exe";
-const files = readdirSync("testdata").filter((f) => f.endsWith(".svg"));
+const bin = join(ROOT, "_build/native/release/build/cmd/main/main.exe");
+const files = readdirSync(TESTDATA).filter((f) => f.endsWith(".svg"));
 const render = (svg) => {
   const r = new Resvg(svg, { fitTo: { mode: "width", value: 256 } });
   return PNG.sync.read(r.render().asPng());
 };
 let failed = 0;
 for (const f of files) {
-  const src = readFileSync(`testdata/${f}`, "utf8");
-  const out = execFileSync(bin, [`testdata/${f}`], { encoding: "utf8" }).trim();
+  const src = readFileSync(join(TESTDATA, f), "utf8");
+  const out = execFileSync(bin, [join(TESTDATA, f)], { encoding: "utf8" }).trim();
   const a = render(src);
   const b = render(out);
   if (a.width !== b.width || a.height !== b.height) {

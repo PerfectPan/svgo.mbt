@@ -1,16 +1,18 @@
 // Collect the numbers the site shows: sizes (original / svgo.mbt / svgo-js)
 // and same-process timings (wasm-gc vs svgo-js) for every corpus file.
-// Writes site/data.json. Usage: node harness/collect.mjs
-// Requires scripts/build-wasm.sh and `cd harness && npm install`.
+// Writes site/data.json. Usage: node packages/compare/collect.mjs
+// Requires scripts/build-wasm.sh and `pnpm install`.
 import { readFileSync, writeFileSync, readdirSync, statSync } from "node:fs";
+import { join } from "node:path";
 import { optimize as jsOptimize } from "svgo";
-import { optimize as mbtOptimize, init, plugins } from "../npm/index.mjs";
+import { optimize as mbtOptimize, init, plugins } from "svgo-mbt";
 
-await init(new URL("../npm/svgo.wasm", import.meta.url));
+const ROOT = new URL("../../", import.meta.url).pathname;
+await init();
 
 const files = [
-  ...readdirSync("testdata").filter((f) => f.endsWith(".svg")).map((f) => `testdata/${f}`),
-  ...readdirSync("harness/corpus").filter((f) => f.endsWith(".svg") && !f.includes("x12")).map((f) => `harness/corpus/${f}`),
+  ...readdirSync(join(ROOT, "svgo/testdata")).filter((f) => f.endsWith(".svg")).map((f) => join(ROOT, "svgo/testdata", f)),
+  ...readdirSync(join(ROOT, "packages/compare/corpus")).filter((f) => f.endsWith(".svg") && !f.includes("x12")).map((f) => join(ROOT, "packages/compare/corpus", f)),
 ];
 const bytes = (s) => Buffer.byteLength(s, "utf8");
 const time = async (fn, n) => {
@@ -43,10 +45,10 @@ for (const f of files) {
 const data = {
   generated: new Date().toISOString().slice(0, 10),
   node: process.version,
-  svgoVersion: JSON.parse(readFileSync("harness/node_modules/svgo/package.json", "utf8")).version,
-  wasmBytes: statSync("npm/svgo.wasm").size,
+  svgoVersion: JSON.parse(readFileSync(join(ROOT, "packages/compare/node_modules/svgo/package.json"), "utf8")).version,
+  wasmBytes: statSync(join(ROOT, "packages/svgo-mbt/svgo.wasm")).size,
   plugins: await plugins(),
   rows,
 };
-writeFileSync("site/data.json", JSON.stringify(data, null, 2) + "\n");
+writeFileSync(join(ROOT, "site/data.json"), JSON.stringify(data, null, 2) + "\n");
 console.log("wrote site/data.json");

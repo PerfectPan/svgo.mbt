@@ -99,21 +99,21 @@ that did something. `utf8_length` counts bytes without encoding.
 
 | form | package | notes |
 | --- | --- | --- |
-| wasm-gc module + JS loader | `wasm/`, `npm/` | JS String Builtins: MoonBit `String` *is* a JS string, so the boundary is two string arguments and one JSON string back. 160 KB. |
-| native CLI | `cmd/main/` | C file I/O via two `extern "C"` functions; `--json` for tooling. |
+| wasm-gc module + JS loader | `svgo/wasm/`, `packages/svgo-mbt/` | JS String Builtins: MoonBit `String` *is* a JS string, so the boundary is two string arguments and one JSON string back. 160 KB. |
+| native CLI | `svgo/cmd/main/` | C file I/O via two `extern "C"` functions; `--json` for tooling. |
 | MoonBit library | root | `moon add perfectpan/svgo`. |
 
 ## Verification layers
 
 1. **Unit and snapshot tests** in each package (`moon test`, 3 backends).
-2. **Fixtures** (`plugins/fixtures/*.txt`, svgo's `@@@` format) generated into
+2. **Fixtures** (`svgo/plugins/fixtures/*.txt`, svgo's `@@@` format) generated into
    a test file; one plugin at a time.
 3. **Corpus regression** (`scripts/regress.sh`): byte-identical output across
    refactors.
-4. **Render diff** (`harness/render-diff.mjs`): resvg rasterizes before and
+4. **Render diff** (`packages/compare/render-diff.mjs`): resvg rasterizes before and
    after, pixelmatch counts differences.
 5. **Benchmarks** (`moon bench`, `scripts/bench.sh`): per-file and
-   per-plugin timings; `harness/wasm-speed.mjs` for the same-process
+   per-plugin timings; `packages/compare/wasm-speed.mjs` for the same-process
    comparison with svgo-js.
 
 ## What is deliberately not here

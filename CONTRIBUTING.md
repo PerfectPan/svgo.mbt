@@ -1,17 +1,20 @@
 # Contributing
 
 Thanks for looking. Everything runs on the stock MoonBit toolchain; there is
-no build step outside `moon` except the optional Node harness.
+no build step outside `moon` except the optional Node comparison suite and the website.
 
 ## Setup
 
 ```bash
 curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash   # MoonBit
 git clone https://github.com/PerfectPan/svgo.mbt && cd svgo.mbt
-moon test --target native                                         # 20 tests + fixtures
+moon test --target native                                         # unit tests + fixtures (moon.work runs every member)
 scripts/verify.sh                                                 # what CI runs
-cd harness && npm install && cd ..                                # svgo-js, resvg, pixelmatch
+pnpm install                                                      # svgo-js, resvg, pixelmatch, tailwind, remotion
 scripts/verify.sh --full                                          # + wasm, sizes, pixel diffs
+
+The MoonBit module lives in `svgo/`; `packages/` holds the npm package and the
+comparison suite; `site/` the website. `moon` commands run from the root.
 ```
 
 The repository ships a pre-commit hook that runs `moon check`:
@@ -19,7 +22,7 @@ The repository ships a pre-commit hook that runs `moon check`:
 
 ## Adding or changing a plugin
 
-1. **Fixture first.** Create `plugins/fixtures/<svgoName>.<nn>.txt`:
+1. **Fixture first.** Create `svgo/plugins/fixtures/<svgoName>.<nn>.txt`:
 
    ```
    <svg xmlns="http://www.w3.org/2000/svg">...input...</svg>
@@ -38,9 +41,9 @@ The repository ships a pre-commit hook that runs `moon check`:
    with `python3 scripts/gen-fixtures.py` and run `moon test`.
 
    Tip: to see what the current implementation produces for an input,
-   `moon run --target native cmd/main -- in.svg --plugins svgoName --no-multipass --pretty`.
+   `moon run --target native svgo/cmd/main -- in.svg --plugins svgoName --no-multipass --pretty`.
 
-2. **Implement** in the matching `plugins/*.mbt` file as a value:
+2. **Implement** in the matching `svgo/plugins/*.mbt` file as a value:
 
    ```moonbit
    ///|
@@ -66,7 +69,7 @@ The repository ships a pre-commit hook that runs `moon check`:
    must run before `convertPathData`, `collapseGroups` before `mergePaths`,
    `sortAttrs` last) or in `optional_plugins`.
 
-4. **Prove it is safe.** Add the input to `testdata/` if it exercises a new
+4. **Prove it is safe.** Add the input to `svgo/testdata/` if it exercises a new
    shape of document, then `scripts/verify.sh --full`: the render diff must
    stay at zero pixels. Rendering fidelity beats bytes saved.
 
@@ -76,13 +79,13 @@ The repository ships a pre-commit hook that runs `moon check`:
 ## Performance work
 
 - Baseline: `scripts/bench.sh` (native) and `scripts/bench.sh native profile_test.mbt`
-  for per-plugin cost. `benchmark/README.md` records the numbers per commit.
+  for per-plugin cost. `svgo/benchmark/README.md` records the numbers per commit.
 - Output must not change: build the previous revision into a worktree,
   produce reference files, and compare.
 
   ```bash
   git worktree add /tmp/svgo-base HEAD && (cd /tmp/svgo-base && moon build --target native --release -q)
-  mkdir -p /tmp/ref && for f in testdata/*.svg harness/corpus/*.svg; do
+  mkdir -p /tmp/ref && for f in svgo/testdata/*.svg packages/compare/corpus/*.svg; do
     /tmp/svgo-base/_build/native/release/build/cmd/main/main.exe "$f" -o "/tmp/ref/$(basename "$f")"; done
   scripts/regress.sh /tmp/ref          # every line must say "same"
   ```
@@ -96,5 +99,5 @@ The repository ships a pre-commit hook that runs `moon check`:
 
 ## Commit style
 
-`type(scope): summary` with `feat`, `fix`, `perf`, `docs`, `bench`, `harness`,
+`type(scope): summary` with `feat`, `fix`, `perf`, `docs`, `bench`, `compare`, `site`,
 `build`, `chore`. The body says what changed in behaviour or numbers.

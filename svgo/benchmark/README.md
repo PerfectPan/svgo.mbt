@@ -1,7 +1,7 @@
 # Benchmarks
 
 `moon bench` micro benchmarks over an embedded corpus (`corpus.mbt`, generated
-from `testdata/` and `harness/corpus/`). Run them with
+from `svgo/testdata/` and `packages/compare/corpus/`). Run them with
 
 ```bash
 scripts/bench.sh                      # native, release: end-to-end + stages
@@ -52,8 +52,8 @@ Where the time went and what removed it (see the `perf:` commits):
 
 ## Against svgo 4.1 (Node)
 
-Same process, both multipass, ms per call (`node harness/wasm-speed.mjs`,
-requires `scripts/build-wasm.sh` and `cd harness && npm install`):
+Same process, both multipass, ms per call (`node packages/compare/wasm-speed.mjs`,
+requires `scripts/build-wasm.sh` and `pnpm install`):
 
 | file | svgo.mbt wasm-gc | svgo-js | ratio |
 | --- | ---: | ---: | ---: |
@@ -65,7 +65,7 @@ requires `scripts/build-wasm.sh` and `cd harness && npm install`):
 | World map 85 KB | 66.8 | 83.1 | 1.2x |
 
 Those wasm numbers predate the optimisation round above; rerun
-`node harness/wasm-speed.mjs` for current values (the table in the README and
+`node packages/compare/wasm-speed.mjs` for current values (the table in the README and
 on the site is refreshed from the harness output).
 
 ## Methodology notes

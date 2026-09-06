@@ -1,17 +1,17 @@
 // Build the static site into _build/site:
 //   - copies the landing page, playground and styles
-//   - copies the wasm build and its loader (npm/)
+//   - copies the wasm build and its loader (packages/svgo-mbt)
 //   - renders api.html from `moon doc` output (_build/doc/**/package_data.json)
-//   - fills the before/after gallery on the landing page from testdata/
-// Usage: scripts/build-wasm.sh && moon doc && node site/build.mjs
+//   - fills the before/after gallery on the landing page from svgo/testdata/
+// Usage: scripts/build-wasm.sh && moon -C svgo doc && node site/build.mjs   (pnpm install once)
 import { readFileSync, writeFileSync, mkdirSync, copyFileSync, readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
-import { optimize, init } from "../npm/index.mjs";
+import { optimize, init } from "svgo-mbt";
 
 const ROOT = new URL("..", import.meta.url).pathname;
 const OUT = join(ROOT, "_build/site");
-const REPO = "https://github.com/PerfectPan/svgo.mbt/blob/main";
+const REPO = "https://github.com/PerfectPan/svgo.mbt/blob/main/svgo";
 mkdirSync(OUT, { recursive: true });
 
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -20,22 +20,22 @@ const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replac
 // Tailwind v4: site/src/style.css -> _build/site/style.css (needs `cd site && npm install` once)
 const tw = spawnSync(join(ROOT, "site/node_modules/.bin/tailwindcss"), ["-i", join(ROOT, "site/src/style.css"), "-o", join(OUT, "style.css"), "--minify"], { stdio: "inherit" });
 if (tw.status !== 0) {
-  console.error("site: tailwind build failed (run `cd site && npm install`)");
+  console.error("site: tailwind build failed (run `pnpm install` at the repo root)");
   process.exit(1);
 }
 for (const f of ["app.js", "playground.html", "playground.js", "favicon.svg", "data.json", "hero.mp4", "hero-poster.jpg"]) {
   if (existsSync(join(ROOT, "site", f))) copyFileSync(join(ROOT, "site", f), join(OUT, f));
-  else console.warn(`site: ${f} missing (hero animation: cd site/motion && npm install && npm run render)`);
+  else console.warn(`site: ${f} missing (hero animation: pnpm -C site motion:render)`);
 }
-copyFileSync(join(ROOT, "npm/index.mjs"), join(OUT, "svgo.mjs"));
-copyFileSync(join(ROOT, "npm/svgo.wasm"), join(OUT, "svgo.wasm"));
+copyFileSync(join(ROOT, "packages/svgo-mbt/index.mjs"), join(OUT, "svgo.mjs"));
+copyFileSync(join(ROOT, "packages/svgo-mbt/svgo.wasm"), join(OUT, "svgo.wasm"));
 writeFileSync(join(OUT, ".nojekyll"), "");
 
 // ---------- landing page gallery ----------
-await init(new URL("../npm/svgo.wasm", import.meta.url));
+await init();
 const shots = [];
-for (const f of readdirSync(join(ROOT, "testdata")).filter((f) => f.endsWith(".svg")).sort()) {
-  const src = readFileSync(join(ROOT, "testdata", f), "utf8");
+for (const f of readdirSync(join(ROOT, "svgo/testdata")).filter((f) => f.endsWith(".svg")).sort()) {
+  const src = readFileSync(join(ROOT, "svgo/testdata", f), "utf8");
   const r = await optimize(src);
   const pct = ((1 - r.size / r.originalSize) * 100).toFixed(0);
   shots.push(`<div class="shot"><div class="pair"><div>${src}</div><div>${r.data}</div></div>
@@ -124,7 +124,7 @@ ${nav}
     ${side}
   </aside>
   <main class="api-main min-w-0">
-    ${main || "<p>Run <code>moon doc</code> before building the site.</p>"}
+    ${main || "<p>Run <code>moon -C svgo doc</code> before building the site.</p>"}
   </main>
 </div>
 </body>

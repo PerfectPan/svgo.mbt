@@ -149,7 +149,7 @@ Not implemented yet compared to svgo: `inlineStyles`, `minifyStyles`,
 ## Performance
 
 Same Node process, both with multipass, milliseconds per call
-(`node harness/collect.mjs`, Node 22, svgo 4.1.0):
+(`node packages/compare/collect.mjs`, Node 22, svgo 4.1.0):
 
 | file | size | svgo.mbt (wasm-gc) | svgo-js | ratio |
 | --- | ---: | ---: | ---: | ---: |
@@ -173,23 +173,25 @@ Output sizes are on par: svgo.mbt wins on path-heavy files (Tiger 53.7 KB vs
 
 ```bash
 scripts/verify.sh            # check, fmt, .mbti drift, fixtures, tests on wasm-gc / js / native
-scripts/verify.sh --full     # + wasm build, sizes vs svgo-js, resvg pixel diff, speed
+scripts/verify.sh --full     # + wasm build, sizes vs svgo-js, resvg pixel diff, speed (needs pnpm install)
 scripts/regress.sh <ref-dir> # byte-for-byte output comparison against a reference build
 ```
 
 Four layers: unit and snapshot tests per package; svgo-style fixture files
-(`plugins/fixtures/*.txt`, one plugin each); a corpus that must reproduce
+(`svgo/plugins/fixtures/*.txt`, one plugin each); a corpus that must reproduce
 byte for byte across refactors; and a render diff that rasterises every
 fixture before and after. Details in `docs/ARCHITECTURE.md`.
 
-## Project layout
+## Repository layout
+
+A MoonBit workspace (`moon.work`) and a pnpm workspace side by side:
 
 ```
-xml/        parser and serializer        path/       path data parser, optimizer, printer
-plugins/    the 27 plugins + fixtures     svgo.mbt    optimize(), Config, Result
-cmd/main/   native CLI                    wasm/ npm/  wasm-gc build and its JS loader
-benchmark/  moon bench suite              harness/    svgo-js comparison, render diff (Node)
-site/       website (Tailwind v4, Remotion)  scripts/    build-wasm, verify, bench, regress, fixtures
+svgo/                 the MoonBit module: xml/ path/ plugins/ (+ fixtures) svgo.mbt cmd/main wasm/ benchmark/ testdata/
+packages/svgo-mbt/    npm package: JS loader + svgo.wasm
+packages/compare/     svgo-js comparison, resvg render diff, same-process speed, site numbers
+site/                 website and playground (Tailwind v4) + Remotion hero animation
+scripts/              build-wasm, verify, bench, regress, gen-fixtures
 ```
 
 `AGENTS.md` is the guide for coding agents (commands, invariants, conventions);

@@ -16,19 +16,21 @@ jobs:
         run: |
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
           echo "$HOME/.moon/bin" >> $GITHUB_PATH
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: pnpm
       - name: Check, format, interfaces, fixtures, tests on wasm-gc / js / native
         run: scripts/verify.sh
       - name: Wasm artifact, size comparison, render diff, speed
         run: |
           scripts/build-wasm.sh
           moon build --target native --release -q
-          cd harness && npm install --no-audit --no-fund && cd ..
-          harness/compare.sh
-          node harness/render-diff.mjs
-          node harness/wasm-speed.mjs
+          pnpm install --frozen-lockfile
+          packages/compare/compare.sh
+          node packages/compare/render-diff.mjs
+          node packages/compare/wasm-speed.mjs
       - name: Benchmarks (native)
         if: matrix.os == 'macos-latest'
         run: scripts/bench.sh

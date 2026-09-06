@@ -23,14 +23,16 @@ jobs:
         run: |
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
           echo "$HOME/.moon/bin" >> $GITHUB_PATH
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: pnpm
       - name: Build wasm, API docs and the site
         run: |
           scripts/build-wasm.sh
-          moon doc
-          cd site && npm install --no-audit --no-fund && cd ..
+          moon -C svgo doc
+          pnpm install --frozen-lockfile
           node site/build.mjs
       - uses: actions/upload-pages-artifact@v3
         with:

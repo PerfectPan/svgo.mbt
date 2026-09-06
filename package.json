@@ -1,0 +1,12 @@
+{
+  "name": "svgo.mbt-workspace",
+  "private": true,
+  "description": "svgo.mbt monorepo: MoonBit module (svgo/), npm package (packages/svgo-mbt), comparison suite (packages/compare), website (site/)",
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "build:wasm": "scripts/build-wasm.sh",
+    "compare": "pnpm -C packages/compare run all",
+    "site": "moon -C svgo doc && node site/build.mjs",
+    "verify": "scripts/verify.sh"
+  }
+}

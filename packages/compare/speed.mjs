@@ -1,5 +1,5 @@
 // In-process throughput of the reference svgo on the same corpus.
-// Usage: node harness/speed.mjs <runs> files...
+// Usage: node packages/compare/speed.mjs <runs> files...
 import { readFileSync } from "node:fs";
 import { optimize } from "svgo";
 const [runs, ...files] = process.argv.slice(2);

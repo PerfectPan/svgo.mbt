@@ -3,6 +3,6 @@ _build/
 target/
 .mooncakes/
 .moonagent/
-npm/svgo.wasm
-harness/node_modules/
-bench/corpus/World_map_x12.svg
+node_modules/
+packages/svgo-mbt/svgo.wasm
+packages/compare/corpus/World_map_x12.svg

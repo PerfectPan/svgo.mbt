@@ -7,7 +7,7 @@ REF=${1:?reference directory}
 moon build --target native --release -q
 BIN=_build/native/release/build/cmd/main/main.exe
 status=0
-for f in testdata/*.svg harness/corpus/*.svg; do
+for f in svgo/testdata/*.svg packages/compare/corpus/*.svg; do
   name=$(basename "$f")
   [ -f "$REF/$name" ] || continue
   out=$("$BIN" "$f")

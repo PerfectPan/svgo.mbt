@@ -1,0 +1,21 @@
+{
+  "name": "@svgo-mbt/compare",
+  "private": true,
+  "type": "module",
+  "description": "Compares svgo.mbt with svgo (Node) on a corpus: output sizes, same-process speed, and resvg pixel diffs of before/after renderings; also collects the numbers for the website",
+  "scripts": {
+    "sizes": "./compare.sh",
+    "render-diff": "node render-diff.mjs",
+    "speed": "node wasm-speed.mjs",
+    "report": "node report.mjs",
+    "collect": "node collect.mjs",
+    "all": "./compare.sh && node render-diff.mjs && node wasm-speed.mjs"
+  },
+  "dependencies": {
+    "svgo-mbt": "workspace:*",
+    "@resvg/resvg-js": "^2.6.2",
+    "pixelmatch": "^6.0.0",
+    "pngjs": "^7.0.0",
+    "svgo": "^4.1.0"
+  }
+}

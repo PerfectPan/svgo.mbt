@@ -23,7 +23,7 @@ for target in wasm-gc js native; do
   step "moon test --target $target"
   moon test --target "$target" -q
 done
-step "fixtures are in sync with plugins/fixtures/*.txt"
+step "fixtures are in sync with svgo/plugins/fixtures/*.txt"
 python3 scripts/gen-fixtures.py --check
 
 if [ "${1:-}" = "--full" ]; then
@@ -31,11 +31,11 @@ if [ "${1:-}" = "--full" ]; then
   scripts/build-wasm.sh
   step "native CLI smoke test"
   moon build --target native --release -q
-  _build/native/release/build/cmd/main/main.exe testdata/sketch-icon.svg --json >/dev/null
-  step "harness: sizes vs svgo-js, render diff, same-process speed"
-  (cd harness && npm install --no-audit --no-fund --silent)
-  harness/compare.sh
-  node harness/render-diff.mjs
-  node harness/wasm-speed.mjs
+  _build/native/release/build/cmd/main/main.exe svgo/testdata/sketch-icon.svg --json >/dev/null
+  step "compare: sizes vs svgo-js, render diff, same-process speed"
+  pnpm install --frozen-lockfile --silent
+  packages/compare/compare.sh
+  node packages/compare/render-diff.mjs
+  node packages/compare/wasm-speed.mjs
 fi
 printf '\n\033[32mall good\033[0m\n'

@@ -1,22 +1,26 @@
 // Build an HTML report showing every testdata SVG before/after optimisation
-// side by side with sizes and pixel diffs. Output: _build/harness/report.html
+// side by side with sizes and pixel diffs. Output: _build/compare/report.html
 import { readFileSync, readdirSync, writeFileSync, mkdirSync } from "node:fs";
+import { join } from "node:path";
+
+const ROOT = new URL("../../", import.meta.url).pathname;
+const TESTDATA = join(ROOT, "svgo/testdata");
 import { execFileSync } from "node:child_process";
 import { Resvg } from "@resvg/resvg-js";
 import pixelmatch from "pixelmatch";
 import { PNG } from "pngjs";
 
-const bin = "_build/native/debug/build/cmd/main/main.exe";
-mkdirSync("_build/harness", { recursive: true });
-const files = readdirSync("testdata").filter((f) => f.endsWith(".svg"));
+const bin = join(ROOT, "_build/native/release/build/cmd/main/main.exe");
+mkdirSync(join(ROOT, "_build/compare"), { recursive: true });
+const files = readdirSync(TESTDATA).filter((f) => f.endsWith(".svg"));
 const render = (svg) => PNG.sync.read(new Resvg(svg, { fitTo: { mode: "width", value: 256 } }).render().asPng());
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
 let rows = "";
 for (const f of files) {
-  const src = readFileSync(`testdata/${f}`, "utf8");
-  const ours = execFileSync(bin, [`testdata/${f}`], { encoding: "utf8" }).trim();
+  const src = readFileSync(join(TESTDATA, f), "utf8");
+  const ours = execFileSync(bin, [join(TESTDATA, f)], { encoding: "utf8" }).trim();
   let js = "";
-  try { js = execFileSync("npx", ["--yes", "svgo", "-q", "-i", `testdata/${f}`, "-o", "-"], { encoding: "utf8" }).trim(); } catch {}
+  try { js = execFileSync("node", [join(ROOT, "packages/compare/node_modules/svgo/bin/svgo"), "-q", "-i", join(TESTDATA, f), "-o", "-"], { encoding: "utf8" }).trim(); } catch {}
   const a = render(src), b = render(ours);
   const diffPng = new PNG({ width: a.width, height: a.height });
   const diff = pixelmatch(a.data, b.data, diffPng.data, a.width, a.height, { threshold: 0.1 });
@@ -42,5 +46,5 @@ figure{margin:0} figcaption{color:#666;margin-bottom:4px}
 .box svg,.box img{max-width:240px;max-height:240px;width:auto;height:auto}
 .code{display:grid;grid-template-columns:1fr 1fr;gap:12px} pre{background:#fff;border:1px solid #ddd;padding:8px;overflow:auto;font-size:11px;white-space:pre-wrap;word-break:break-all}
 </style><h1>svgo.mbt: before / after</h1><p>Left: input as exported by the editor. Middle: output of <code>svgo.mbt</code>. Right: pixel difference of the two renderings (resvg, 256px wide).</p>${rows}`;
-writeFileSync("_build/harness/report.html", html);
-console.log("wrote _build/harness/report.html");
+writeFileSync(join(ROOT, "_build/compare/report.html"), html);
+console.log("wrote _build/compare/report.html");

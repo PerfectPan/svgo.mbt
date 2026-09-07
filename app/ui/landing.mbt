@@ -135,7 +135,7 @@ fn copy_pill(cmd : String) -> Html {
 fn hero(demo_html : Html) -> Html {
   header(class="relative overflow-hidden pb-10 pt-[72px]", [
     div(
-      class="pointer-events-none absolute -inset-x-[10%] -top-[20%] -z-10 h-[120%] bg-[radial-gradient(640px_420px_at_12%_0%,color-mix(in_srgb,var(--color-accent)_16%,transparent),transparent_65%),radial-gradient(560px_420px_at_88%_20%,color-mix(in_srgb,var(--color-mint)_18%,transparent),transparent_65%),radial-gradient(400px_300px_at_60%_90%,rgb(244_114_182/0.12),transparent_65%)]",
+      class="pointer-events-none absolute -inset-x-[10%] -top-[20%] -z-10 h-[120%] bg-[radial-gradient(640px_420px_at_12%_0%,color-mix(in_srgb,var(--color-accent)_16%,transparent),transparent_65%),radial-gradient(560px_420px_at_88%_20%,color-mix(in_srgb,var(--color-mint)_18%,transparent),transparent_65%),radial-gradient(400px_300px_at_60%_90%,rgb(251_191_36/0.14),transparent_65%)]",
       nothing,
     ),
     div(class="wrap", [

@@ -13,7 +13,7 @@ pub fn logo(size? : String = "size-[26px]") -> Html {
   span(
     class="inline-flex",
     attrs=Attrs::build().inner_html(
-      "<svg class=\"\{size}\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><rect width=\"24\" height=\"24\" rx=\"6\" fill=\"#6d5dfc\"/><path d=\"M7 15.5c1 1.2 2.4 1.8 4 1.8 2.3 0 3.8-1.1 3.8-2.9 0-3.6-7.2-1.6-7.2-5.6C7.6 7.2 9 6 11.2 6c1.5 0 2.8.5 3.7 1.4\" fill=\"none\" stroke=\"#fff\" stroke-width=\"1.9\" stroke-linecap=\"round\"/></svg>",
+      "<svg class=\"\{size}\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><rect width=\"24\" height=\"24\" rx=\"6\" fill=\"#0b0d12\"/><path d=\"M7 15.5c1 1.2 2.4 1.8 4 1.8 2.3 0 3.8-1.1 3.8-2.9 0-3.6-7.2-1.6-7.2-5.6C7.6 7.2 9 6 11.2 6c1.5 0 2.8.5 3.7 1.4\" fill=\"none\" stroke=\"#fff\" stroke-width=\"1.9\" stroke-linecap=\"round\"/></svg>",
     ),
     nothing,
   )

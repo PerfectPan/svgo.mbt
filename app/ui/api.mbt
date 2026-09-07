@@ -94,17 +94,17 @@ fn side_nav() -> Html {
         class="mb-1.5 text-xs text-muted",
         tm(
           [
-            text("Generated from "),
+            text("From "),
             code("moon doc"),
             text(". Also on "),
             a(class="text-ink-2", href=MOONCAKES_URL, "mooncakes.io"),
           ],
           [
-            text("由 "),
+            text("来自 "),
             code("moon doc"),
-            text(" 生成，也可在 "),
+            text("，"),
             a(class="text-ink-2", href=MOONCAKES_URL, "mooncakes.io"),
-            text(" 查看"),
+            text(" 上也有"),
           ],
         ),
       ),
@@ -127,16 +127,14 @@ pub fn api_page(chrome : Chrome) -> Val[Html] {
     div(class="pt-[60px]", [
       top_nav(Api, "API", p, chrome.emit),
       page_head(
-        t(
-          "API reference · generated from moon doc", "API 文档 · 由 moon doc 生成",
-        ),
+        t("API reference · from moon doc", "API 文档 · 来自 moon doc"),
         tm([text("Plain structs, "), span(class="grad", "no globals.")], [
-          text("纯结构体，"),
-          span(class="grad", "没有全局状态。"),
+          text("都是普通结构体，"),
+          span(class="grad", "没有全局变量。"),
         ]),
         t(
-          "The public surface of perfectpan/svgo and its packages, extracted from the doc comments in the source. It is the same text mooncakes.io shows, and every item links to the file that defines it.",
-          "perfectpan/svgo 及其子包的公开接口，全部提取自源码中的文档注释，与 mooncakes.io 上显示的是同一份文字。每一项都链接到定义它的源文件。",
+          "The public API of perfectpan/svgo and its packages, pulled from the doc comments in the source. Same text you see on mooncakes.io, and every item links to the file that defines it.",
+          "perfectpan/svgo 及其子包的公开接口，都是从源码里的文档注释提出来的，和 mooncakes.io 上看到的是同一份。每一项都能点进定义它的源文件。",
         ),
       ),
       div(

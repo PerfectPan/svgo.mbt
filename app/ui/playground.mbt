@@ -261,9 +261,7 @@ fn sidebar(m : PgModel, emit : Emit[PgMsg]) -> Html {
       span([
         text("multipass"),
         small(
-          t(
-            "repeat until the output is stable", "重复运行直到输出稳定",
-          ),
+          t("repeat until the output is stable", "跑到输出不变为止"),
         ),
       ]),
       input(
@@ -276,7 +274,7 @@ fn sidebar(m : PgModel, emit : Emit[PgMsg]) -> Html {
     label(class="opt", [
       span([
         text(t("pretty print", "格式化输出")),
-        small(t("indented output", "带缩进的输出")),
+        small(t("indented output", "带缩进")),
       ]),
       input(
         input_type=Checkbox,
@@ -354,7 +352,7 @@ fn toolbar(m : PgModel, emit : Emit[PgMsg]) -> Html {
         button(
           class="btn btn-primary btn-sm",
           title=t(
-            "Copy a URL with the current input and options", "复制带当前输入和选项的链接",
+            "Copy a link with the current input and options", "把当前的输入和选项一起复制成链接",
           ),
           on_click=emit(Share),
           t("Share link", "分享链接"),
@@ -405,7 +403,7 @@ fn pg_view(m : PgModel, p : Prefs, chrome : Chrome, emit : Emit[PgMsg]) -> Html 
                 text(
                   " " +
                   t(
-                    "Playground · runs in your browser", "在线体验 · 全程在浏览器中运行",
+                    "Playground · runs in your browser", "在线体验 · 就在你浏览器里跑",
                   ),
                 ),
               ]),
@@ -426,8 +424,8 @@ fn pg_view(m : PgModel, p : Prefs, chrome : Chrome, emit : Emit[PgMsg]) -> Html 
               class="rise max-w-[56ch] text-[14px] leading-relaxed text-ink-2",
               style=["--d: 120ms"],
               t(
-                "Paste an SVG, open a file or pick a sample; the output updates as you type. Nothing leaves this tab: the optimizer is MoonBit compiled to JavaScript. A share link carries the input and options in the URL.",
-                "粘贴 SVG、打开文件或选一个示例，输出随输入实时更新。所有处理都在这个标签页里完成，不会上传任何内容：优化器是编译成 JavaScript 的 MoonBit。分享链接会把输入和选项一并编码在 URL 里。",
+                "Paste an SVG, open a file, or pick a sample — the output updates as you type. Nothing leaves this tab: the optimizer is MoonBit compiled to JavaScript. Share links put the input and options in the URL.",
+                "粘一段 SVG、打开一个文件，或者选个示例，输入一变输出就跟着变。所有东西都不出这个标签页：优化器是用 MoonBit 写、编译成 JavaScript 的。分享链接会把输入和选项都放进 URL 里。",
               ),
             ),
           ],

@@ -153,7 +153,7 @@ pub fn page_footer() -> Html {
       div(
         tm(
           [
-            text("svgo.mbt · MIT · plugin semantics follow "),
+            text("svgo.mbt · MIT · plugin behavior follows "),
             a(class="text-ink-2", href="https://github.com/svg/svgo", "svgo"),
             text(" (MIT) · this site is also MoonBit, built with "),
             a(
@@ -163,9 +163,9 @@ pub fn page_footer() -> Html {
             ),
           ],
           [
-            text("svgo.mbt · MIT · 插件语义遵循 "),
+            text("svgo.mbt · MIT · 插件行为和 "),
             a(class="text-ink-2", href="https://github.com/svg/svgo", "svgo"),
-            text("（MIT）· 本站同样由 MoonBit 编写，基于 "),
+            text(" 一致（MIT）· 这个站也是 MoonBit 写的，用的 "),
             a(
               class="text-ink-2",
               href="https://github.com/moonbit-community/rabbita",

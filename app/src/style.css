@@ -35,35 +35,9 @@
 }
 
 @layer base {
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --color-bg: #0f1117;
-      --color-bg-2: #13161d;
-      --color-surface: #161922;
-      --color-surface-2: #1d212c;
-      --color-ink: #f2f3f7;
-      --color-ink-2: #c8ccd8;
-      --color-muted: #8b93a5;
-      --color-line: #262b38;
-      --color-line-2: #333949;
-      --color-accent: #8f82ff;
-      --color-accent-soft: #262353;
-      --color-mint: #2dd4a6;
-      --color-mint-soft: #123a30;
-      --color-warn: #f59e0b;
-      --color-check: #222634;
-      --color-bar-b: #343a4a;
-      --shadow-card: 0 30px 80px -40px rgb(0 0 0 / 0.8);
-      color-scheme: dark;
-    }
-  }
-  :root[data-theme="dark"] {
-    --color-bg: #0f1117; --color-bg-2: #13161d; --color-surface: #161922; --color-surface-2: #1d212c;
-    --color-ink: #f2f3f7; --color-ink-2: #c8ccd8; --color-muted: #8b93a5; --color-line: #262b38; --color-line-2: #333949;
-    --color-accent: #8f82ff; --color-accent-soft: #262353; --color-mint: #2dd4a6; --color-mint-soft: #123a30;
-    --color-warn: #f59e0b; --color-check: #222634; --color-bar-b: #343a4a;
-    --shadow-card: 0 30px 80px -40px rgb(0 0 0 / 0.8); color-scheme: dark;
-  }
+  /* Light only, on purpose: the page is designed bright and does not follow
+     the OS colour scheme. */
+  :root { color-scheme: light; }
   html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
   body { @apply bg-bg font-sans text-[15px] leading-relaxed text-ink antialiased; }
   ::selection { @apply bg-accent-soft; }

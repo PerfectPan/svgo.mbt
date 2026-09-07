@@ -38,6 +38,10 @@
   /* Light only, on purpose: the page is designed bright and does not follow
      the OS colour scheme. */
   :root { color-scheme: light; }
+  /* Alternative accents, switchable from the palette widget (bottom right). */
+  :root[data-palette="ocean"] { --color-accent: #2563eb; --color-accent-soft: #e8efff; --color-mint: #0891b2; --color-mint-soft: #e0f4f8; --background-image-grad: linear-gradient(90deg, #2563eb, #06b6d4); }
+  :root[data-palette="warm"] { --color-accent: #ea580c; --color-accent-soft: #fff1e8; --color-mint: #e11d48; --color-mint-soft: #ffe4e6; --background-image-grad: linear-gradient(90deg, #f97316, #e11d48); }
+  :root[data-palette="violet"] { --color-accent: #6d5dfc; --color-accent-soft: #eeecff; --color-mint: #16c79a; --color-mint-soft: #e3f8f1; --background-image-grad: linear-gradient(90deg, #6d5dfc, #16c79a); }
   html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
   body { @apply bg-bg font-sans text-[15px] leading-relaxed text-ink antialiased; }
   ::selection { @apply bg-accent-soft; }

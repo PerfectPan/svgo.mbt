@@ -92,3 +92,15 @@ pub fn fmt_int(n : Int) -> String {
 pub fn fmt_pct(p : Double, digits? : Int = 1) -> String {
   to_fixed(p, digits)
 }
+
+///|
+extern "js" fn set_palette(name : String) -> Unit =
+  #|(name) => {
+  #|  if (name === "emerald") delete document.documentElement.dataset.palette;
+  #|  else document.documentElement.dataset.palette = name;
+  #|  try { localStorage.setItem("svgo-palette", name === "emerald" ? "" : name); } catch (e) {}
+  #|}
+
+///|
+extern "js" fn get_palette() -> String =
+  #|() => document.documentElement.dataset.palette || "emerald"

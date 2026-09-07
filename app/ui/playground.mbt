@@ -223,7 +223,8 @@ fn with_notice(
 
 ///|
 fn sidebar(m : PgModel, emit : Emit[PgMsg]) -> Html {
-  let plugin_rows = @svgo.list_plugins().map(it => {
+  let all = @svgo.list_plugins()
+  let plugin_rows = all.map(it => {
     let (name, desc, _) = it
     label(class="pl", [
       input(
@@ -231,105 +232,130 @@ fn sidebar(m : PgModel, emit : Emit[PgMsg]) -> Html {
         checked=m.enabled.contains(name),
         on_change=emit.map(_ => Toggle(name)),
       ),
-      span([text(name), small(desc)]),
+      span([code(name), small(desc)]),
     ])
   })
   aside(
-    class="overflow-auto border-r border-line bg-bg-2 p-[18px] max-[900px]:border-b max-[900px]:border-r-0",
+    class="rise card min-[961px]:sticky min-[961px]:top-20 min-[961px]:max-h-[calc(100vh-96px)] min-[961px]:overflow-auto",
+    style=["--d: 120ms"],
     [
-      h4(
-        class="mb-2 text-[11px] font-bold uppercase tracking-[0.1em] text-muted",
-        "Options",
-      ),
-      label(
-        class="flex items-center justify-between gap-2.5 py-[5px] text-[13px]",
-        [
-          text("precision"),
-          input(
-            input_type=Number,
-            class="w-[60px] rounded-lg border border-line-2 bg-surface px-2 py-1",
-            value=m.precision.to_string(),
-            min=0,
-            max=8,
-            on_input=emit.map(v => SetPrecision(v)),
-          ),
-        ],
-      ),
-      label(
-        class="flex items-center justify-between gap-2.5 py-[5px] text-[13px]",
-        [
-          text("multipass"),
-          input(
-            input_type=Checkbox,
-            class="accent-accent",
-            checked=m.multipass,
-            on_change=emit.map(_ => ToggleMultipass),
-          ),
-        ],
-      ),
-      label(
-        class="flex items-center justify-between gap-2.5 py-[5px] text-[13px]",
-        [
-          text("pretty print"),
-          input(
-            input_type=Checkbox,
-            class="accent-accent",
-            checked=m.pretty,
-            on_change=emit.map(_ => TogglePretty),
-          ),
-        ],
-      ),
-      h4(
-        class="mb-2 mt-5 flex items-center justify-between text-[11px] font-bold uppercase tracking-[0.1em] text-muted",
-        [
+      div(class="side-head", [text("Options")]),
+      label(class="opt", [
+        span([text("precision"), small("decimal places kept in numbers")]),
+        input(
+          input_type=Number,
+          class="num",
+          value=m.precision.to_string(),
+          min=0,
+          max=8,
+          on_input=emit.map(v => SetPrecision(v)),
+        ),
+      ]),
+      label(class="opt", [
+        span([text("multipass"), small("repeat until nothing changes")]),
+        input(
+          input_type=Checkbox,
+          class="switch",
+          checked=m.multipass,
+          on_change=emit.map(_ => ToggleMultipass),
+        ),
+      ]),
+      label(class="opt", [
+        span([text("pretty print"), small("indented output")]),
+        input(
+          input_type=Checkbox,
+          class="switch",
+          checked=m.pretty,
+          on_change=emit.map(_ => TogglePretty),
+        ),
+      ]),
+      div(class="side-head mt-6", [
+        span(class="flex items-center gap-2", [
           text("Plugins"),
-          button(
-            class="chip -my-1 normal-case tracking-normal",
-            on_click=emit(Reset),
-            "reset",
+          span(
+            class="tag normal-case tracking-normal",
+            "\{m.enabled.length()}/\{all.length()}",
           ),
-        ],
-      ),
-      div(plugin_rows),
+        ]),
+        button(
+          class="chip -my-1 normal-case tracking-normal",
+          on_click=emit(Reset),
+          "reset",
+        ),
+      ]),
+      div(class="divide-y divide-line", plugin_rows),
     ],
   )
 }
 
 ///|
 fn toolbar(m : PgModel, emit : Emit[PgMsg]) -> Html {
-  let options = [option(value="", "Samples…")]
-  for s in samples {
-    options.push(option(value=s.name, s.name))
-  }
-  div(
-    class="flex flex-wrap items-center gap-2.5 border-b border-line px-4 py-2.5",
-    [
-      select(
-        class="rounded-full border border-line-2 bg-surface px-2.5 py-[7px]",
-        on_change=emit.map(v => LoadSample(v)),
-        attrs=Attrs::build().aria_label("sample"),
-        options,
+  let tabs = samples.map(s => {
+    button(
+      class="chip",
+      attrs=Attrs::build().aria_selected(
+        if m.source == s.svg {
+          "true"
+        } else {
+          "false"
+        },
       ),
-      label(class="btn btn-sm", for_="pg-file", [
-        text("Open .svg"),
-        input(
-          id="pg-file",
-          input_type=File,
-          accept=".svg,image/svg+xml",
-          hidden=true,
-          on_change=emit.map(_ => FilePicked),
+      on_click=emit(LoadSample(s.name)),
+      s.name,
+    )
+  })
+  div(
+    class="flex flex-wrap items-center gap-2 border-b border-line bg-surface-2 px-4 py-3",
+    [
+      div(class="flex flex-wrap items-center gap-1", [
+        div(
+          class="flex flex-wrap gap-1",
+          attrs=Attrs::build().role("tablist"),
+          tabs,
+        ),
+        label(class="chip", for_="pg-file", [
+          text("Open .svg…"),
+          input(
+            id="pg-file",
+            input_type=File,
+            accept=".svg,image/svg+xml",
+            hidden=true,
+            on_change=emit.map(_ => FilePicked),
+          ),
+        ]),
+      ]),
+      div(class="ml-auto flex items-center gap-2", [
+        span(class="text-[12.5px] font-semibold text-mint", m.notice),
+        button(class="btn btn-sm", on_click=emit(Copy), "Copy output"),
+        button(class="btn btn-sm", on_click=emit(Download), "Download"),
+        button(
+          class="btn btn-primary btn-sm",
+          title="URL with the current input and options",
+          on_click=emit(Share),
+          "Share link",
         ),
       ]),
-      span(class="flex-1", nothing),
-      span(class="text-[12.5px] text-mint font-semibold", m.notice),
-      button(class="btn btn-sm", on_click=emit(Copy), "Copy output"),
-      button(class="btn btn-sm", on_click=emit(Download), "Download"),
-      button(
-        class="btn btn-sm",
-        title="URL with the current input and options",
-        on_click=emit(Share),
-        "Share link",
+    ],
+  )
+}
+
+///|
+fn applied_row(o : Outcome) -> Html {
+  div(
+    class="flex flex-wrap items-center gap-1.5 border-t border-line bg-surface px-4 py-3 text-[12.5px]",
+    [
+      span(
+        class="mr-1.5 text-[11px] font-bold uppercase tracking-[0.1em] text-muted",
+        "changed by",
       ),
+      if o.applied.is_empty() {
+        span(class="text-muted", "nothing yet")
+      } else {
+        span(
+          class="flex flex-wrap gap-1.5",
+          o.applied.map(n => span(class="tag", n)),
+        )
+      },
     ],
   )
 }
@@ -338,53 +364,62 @@ fn toolbar(m : PgModel, emit : Emit[PgMsg]) -> Html {
 fn pg_view(m : PgModel, emit : Emit[PgMsg]) -> Html {
   div([
     top_nav(Playground, "playground"),
+    page_head(
+      "Playground · runs in your browser",
+      [text("Try it on "), span(class="grad", "your own files.")],
+      "Paste an SVG, open a file or pick a sample, then tune precision and plugins and watch the output change as you type. Copy it, download it or share a link that carries your input and options. Nothing leaves this tab: the optimizer is MoonBit compiled to JavaScript.",
+    ),
     div(
-      class="grid h-[calc(100vh-61px)] grid-cols-[272px_1fr] max-[900px]:h-auto max-[900px]:grid-cols-1",
+      class="wrap grid items-start gap-5 pb-20 min-[961px]:grid-cols-[280px_minmax(0,1fr)]",
       [
         sidebar(m, emit),
-        main_(class="grid min-h-0 min-w-0 grid-rows-[auto_1fr_auto]", [
-          toolbar(m, emit),
-          div(class="grid min-h-0 grid-cols-2 max-[900px]:grid-cols-1", [
-            div(class="pane", [
-              span(class="pane-label", "input"),
-              textarea(
-                class="!h-auto !min-h-[240px] !flex-1",
-                value=m.source,
-                placeholder="Paste SVG or pick a sample",
-                on_input=emit.map(s => Edit(s)),
-                attrs=Attrs::build().spellcheck(false).aria_label("SVG input"),
-                nothing,
-              ),
-              svg_preview(m.source, class="preview !h-[220px]"),
-            ]),
-            div(
-              class="pane border-l border-line max-[900px]:border-l-0 max-[900px]:border-t",
-              [
-                span(class="pane-label", "output"),
+        main_(
+          class="rise overflow-hidden rounded-card border border-line bg-surface shadow-card",
+          style=["--d: 220ms"],
+          [
+            toolbar(m, emit),
+            div(class="grid grid-cols-2 max-[800px]:grid-cols-1", [
+              div(class="pane", [
+                span(class="pane-label", "input"),
                 textarea(
-                  class="!h-auto !min-h-[240px] !flex-1",
-                  value=if m.outcome.error != "" {
-                    m.outcome.error
-                  } else {
-                    m.outcome.data
-                  },
-                  read_only=true,
-                  attrs=Attrs::build().aria_label("optimized SVG"),
+                  class="!h-[min(48vh,420px)]",
+                  value=m.source,
+                  placeholder="Paste SVG or pick a sample",
+                  on_input=emit.map(s => Edit(s)),
+                  attrs=Attrs::build().spellcheck(false).aria_label("SVG input"),
                   nothing,
                 ),
-                svg_preview(m.outcome.data, class="preview !h-[220px]"),
-              ],
-            ),
-          ]),
-          div(class="bg-surface", [
+                svg_preview(m.source, class="preview !h-[200px]"),
+              ]),
+              div(
+                class="pane border-l border-line max-[800px]:border-l-0 max-[800px]:border-t",
+                [
+                  span(class="pane-label", "svgo.mbt output"),
+                  textarea(
+                    class="!h-[min(48vh,420px)]",
+                    value=if m.outcome.error != "" {
+                      m.outcome.error
+                    } else {
+                      m.outcome.data
+                    },
+                    read_only=true,
+                    attrs=Attrs::build().aria_label("optimized SVG"),
+                    nothing,
+                  ),
+                  svg_preview(m.outcome.data, class="preview !h-[200px]"),
+                ],
+              ),
+            ]),
             stats_bar(
               m.outcome,
-              "\{m.outcome.passes} pass\{if m.outcome.passes == 1 { "" } else { "es" }} · changed by: \{if m.outcome.applied.is_empty() { "nothing" } else { m.outcome.applied.join(", ") }}",
+              "\{m.outcome.passes} pass\{if m.outcome.passes == 1 { "" } else { "es" }}",
             ),
-          ]),
-        ]),
+            applied_row(m.outcome),
+          ],
+        ),
       ],
     ),
+    page_footer(),
   ])
 }
 

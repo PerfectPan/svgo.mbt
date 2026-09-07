@@ -94,13 +94,48 @@ pub fn fmt_pct(p : Double, digits? : Int = 1) -> String {
 }
 
 ///|
-extern "js" fn set_palette(name : String) -> Unit =
-  #|(name) => {
-  #|  if (name === "emerald") delete document.documentElement.dataset.palette;
-  #|  else document.documentElement.dataset.palette = name;
-  #|  try { localStorage.setItem("svgo-palette", name === "emerald" ? "" : name); } catch (e) {}
+/// Decorative motion: scroll-triggered reveals (`.reveal` gets `.in` when it
+/// enters the viewport) and number count-ups (`data-count`). Installed once;
+/// a MutationObserver picks up nodes the app renders later. Adds `motion` to
+/// <html> so the stylesheet only hides `.reveal` elements while this runs,
+/// and does nothing when the visitor prefers reduced motion.
+extern "js" fn install_motion() -> Unit =
+  #|() => {
+  #|  if (!("IntersectionObserver" in window) || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  #|  document.documentElement.classList.add("motion");
+  #|  const count = (el) => {
+  #|    const raw = el.dataset.count, target = parseFloat(raw), final = el.textContent;
+  #|    if (!target || el.dataset.counted) return;
+  #|    el.dataset.counted = "1";
+  #|    const dec = (raw.split(".")[1] || "").length, t0 = performance.now(), dur = 1400;
+  #|    const tick = (now) => {
+  #|      const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+  #|      el.textContent = k >= 1 ? final : final.replace(raw, (target * e).toFixed(dec));
+  #|      if (k < 1) requestAnimationFrame(tick);
+  #|    };
+  #|    requestAnimationFrame(tick);
+  #|  };
+  #|  const io = new IntersectionObserver((entries) => {
+  #|    for (const e of entries) {
+  #|      if (!e.isIntersecting) continue;
+  #|      io.unobserve(e.target);
+  #|      e.target.classList.add("in");
+  #|      if (e.target.dataset.count) count(e.target);
+  #|      e.target.querySelectorAll("[data-count]").forEach(count);
+  #|    }
+  #|  }, { rootMargin: "0px 0px -8% 0px", threshold: 0.1 });
+  #|  const scan = (root) => {
+  #|    if (root.nodeType !== 1) return;
+  #|    if (root.classList.contains("reveal") && !root.classList.contains("in")) io.observe(root);
+  #|    root.querySelectorAll(".reveal:not(.in)").forEach((el) => io.observe(el));
+  #|  };
+  #|  scan(document.documentElement);
+  #|  new MutationObserver((ms) => ms.forEach((m) => m.addedNodes.forEach(scan)))
+  #|    .observe(document.body, { childList: true, subtree: true });
   #|}
 
 ///|
-extern "js" fn get_palette() -> String =
-  #|() => document.documentElement.dataset.palette || "emerald"
+/// Call once before mounting the app.
+pub fn start_motion() -> Unit {
+  install_motion()
+}

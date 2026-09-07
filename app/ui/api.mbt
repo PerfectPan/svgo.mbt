@@ -115,8 +115,13 @@ pub fn api_page() -> Val[Html] {
   Val::constant(
     div([
       top_nav(Api, "API"),
+      page_head(
+        "API reference · generated from moon doc",
+        [text("Plain structs, "), span(class="grad", "no globals.")],
+        "The public surface of perfectpan/svgo and its packages. Everything below is extracted from the doc comments in the source, so it is the same text mooncakes.io shows; each item links to the line that defines it.",
+      ),
       div(
-        class="wrap grid gap-10 pb-20 pt-10 min-[901px]:grid-cols-[240px_1fr]",
+        class="wrap grid gap-10 pb-20 pt-2 min-[901px]:grid-cols-[240px_1fr]",
         [side_nav(), main_(class="api-main min-w-0", sections)],
       ),
       page_footer(),

@@ -68,6 +68,25 @@ pub fn top_nav(route : Route, subtitle : String) -> Html {
 }
 
 ///|
+/// Page header used by the playground and API pages: eyebrow, display title
+/// and a one-paragraph blurb, entering with the same stagger as the hero.
+pub fn page_head(eyebrow : String, title : Array[Html], blurb : String) -> Html {
+  header(class="wrap pb-8 pt-14", [
+    div(class="eyebrow rise", [span(class="dot", nothing), text(" " + eyebrow)]),
+    h1(
+      class="display rise mt-3 text-[clamp(34px,4.4vw,52px)] leading-[1.05]",
+      style=["--d: 70ms"],
+      title,
+    ),
+    p(
+      class="rise mt-4 max-w-[62ch] text-base text-ink-2",
+      style=["--d: 140ms"],
+      blurb,
+    ),
+  ])
+}
+
+///|
 pub fn page_footer() -> Html {
   footer(class="pb-14 pt-9 text-[13px] text-muted", [
     div(class="wrap flex flex-wrap justify-between gap-5", [

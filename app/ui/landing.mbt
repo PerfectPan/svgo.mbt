@@ -46,7 +46,8 @@ fn demo_view(m : DemoModel, emit : Emit[DemoMsg]) -> Html {
     )
   })
   div(
-    class="mt-12 overflow-hidden rounded-card border border-line bg-surface shadow-card",
+    class="rise mt-12 overflow-hidden rounded-card border border-line bg-surface shadow-card",
+    style=["--d: 360ms"],
     [
       div(
         class="flex flex-wrap items-center justify-between gap-4 border-b border-line bg-surface-2 px-4 py-3",
@@ -133,22 +134,37 @@ fn copy_pill(cmd : String) -> Html {
 
 ///|
 fn hero(demo_html : Html) -> Html {
-  header(class="relative overflow-hidden pb-10 pt-[72px]", [
+  header(class="relative isolate overflow-hidden pb-10 pt-[72px]", [
     div(
-      class="pointer-events-none absolute -inset-x-[10%] -top-[20%] -z-10 h-[120%] bg-[radial-gradient(640px_420px_at_12%_0%,color-mix(in_srgb,var(--color-accent)_16%,transparent),transparent_65%),radial-gradient(560px_420px_at_88%_20%,color-mix(in_srgb,var(--color-mint)_18%,transparent),transparent_65%),radial-gradient(400px_300px_at_60%_90%,rgb(251_191_36/0.14),transparent_65%)]",
-      nothing,
+      class="pointer-events-none absolute inset-0 -z-10 overflow-hidden",
+      attrs=Attrs::build().aria_hidden("true"),
+      [
+        span(
+          class="blob -left-[8%] -top-[30%] size-[640px] bg-accent/20",
+          nothing,
+        ),
+        span(
+          class="blob -right-[6%] -top-[10%] size-[560px] bg-teal/20 [animation-delay:-7s]",
+          nothing,
+        ),
+        span(
+          class="blob -bottom-[25%] left-[42%] size-[480px] bg-amber-300/25 [animation-delay:-14s]",
+          nothing,
+        ),
+      ],
     ),
     div(class="wrap", [
       div(
         class="grid items-center gap-12 max-[960px]:grid-cols-1 max-[960px]:gap-7 min-[961px]:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]",
         [
           div([
-            div(class="eyebrow", [
+            div(class="eyebrow rise", [
               span(class="dot", nothing),
               text(" MoonBit · WebAssembly · \{wasm_bytes / 1024} KB"),
             ]),
             h1(
-              class="display mt-3.5 text-[clamp(42px,5.6vw,68px)] leading-[1.02]",
+              class="display rise mt-3.5 text-[clamp(42px,5.6vw,68px)] leading-[1.02]",
+              style=["--d: 80ms"],
               [
                 text("Smaller SVGs."),
                 br(),
@@ -156,21 +172,27 @@ fn hero(demo_html : Html) -> Html {
               ],
             ),
             p(
-              class="mt-[22px] max-w-[54ch] text-[17px] leading-relaxed text-ink-2",
+              class="rise mt-[22px] max-w-[54ch] text-[17px] leading-relaxed text-ink-2",
+              style=["--d: 160ms"],
               "svgo.mbt is an SVG optimizer written in MoonBit and compiled to one wasm-gc module. Same plugin pipeline as svgo's preset-default, a fraction of the runtime: it runs in the browser, in Node 22+, or as a 1 MB native binary, and every optimisation is checked with pixel diffs before it ships.",
             ),
-            div(class="mt-7 flex flex-wrap items-center gap-3", [
-              a(
-                class="btn btn-primary",
-                href="#/playground",
-                "Open the playground",
-              ),
-              copy_pill("npm i svgo-mbt"),
-              copy_pill("moon add perfectpan/svgo"),
-            ]),
+            div(
+              class="rise mt-7 flex flex-wrap items-center gap-3",
+              style=["--d: 240ms"],
+              [
+                a(
+                  class="btn btn-primary",
+                  href="#/playground",
+                  "Open the playground",
+                ),
+                copy_pill("npm i svgo-mbt"),
+                copy_pill("moon add perfectpan/svgo"),
+              ],
+            ),
           ]),
           div(
-            class="relative aspect-video overflow-hidden rounded-[22px] border border-line bg-surface shadow-card",
+            class="rise relative aspect-video overflow-hidden rounded-[22px] border border-line bg-surface shadow-card",
+            style=["--d: 200ms"],
             attrs=Attrs::build().aria_hidden("true"),
             [
               video(
@@ -203,7 +225,7 @@ fn hero(demo_html : Html) -> Html {
 ///|
 fn section_head(title : String, blurb : Array[Html]) -> Html {
   div(
-    class="mb-9 grid items-end gap-8 max-[800px]:gap-3 min-[801px]:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]",
+    class="reveal mb-9 grid items-end gap-8 max-[800px]:gap-3 min-[801px]:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]",
     [
       h2(class="display text-[clamp(30px,3.4vw,42px)] leading-[1.08]", title),
       p(class="max-w-[58ch] text-base text-ink-2", blurb),
@@ -243,8 +265,8 @@ fn numbers_section() -> Html {
     let w = @math.ln(ms / lo) / @math.ln(hi / lo) * 78.0
     "width: \{to_fixed(w, 2)}%"
   }
-  let bar_rows = rows.map(r => {
-    div(class="row", [
+  let bar_rows = rows.mapi((idx, r) => {
+    div(class="row", style=["--i: \{idx}"], [
       div(class="name", title=r.file, [
         text(nice_name(r.file)),
         small(fmt_kb(r.original)),
@@ -291,17 +313,26 @@ fn numbers_section() -> Html {
         text(" (\{generated_on})."),
       ]),
       div(class="mb-5 grid grid-cols-3 gap-4 max-sm:grid-cols-1", [
-        div(class="kpi", [
-          b("\{to_fixed(median, 1)}×"),
+        div(class="kpi reveal", [
+          b(
+            attrs=Attrs::build().data_set("count", to_fixed(median, 1)),
+            "\{to_fixed(median, 1)}×",
+          ),
           span("median speedup over svgo-js, same process"),
         ]),
-        div(class="kpi", [
-          b("\{wasm_bytes / 1024}"),
+        div(class="kpi reveal", style=["--d: 90ms"], [
+          b(
+            attrs=Attrs::build().data_set(
+              "count",
+              (wasm_bytes / 1024).to_string(),
+            ),
+            "\{wasm_bytes / 1024}",
+          ),
           span(
             "KB of wasm-gc, no dependencies, streams and instantiates in milliseconds",
           ),
         ]),
-        div(class="kpi", [
+        div(class="kpi reveal", style=["--d: 180ms"], [
           b("0 px"),
           span(
             "rendering differences on every editor export in the corpus (resvg + pixelmatch)",
@@ -309,7 +340,7 @@ fn numbers_section() -> Html {
         ]),
       ]),
       div(class="grid gap-5 min-[901px]:grid-cols-[1.3fr_1fr]", [
-        div(class="card", [
+        div(class="card reveal", [
           h3("Time per optimisation"),
           div(class="sub", "milliseconds, lower is better · log scale"),
           div(class="grid gap-3", bar_rows),
@@ -318,7 +349,7 @@ fn numbers_section() -> Html {
             span([i(class="bg-bar-b", nothing), text("svgo-js")]),
           ]),
         ]),
-        div(class="card", [
+        div(class="card reveal", style=["--d: 120ms"], [
           h3("Output size"),
           div(class="sub", "bytes after optimisation"),
           table(class="sizes", [
@@ -342,12 +373,17 @@ fn numbers_section() -> Html {
 
 ///|
 fn plugins_section() -> Html {
-  let cards = @svgo.list_plugins().map(item => {
+  let cards = @svgo.list_plugins().mapi((idx, item) => {
     let (name, desc, enabled) = item
-    div(class=if enabled { "plugin" } else { "plugin plugin-optional" }, [
-      code(name),
-      p(desc),
-    ])
+    div(
+      class=if enabled {
+        "plugin reveal stagger"
+      } else {
+        "plugin plugin-optional reveal stagger"
+      },
+      style=["--i: \{idx}"],
+      [code(name), p(desc)],
+    )
   })
   let count = @svgo.list_plugins().filter(it => it.2).length()
   section(id="plugins", class="border-y border-line bg-bg-2 py-20", [
@@ -368,8 +404,17 @@ fn plugins_section() -> Html {
 }
 
 ///|
-fn snippet(title : String, sub : String, lines : Array[Html]) -> Html {
-  div(class="use", [h3(title), div(class="sub", sub), pre(lines)])
+fn snippet(
+  idx : Int,
+  title : String,
+  sub : String,
+  lines : Array[Html],
+) -> Html {
+  div(class="use reveal", style=["--d: \{idx * 110}ms"], [
+    h3(title),
+    div(class="sub", sub),
+    pre(lines),
+  ])
 }
 
 ///|
@@ -393,6 +438,7 @@ fn use_section() -> Html {
       ]),
       div(class="grid gap-4 min-[901px]:grid-cols-3", [
         snippet(
+          0,
           "JavaScript · npm",
           "Node 22+, Chrome 130+, Firefox 134+, Safari 18.4+ (JS String Builtins).",
           [
@@ -414,6 +460,7 @@ fn use_section() -> Html {
           ],
         ),
         snippet(
+          1,
           "Command line · native",
           "A single binary; cold start is about 40× faster than the svgo CLI.",
           [
@@ -427,6 +474,7 @@ fn use_section() -> Html {
           ],
         ),
         snippet(
+          2,
           "MoonBit · library",
           "Plain structs, no globals; parse, plugins and path packages are usable on their own.",
           [
@@ -448,9 +496,9 @@ fn use_section() -> Html {
 
 ///|
 fn gallery_section() -> Html {
-  let shots = samples.map(s => {
+  let shots = samples.mapi((idx, s) => {
     let o = run_optimize(s.svg)
-    div(class="shot", [
+    div(class="shot reveal stagger", style=["--i: \{idx}"], [
       div(class="pair", [
         div(attrs=Attrs::build().inner_html(s.svg), nothing),
         div(attrs=Attrs::build().inner_html(o.data), nothing),

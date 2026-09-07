@@ -67,11 +67,11 @@ export const Hero = () => {
   return (
     <AbsoluteFill className="bg-white font-sans text-ink">
       {/* soft colour wash, same as the page hero */}
-      <div className="absolute inset-0 bg-[radial-gradient(600px_400px_at_15%_10%,rgb(109_93_252/0.14),transparent_60%),radial-gradient(500px_400px_at_90%_90%,rgb(22_199_154/0.15),transparent_60%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(600px_400px_at_15%_10%,rgb(5_150_105/0.14),transparent_60%),radial-gradient(500px_400px_at_90%_90%,rgb(20_184_166/0.16),transparent_60%)]" />
 
       {/* code card */}
       <div
-        className="absolute left-[72px] top-[72px] h-[576px] w-[820px] overflow-hidden rounded-[20px] border border-line bg-white shadow-[0_30px_80px_-40px_rgb(30_20_90/0.35)]"
+        className="absolute left-[72px] top-[72px] h-[576px] w-[820px] overflow-hidden rounded-[20px] border border-line bg-white shadow-[0_30px_80px_-40px_rgb(15_40_60/0.30)]"
         style={{ opacity: appear, transform: `translateY(${(1 - appear) * 24}px)` }}
       >
         <div className="flex h-11 items-center gap-2 border-b border-line px-[18px] text-[13px] text-muted">

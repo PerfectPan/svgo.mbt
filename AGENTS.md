@@ -28,8 +28,8 @@ root installs every JS package.
 | wasm artifact for `packages/svgo-mbt` and the site | `scripts/build-wasm.sh` |
 | compare with svgo-js (sizes, render diff, speed) | `pnpm compare` (or the scripts in `packages/compare/`) |
 | refresh the numbers on the site | `node packages/compare/collect.mjs` → `app/data.json` |
-| API docs data (also what mooncakes.io renders) | `moon -C svgo doc` → `_build/doc/` |
-| build the site into `_build/app` | `pnpm site` (= `moon -C svgo doc && node app/build.mjs`; needs `moon install moonbit-community/warren`) |
+| API docs data (also what mooncakes.io renders) | `pnpm docs` (= `MOON_WORK=off moon -C svgo doc`, workspace mode off because the app member is js-only) → `svgo/_build/doc/` |
+| build the site into `_build/app` | `pnpm app` (= `pnpm docs && node app/build.mjs`; needs `moon install moonbit-community/warren`) |
 | dev server with live reload | `pnpm dev` → http://localhost:4173 (warren dev + tailwind --watch) |
 | regenerate the site's data files | `node app/gen.mjs` (after collect.mjs or moon doc changed) |
 | re-render the hero animation | `pnpm -C app motion:render` |
@@ -90,7 +90,7 @@ docs/ARCHITECTURE.md          design notes
   site's API reference is generated from them).
 - Derive `Debug`, not `Show`, for data; implement `Show` only for errors.
 - Tests: `inspect(value, content=...)` snapshots for outputs, `assert_eq` for
-  invariant checks. New plugin behaviour gets a fixture file first, then a
+  invariant checks. New plugin behavior gets a fixture file first, then a
   unit test if the logic is subtle.
 - Lookups in hot paths use `Set`/`Map`, never linear `Array::contains` over
   string lists. Measure with `scripts/bench.sh` before and after; the

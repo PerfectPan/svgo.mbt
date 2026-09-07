@@ -29,7 +29,7 @@ Three properties drive the design:
 - **Safe by construction and by test.** Plugins only remove what a renderer
   cannot observe; ids that are referenced anywhere survive; inherited
   defaults are only dropped when no ancestor overrides them. Every fixture is
-  rasterised before and after with resvg and compared pixel by pixel.
+  rasterized before and after with resvg and compared pixel by pixel.
 - **Fast.** In one Node process the wasm build is 4 to 6 times faster than
   svgo-js on the same files; the native CLI starts about 40 times faster than
   the svgo CLI. Numbers below.
@@ -161,7 +161,7 @@ Same Node process, both with multipass, milliseconds per call
 | World map (low resolution) | 85 KB | 9.1 | 53.0 | 5.8× |
 
 In-module (`scripts/bench.sh`, native release): the Tiger takes 6.8 ms end to
-end, of which parsing is 0.23 ms and path data optimisation 1.7 ms per pass.
+end, of which parsing is 0.23 ms and path data optimization 1.7 ms per pass.
 `benchmark/README.md` has the stage breakdown and the history of what made it
 fast.
 

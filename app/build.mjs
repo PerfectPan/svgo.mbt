@@ -2,7 +2,7 @@
 //   1. Tailwind: src/style.css -> public/style.css
 //   2. gen.mjs: data / samples / API docs -> ui/*.mbt
 //   3. warren build: MoonBit (js backend) -> dist, with public/ copied along
-// Usage: scripts/build-wasm.sh && moon -C svgo doc && node app/build.mjs   (pnpm install once)
+// Usage: scripts/build-wasm.sh && pnpm docs && node app/build.mjs   (pnpm install once)
 import { spawnSync } from "node:child_process";
 import { cpSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";

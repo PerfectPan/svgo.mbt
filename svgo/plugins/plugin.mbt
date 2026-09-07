@@ -16,7 +16,7 @@ pub fn Context::new(precision? : Int = 3) -> Context {
 
 ///|
 /// A plugin transforms the document in place and reports whether it changed
-/// anything, which drives multipass optimisation.
+/// anything, which drives multipass optimization.
 pub(all) struct Plugin {
   name : String
   description : String

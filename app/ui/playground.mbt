@@ -189,7 +189,7 @@ fn pg_update(
         m,
         with_notice(
           emit,
-          t("Output copied", "已复制输出"),
+          t("Output copied", "输出已复制"),
           @rabbita.effect(fn() noraise { copy_text(m.outcome.data) }),
         ),
       )
@@ -246,9 +246,7 @@ fn sidebar(m : PgModel, emit : Emit[PgMsg]) -> Html {
     label(class="opt", [
       span([
         text(t("precision", "精度")),
-        small(
-          t("decimal places kept in numbers", "数字保留的小数位数"),
-        ),
+        small(t("decimal places kept", "保留的小数位数")),
       ]),
       input(
         input_type=Number,
@@ -263,7 +261,9 @@ fn sidebar(m : PgModel, emit : Emit[PgMsg]) -> Html {
       span([
         text("multipass"),
         small(
-          t("repeat until nothing changes", "反复运行直到没有变化"),
+          t(
+            "repeat until the output is stable", "重复运行直到输出稳定",
+          ),
         ),
       ]),
       input(
@@ -354,7 +354,7 @@ fn toolbar(m : PgModel, emit : Emit[PgMsg]) -> Html {
         button(
           class="btn btn-primary btn-sm",
           title=t(
-            "URL with the current input and options", "带当前输入和选项的链接",
+            "Copy a URL with the current input and options", "复制带当前输入和选项的链接",
           ),
           on_click=emit(Share),
           t("Share link", "分享链接"),
@@ -394,48 +394,89 @@ fn pg_view(m : PgModel, p : Prefs, chrome : Chrome, emit : Emit[PgMsg]) -> Html 
   div(class="pt-[60px]", [
     top_nav(Playground, t("playground", "在线体验"), p, chrome.emit),
     div(
-      class="pg mx-auto grid w-[min(1480px,calc(100%-32px))] gap-4 py-4 min-[961px]:h-[calc(100dvh-60px)] min-[961px]:grid-cols-[280px_minmax(0,1fr)]",
+      class="pg mx-auto grid w-[min(1480px,calc(100%-32px))] grid-rows-[auto_minmax(0,1fr)] gap-4 pb-4 pt-6 min-[961px]:h-[calc(100dvh-60px)]",
       [
-        sidebar(m, emit),
-        main_(
-          class="rise grid min-h-0 grid-rows-[auto_minmax(0,1fr)_auto_auto] overflow-hidden rounded-card border border-line bg-surface shadow-card",
-          style=["--d: 160ms"],
+        div(
+          class="flex flex-wrap items-end justify-between gap-x-10 gap-y-2 px-1",
           [
-            toolbar(m, emit),
-            div(class="grid min-h-0 grid-cols-2 max-[800px]:grid-cols-1", [
-              div(class="pane", [
-                span(class="pane-label", t("input", "输入")),
-                code_editor(
-                  m.source,
-                  emit.map(s => Edit(s)),
-                  placeholder=t(
-                    "Paste SVG or pick a sample", "粘贴 SVG，或选一个示例",
+            div([
+              div(class="eyebrow rise", [
+                span(class="dot", nothing),
+                text(
+                  " " +
+                  t(
+                    "Playground · runs in your browser", "在线体验 · 全程在浏览器中运行",
                   ),
-                  label=t("SVG input", "SVG 输入"),
                 ),
-                svg_preview(m.source),
               ]),
-              div(
-                class="pane border-l border-line max-[800px]:border-l-0 max-[800px]:border-t",
-                [
-                  span(
-                    class="pane-label",
-                    t("svgo.mbt output", "svgo.mbt 输出"),
-                  ),
-                  code_view(
-                    if m.outcome.error != "" {
-                      m.outcome.error
-                    } else {
-                      m.outcome.data
-                    },
-                    label=t("optimized SVG", "优化后的 SVG"),
-                  ),
-                  svg_preview(m.outcome.data),
-                ],
+              h1(
+                class="display rise mt-1.5 text-[clamp(28px,3.2vw,38px)] leading-[1.08]",
+                style=["--d: 60ms"],
+                tm(
+                  [text("Try it on "), span(class="grad", "your own files.")],
+                  [
+                    text("用"),
+                    span(class="grad", "你自己的文件"),
+                    text("试试。"),
+                  ],
+                ),
               ),
             ]),
-            stats_bar(m.outcome, passes),
-            applied_row(m.outcome),
+            @html.p(
+              class="rise max-w-[56ch] text-[14px] leading-relaxed text-ink-2",
+              style=["--d: 120ms"],
+              t(
+                "Paste an SVG, open a file or pick a sample; the output updates as you type. Nothing leaves this tab: the optimizer is MoonBit compiled to JavaScript. A share link carries the input and options in the URL.",
+                "粘贴 SVG、打开文件或选一个示例，输出随输入实时更新。所有处理都在这个标签页里完成，不会上传任何内容：优化器是编译成 JavaScript 的 MoonBit。分享链接会把输入和选项一并编码在 URL 里。",
+              ),
+            ),
+          ],
+        ),
+        div(
+          class="grid min-h-0 gap-4 min-[961px]:grid-cols-[280px_minmax(0,1fr)]",
+          [
+            sidebar(m, emit),
+            main_(
+              class="rise grid min-h-0 grid-rows-[auto_minmax(0,1fr)_auto_auto] overflow-hidden rounded-card border border-line bg-surface shadow-card",
+              style=["--d: 160ms"],
+              [
+                toolbar(m, emit),
+                div(class="grid min-h-0 grid-cols-2 max-[800px]:grid-cols-1", [
+                  div(class="pane", [
+                    span(class="pane-label", t("input", "输入")),
+                    code_editor(
+                      m.source,
+                      emit.map(s => Edit(s)),
+                      placeholder=t(
+                        "Paste an SVG or pick a sample", "粘贴 SVG 或选择示例",
+                      ),
+                      label=t("SVG input", "SVG 输入"),
+                    ),
+                    svg_preview(m.source),
+                  ]),
+                  div(
+                    class="pane border-l border-line max-[800px]:border-l-0 max-[800px]:border-t",
+                    [
+                      span(
+                        class="pane-label",
+                        t("svgo.mbt output", "svgo.mbt 输出"),
+                      ),
+                      code_view(
+                        if m.outcome.error != "" {
+                          m.outcome.error
+                        } else {
+                          m.outcome.data
+                        },
+                        label=t("optimized SVG", "优化后的 SVG"),
+                      ),
+                      svg_preview(m.outcome.data),
+                    ],
+                  ),
+                ]),
+                stats_bar(m.outcome, passes),
+                applied_row(m.outcome),
+              ],
+            ),
           ],
         ),
       ],

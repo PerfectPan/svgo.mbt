@@ -34,7 +34,7 @@ jobs:
       - name: Website builds (Rabbita app, js backend)
         run: |
           moon install moonbit-community/warren
-          moon -C svgo doc
+          MOON_WORK=off moon -C svgo doc
           node app/build.mjs
       - name: Benchmarks (native)
         if: matrix.os == 'macos-latest'

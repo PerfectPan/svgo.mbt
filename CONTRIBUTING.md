@@ -100,4 +100,4 @@ The repository ships a pre-commit hook that runs `moon check`:
 ## Commit style
 
 `type(scope): summary` with `feat`, `fix`, `perf`, `docs`, `bench`, `compare`, `site`,
-`build`, `chore`. The body says what changed in behaviour or numbers.
+`build`, `chore`. The body says what changed in behavior or numbers.

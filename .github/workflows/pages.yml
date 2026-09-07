@@ -32,7 +32,7 @@ jobs:
       - name: Build wasm, API docs and the site
         run: |
           scripts/build-wasm.sh
-          moon -C svgo doc
+          MOON_WORK=off moon -C svgo doc
           pnpm install --frozen-lockfile
           node app/build.mjs
       - uses: actions/upload-pages-artifact@v3

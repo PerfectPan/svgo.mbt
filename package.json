@@ -7,7 +7,8 @@
     "dev": "pnpm -C app dev",
     "build:wasm": "scripts/build-wasm.sh",
     "compare": "pnpm -C packages/compare run all",
-    "app": "moon -C svgo doc && node app/build.mjs",
+    "docs": "MOON_WORK=off moon -C svgo doc",
+    "app": "pnpm -s docs && node app/build.mjs",
     "verify": "scripts/verify.sh"
   }
 }

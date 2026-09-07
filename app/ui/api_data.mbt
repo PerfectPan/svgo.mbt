@@ -272,7 +272,7 @@ pub let api_packages : Array[ApiPackage] = [
         kind: "type",
         name: "Plugin",
         signature: "pub(all) struct Plugin {\n  name : String\n  description : String\n  run : (@perfectpan/svgo/xml.Document, Context) -> Bool\n}",
-        doc: "\n A plugin transforms the document in place and reports whether it changed\n anything, which drives multipass optimisation.",
+        doc: "\n A plugin transforms the document in place and reports whether it changed\n anything, which drives multipass optimization.",
         file: "plugin.mbt#L20",
         methods: [],
         impls: [],

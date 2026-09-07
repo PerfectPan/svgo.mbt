@@ -155,7 +155,7 @@ pub fn page_footer() -> Html {
           [
             text("svgo.mbt · MIT · plugin semantics follow "),
             a(class="text-ink-2", href="https://github.com/svg/svgo", "svgo"),
-            text(" (MIT) · this site is MoonBit too, built with "),
+            text(" (MIT) · this site is also MoonBit, built with "),
             a(
               class="text-ink-2",
               href="https://github.com/moonbit-community/rabbita",

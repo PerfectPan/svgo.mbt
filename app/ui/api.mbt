@@ -135,8 +135,8 @@ pub fn api_page(chrome : Chrome) -> Val[Html] {
           span(class="grad", "没有全局状态。"),
         ]),
         t(
-          "The public surface of perfectpan/svgo and its packages. Everything below is extracted from the doc comments in the source, so it is the same text mooncakes.io shows; each item links to the line that defines it.",
-          "perfectpan/svgo 及其子包的公开接口。下面的内容全部从源码的文档注释中提取，和 mooncakes.io 上显示的是同一份文字；每一项都链接到定义它的那一行。",
+          "The public surface of perfectpan/svgo and its packages, extracted from the doc comments in the source. It is the same text mooncakes.io shows, and every item links to the file that defines it.",
+          "perfectpan/svgo 及其子包的公开接口，全部提取自源码中的文档注释，与 mooncakes.io 上显示的是同一份文字。每一项都链接到定义它的源文件。",
         ),
       ),
       div(

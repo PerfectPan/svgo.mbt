@@ -76,8 +76,8 @@ fn hero(dark : Bool) -> Html {
               class="rise mt-[22px] max-w-[54ch] text-[17px] leading-relaxed text-ink-2",
               style=["--d: 160ms"],
               t(
-                "svgo.mbt is svgo's preset-default pipeline rewritten in MoonBit and compiled to one wasm-gc module. It runs in the browser, in Node, or as a native binary, produces the same output as svgo on the corpus, and every optimisation is checked with pixel diffs before it ships.",
-                "svgo.mbt 用 MoonBit 重写了 svgo 的 preset-default 优化流水线，编译成一个 wasm-gc 模块。它可以跑在浏览器、Node 或原生二进制里，在语料库上与 svgo 输出一致，每一项优化在发布前都经过逐像素比对。",
+                "svgo.mbt is svgo's preset-default pipeline, rewritten in MoonBit and compiled to a single wasm-gc module with no dependencies. It runs in the browser, in Node 22+, and as a native binary, and every optimization is checked with pixel diffs before it ships.",
+                "svgo.mbt 用 MoonBit 重写了 svgo 的 preset-default 流水线，编译成一个零依赖的 wasm-gc 模块，可以在浏览器、Node 22+ 和原生二进制中运行。每一项优化在发布前都经过逐像素比对。",
               ),
             ),
             div(
@@ -116,7 +116,8 @@ fn hero(dark : Bool) -> Html {
               span(
                 class="absolute bottom-3 left-3.5 rounded-full border border-line bg-bg/80 px-2.5 py-1 text-[11.5px] text-muted backdrop-blur-sm",
                 t(
-                  "what one optimize() call does · rendered with Remotion", "一次 optimize() 调用做了什么 · Remotion 渲染",
+                  "one optimize() call, step by step · rendered with Remotion",
+                  "一次 optimize() 调用的全过程 · 由 Remotion 渲染",
                 ),
               ),
             ],
@@ -214,17 +215,17 @@ fn numbers_section() -> Html {
         tm(
           [
             text(
-              "Measured in one Node process against svgo \{svgo_js_version}, both with multipass, on real editor exports and the classic large test files. The MoonBit side pays for JSON serialisation of the result; the JS side is warm. Numbers regenerate from ",
+              "Measured in a single Node process against svgo \{svgo_js_version}, both with multipass, on real editor exports and the classic large test files. The MoonBit side also pays to serialize its result as JSON; the JS side is warm. Regenerated from ",
             ),
             code("packages/compare/collect.mjs"),
-            text(" (\{generated_on})."),
+            text(" on \{generated_on}."),
           ],
           [
             text(
-              "在同一个 Node 进程里与 svgo \{svgo_js_version} 对比，双方都开 multipass，样本是真实的编辑器导出文件和经典的大型测试文件。MoonBit 一侧还额外付出了结果 JSON 序列化的开销，JS 一侧则是预热后的。数据由 ",
+              "在同一个 Node 进程中与 svgo \{svgo_js_version} 对比，双方均开启 multipass，样本为真实的编辑器导出文件和经典的大型测试文件。MoonBit 一侧还额外承担了结果的 JSON 序列化开销，JS 一侧则已预热。数据由 ",
             ),
             code("packages/compare/collect.mjs"),
-            text(" 重新生成（\{generated_on}）。"),
+            text(" 生成于 \{generated_on}。"),
           ],
         ),
       ),
@@ -236,7 +237,7 @@ fn numbers_section() -> Html {
           ),
           span(
             t(
-              "median speedup over svgo-js, same process", "相对 svgo-js 的中位加速比，同进程",
+              "median speedup over svgo-js in the same process", "同进程下相对 svgo-js 的中位加速比",
             ),
           ),
         ]),
@@ -250,8 +251,7 @@ fn numbers_section() -> Html {
           ),
           span(
             t(
-              "KB of wasm-gc, no dependencies, streams and instantiates in milliseconds",
-              "KB 的 wasm-gc，零依赖，毫秒级流式实例化",
+              "KB of wasm-gc, no dependencies, instantiates in milliseconds", "KB 的 wasm-gc 模块，零依赖，毫秒级实例化",
             ),
           ),
         ]),
@@ -259,7 +259,7 @@ fn numbers_section() -> Html {
           b("0 px"),
           span(
             t(
-              "rendering differences on every editor export in the corpus (resvg + pixelmatch)",
+              "of rendering difference across every editor export in the corpus (resvg + pixelmatch)",
               "语料库中所有编辑器导出文件的渲染差异（resvg + pixelmatch）",
             ),
           ),
@@ -267,7 +267,7 @@ fn numbers_section() -> Html {
       ]),
       div(class="grid gap-5 min-[901px]:grid-cols-[1.3fr_1fr]", [
         div(class="card reveal", [
-          h3(t("Time per optimisation", "单次优化耗时")),
+          h3(t("Time per call", "单次调用耗时")),
           div(
             class="sub",
             t(
@@ -284,7 +284,7 @@ fn numbers_section() -> Html {
           h3(t("Output size", "输出大小")),
           div(
             class="sub",
-            t("bytes after optimisation", "优化后的字节数"),
+            t("bytes after optimization", "优化后的字节数"),
           ),
           table(class="sizes", [
             thead([
@@ -301,20 +301,18 @@ fn numbers_section() -> Html {
             class="mt-3.5 text-[12.5px] text-muted",
             tm(
               [
-                text("Where svgo-js wins it is through "),
+                text("Where svgo-js is smaller, the difference comes from "),
                 code("inlineStyles"),
                 text("/"),
                 code("minifyStyles"),
-                text(", which need a CSS parser and are on the roadmap."),
+                text(", which need a CSS parser and are not implemented yet."),
               ],
               [
-                text("svgo-js 领先的地方来自 "),
+                text("svgo-js 更小的文件，差距来自 "),
                 code("inlineStyles"),
                 text("/"),
                 code("minifyStyles"),
-                text(
-                  "，它们需要一个 CSS 解析器，已在路线图上。",
-                ),
+                text("：它们需要 CSS 解析器，尚未实现。"),
               ],
             ),
           ),
@@ -342,20 +340,20 @@ fn plugins_section() -> Html {
   section(id="plugins", class="border-y border-line bg-bg-2 py-20", [
     div(class="wrap", [
       section_head(
-        t("Every optimisation is a value.", "每一项优化都是一个值。"),
+        t("Every plugin is a value.", "每个插件都是一个值。"),
         tm(
           [
             text("A plugin is "),
             code("{ name, description, run }"),
             text(
-              ". The preset is an array literal in svgo's order, the CLI and the playground list it, and each one reports whether it changed the tree so multipass knows when to stop. \{count} plugins ship today; this list comes straight from the library at runtime.",
+              ". The preset is an array literal in svgo's order, the CLI and the playground list it directly, and every plugin reports whether it changed the tree, which is how multipass knows when to stop. The default preset has \{count} plugins today; the list below, optional ones included, is read from the library at runtime.",
             ),
           ],
           [
             text("一个插件就是 "),
             code("{ name, description, run }"),
             text(
-              "。预设是一个按 svgo 顺序排列的数组字面量，CLI 和在线体验都直接列出它；每个插件都会报告自己是否改动了树，multipass 据此决定何时停止。目前内置 \{count} 个插件，下面这份列表是运行时直接从库里读出来的。",
+              "。预设是一个按 svgo 顺序排列的数组字面量，CLI 和在线体验直接列出它；每个插件都会报告自己是否改动了树，multipass 据此决定何时停止。默认预设目前有 \{count} 个插件，下面的列表（含可选插件）是运行时直接从库里读出来的。",
             ),
           ],
         ),
@@ -401,8 +399,8 @@ fn use_section() -> Html {
         [
           text(
             t(
-              "The wasm build is the primary artifact. The same source also produces a native CLI and a MoonBit library you can embed in your own tooling. This very page imports it as a MoonBit dependency.",
-              "wasm 构建是主要产物。同一份源码还产出一个原生 CLI 和一个可以嵌进你自己工具链的 MoonBit 库。你正在看的这个页面就是把它当作 MoonBit 依赖引入的。",
+              "The wasm build is the primary artifact. The same source also produces a native CLI and a MoonBit library you can embed in your own tools. This page imports it as a MoonBit dependency.",
+              "wasm 构建是主要产物。同一份源码还产出一个原生 CLI 和一个可嵌入你自己工具链的 MoonBit 库。你正在看的这个页面就是以 MoonBit 依赖的方式引入它的。",
             ),
           ),
         ],
@@ -437,8 +435,7 @@ fn use_section() -> Html {
           1,
           t("Command line · native", "命令行 · 原生"),
           t(
-            "A single binary; cold start is about 40× faster than the svgo CLI.",
-            "单个二进制文件，冷启动比 svgo CLI 快约 40 倍。",
+            "One binary. Cold start is about 40× faster than the svgo CLI.", "单个二进制文件，冷启动比 svgo CLI 快约 40 倍。",
           ),
           [
             text(
@@ -454,8 +451,8 @@ fn use_section() -> Html {
           2,
           t("MoonBit · library", "MoonBit · 库"),
           t(
-            "Plain structs, no globals; parse, plugins and path packages are usable on their own.",
-            "纯结构体，没有全局状态；解析、插件和路径包都可以单独使用。",
+            "Plain structs, no globals. The xml, path and plugins packages work on their own.",
+            "纯结构体，没有全局状态。xml、path 和 plugins 包都可以单独使用。",
           ),
           [
             k("let"),
@@ -504,26 +501,24 @@ fn gallery_section() -> Html {
   section(id="verified", class="border-y border-line bg-bg-2 py-20", [
     div(class="wrap", [
       section_head(
-        t(
-          "Verified, not just smaller.", "不只是更小，而且经过验证。",
-        ),
+        t("Verified, not just smaller.", "不只更小，而且经过验证。"),
         tm(
           [
             text(
-              "Every fixture is rasterised before and after with resvg and compared pixel by pixel. Plugin behaviour is locked in svgo-style fixture files, performance changes must reproduce the corpus byte for byte, and ",
+              "Every fixture is rasterized with resvg before and after, then compared pixel by pixel. Plugin behavior is pinned in svgo-style fixture files, performance work must reproduce the corpus byte for byte, and ",
             ),
             code("moon test"),
             text(
-              " runs on wasm-gc, JS and native. Left: the original. Right: svgo.mbt output, optimized just now in your browser.",
+              " runs on wasm-gc, JS and native. Left, the original. Right, svgo.mbt output, optimized just now in your browser.",
             ),
           ],
           [
             text(
-              "每个样例都用 resvg 在优化前后各栅格化一次，逐像素比对。插件行为锁在 svgo 风格的 fixture 文件里，性能改动必须逐字节复现整个语料库，",
+              "每个样例都在优化前后用 resvg 各栅格化一次，再逐像素比对。插件行为固定在 svgo 风格的 fixture 文件里，性能改动必须逐字节复现整个语料库，",
             ),
             code("moon test"),
             text(
-              " 在 wasm-gc、JS 和原生三个后端上运行。左边是原图，右边是刚刚在你浏览器里由 svgo.mbt 优化后的输出。",
+              " 在 wasm-gc、JS 和原生三个后端上运行。左侧是原图，右侧是刚刚在你的浏览器里由 svgo.mbt 优化的输出。",
             ),
           ],
         ),

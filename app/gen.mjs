@@ -1,7 +1,7 @@
 // Generate the MoonBit data files the site is compiled with:
 //   ui/data.mbt      benchmark rows + plugin list   (from app/data.json, written by packages/compare/collect.mjs)
 //   ui/samples.mbt   curated sample SVGs (testdata + compare corpus), optimized live in the browser
-//   ui/api_data.mbt  the public API                 (from `moon -C svgo doc` → _build/doc)
+//   ui/api_data.mbt  the public API                 (from `MOON_WORK=off moon -C svgo doc` → svgo/_build/doc)
 // Usage: node app/gen.mjs   (run by app/build.mjs)
 import { readFileSync, writeFileSync, readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
@@ -56,7 +56,10 @@ ${SAMPLES.map(([name, f]) => `  { name: ${str(name)}, file: ${str(f.split("/").p
 `);
 
 // ---------- api_data.mbt ----------
-const DOC = join(ROOT, "_build/doc/perfectpan/svgo");
+// `moon doc` must run with workspace mode off (the app member only builds
+// for js): `MOON_WORK=off moon -C svgo doc` writes svgo/_build/doc. The old
+// workspace location is still accepted.
+const DOC = ["svgo/_build/doc/perfectpan/svgo", "_build/doc/perfectpan/svgo"].map((d) => join(ROOT, d)).find(existsSync);
 function findPackages(dir, rel = "") {
   const out = [];
   if (existsSync(join(dir, "package_data.json"))) out.push({ dir, rel });
@@ -67,8 +70,8 @@ function findPackages(dir, rel = "") {
 }
 const ORDER = ["", "xml", "path", "plugins", "wasm"];
 const plain = (html) => html.replace(/<a href="[^"]*">([^<]*)<\/a>/g, "$1").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
-const pkgs = existsSync(DOC) ? findPackages(DOC).filter((p) => ORDER.includes(p.rel)).sort((a, b) => ORDER.indexOf(a.rel) - ORDER.indexOf(b.rel)) : [];
-if (pkgs.length === 0) console.warn("app/gen.mjs: no moon doc output found; run `moon -C svgo doc` (keeping the committed api_data.mbt)");
+const pkgs = DOC ? findPackages(DOC).filter((p) => ORDER.includes(p.rel)).sort((a, b) => ORDER.indexOf(a.rel) - ORDER.indexOf(b.rel)) : [];
+if (pkgs.length === 0) console.warn("app/gen.mjs: no moon doc output found; run `MOON_WORK=off moon -C svgo doc` (keeping the committed api_data.mbt)");
 else {
   const packages = pkgs.map(({ dir, rel }) => {
     const d = JSON.parse(readFileSync(join(dir, "package_data.json"), "utf8"));

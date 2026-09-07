@@ -64,7 +64,7 @@ requires `scripts/build-wasm.sh` and `pnpm install`):
 | Ghostscript_Tiger.svg 68 KB | 47.4 | 53.8 | 1.1x |
 | World map 85 KB | 66.8 | 83.1 | 1.2x |
 
-Those wasm numbers predate the optimisation round above; rerun
+Those wasm numbers predate the optimization round above; rerun
 `node packages/compare/wasm-speed.mjs` for current values (the table in the README and
 on the site is refreshed from the harness output).
 

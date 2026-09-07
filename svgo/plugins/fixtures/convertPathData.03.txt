@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <path d="M0 0h10v10L0 0"/>
+  <path stroke="red" d="M0 0h10v10L0 0"/>
+  <path style="stroke:red" d="M0 0h10v10L0 0"/>
+  <path stroke="red" stroke-linecap="round" stroke-linejoin="round" d="M0 0h10v10L0 0"/>
+  <g style="stroke:red"><path d="M0 0h10v10L0 0"/></g>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg">
+  <path d="M0 0h10v10z"/>
+  <path stroke="red" d="M0 0h10v10L0 0"/>
+  <path style="stroke:red" d="M0 0h10v10L0 0"/>
+  <path stroke="red" stroke-linecap="round" stroke-linejoin="round" d="M0 0h10v10z"/>
+  <g style="stroke:red"><path d="M0 0h10v10L0 0"/></g>
+</svg>

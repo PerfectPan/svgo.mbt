@@ -95,7 +95,7 @@ The repository ships a pre-commit hook that runs `moon check`:
   ```bash
   git worktree add /tmp/svgo-base HEAD && (cd /tmp/svgo-base && moon build --target native --release -q)
   mkdir -p /tmp/ref && for f in svgo/testdata/*.svg packages/compare/corpus/*.svg; do
-    /tmp/svgo-base/_build/native/release/build/cmd/main/main.exe "$f" -o "/tmp/ref/$(basename "$f")"; done
+    "$(cd /tmp/svgo-base && scripts/bin-path.sh)" "$f" -o "/tmp/ref/$(basename "$f")"; done
   scripts/regress.sh /tmp/ref          # every line must say "same"
   ```
 

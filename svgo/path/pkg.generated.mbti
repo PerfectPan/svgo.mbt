@@ -20,6 +20,8 @@ pub fn segment_len(Segment, Int) -> Int
 
 pub fn stringify(Array[Segment], precision? : Int) -> String
 
+pub fn strong_round(Double, Int) -> Double
+
 pub fn write_number(StringBuilder, Double, Int) -> Unit
 
 pub fn write_path(StringBuilder, Array[Segment], Int) -> Unit
@@ -36,7 +38,13 @@ pub(all) struct Options {
   utilize_absolute : Bool
   remove_useless : Bool
   straight_curves : Bool
+  convert_to_q : Bool
   smooth_shorthands : Bool
+  collapse_repeated : Bool
+  convert_to_z : Bool
+  linecap : String
+  linejoin : String
+  has_stroke : Bool
 } derive(@debug.Debug)
 pub fn Options::default() -> Self
 

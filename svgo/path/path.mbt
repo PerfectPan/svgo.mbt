@@ -118,13 +118,28 @@ pub fn write_path(
   segments : Array[Segment],
   precision : Int,
 ) -> Unit {
+  // The leading moveto is always from the origin, so its absolute/relative
+  // form is interchangeable. Match its case to the following lineto so the
+  // pair can share an implicit command letter (`M x y L` → `M x y `,
+  // `M x y l` → `m x y `).
+  let first_cmd = if segments.length() >= 2 {
+    match (segments[0].cmd, segments[1].cmd) {
+      ('M', 'l') => 'm'
+      ('m', 'L') => 'M'
+      (c, _) => c
+    }
+  } else if segments.length() == 1 {
+    segments[0].cmd
+  } else {
+    ' '
+  }
   let mut prev_cmd : Char = ' '
   // shape of the last number written in the current command, 0 right after
   // a command letter
   let mut prev_shape = 0
   let mut prev_was_flag = false
-  for seg in segments {
-    let cmd = seg.cmd
+  for i, seg in segments {
+    let cmd = if i == 0 { first_cmd } else { seg.cmd }
     // implicit repetition saves the command letter; `M x y L` pairs use it too
     let implicit = (
         cmd == prev_cmd && cmd != 'M' && cmd != 'm' && cmd != 'z' && cmd != 'Z'
@@ -155,7 +170,7 @@ pub fn write_path(
         // with '.' after a number that already has a '.'
         let (neg, int_part, frac, _) = decompose(a, precision)
         let nonzero = int_part != 0 || frac != 0
-        let starts_neg = nonzero && neg && !prev_was_flag
+        let starts_neg = nonzero && neg
         let starts_dot = nonzero &&
           !neg &&
           int_part == 0 &&

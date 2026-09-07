@@ -10,7 +10,7 @@ import { Resvg } from "@resvg/resvg-js";
 import pixelmatch from "pixelmatch";
 import { PNG } from "pngjs";
 
-const bin = join(ROOT, "_build/native/release/build/cmd/main/main.exe");
+const bin = execFileSync(join(ROOT, "scripts/bin-path.sh"), { encoding: "utf8" }).trim();
 mkdirSync(join(ROOT, "_build/compare"), { recursive: true });
 const files = readdirSync(TESTDATA).filter((f) => f.endsWith(".svg"));
 const render = (svg) => PNG.sync.read(new Resvg(svg, { fitTo: { mode: "width", value: 256 } }).render().asPng());

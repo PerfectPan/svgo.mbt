@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 moon build --target native --release -q
-BIN=_build/native/release/build/cmd/main/main.exe
+BIN=$(scripts/bin-path.sh)
 mkdir -p _build/compare
 printf "%-26s %9s %9s %9s\n" file original svgo.mbt svgo-js
 for f in svgo/testdata/*.svg; do

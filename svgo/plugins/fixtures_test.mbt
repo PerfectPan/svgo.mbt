@@ -168,11 +168,11 @@ test "fixture convertPathData.01" {
     (
       #|<svg xmlns="http://www.w3.org/2000/svg">
       #|  <path d="M10 10h10v10H10z"/>
-      #|  <path d="M0 0l30 30"/>
-      #|  <path d="M0 0l3 3 3 3"/>
-      #|  <path d="M1.235 2.346l5 5"/>
+      #|  <path d="m0 0 30 30"/>
+      #|  <path d="m0 0 3 3 3 3"/>
+      #|  <path d="m1.235 2.346 5 5"/>
       #|  <path d="M0 0a10 10 0 1 0 20 0l10 10"/>
-      #|  <path d="M2 2h3v3H2z"/>
+      #|  <path d="M2 2h3v3H2zm10 10"/>
       #|</svg>
     ),
     precision=3,
@@ -192,11 +192,59 @@ test "fixture convertPathData.02" {
     ),
     (
       #|<svg xmlns="http://www.w3.org/2000/svg">
-      #|  <path d="M0 0l100.12 100.65L200.5 0"/>
-      #|  <path marker-end="url(#m)" d="M0 0h0l10 10"/>
+      #|  <path d="m0 0 100.12 100.65L200.5 0"/>
+      #|  <path marker-end="url(#m)" d="m0 0 10 10"/>
       #|</svg>
     ),
     precision=2,
+    multipass=false,
+  )
+}
+
+///|
+test "fixture convertPathData.03" {
+  check_fixture(
+    "convertPathData",
+    (
+      #|<svg xmlns="http://www.w3.org/2000/svg">
+      #|  <path d="M0 0h10v10L0 0"/>
+      #|  <path stroke="red" d="M0 0h10v10L0 0"/>
+      #|  <path style="stroke:red" d="M0 0h10v10L0 0"/>
+      #|  <path stroke="red" stroke-linecap="round" stroke-linejoin="round" d="M0 0h10v10L0 0"/>
+      #|  <g style="stroke:red"><path d="M0 0h10v10L0 0"/></g>
+      #|</svg>
+    ),
+    (
+      #|<svg xmlns="http://www.w3.org/2000/svg">
+      #|  <path d="M0 0h10v10z"/>
+      #|  <path stroke="red" d="M0 0h10v10L0 0"/>
+      #|  <path style="stroke:red" d="M0 0h10v10L0 0"/>
+      #|  <path stroke="red" stroke-linecap="round" stroke-linejoin="round" d="M0 0h10v10z"/>
+      #|  <g style="stroke:red"><path d="M0 0h10v10L0 0"/></g>
+      #|</svg>
+    ),
+    precision=3,
+    multipass=false,
+  )
+}
+
+///|
+test "fixture convertPathData.04" {
+  check_fixture(
+    "convertPathData",
+    (
+      #|<svg xmlns="http://www.w3.org/2000/svg">
+      #|  <style>rect, path { stroke: #000 }</style>
+      #|  <path d="M0 0h10v10L0 0"/>
+      #|</svg>
+    ),
+    (
+      #|<svg xmlns="http://www.w3.org/2000/svg">
+      #|  <style>rect, path { stroke: #000 }</style>
+      #|  <path d="M0 0h10v10L0 0"/>
+      #|</svg>
+    ),
+    precision=3,
     multipass=false,
   )
 }
@@ -2801,7 +2849,7 @@ test "upstream convertPathData.01" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -2831,7 +2879,7 @@ test "upstream convertPathData.02" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -2903,7 +2951,7 @@ test "upstream convertPathData.03" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -2935,7 +2983,7 @@ test "upstream convertPathData.04" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -2961,7 +3009,7 @@ test "upstream convertPathData.05" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3005,7 +3053,7 @@ test "upstream convertPathData.06" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3037,7 +3085,7 @@ test "upstream convertPathData.07" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3081,7 +3129,7 @@ test "upstream convertPathData.08" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3129,7 +3177,7 @@ test "upstream convertPathData.10" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3257,7 +3305,7 @@ test "upstream convertPathData.12" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3277,7 +3325,7 @@ test "upstream convertPathData.13" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3377,7 +3425,7 @@ test "upstream convertPathData.17" {
     ),
     precision=8,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3437,7 +3485,7 @@ test "upstream convertPathData.20" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3585,7 +3633,7 @@ test "upstream convertPathData.26" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3609,7 +3657,7 @@ test "upstream convertPathData.27" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3629,7 +3677,7 @@ test "upstream convertPathData.28" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3651,7 +3699,7 @@ test "upstream convertPathData.29" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3671,7 +3719,7 @@ test "upstream convertPathData.30" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3691,7 +3739,7 @@ test "upstream convertPathData.31" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3711,7 +3759,7 @@ test "upstream convertPathData.32" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3731,7 +3779,7 @@ test "upstream convertPathData.33" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3773,7 +3821,7 @@ test "upstream convertPathData.35" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3827,7 +3875,7 @@ test "upstream convertPathData.37" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3847,7 +3895,7 @@ test "upstream convertPathData.38" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3887,7 +3935,7 @@ test "upstream convertPathData.40" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 

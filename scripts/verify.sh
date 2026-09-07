@@ -31,7 +31,7 @@ if [ "${1:-}" = "--full" ]; then
   scripts/build-wasm.sh
   step "native CLI smoke test"
   moon build --target native --release -q
-  _build/native/release/build/cmd/main/main.exe svgo/testdata/sketch-icon.svg --json >/dev/null
+  "$(scripts/bin-path.sh)" svgo/testdata/sketch-icon.svg --json >/dev/null
   step "compare: sizes vs svgo-js, render diff, same-process speed"
   pnpm install --frozen-lockfile --silent
   packages/compare/compare.sh

@@ -36,42 +36,14 @@ convertColors.01
 # convertEllipseToCircle: not analysed yet
 convertEllipseToCircle.01
 
-# convertPathData: shorter absolute/relative choice, S/T shorthand, lowercase initial m not implemented
-convertPathData.01
-convertPathData.02
-convertPathData.03
-convertPathData.04
-convertPathData.05
-convertPathData.06
-convertPathData.07
-convertPathData.08
-convertPathData.10
+# convertPathData: applyTransforms (transform baked into path data) and makeArcs not implemented
 convertPathData.11
-convertPathData.12
-convertPathData.13
-convertPathData.14
-convertPathData.15
-convertPathData.16
-convertPathData.17
 convertPathData.18
 convertPathData.19
-convertPathData.20
 convertPathData.22
 convertPathData.23
 convertPathData.24
 convertPathData.25
-convertPathData.26
-convertPathData.27
-convertPathData.28
-convertPathData.29
-convertPathData.30
-convertPathData.31
-convertPathData.32
-convertPathData.33
-convertPathData.35
-convertPathData.37
-convertPathData.38
-convertPathData.40
 
 # convertShapeToPath: not analysed yet
 convertShapeToPath.01
@@ -145,3 +117,6 @@ removeUselessStrokeAndFill.01
 removeUselessStrokeAndFill.02
 removeUselessStrokeAndFill.03
 
+convertPathData.14
+convertPathData.15
+convertPathData.16

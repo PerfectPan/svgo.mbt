@@ -44,7 +44,9 @@ test "optimize typical editor output" {
     @path.optimize_string(
       "M 6.000000,6.000000 L 18.000000,18.000000 M 18.000000,6.000000 L 6.000000,18.000000",
     ),
-    content="M6 6l12 12M18 6 6 18",
+    content=(
+      #|m6 6 12 12m0-12L6 18
+    ),
   )
   // lineto back to start before Z is dropped, H/V used for axis aligned lines
   inspect(
@@ -54,20 +56,25 @@ test "optimize typical editor output" {
   // curves whose control points mirror become S, straight curves become lines
   inspect(
     @path.optimize_string("M0 0 C 10 10 20 10 30 0 C 40 -10 50 -10 60 0"),
-    content="M0 0c10 10 20 10 30 0s20-10 30 0",
+    content="M0 0q15 15 30 0 15-15 30 0",
   )
-  inspect(@path.optimize_string("M0 0 C 1 1 2 2 3 3"), content="M0 0l3 3")
+  inspect(
+    @path.optimize_string("M0 0 C 1 1 2 2 3 3"),
+    content=(
+      #|m0 0 3 3
+    ),
+  )
   inspect(
     @path.optimize_string("M0 0 Q 5 5 10 10 T 20 20"),
     content=(
-      #|M0 0l10 10 10 10
+      #|m0 0 10 10 10 10
     ),
   )
   // zero length segments and empty subpaths are removed
   inspect(
     @path.optimize_string("M1 1 L1 1 L2 2 M5 5 M6 6 L7 7 M9 9"),
     content=(
-      #|M1 1l1 1M6 6l1 1
+      #|m1 1 1 1m4 4 1 1m2 2
     ),
   )
   // rounding keeps absolute positions from drifting
@@ -77,7 +84,7 @@ test "optimize typical editor output" {
       options={ ..@path.Options::default(), precision: 1, },
     ),
     content=(
-      #|M0 0h.3.4H1h.3.4H2
+      #|M0 0h2
     ),
   )
 }
@@ -86,10 +93,17 @@ test "optimize typical editor output" {
 test "arcs" {
   inspect(
     @path.optimize_string("M 5 5 A 5 5 0 1 1 15 5 A 5 5 0 1 1 5 5 Z"),
-    content="M5 5a5 5 0 1 1 10 0A5 5 0 1 1 5 5z",
+    content=(
+      #|M5 5a5 5 0 1 1 10 0A5 5 0 1 1 5 5
+    ),
   )
   // degenerate arc is a line
-  inspect(@path.optimize_string("M0 0 A 0 5 0 0 0 10 10"), content="M0 0l10 10")
+  inspect(
+    @path.optimize_string("M0 0 A 0 5 0 0 0 10 10"),
+    content=(
+      #|m0 0 10 10
+    ),
+  )
 }
 
 ///|

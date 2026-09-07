@@ -11,9 +11,9 @@
 
 <svg xmlns="http://www.w3.org/2000/svg">
   <path d="M10 10h10v10H10z"/>
-  <path d="M0 0l30 30"/>
-  <path d="M0 0l3 3 3 3"/>
-  <path d="M1.235 2.346l5 5"/>
+  <path d="m0 0 30 30"/>
+  <path d="m0 0 3 3 3 3"/>
+  <path d="m1.235 2.346 5 5"/>
   <path d="M0 0a10 10 0 1 0 20 0l10 10"/>
-  <path d="M2 2h3v3H2z"/>
+  <path d="M2 2h3v3H2zm10 10"/>
 </svg>

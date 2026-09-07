@@ -1,8 +1,8 @@
 {
-  "generated": "2026-09-06",
+  "generated": "2026-09-07",
   "node": "v24.18.0",
   "svgoVersion": "4.1.0",
-  "wasmBytes": 165702,
+  "wasmBytes": 174106,
   "plugins": [
     {
       "name": "removeDoctype",
@@ -146,17 +146,17 @@
       "original": 570,
       "mbt": 458,
       "js": 442,
-      "mbtMs": 0.158,
-      "jsMs": 0.321,
+      "mbtMs": 0.183,
+      "jsMs": 0.355,
       "passes": 2
     },
     {
       "file": "illustrator-logo.svg",
       "original": 1149,
-      "mbt": 635,
+      "mbt": 632,
       "js": 528,
-      "mbtMs": 0.109,
-      "jsMs": 0.727,
+      "mbtMs": 0.142,
+      "jsMs": 0.79,
       "passes": 2
     },
     {
@@ -164,8 +164,8 @@
       "original": 2078,
       "mbt": 663,
       "js": 640,
-      "mbtMs": 0.157,
-      "jsMs": 0.905,
+      "mbtMs": 0.234,
+      "jsMs": 1.016,
       "passes": 2
     },
     {
@@ -173,26 +173,26 @@
       "original": 836,
       "mbt": 276,
       "js": 288,
-      "mbtMs": 0.074,
-      "jsMs": 0.352,
+      "mbtMs": 0.151,
+      "jsMs": 0.667,
       "passes": 3
     },
     {
       "file": "Ghostscript_Tiger.svg",
       "original": 68630,
-      "mbt": 53712,
+      "mbt": 53587,
       "js": 68101,
-      "mbtMs": 9.297,
-      "jsMs": 42.403,
+      "mbtMs": 11.174,
+      "jsMs": 46.249,
       "passes": 3
     },
     {
       "file": "Python_logo_and_wordmark.svg",
       "original": 5419,
-      "mbt": 4664,
+      "mbt": 4612,
       "js": 4551,
-      "mbtMs": 0.546,
-      "jsMs": 2.969,
+      "mbtMs": 0.77,
+      "jsMs": 3.507,
       "passes": 3
     },
     {
@@ -200,35 +200,35 @@
       "original": 366,
       "mbt": 302,
       "js": 302,
-      "mbtMs": 0.041,
-      "jsMs": 0.185,
+      "mbtMs": 0.046,
+      "jsMs": 0.2,
       "passes": 2
     },
     {
       "file": "SVG_logo.svg",
       "original": 4019,
-      "mbt": 3799,
+      "mbt": 3795,
       "js": 3584,
-      "mbtMs": 0.286,
-      "jsMs": 1.805,
+      "mbtMs": 0.361,
+      "jsMs": 2.081,
       "passes": 2
     },
     {
       "file": "Tux.svg",
       "original": 49983,
-      "mbt": 41279,
+      "mbt": 41230,
       "js": 35983,
-      "mbtMs": 3.817,
-      "jsMs": 15.372,
+      "mbtMs": 4.364,
+      "jsMs": 16.789,
       "passes": 2
     },
     {
       "file": "World_map_-_low_resolution.svg",
       "original": 84823,
-      "mbt": 49499,
+      "mbt": 48230,
       "js": 46706,
-      "mbtMs": 9.285,
-      "jsMs": 54.499,
+      "mbtMs": 12.491,
+      "jsMs": 61.02,
       "passes": 3
     }
   ]

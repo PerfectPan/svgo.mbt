@@ -19,7 +19,7 @@ test "sketch export" {
   inspect(
     r.data,
     content=(
-      #|<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><title>icon/action/close</title><g fill="red" transform="translate(2 2)"><path stroke="red" stroke-linecap="round" stroke-width="2" d="M4 4l12 12M16 4 4 16"/><path d="M0 0h20v20H0z"/></g></svg>
+      #|<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><title>icon/action/close</title><g fill="red" transform="translate(2 2)"><path stroke="red" stroke-linecap="round" stroke-width="2" d="m4 4 12 12m0-12L4 16"/><path d="M0 0h20v20H0z"/></g></svg>
     ),
   )
   inspect(r.saved_percent() > 60.0, content="true")
@@ -50,7 +50,7 @@ test "inherited defaults are kept when an ancestor overrides them" {
   inspect(
     r.data,
     content=(
-      #|<svg xmlns="http://www.w3.org/2000/svg"><g stroke="#00f" stroke-width="3"><path stroke-width="1" d="M0 0l5 5"/><path stroke="none" d="M0 0l6 6"/></g></svg>
+      #|<svg xmlns="http://www.w3.org/2000/svg"><g stroke="#00f" stroke-width="3"><path stroke-width="1" d="m0 0 5 5"/><path stroke="none" d="m0 0 6 6"/></g></svg>
     ),
   )
 }
@@ -86,7 +86,7 @@ test "groups collapse and paths merge only when safe" {
   inspect(
     r.data,
     content=(
-      #|<svg xmlns="http://www.w3.org/2000/svg"><path fill="red" d="M0 0h10v10H0z"/><path fill="#00f" d="M20 0h10v10H20zM40 0h10v10H40z"/><path fill="#00f" d="M45 0h10v10H45z"/></svg>
+      #|<svg xmlns="http://www.w3.org/2000/svg"><path fill="red" d="M0 0h10v10H0z"/><path fill="#00f" d="M20 0h10v10H20zm20 0h10v10H40z"/><path fill="#00f" d="M45 0h10v10H45z"/></svg>
     ),
   )
 }
@@ -107,7 +107,7 @@ test "shapes to paths, ellipse to circle, editor namespaces" {
   inspect(
     r.data,
     content=(
-      #|<svg xmlns="http://www.w3.org/2000/svg"><path stroke="#000" d="M0 0l10 10"/><path fill="#333" d="M0 0h10v10z"/><circle cx="5" cy="5" r="3"/><rect width="50%" height="4" x="1" y="1"/></svg>
+      #|<svg xmlns="http://www.w3.org/2000/svg"><path stroke="#000" d="m0 0 10 10"/><path fill="#333" d="M0 0h10v10z"/><circle cx="5" cy="5" r="3"/><rect width="50%" height="4" x="1" y="1"/></svg>
     ),
   )
 }
@@ -122,7 +122,7 @@ test "legal comments, text whitespace and style attributes survive" {
   inspect(
     r.data,
     content=(
-      #|<svg xmlns="http://www.w3.org/2000/svg"><!--! (c) 2026 --><text x="1" y="2">  a   b </text><path d="M0 0l1 1" style="fill:red;stroke:none"/></svg>
+      #|<svg xmlns="http://www.w3.org/2000/svg"><!--! (c) 2026 --><text x="1" y="2">  a   b </text><path d="m0 0 1 1" style="fill:red;stroke:none"/></svg>
     ),
   )
 }

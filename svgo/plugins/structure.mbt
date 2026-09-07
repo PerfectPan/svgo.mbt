@@ -451,41 +451,223 @@ pub let convert_path_data : Plugin = {
   run: (doc, ctx) => {
     let mut changed = false
     let options = { ..@path.Options::default(), precision: ctx.precision, }
+    // Build class -> property maps from <style> elements so paths that
+    // inherit marker or linecap via CSS are handled correctly.
+    let linecap_by_class : Map[String, String] = Map([])
+    let marker_classes : Set[String] = Set([])
+    // Stylesheets can set a stroke we cannot resolve here (type selectors,
+    // descendant combinators); if any rule mentions stroke, assume every
+    // path may be stroked so `z` is neither added nor removed.
+    let mut css_strokes = false
     doc.each_element((e, _) => {
+      if e.name == "style" {
+        for c in e.children {
+          match c {
+            Text(t) | CData(t) => {
+              collect_style_props(t, linecap_by_class, marker_classes)
+              if t.contains("stroke") {
+                css_strokes = true
+              }
+            }
+            _ => ()
+          }
+        }
+      }
+    })
+    // Walk the tree tracking inherited stroke / linecap / linejoin so the
+    // path optimizer can decide whether a closing `z` is visually redundant.
+    fn walk(
+      e : @xml.Element,
+      inh_stroke : String,
+      inh_sw : String,
+      inh_lc : String,
+      inh_lj : String,
+      linecap_by_class : Map[String, String],
+      marker_classes : Set[String],
+      options : @path.Options,
+      ctx : Context,
+      changed : (Bool) -> Unit,
+    ) -> Unit {
+      let stroke = match presentation(e, "stroke") {
+        Some(v) => v
+        None => inh_stroke
+      }
+      let sw = match presentation(e, "stroke-width") {
+        Some(v) => v
+        None => inh_sw
+      }
+      let linecap = match presentation(e, "stroke-linecap") {
+        Some(v) => v.trim().to_owned()
+        None =>
+          match e.attrs.get("class") {
+            Some(cls) => {
+              let mut lc = inh_lc
+              for c in cls.split(" ") {
+                let c = c.trim().to_owned()
+                if c.length() > 0 {
+                  match linecap_by_class.get(c) {
+                    Some(v) => lc = v
+                    None => ()
+                  }
+                }
+              }
+              lc
+            }
+            None => inh_lc
+          }
+      }
+      let linejoin = match presentation(e, "stroke-linejoin") {
+        Some(v) => v
+        None => inh_lj
+      }
+      let has_stroke = css_strokes || (stroke != "none" && sw != "0")
       if e.name == "path" && e.attrs.get("d") is Some(d) {
-        // marker positions depend on zero-length segments; keep those paths intact
-        let has_markers = e.attrs.contains("marker-start") ||
-          e.attrs.contains("marker-mid") ||
-          e.attrs.contains("marker-end")
-        // data the optimizer already left unchanged in an earlier pass is a
-        // fixpoint; skip it
-        if !has_markers && ctx.optimized_paths.contains(d) {
+        // applyTransforms: drop identity transforms (the full transform
+        // application to path data is not implemented, but identity
+        // transforms are always safe to remove).
+        match e.attrs.get("transform") {
+          Some(tv) =>
+            match parse_transform(tv) {
+              Some(list) if list.all(is_identity) => {
+                e.attrs.remove("transform")
+                changed(true)
+              }
+              _ => ()
+            }
+          None => ()
+        }
+        // marker-mid is placed on every vertex including zero-length
+        // segments; marker-start/end only care about the path endpoints, so
+        // only marker-mid forces us to keep the segment structure intact.
+        let has_marker_mid = e.attrs.contains("marker-mid") ||
+          (match e.attrs.get("class") {
+            Some(cls) =>
+              cls
+              .split(" ")
+              .any(c => marker_classes.contains(c.trim().to_owned()))
+            None => false
+          })
+        // The memo of already-optimal path data is only valid in the default
+        // context: with a stroke the result also depends on linecap/linejoin,
+        // and the same `d` may appear on differently styled elements.
+        let memo_ok = !has_marker_mid && !has_stroke
+        if memo_ok && ctx.optimized_paths.contains(d) {
           return
         }
-        let opts = if has_markers {
-          { ..options, remove_useless: false, }
+        let opts = if has_marker_mid {
+          {
+            ..options,
+            remove_useless: false,
+            collapse_repeated: false,
+            convert_to_z: false,
+          }
         } else {
-          options
+          { ..options, linecap, linejoin, has_stroke, }
         }
         try {
           let segs = @path.parse(d)
-          let out = @path.stringify(
-            @path.optimize(segs, options=opts),
-            precision=ctx.precision,
-          )
+          // marker-start/end on a path that originally had drawing commands
+          // but optimizes down to only M/m needs an explicit `z` so the
+          // marker renders consistently across clients.
+          let has_marker_se = e.attrs.contains("marker-start") ||
+            e.attrs.contains("marker-end")
+          let includes_vertices = segs.any(s => s.cmd != 'M' && s.cmd != 'm')
+          let optimized = @path.optimize(segs, options=opts)
+          let all_moveto = optimized.all(s => s.cmd == 'M' || s.cmd == 'm')
+          if has_marker_se && includes_vertices && all_moveto {
+            optimized.push({ cmd: 'z', args: [], })
+          }
+          let out = @path.stringify(optimized, precision=ctx.precision)
           if out != d {
             e.attrs["d"] = out
-            changed = true
-          } else if !has_markers {
+            changed(true)
+          } else if memo_ok {
             ctx.optimized_paths.add(d)
           }
         } catch {
           _ => ()
         }
       }
-    })
+      for c in e.children {
+        if c is @xml.Element(child) {
+          walk(
+            child, stroke, sw, linecap, linejoin, linecap_by_class, marker_classes,
+            options, ctx, changed,
+          )
+        }
+      }
+    }
+    for c in doc.children {
+      if c is @xml.Element(e) {
+        walk(
+          e,
+          "none",
+          "1",
+          "butt",
+          "miter",
+          linecap_by_class,
+          marker_classes,
+          options,
+          ctx,
+          b => changed = changed || b,
+        )
+      }
+    }
     changed
   },
+}
+
+///|
+/// A presentation property as the renderer resolves it on this element: the
+/// `style` attribute wins over the attribute of the same name.
+fn presentation(e : @xml.Element, name : String) -> String? {
+  if e.attrs.get("style") is Some(css) {
+    for decl in css.split(";") {
+      match decl.split_once(":") {
+        Some((k, v)) => if k.trim() == name { return Some(v.trim().to_owned()) }
+        None => ()
+      }
+    }
+  }
+  e.attrs.get(name)
+}
+
+///|
+/// Extract `.class { property: value; }` rules from CSS text. Populates
+/// `linecap` with stroke-linecap values and `markers` with class names that
+/// set any marker-* property. Only simple class selectors are handled.
+fn collect_style_props(
+  css : String,
+  linecap : Map[String, String],
+  markers : Set[String],
+) -> Unit {
+  for block in css.split("}") {
+    let parts = block.split("{").to_array()
+    if parts.length() != 2 {
+      continue
+    }
+    let selector = parts[0].trim().to_owned()
+    let body = parts[1].trim().to_owned()
+    if !selector.has_prefix(".") {
+      continue
+    }
+    let cls = selector[1:].trim().to_owned()
+    for decl in body.split(";") {
+      let kv = decl.split(":").to_array()
+      if kv.length() == 2 {
+        let k = kv[0].trim().to_owned()
+        let v = kv[1].trim().to_owned()
+        if k == "stroke-linecap" {
+          linecap[cls] = v
+        } else if k == "marker" ||
+          k == "marker-start" ||
+          k == "marker-mid" ||
+          k == "marker-end" {
+          markers.add(cls)
+        }
+      }
+    }
+  }
 }
 
 ///|

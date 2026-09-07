@@ -6,8 +6,8 @@
 @@@
 
 <svg xmlns="http://www.w3.org/2000/svg">
-  <path d="M0 0l100.12 100.65L200.5 0"/>
-  <path marker-end="url(#m)" d="M0 0h0l10 10"/>
+  <path d="m0 0 100.12 100.65L200.5 0"/>
+  <path marker-end="url(#m)" d="m0 0 10 10"/>
 </svg>
 
 @@@

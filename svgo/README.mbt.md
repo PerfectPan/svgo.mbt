@@ -54,7 +54,7 @@ r.data; r.originalSize; r.size; r.passes; r.applied;
 **Command line** (native, one binary):
 
 ```bash
-moon build --target native --release          # -> _build/native/release/build/cmd/main/main.exe
+moon build --target native --release          # -> $(scripts/bin-path.sh), under _build/native/release/
 svgo input.svg                                # optimized SVG on stdout
 svgo input.svg -o out.svg --stats             # write a file, print size statistics
 svgo input.svg -p 2 --pretty                  # 2 decimal places, indented output
@@ -191,15 +191,15 @@ Of svgo's 209 test cases for the plugins svgo.mbt implements (svgo e4cb29b,
 
 | | cases |
 | --- | --- |
-| pass | 76 |
-| known differences (listed in `fixtures/upstream/KNOWN_FAILURES.txt`) | 107 |
+| pass | 101 |
+| known differences (listed in `fixtures/upstream/KNOWN_FAILURES.txt`) | 82 |
 | need per-plugin params svgo.mbt does not have yet (`preserve`, `force`, ...) | 26 |
 
 The known differences are mostly places where svgo compresses harder
-(`convertPathData` picks the shorter of absolute and relative per segment and
-uses `S`/`T` shorthands, `convertTransform` decomposes matrices back into
-`rotate`/`scale`/`translate`), plus `cleanupIds` refusing to run when a
-`<style>` element exists. Each entry is an expected failure in the test suite:
+(`convertTransform` decomposes matrices back into `rotate`/`scale`/`translate`,
+`convertPathData` applies element transforms to the path data and turns curve
+runs into arcs), plus `cleanupIds` refusing to run when a `<style>` element
+exists. Each entry is an expected failure in the test suite:
 fixing one requires deleting its line, so the list only shrinks.
 
 ## Repository layout

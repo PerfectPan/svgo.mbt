@@ -30,6 +30,29 @@ pub fn round_to(v : Double, precision : Int) -> Double {
 }
 
 ///|
+/// svgo's "strong" rounding: round to `precision` places, but if the value is
+/// within `10^-precision` of a `precision-1`-place boundary, snap to that
+/// boundary. This kills near-zero values like 0.0005 (at precision 3 → 0)
+/// instead of writing them as 0.001.
+pub fn strong_round(v : Double, precision : Int) -> Double {
+  if precision <= 0 {
+    return round_to(v, precision)
+  }
+  let fixed = round_to(v, precision)
+  if fixed == v {
+    v
+  } else {
+    let rounded = round_to(v, precision - 1)
+    let error = 1.0 / pow10[precision]
+    if round_to((rounded - v).abs(), precision + 1) >= error {
+      fixed
+    } else {
+      rounded
+    }
+  }
+}
+
+///|
 /// Parse the number in `cu[i:]`; returns the value and the index just past
 /// it. Numbers with at most 15 significant digits are decoded exactly with
 /// integer arithmetic and one correctly rounded division; longer ones fall
@@ -195,6 +218,50 @@ fn write_number_shaped(sb : StringBuilder, v : Double, precision : Int) -> Int {
     sb.write_char('0')
     return 1 << 3
   }
+  // For small numbers (int_part == 0) check whether scientific notation is
+  // shorter than the decimal form, e.g. 1e-7 vs .0000001.
+  if int_part == 0 && frac > 0 {
+    let mant_digits = digits_of(frac)
+    let exponent = mant_digits - frac_len - 1 // negative for values < 1
+    let mant_len = if mant_digits == 1 { mant_digits } else { mant_digits + 1 }
+    let sci_len = mant_len + 1 + 1 + digits_of(exponent.abs().to_int64())
+    let dec_len = 1 + frac_len
+    if sci_len < dec_len {
+      let mut len = 0
+      let mut flags = 0
+      if neg {
+        sb.write_char('-')
+        len += 1
+        flags = flags | 1
+      }
+      // mantissa: first digit, then a dot and the rest if more than one digit
+      let mut pow : Int64 = 1
+      for _ in 1..<mant_digits {
+        pow = pow * 10
+      }
+      let first = frac / pow
+      sb.write_char((first.to_int() + 48).unsafe_to_char())
+      len += 1
+      if mant_digits > 1 {
+        sb.write_char('.')
+        len += 1
+        flags = flags | 4
+        write_digits(sb, frac % pow)
+        len += mant_digits - 1
+      }
+      sb.write_char('e')
+      len += 1
+      if exponent < 0 {
+        sb.write_char('-')
+      } else {
+        sb.write_char('+')
+      }
+      len += 1
+      write_digits(sb, exponent.abs().to_int64())
+      len += digits_of(exponent.abs().to_int64())
+      return (len << 3) | flags
+    }
+  }
   let mut len = 0
   let mut flags = 0
   if neg {
@@ -229,6 +296,25 @@ fn number_shape(v : Double, precision : Int) -> Int {
   let (neg, int_part, frac, frac_len) = decompose(v, precision)
   if int_part == 0 && frac == 0 {
     return 1 << 3
+  }
+  if int_part == 0 && frac > 0 {
+    let mant_digits = digits_of(frac)
+    let exponent = mant_digits - frac_len - 1
+    let mant_len = if mant_digits == 1 { mant_digits } else { mant_digits + 1 }
+    let sci_len = mant_len + 1 + 1 + digits_of(exponent.abs().to_int64())
+    let dec_len = 1 + frac_len
+    if sci_len < dec_len {
+      let mut len = sci_len
+      let mut flags = 0
+      if neg {
+        len += 1
+        flags = flags | 1
+      }
+      if mant_digits > 1 {
+        flags = flags | 4
+      }
+      return (len << 3) | flags
+    }
   }
   let mut len = 0
   let mut flags = 0
@@ -268,7 +354,7 @@ pub fn segment_len(seg : Segment, precision : Int) -> Int {
       prev_was_flag = true
     } else {
       let shape = number_shape(a, precision)
-      let starts_neg = (shape & 1) != 0 && !prev_was_flag
+      let starts_neg = (shape & 1) != 0
       let starts_dot = (shape & 2) != 0 && prev_has_dot && !prev_was_flag
       if !first && !(starts_neg || starts_dot) {
         len += 1

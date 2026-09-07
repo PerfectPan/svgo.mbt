@@ -191,15 +191,15 @@ Of svgo's 209 test cases for the plugins svgo.mbt implements (svgo e4cb29b,
 
 | | cases |
 | --- | --- |
-| pass | 101 |
-| known differences (listed in `fixtures/upstream/KNOWN_FAILURES.txt`) | 82 |
+| pass | 111 |
+| known differences (listed in `fixtures/upstream/KNOWN_FAILURES.txt`) | 72 |
 | need per-plugin params svgo.mbt does not have yet (`preserve`, `force`, ...) | 26 |
 
 The known differences are mostly places where svgo compresses harder
-(`convertTransform` decomposes matrices back into `rotate`/`scale`/`translate`,
-`convertPathData` applies element transforms to the path data and turns curve
-runs into arcs), plus `cleanupIds` refusing to run when a `<style>` element
-exists. Each entry is an expected failure in the test suite:
+(`convertPathData` applies element transforms to the path data and turns curve
+runs into arcs; `mergePaths`, `collapseGroups` and `removeUnknownsAndDefaults`
+have rules we have not ported yet), plus `cleanupIds` refusing to run when a
+`<style>` element exists. Each entry is an expected failure in the test suite:
 fixing one requires deleting its line, so the list only shrinks.
 
 ## Repository layout

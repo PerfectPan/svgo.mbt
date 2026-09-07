@@ -292,15 +292,9 @@ test "fixture convertTransform.01" {
     ),
     (
       #|<svg xmlns="http://www.w3.org/2000/svg">
-      #|  <g>
-      #|    <rect width="1" height="1"/>
-      #|  </g>
-      #|  <g transform="translate(10) scale(2)">
-      #|    <rect width="1" height="1"/>
-      #|  </g>
-      #|  <g transform="rotate(45) translate(1 2)">
-      #|    <rect width="1" height="1"/>
-      #|  </g>
+      #|  <g><rect width="1" height="1"/></g>
+      #|  <g transform="matrix(2 0 0 2 10 0)"><rect width="1" height="1"/></g>
+      #|  <g transform="rotate(45 -2.914 .207)"><rect width="1" height="1"/></g>
       #|  <linearGradient/>
       #|</svg>
     ),
@@ -4139,7 +4133,7 @@ test "upstream convertTransform.01" {
     ),
     precision=3,
     passes=1,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -4173,7 +4167,7 @@ test "upstream convertTransform.02" {
     ),
     precision=3,
     passes=1,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -4205,7 +4199,7 @@ test "upstream convertTransform.03" {
     ),
     precision=3,
     passes=1,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -4247,7 +4241,7 @@ test "upstream convertTransform.04" {
     ),
     precision=3,
     passes=1,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -4267,7 +4261,7 @@ test "upstream convertTransform.05" {
     ),
     precision=3,
     passes=1,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -4337,7 +4331,7 @@ test "upstream convertTransform.10" {
     ),
     precision=3,
     passes=1,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -4357,7 +4351,7 @@ test "upstream convertTransform.11" {
     ),
     precision=3,
     passes=1,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -4377,7 +4371,7 @@ test "upstream convertTransform.12" {
     ),
     precision=3,
     passes=1,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -4399,7 +4393,7 @@ test "upstream convertTransform.13" {
     ),
     precision=3,
     passes=1,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -4440,7 +4434,7 @@ test "upstream convertTransform.15" {
     ),
     precision=3,
     passes=1,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 

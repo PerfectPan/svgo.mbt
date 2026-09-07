@@ -49,17 +49,7 @@ convertPathData.25
 convertShapeToPath.01
 convertShapeToPath.03
 
-# convertTransform: no matrix decomposition to rotate/scale/translate shorts, sequences not multiplied
-convertTransform.01
-convertTransform.02
-convertTransform.03
-convertTransform.04
-convertTransform.05
-convertTransform.10
-convertTransform.11
-convertTransform.12
-convertTransform.13
-convertTransform.15
+# convertTransform: remaining precision/decomposition edge cases
 
 # mergePaths: lone movetos not dropped, some merges svgo refuses
 mergePaths.01

@@ -23,7 +23,7 @@ root installs every JS package.
 | everything CI checks, in one go | `scripts/verify.sh` (`--full` adds wasm build, svgo-js comparison, render diff) |
 | micro benchmarks as a table | `scripts/bench.sh [native\|wasm-gc\|js] [bench_test.mbt\|profile_test.mbt]` |
 | byte-for-byte output comparison against a reference build | `scripts/regress.sh <dir>` (see CONTRIBUTING) |
-| regenerate `svgo/plugins/fixtures_test.mbt` from `svgo/plugins/fixtures/*.txt` | `python3 scripts/gen-fixtures.py` |
+| regenerate `svgo/plugins/fixtures_test.mbt` from `svgo/plugins/fixtures/**/*.txt` | `python3 scripts/gen-fixtures.py` (prints pass / known-failure / skipped counts) |
 | native CLI | `moon run --target native svgo/cmd/main -- file.svg --stats` (`--json`, `--plugins a,b`) |
 | wasm artifact for `packages/svgo-mbt` and the site | `scripts/build-wasm.sh` |
 | compare with svgo-js (sizes, render diff, speed) | `pnpm compare` (or the scripts in `packages/compare/`) |
@@ -50,6 +50,7 @@ svgo/                         the MoonBit module perfectpan/svgo
     transform.mbt             transform attribute simplification
     preset.mbt                preset_default / optional_plugins / find_plugin
     fixtures/*.txt            input @@@ expected [@@@ params] — regenerated into fixtures_test.mbt
+    fixtures/upstream/        svgo's own test/plugins cases, verbatim; KNOWN_FAILURES.txt = expected failures (ratchet, only shrinks)
   cmd/main/                   native CLI (C file I/O in io.c; stubs keep other targets checking)
   wasm/                       foreign_library exporting optimize/plugins/version as JSON strings
   benchmark/                  moon bench tests over an embedded corpus (corpus.mbt is generated)
@@ -91,7 +92,11 @@ docs/ARCHITECTURE.md          design notes
 - Derive `Debug`, not `Show`, for data; implement `Show` only for errors.
 - Tests: `inspect(value, content=...)` snapshots for outputs, `assert_eq` for
   invariant checks. New plugin behavior gets a fixture file first, then a
-  unit test if the logic is subtle.
+  unit test if the logic is subtle. After any plugin change run
+  `python3 scripts/gen-fixtures.py && moon test --target native -p perfectpan/svgo/plugins`:
+  an upstream case that starts passing fails with "now passes: remove it from
+  KNOWN_FAILURES.txt"; delete that line in the same change. Never add lines
+  to KNOWN_FAILURES.txt without a reason.
 - Lookups in hot paths use `Set`/`Map`, never linear `Array::contains` over
   string lists. Measure with `scripts/bench.sh` before and after; the
   numbers in `svgo/benchmark/README.md` are the reference.

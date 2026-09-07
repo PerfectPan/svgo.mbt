@@ -177,10 +177,30 @@ scripts/verify.sh --full     # + wasm build, sizes vs svgo-js, resvg pixel diff,
 scripts/regress.sh <ref-dir> # byte-for-byte output comparison against a reference build
 ```
 
-Four layers: unit and snapshot tests per package; svgo-style fixture files
-(`svgo/plugins/fixtures/*.txt`, one plugin each); a corpus that must reproduce
-byte for byte across refactors; and a render diff that rasterises every
-fixture before and after. Details in `docs/ARCHITECTURE.md`.
+Five layers: unit and snapshot tests per package; our own svgo-style fixture
+files (`svgo/plugins/fixtures/*.txt`, one plugin each); **svgo's own plugin
+test suite**, copied verbatim into `svgo/plugins/fixtures/upstream/` and run
+with svgo's rules (one plugin, twice, both results must match); a corpus that
+must reproduce byte for byte across refactors; and a render diff that
+rasterizes every fixture before and after. Details in `docs/ARCHITECTURE.md`.
+
+### Compatibility with svgo, measured
+
+Of svgo's 209 test cases for the plugins svgo.mbt implements (svgo e4cb29b,
+2026-08-27):
+
+| | cases |
+| --- | --- |
+| pass | 76 |
+| known differences (listed in `fixtures/upstream/KNOWN_FAILURES.txt`) | 107 |
+| need per-plugin params svgo.mbt does not have yet (`preserve`, `force`, ...) | 26 |
+
+The known differences are mostly places where svgo compresses harder
+(`convertPathData` picks the shorter of absolute and relative per segment and
+uses `S`/`T` shorthands, `convertTransform` decomposes matrices back into
+`rotate`/`scale`/`translate`), plus `cleanupIds` refusing to run when a
+`<style>` element exists. Each entry is an expected failure in the test suite:
+fixing one requires deleting its line, so the list only shrinks.
 
 ## Repository layout
 

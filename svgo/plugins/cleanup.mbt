@@ -229,15 +229,30 @@ pub let remove_hidden_elems : Plugin = {
   description: "remove elements that are not rendered",
   run: (doc, _) => {
     let ids = referenced_ids(doc)
+    // a stylesheet can override presentation attributes, so with <style>
+    // present an element a rule might match is not provably hidden
+    let css = style_text(doc)
+    let maybe_styled = fn(e : @xml.Element) -> Bool {
+      !css.is_empty() &&
+      (
+        e.attrs.contains("class") ||
+        e.attrs.contains("id") ||
+        css.contains(e.name)
+      )
+    }
     remove_elements(doc, (e, _) => {
       // referenced elements may still be used via <use> or as clip paths
       if e.attrs.get("id") is Some(id) && ids.contains(id) {
         return false
       }
-      if e.attrs.get("display") == Some("none") && e.name != "marker" {
+      if e.attrs.get("display") == Some("none") &&
+        e.name != "marker" &&
+        !maybe_styled(e) {
         return true
       }
-      if e.attrs.get("opacity") == Some("0") && e.name != "svg" {
+      if e.attrs.get("opacity") == Some("0") &&
+        e.name != "svg" &&
+        !maybe_styled(e) {
         return true
       }
       match e.name {
@@ -448,4 +463,21 @@ fn needs_collapse(v : String) -> Bool {
     prev_space = space
   }
   false
+}
+
+///|
+/// The concatenated text of every `<style>` element.
+fn style_text(doc : @xml.Document) -> String {
+  let sb = StringBuilder()
+  doc.each_element((e, _) => {
+    if e.name == "style" {
+      for c in e.children {
+        match c {
+          Text(t) | CData(t) => sb.write_string(t)
+          _ => ()
+        }
+      }
+    }
+  })
+  sb.to_string()
 }

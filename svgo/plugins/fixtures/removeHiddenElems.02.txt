@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <style>.a { opacity: 0.5 } circle { display: inline }</style>
+  <rect opacity="0" width="1" height="1"/>
+  <rect opacity="0" class="a" width="1" height="1"/>
+  <circle display="none" r="1"/>
+  <path display="none" d="M0 0h1"/>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg">
+  <style>.a { opacity: 0.5 } circle { display: inline }</style>
+  <rect opacity="0" class="a" width="1" height="1"/>
+  <circle display="none" r="1"/>
+</svg>

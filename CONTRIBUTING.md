@@ -43,6 +43,15 @@ The repository ships a pre-commit hook that runs `moon check`:
    Tip: to see what the current implementation produces for an input,
    `moon run --target native svgo/cmd/main -- in.svg --plugins svgoName --no-multipass --pretty`.
 
+   **svgo's own cases.** `svgo/plugins/fixtures/upstream/` holds svgo's
+   `test/plugins` suite verbatim (see `NOTICE.md` there). They run with svgo's
+   rules: the plugin runs twice and both results must equal `expected`. Cases
+   we do not pass yet are listed in `upstream/KNOWN_FAILURES.txt` and generated
+   as expected failures. When your change makes one pass, the test tells you to
+   delete its line; do that in the same commit. Never add a line without a
+   reason comment. Cases that need plugin params (`preserve`, `force`, ...)
+   are generated as skipped tests until params exist.
+
 2. **Implement** in the matching `svgo/plugins/*.mbt` file as a value:
 
    ```moonbit

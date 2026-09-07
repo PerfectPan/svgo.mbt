@@ -1,0 +1,147 @@
+# Upstream svgo cases svgo.mbt does not pass yet, one per line, optional '# reason'.
+# Generated tests assert these still fail; when you fix one, delete its line.
+# Baseline 2026-09-07: 109 of 183 runnable cases (26 more need plugin params).
+
+# cleanupAttrs: not analysed yet
+cleanupAttrs.02
+
+# cleanupIds: svgo skips the plugin when <style> is present; minify not implemented
+cleanupIds.01
+cleanupIds.02
+cleanupIds.04
+cleanupIds.05
+cleanupIds.11
+cleanupIds.19
+cleanupIds.22
+cleanupIds.23
+cleanupIds.24
+cleanupIds.25
+cleanupIds.26
+
+# cleanupNumericValues: not analysed yet
+cleanupNumericValues.01
+
+# collapseGroups: attribute move-down rules incomplete
+collapseGroups.07
+collapseGroups.12
+collapseGroups.13
+collapseGroups.14
+collapseGroups.15
+collapseGroups.17
+collapseGroups.18
+
+# convertColors: not analysed yet
+convertColors.01
+
+# convertEllipseToCircle: not analysed yet
+convertEllipseToCircle.01
+
+# convertPathData: shorter absolute/relative choice, S/T shorthand, lowercase initial m not implemented
+convertPathData.01
+convertPathData.02
+convertPathData.03
+convertPathData.04
+convertPathData.05
+convertPathData.06
+convertPathData.07
+convertPathData.08
+convertPathData.10
+convertPathData.11
+convertPathData.12
+convertPathData.13
+convertPathData.14
+convertPathData.15
+convertPathData.16
+convertPathData.17
+convertPathData.18
+convertPathData.19
+convertPathData.20
+convertPathData.22
+convertPathData.23
+convertPathData.24
+convertPathData.25
+convertPathData.26
+convertPathData.27
+convertPathData.28
+convertPathData.29
+convertPathData.30
+convertPathData.31
+convertPathData.32
+convertPathData.33
+convertPathData.35
+convertPathData.37
+convertPathData.38
+convertPathData.40
+
+# convertShapeToPath: not analysed yet
+convertShapeToPath.01
+convertShapeToPath.03
+
+# convertTransform: no matrix decomposition to rotate/scale/translate shorts, sequences not multiplied
+convertTransform.01
+convertTransform.02
+convertTransform.03
+convertTransform.04
+convertTransform.05
+convertTransform.10
+convertTransform.11
+convertTransform.12
+convertTransform.13
+convertTransform.15
+
+# mergePaths: lone movetos not dropped, some merges svgo refuses
+mergePaths.01
+mergePaths.02
+mergePaths.03
+mergePaths.04
+mergePaths.06
+mergePaths.07
+mergePaths.08
+mergePaths.09
+mergePaths.10
+mergePaths.11
+mergePaths.12
+
+# removeDimensions: not analysed yet
+removeDimensions.04
+removeDimensions.05
+
+# removeEditorsNSData: not analysed yet
+removeEditorsNSData.02
+
+# removeEmptyAttrs: not analysed yet
+removeEmptyAttrs.02
+
+# removeEmptyContainers: not analysed yet
+removeEmptyContainers.03
+removeEmptyContainers.07
+removeEmptyContainers.08
+
+# removeHiddenElems: some shape rules missing
+removeHiddenElems.03
+removeHiddenElems.06
+removeHiddenElems.08
+removeHiddenElems.11
+removeHiddenElems.12
+removeHiddenElems.13
+removeHiddenElems.14
+removeHiddenElems.19
+
+# removeUnknownsAndDefaults: unknown elements kept; some default values missing
+removeUnknownsAndDefaults.01
+removeUnknownsAndDefaults.02
+removeUnknownsAndDefaults.04
+removeUnknownsAndDefaults.05
+removeUnknownsAndDefaults.07
+removeUnknownsAndDefaults.09
+removeUnknownsAndDefaults.13
+removeUnknownsAndDefaults.16
+
+# removeUselessDefs: not analysed yet
+removeUselessDefs.03
+
+# removeUselessStrokeAndFill: stroke inheritance rules incomplete
+removeUselessStrokeAndFill.01
+removeUselessStrokeAndFill.02
+removeUselessStrokeAndFill.03
+

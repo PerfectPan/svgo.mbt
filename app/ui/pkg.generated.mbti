@@ -3,7 +3,9 @@ package "perfectpan/svgo-app/ui"
 
 import {
   "moonbit-community/rabbita",
+  "moonbit-community/rabbita/cmd",
   "moonbit-community/rabbita/html",
+  "moonbitlang/core/ref",
 }
 
 // Values
@@ -15,11 +17,15 @@ pub const REPO_URL : String = "https://github.com/PerfectPan/svgo.mbt"
 
 pub let api_packages : Array[ApiPackage]
 
-pub fn api_page() -> @rabbita.Val[@html.Html]
+pub fn api_page(Chrome) -> @rabbita.Val[@html.Html]
 
 pub fn app() -> @rabbita.Val[@html.Html]
 
 pub let bench_rows : Array[BenchRow]
+
+pub fn code_editor(String, @cmd.Emit[String], placeholder~ : String, label~ : String) -> @html.Html
+
+pub fn code_view(String, label~ : String) -> @html.Html
 
 pub fn fmt_int(Int) -> String
 
@@ -31,17 +37,31 @@ pub fn fmt_pct(Double, digits? : Int) -> String
 
 pub let generated_on : String
 
-pub fn landing_page() -> @rabbita.Val[@html.Html]
+pub fn highlight(String) -> Array[@html.Html]
+
+pub let highlight_limit : Int
+
+pub fn landing_page(Chrome) -> @rabbita.Val[@html.Html]
+
+pub let lang : @ref.Ref[Lang]
 
 pub fn logo(size? : String) -> @html.Html
 
+pub fn lz_compress(String) -> String
+
+pub fn lz_decompress(String) -> String?
+
 pub fn page_footer() -> @html.Html
 
-pub fn playground_page() -> @rabbita.Val[@html.Html]
+pub fn page_head(String, Array[@html.Html], String) -> @html.Html
+
+pub fn playground_page(Chrome) -> @rabbita.Val[@html.Html]
 
 pub fn run_optimize(String, plugins? : Array[String], precision? : Int, multipass? : Bool, pretty? : Bool) -> Outcome
 
 pub let samples : Array[Sample]
+
+pub fn start_motion() -> Unit
 
 pub fn stats_bar(Outcome, String) -> @html.Html
 
@@ -49,7 +69,13 @@ pub fn svg_preview(String, class? : String) -> @html.Html
 
 pub let svgo_js_version : String
 
-pub fn top_nav(Route, String) -> @html.Html
+pub fn t(String, String) -> String
+
+pub fn tm(Array[@html.Html], Array[@html.Html]) -> Array[@html.Html]
+
+pub fn tokenize(String) -> Array[(String, String)]
+
+pub fn top_nav(Route, String, Prefs, @cmd.Emit[PrefMsg]) -> @html.Html
 
 pub let wasm_bytes : Int
 
@@ -87,6 +113,18 @@ pub(all) struct BenchRow {
   js_ms : Double
 } derive(Eq)
 
+pub(all) struct Chrome {
+  prefs : @rabbita.Val[Prefs]
+  emit : @cmd.Emit[PrefMsg]
+}
+
+pub(all) enum Lang {
+  En
+  Zh
+} derive(Eq)
+pub fn Lang::code(Self) -> String
+pub fn Lang::parse(String) -> Self?
+
 pub(all) struct Outcome {
   data : String
   original_size : Int
@@ -98,6 +136,16 @@ pub(all) struct Outcome {
 } derive(Eq)
 pub fn Outcome::empty() -> Self
 pub fn Outcome::saved_percent(Self) -> Double
+
+pub(all) enum PrefMsg {
+  SetLang(Lang)
+  ToggleDark
+}
+
+pub(all) struct Prefs {
+  lang : Lang
+  dark : Bool
+} derive(Eq)
 
 pub(all) enum Route {
   Landing

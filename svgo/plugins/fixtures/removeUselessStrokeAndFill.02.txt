@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <g id="shape"><rect stroke-width="4" stroke-dashoffset="5" width="10" height="10"/></g>
+  </defs>
+  <g id="reused"><circle stroke-linecap="round" r="5"/></g>
+  <use href="#shape" stroke="#000"/>
+  <use href="#reused" stroke="#000"/>
+  <rect stroke-width="4" width="10" height="10"/>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <g id="shape"><rect stroke-width="4" stroke-dashoffset="5" width="10" height="10"/></g>
+  </defs>
+  <g id="reused"><circle stroke-linecap="round" r="5"/></g>
+  <use href="#shape" stroke="#000"/>
+  <use href="#reused" stroke="#000"/>
+  <rect width="10" height="10"/>
+</svg>

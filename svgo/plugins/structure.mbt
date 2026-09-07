@@ -165,7 +165,16 @@ pub let remove_useless_stroke_and_fill : Plugin = {
         "path", "rect", "circle", "ellipse", "line", "polyline", "polygon", "g",
         "text",
       ].contains(e.name)
-      let referenced = e.attrs.get("id") is Some(id) && ids.contains(id)
+      // ...and so may anything below a referenced element or inside <defs>:
+      // a <use> can put a stroke on it that is not visible here
+      let referenced = (e.attrs.get("id") is Some(id) && ids.contains(id)) ||
+        chain
+        .iter()
+        .any(a => {
+          a.name == "defs" ||
+          a.name == "symbol" ||
+          (a.attrs.get("id") is Some(id) && ids.contains(id))
+        })
       if shape && !referenced && e.name != "g" {
         let stroke = e.attrs.get("stroke")
         let stroke_width = e.attrs.get("stroke-width")
@@ -493,17 +502,47 @@ pub let merge_paths : Plugin = {
         match (parent.children[i], parent.children[i + 1]) {
           (Element(a), Element(b)) if a.name == "path" &&
             b.name == "path" &&
-            mergeable(a, b, ctx) => {
-            a.attrs["d"] = a.attrs.get("d").unwrap() + b.attrs.get("d").unwrap()
-            ignore(parent.children.remove(i + 1))
-            changed = true
-          }
+            mergeable(a, b, ctx) =>
+            match
+              merged_data(
+                a.attrs.get("d").unwrap(),
+                b.attrs.get("d").unwrap(),
+                ctx.precision,
+              ) {
+              Some(d) => {
+                a.attrs["d"] = d
+                ignore(parent.children.remove(i + 1))
+                changed = true
+              }
+              None => i += 1
+            }
           _ => i += 1
         }
       }
     })
     changed
   },
+}
+
+///|
+/// Path data of `a` followed by `b`. A path's first `m` is absolute on its
+/// own but relative once it follows another subpath, so it becomes `M`
+/// (its implicit trailing pairs stay relative as an explicit `l`).
+fn merged_data(da : String, db : String, precision : Int) -> String? {
+  let sa = @path.parse(da) catch { _ => return None }
+  let sb = @path.parse(db) catch { _ => return None }
+  let out = sa
+  for i, seg in sb {
+    if i == 0 && seg.cmd == 'm' {
+      out.push({ cmd: 'M', args: seg.args[:2].to_owned(), })
+      if seg.args.length() > 2 {
+        out.push({ cmd: 'l', args: seg.args[2:].to_owned(), })
+      }
+    } else {
+      out.push(seg)
+    }
+  }
+  Some(@path.stringify(out, precision~))
 }
 
 ///|

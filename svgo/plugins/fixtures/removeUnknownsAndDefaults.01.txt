@@ -9,7 +9,7 @@
 
 <svg xmlns="http://www.w3.org/2000/svg">
   <rect width="1" height="1"/>
-  <rect rx="0" ry="5" width="1" height="1"/>
+  <rect rx="0" ry="5" width="1" height="1" fill="black"/>
   <g stroke="red">
     <rect width="1" height="1" stroke="none"/>
   </g>

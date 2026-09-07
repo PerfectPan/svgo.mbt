@@ -21,15 +21,6 @@ cleanupIds.26
 # cleanupNumericValues: not analysed yet
 cleanupNumericValues.01
 
-# collapseGroups: attribute move-down rules incomplete
-collapseGroups.07
-collapseGroups.12
-collapseGroups.13
-collapseGroups.14
-collapseGroups.15
-collapseGroups.17
-collapseGroups.18
-
 # convertColors: not analysed yet
 convertColors.01
 
@@ -50,19 +41,6 @@ convertShapeToPath.01
 convertShapeToPath.03
 
 # convertTransform: remaining precision/decomposition edge cases
-
-# mergePaths: lone movetos not dropped, some merges svgo refuses
-mergePaths.01
-mergePaths.02
-mergePaths.03
-mergePaths.04
-mergePaths.06
-mergePaths.07
-mergePaths.08
-mergePaths.09
-mergePaths.10
-mergePaths.11
-mergePaths.12
 
 # removeDimensions: not analysed yet
 removeDimensions.04
@@ -89,15 +67,7 @@ removeHiddenElems.13
 removeHiddenElems.14
 removeHiddenElems.19
 
-# removeUnknownsAndDefaults: unknown elements kept; some default values missing
-removeUnknownsAndDefaults.01
-removeUnknownsAndDefaults.02
-removeUnknownsAndDefaults.04
-removeUnknownsAndDefaults.05
-removeUnknownsAndDefaults.07
-removeUnknownsAndDefaults.09
-removeUnknownsAndDefaults.13
-removeUnknownsAndDefaults.16
+# removeUnknownsAndDefaults: (all passing)
 
 # removeUselessDefs: not analysed yet
 removeUselessDefs.03

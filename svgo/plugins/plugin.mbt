@@ -6,12 +6,16 @@ pub struct Context {
   precision : Int
   /// path data the optimizer has already left unchanged in this run
   optimized_paths : Set[String]
+  /// convex hulls of each subpath, per path data string, for mergePaths'
+  /// intersection test (paths are compared against both neighbours on
+  /// every pass, so this saves most of the parsing and hull building)
+  path_hulls : Map[String, Array[Array[(Double, Double)]]]
 } derive(Debug)
 
 ///|
 /// A fresh context; create one per `optimize` run.
 pub fn Context::new(precision? : Int = 3) -> Context {
-  { precision, optimized_paths: Set([]), }
+  { precision, optimized_paths: Set([]), path_hulls: Map([]), }
 }
 
 ///|

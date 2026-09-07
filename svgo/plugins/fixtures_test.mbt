@@ -104,9 +104,7 @@ test "fixture collapseGroups.01" {
       #|  <rect width="1" height="1"/>
       #|  <rect width="1" height="1" transform="translate(1) scale(2)" fill="red"/>
       #|  <rect fill="blue" width="1" height="1"/>
-      #|  <g id="keep">
-      #|    <rect width="1" height="1"/>
-      #|  </g>
+      #|  <rect width="1" height="1" id="keep"/>
       #|  <g clip-path="url(#c)">
       #|    <rect width="1" height="1"/>
       #|  </g>
@@ -508,7 +506,7 @@ test "fixture removeUnknownsAndDefaults.01" {
     (
       #|<svg xmlns="http://www.w3.org/2000/svg">
       #|  <rect width="1" height="1"/>
-      #|  <rect rx="0" ry="5" width="1" height="1"/>
+      #|  <rect rx="0" ry="5" width="1" height="1" fill="black"/>
       #|  <g stroke="red">
       #|    <rect width="1" height="1" stroke="none"/>
       #|  </g>
@@ -2169,7 +2167,7 @@ test "upstream collapseGroups.07" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -2345,7 +2343,7 @@ test "upstream collapseGroups.12" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -2381,7 +2379,7 @@ test "upstream collapseGroups.13" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -2422,7 +2420,7 @@ test "upstream collapseGroups.14" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -2450,7 +2448,7 @@ test "upstream collapseGroups.15" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -2506,7 +2504,7 @@ test "upstream collapseGroups.17" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -2558,7 +2556,7 @@ test "upstream collapseGroups.18" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -4462,7 +4460,7 @@ test "upstream mergePaths.01" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -4504,7 +4502,7 @@ test "upstream mergePaths.02" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -4559,7 +4557,7 @@ test "upstream mergePaths.03" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -4588,7 +4586,7 @@ test "upstream mergePaths.04" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -4649,7 +4647,7 @@ test "upstream mergePaths.06" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -4691,7 +4689,7 @@ test "upstream mergePaths.07" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -4735,7 +4733,7 @@ test "upstream mergePaths.08" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -4779,7 +4777,7 @@ test "upstream mergePaths.09" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -4821,7 +4819,7 @@ test "upstream mergePaths.10" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -4867,7 +4865,7 @@ test "upstream mergePaths.11" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -4915,7 +4913,7 @@ test "upstream mergePaths.12" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -6141,7 +6139,7 @@ test "upstream removeUnknownsAndDefaults.01" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -6174,7 +6172,7 @@ test "upstream removeUnknownsAndDefaults.02" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -6226,7 +6224,7 @@ test "upstream removeUnknownsAndDefaults.04" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -6266,7 +6264,7 @@ test "upstream removeUnknownsAndDefaults.05" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -6334,7 +6332,7 @@ test "upstream removeUnknownsAndDefaults.07" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -6412,7 +6410,7 @@ test "upstream removeUnknownsAndDefaults.09" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -6525,7 +6523,7 @@ test "upstream removeUnknownsAndDefaults.13" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -6592,7 +6590,7 @@ test "upstream removeUnknownsAndDefaults.16" {
     ),
     precision=3,
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 

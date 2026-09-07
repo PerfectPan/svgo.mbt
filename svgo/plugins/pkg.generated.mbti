@@ -86,6 +86,7 @@ pub fn split_unit(String) -> (Double, String)?
 pub struct Context {
   precision : Int
   optimized_paths : @set.Set[String]
+  path_hulls : Map[String, Array[Array[(Double, Double)]]]
 } derive(@debug.Debug)
 pub fn Context::new(precision? : Int) -> Self
 

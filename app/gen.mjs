@@ -1,6 +1,6 @@
 // Generate the MoonBit data files the site is compiled with:
 //   ui/data.mbt      benchmark rows + plugin list   (from app/data.json, written by packages/compare/collect.mjs)
-//   ui/samples.mbt   the editor exports in svgo/testdata/ (optimized live in the browser)
+//   ui/samples.mbt   curated sample SVGs (testdata + compare corpus), optimized live in the browser
 //   ui/api_data.mbt  the public API                 (from `moon -C svgo doc` → _build/doc)
 // Usage: node app/gen.mjs   (run by app/build.mjs)
 import { readFileSync, writeFileSync, readdirSync, existsSync } from "node:fs";
@@ -36,13 +36,22 @@ ${data.rows.map((r) => `  { file: ${str(r.file)}, original: ${r.original}, mbt: 
 `);
 
 // ---------- samples.mbt ----------
-const samples = readdirSync(join(ROOT, "svgo/testdata")).filter((f) => f.endsWith(".svg")).sort();
-const label = (f) => f.replace(".svg", "").split("-").map((w) => w[0].toUpperCase() + w.slice(1)).join(" ");
+// Curated: one real editor export (the default in the playground) plus the
+// classic large test files, which make a better gallery than icons do.
+const SAMPLES = [
+  ["Sketch icon", "svgo/testdata/sketch-icon.svg"],
+  ["SVG logo", "packages/compare/corpus/SVG_logo.svg"],
+  ["Python logo", "packages/compare/corpus/Python_logo_and_wordmark.svg"],
+  ["Tux", "packages/compare/corpus/Tux.svg"],
+  ["Ghostscript Tiger", "packages/compare/corpus/Ghostscript_Tiger.svg"],
+  ["World map", "packages/compare/corpus/World_map_-_low_resolution.svg"],
+];
 writeFileSync(join(UI, "samples.mbt"), `${HEADER}
 ///|
-/// Editor exports from svgo/testdata, shown in the demo and optimized live.
+/// Sample documents bundled with the site: shown in the gallery, selectable
+/// in the playground, optimized live in the browser.
 pub let samples : Array[Sample] = [
-${samples.map((f) => `  { name: ${str(label(f))}, file: ${str(f)}, svg: ${str(readFileSync(join(ROOT, "svgo/testdata", f), "utf8"))} },`).join("\n")}
+${SAMPLES.map(([name, f]) => `  { name: ${str(name)}, file: ${str(f.split("/").pop())}, svg: ${str(readFileSync(join(ROOT, f), "utf8"))} },`).join("\n")}
 ]
 `);
 
@@ -98,4 +107,4 @@ ${p.items.map((it) => `      {
 ]
 `);
 }
-console.log(`app/gen.mjs: data (${data.rows.length} rows), samples (${samples.length}), api (${pkgs.length} packages)`);
+console.log(`app/gen.mjs: data (${data.rows.length} rows), samples (${SAMPLES.length}), api (${pkgs.length} packages)`);

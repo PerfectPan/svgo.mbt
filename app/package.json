@@ -9,7 +9,9 @@
     "gen": "node gen.mjs",
     "css": "tailwindcss -i src/style.css -o public/style.css --minify",
     "motion:studio": "remotion studio motion/src/index.ts",
-    "motion:render": "remotion render motion/src/index.ts Hero public/hero.mp4 --codec h264 --crf 22 && remotion still motion/src/index.ts Hero public/hero-poster.jpg --frame 150 --image-format jpeg --jpeg-quality 85"
+    "motion:render": "pnpm -s motion:render:light && pnpm -s motion:render:dark",
+    "motion:render:light": "remotion render motion/src/index.ts Hero public/hero.mp4 --codec h264 --crf 22 --props='{\"theme\":\"light\"}' && remotion still motion/src/index.ts Hero public/hero-poster.jpg --frame 150 --image-format jpeg --jpeg-quality 85 --props='{\"theme\":\"light\"}'",
+    "motion:render:dark": "remotion render motion/src/index.ts Hero public/hero-dark.mp4 --codec h264 --crf 22 --props='{\"theme\":\"dark\"}' && remotion still motion/src/index.ts Hero public/hero-dark-poster.jpg --frame 150 --image-format jpeg --jpeg-quality 85 --props='{\"theme\":\"dark\"}'"
   },
   "dependencies": {
     "svgo-mbt": "workspace:*"

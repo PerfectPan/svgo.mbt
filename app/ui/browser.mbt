@@ -32,20 +32,6 @@ extern "js" fn read_first_file(
   #|}
 
 ///|
-extern "js" fn b64_encode(s : String) -> String =
-  #|(s) => btoa(String.fromCharCode(...new TextEncoder().encode(s)))
-  #|  .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "")
-
-///|
-extern "js" fn b64_decode(s : String) -> String =
-  #|(s) => {
-  #|  try {
-  #|    return new TextDecoder().decode(
-  #|      Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/")), (c) => c.charCodeAt(0)));
-  #|  } catch { return ""; }
-  #|}
-
-///|
 extern "js" fn location_href() -> String = "() => location.href"
 
 ///|
@@ -139,3 +125,21 @@ extern "js" fn install_motion() -> Unit =
 pub fn start_motion() -> Unit {
   install_motion()
 }
+
+///|
+extern "js" fn load_pref(key : String) -> String =
+  #|(key) => { try { return localStorage.getItem(key) || ""; } catch (e) { return ""; } }
+
+///|
+extern "js" fn save_pref(key : String, value : String) -> Unit =
+  #|(key, value) => { try { localStorage.setItem(key, value); } catch (e) {} }
+
+///|
+extern "js" fn browser_lang() -> String =
+  #|() => (navigator.language || "en").toLowerCase()
+
+///|
+/// `data-theme` on <html> drives the dark palette (see src/style.css); the
+/// shell applies the stored value before the first paint.
+extern "js" fn set_theme(dark : Bool) -> Unit =
+  #|(dark) => { document.documentElement.dataset.theme = dark ? "dark" : "light"; }

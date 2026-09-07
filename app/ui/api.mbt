@@ -49,7 +49,7 @@ fn api_member(pkg : ApiPackage, it : ApiItem) -> Html {
       doc_html(m.doc),
     ])
   })
-  let impls = it.impls.map(t => h4("impl \{t}"))
+  let impls = it.impls.map(tr => h4("impl \{tr}"))
   let src_dir = match pkg.path.find("perfectpan/svgo/") {
     Some(_) => pkg.path["perfectpan/svgo/".length():].to_owned() + "/"
     None => ""
@@ -64,7 +64,7 @@ fn api_member(pkg : ApiPackage, it : ApiItem) -> Html {
         a(
           class="src",
           href="\{REPO_URL}/blob/main/svgo/\{src_dir}\{it.file}",
-          "source",
+          t("source", "源码"),
         )
       },
     ]),
@@ -90,13 +90,24 @@ fn side_nav() -> Html {
   aside(
     class="api-side text-[13px] min-[901px]:sticky min-[901px]:top-20 min-[901px]:max-h-[calc(100vh-100px)] min-[901px]:self-start min-[901px]:overflow-auto",
     [
-      p(class="mb-1.5 text-xs text-muted", [
-        text("Generated from "),
-        code("moon doc"),
-        text(". Also on "),
-        a(class="text-ink-2", href=MOONCAKES_URL, "mooncakes.io"),
-        text("."),
-      ]),
+      p(
+        class="mb-1.5 text-xs text-muted",
+        tm(
+          [
+            text("Generated from "),
+            code("moon doc"),
+            text(". Also on "),
+            a(class="text-ink-2", href=MOONCAKES_URL, "mooncakes.io"),
+          ],
+          [
+            text("由 "),
+            code("moon doc"),
+            text(" 生成，也可在 "),
+            a(class="text-ink-2", href=MOONCAKES_URL, "mooncakes.io"),
+            text(" 查看"),
+          ],
+        ),
+      ),
       ..entries,
     ],
   )
@@ -104,27 +115,35 @@ fn side_nav() -> Html {
 
 ///|
 /// The API reference page.
-pub fn api_page() -> Val[Html] {
-  let sections : Array[Html] = []
-  for pkg in api_packages {
-    sections.push(h2(id=anchor(pkg, "pkg"), class="display", pkg.path))
-    for it in pkg.items {
-      sections.push(api_member(pkg, it))
+pub fn api_page(chrome : Chrome) -> Val[Html] {
+  chrome.prefs.view(p => {
+    let sections : Array[Html] = []
+    for pkg in api_packages {
+      sections.push(h2(id=anchor(pkg, "pkg"), class="display", pkg.path))
+      for it in pkg.items {
+        sections.push(api_member(pkg, it))
+      }
     }
-  }
-  Val::constant(
-    div([
-      top_nav(Api, "API"),
+    div(class="pt-[60px]", [
+      top_nav(Api, "API", p, chrome.emit),
       page_head(
-        "API reference · generated from moon doc",
-        [text("Plain structs, "), span(class="grad", "no globals.")],
-        "The public surface of perfectpan/svgo and its packages. Everything below is extracted from the doc comments in the source, so it is the same text mooncakes.io shows; each item links to the line that defines it.",
+        t(
+          "API reference · generated from moon doc", "API 文档 · 由 moon doc 生成",
+        ),
+        tm([text("Plain structs, "), span(class="grad", "no globals.")], [
+          text("纯结构体，"),
+          span(class="grad", "没有全局状态。"),
+        ]),
+        t(
+          "The public surface of perfectpan/svgo and its packages. Everything below is extracted from the doc comments in the source, so it is the same text mooncakes.io shows; each item links to the line that defines it.",
+          "perfectpan/svgo 及其子包的公开接口。下面的内容全部从源码的文档注释中提取，和 mooncakes.io 上显示的是同一份文字；每一项都链接到定义它的那一行。",
+        ),
       ),
       div(
         class="wrap grid gap-10 pb-20 pt-2 min-[901px]:grid-cols-[240px_1fr]",
         [side_nav(), main_(class="api-main min-w-0", sections)],
       ),
       page_footer(),
-    ]),
-  )
+    ])
+  })
 }

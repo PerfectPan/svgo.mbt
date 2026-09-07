@@ -41,7 +41,14 @@ const Icon = ({ size }: { size: number }) => (
 
 const LINE_HEIGHT = 30;
 
-export const Hero = () => {
+export type HeroProps = { theme: "light" | "dark" };
+
+export const Hero = ({ theme }: HeroProps) => {
+  const dark = theme === "dark";
+  // the two site palettes (app/src/style.css)
+  const c = dark
+    ? { page: "bg-[#0b0d12] text-[#eef0f5]", card: "border-[#1f242e] bg-[#12151c]", ink: "text-[#eef0f5]", muted: "text-[#8a92a3]", faint: "text-[#8a92a3]/40", line: "bg-[#2b3140]", wash: "bg-[radial-gradient(600px_400px_at_15%_10%,rgb(16_185_129/0.16),transparent_60%),radial-gradient(500px_400px_at_90%_90%,rgb(20_184_166/0.14),transparent_60%)]", shadow: "shadow-[0_30px_80px_-40px_rgb(0_0_0/0.8)]", border: "border-[#1f242e]" }
+    : { page: "bg-white text-ink", card: "border-line bg-white", ink: "text-ink", muted: "text-muted", faint: "text-muted/40", line: "bg-line", wash: "bg-[radial-gradient(600px_400px_at_15%_10%,rgb(5_150_105/0.14),transparent_60%),radial-gradient(500px_400px_at_90%_90%,rgb(20_184_166/0.16),transparent_60%)]", shadow: "shadow-[0_30px_80px_-40px_rgb(15_40_60/0.30)]", border: "border-line" };
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
@@ -65,21 +72,21 @@ export const Hero = () => {
   const targets = INPUT.map((l) => (l.kind === "drop" ? -1 : survivors++));
 
   return (
-    <AbsoluteFill className="bg-white font-sans text-ink">
+    <AbsoluteFill className={`font-sans ${c.page}`}>
       {/* soft colour wash, same as the page hero */}
-      <div className="absolute inset-0 bg-[radial-gradient(600px_400px_at_15%_10%,rgb(5_150_105/0.14),transparent_60%),radial-gradient(500px_400px_at_90%_90%,rgb(20_184_166/0.16),transparent_60%)]" />
+      <div className={`absolute inset-0 ${c.wash}`} />
 
       {/* code card */}
       <div
-        className="absolute left-[72px] top-[72px] h-[576px] w-[820px] overflow-hidden rounded-[20px] border border-line bg-white shadow-[0_30px_80px_-40px_rgb(15_40_60/0.30)]"
+        className={`absolute left-[72px] top-[72px] h-[576px] w-[820px] overflow-hidden rounded-[20px] border ${c.card} ${c.shadow}`}
         style={{ opacity: appear, transform: `translateY(${(1 - appear) * 24}px)` }}
       >
-        <div className="flex h-11 items-center gap-2 border-b border-line px-[18px] text-[13px] text-muted">
+        <div className={`flex h-11 items-center gap-2 border-b px-[18px] text-[13px] ${c.border} ${c.muted}`}>
           <span className="size-2.5 rounded-full bg-red-300" />
           <span className="size-2.5 rounded-full bg-amber-300" />
           <span className="size-2.5 rounded-full bg-green-300" />
           <span className="ml-2.5 font-mono">icon-close.svg</span>
-          <span className={`ml-auto font-mono font-semibold tabular-nums ${folded ? "text-mint" : "text-muted"}`}>{bytes} B</span>
+          <span className={`ml-auto font-mono font-semibold tabular-nums ${folded ? "text-mint" : c.muted}`}>{bytes} B</span>
         </div>
         <div className="relative px-6 py-[18px] font-mono text-[15.5px]" style={{ lineHeight: `${LINE_HEIGHT}px` }}>
           {INPUT.map((l, i) => {
@@ -95,7 +102,7 @@ export const Hero = () => {
             return (
               <div
                 key={i}
-                className={`absolute whitespace-pre ${isDrop ? "text-muted" : "text-ink"}`}
+                className={`absolute whitespace-pre ${isDrop ? c.muted : c.ink}`}
                 style={{ left: 24 + l.indent * 22, top: 18 + y, opacity }}
               >
                 <span className="absolute -inset-y-[3px] -inset-x-2 rounded-md bg-accent/10" style={{ opacity: hl }} />
@@ -108,14 +115,14 @@ export const Hero = () => {
 
       {/* plugin ticker + result */}
       <div className="absolute left-[936px] top-[72px] w-[272px]" style={{ opacity: appear }}>
-        <div className="text-xs font-semibold uppercase tracking-[0.1em] text-muted">pipeline</div>
+        <div className={`text-xs font-semibold uppercase tracking-[0.1em] ${c.muted}`}>pipeline</div>
         <div className="mt-2.5 font-mono text-sm">
           {PLUGINS.map((name, i) => {
             const done = i < pluginIndex || folded;
             const active = sweeping && i === pluginIndex;
             return (
-              <div key={name} className={`flex h-[26px] items-center gap-2 ${active ? "font-semibold text-ink" : done ? "text-muted" : "text-muted/40"}`}>
-                <span className={`size-2 rounded-full ${done ? "bg-mint" : active ? "scale-[1.4] bg-accent" : "bg-line"}`} />
+              <div key={name} className={`flex h-[26px] items-center gap-2 ${active ? `font-semibold ${c.ink}` : done ? c.muted : c.faint}`}>
+                <span className={`size-2 rounded-full ${done ? "bg-mint" : active ? "scale-[1.4] bg-accent" : c.line}`} />
                 <span>{name}</span>
               </div>
             );
@@ -123,14 +130,14 @@ export const Hero = () => {
         </div>
 
         <div
-          className="mt-[26px] rounded-2xl border border-line bg-white p-[18px]"
+          className={`mt-[26px] rounded-2xl border p-[18px] ${c.card}`}
           style={{ opacity: resultIn, transform: `translateY(${interpolate(fold, [0, 1], [12, 0])}px)` }}
         >
           <div className="flex items-center gap-3.5">
             <Icon size={56} />
             <div>
-              <div className="font-display text-[30px] font-bold tracking-tight text-ink">−{Math.round((1 - bytes / 836) * 100)}%</div>
-              <div className="text-[13px] text-muted">836 B → {bytes} B · 0 px changed</div>
+              <div className={`font-display text-[30px] font-bold tracking-tight ${c.ink}`}>−{Math.round((1 - bytes / 836) * 100)}%</div>
+              <div className={`text-[13px] ${c.muted}`}>836 B → {bytes} B · 0 px changed</div>
             </div>
           </div>
         </div>

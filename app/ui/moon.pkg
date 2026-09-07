@@ -12,7 +12,7 @@ import {
 
 // the previews render SVG text the user typed, on purpose
 
-warnings = "-alert_xss_vulnerable"
+warnings = "-alert_xss_vulnerable-text_segment_excceed"
 
 supported_targets = "js"
 

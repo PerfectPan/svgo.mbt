@@ -48,33 +48,39 @@ fn recompute(m : PgModel) -> PgModel {
 }
 
 ///|
-/// Share links carry the options and the input in the query string:
-/// `?p=3&m=1&f=0&x=name,name&s=<base64url source>`.
+/// Share links live entirely in the hash, like the TypeScript playground:
+/// `#/playground?p=3&m=1&f=0&x=name,name&s=<lz-string>`. Options are only
+/// written when they differ from the defaults; the source is lz-compressed
+/// (see lz.mbt), roughly half the length base64 of the text would be.
 fn share_url(m : PgModel) -> String {
   let href = location_href()
-  let base = match href.find("?") {
+  let base = match href.find("#") {
     Some(i) => href[:i].to_owned()
-    None =>
-      match href.find("#") {
-        Some(i) => href[:i].to_owned()
-        None => href
-      }
+    None => href
   }
-  let src = if m.source.length() < 20000 { b64_encode(m.source) } else { "" }
-  base +
-  "?p=\{m.precision}&m=\{if m.multipass { 1 } else { 0 }}&f=\{if m.pretty { 1 } else { 0 }}&x=\{m.enabled.join(",")}&s=\{src}#/playground"
+  let q : Array[String] = []
+  if m.precision != 3 {
+    q.push("p=\{m.precision}")
+  }
+  if !m.multipass {
+    q.push("m=0")
+  }
+  if m.pretty {
+    q.push("f=1")
+  }
+  if m.enabled != default_enabled() {
+    q.push("x=\{m.enabled.join(",")}")
+  }
+  q.push("s=\{lz_compress(m.source)}")
+  base + "#/playground?" + q.join("&")
 }
 
 ///|
-/// Restore a model from the current URL's query string, if any.
+/// Restore a model from the current URL, if it carries a share payload.
 fn from_url() -> PgModel? {
   let href = location_href()
-  guard href.find("?") is Some(q) else { return None }
-  let rest = href[q + 1:]
-  let query = match rest.find("#") {
-    Some(h) => rest[:h].to_owned()
-    None => rest.to_owned()
-  }
+  guard href.find("#/playground?") is Some(h) else { return None }
+  let query = href[h + "#/playground?".length():].to_owned()
   let mut precision = 3
   let mut multipass = true
   let mut pretty = false
@@ -86,7 +92,7 @@ fn from_url() -> PgModel? {
         match key.to_owned() {
           "p" =>
             precision = @string.parse_int(value.to_owned()) catch { _ => 3 }
-          "m" => multipass = value == "1"
+          "m" => multipass = value != "0"
           "f" => pretty = value == "1"
           "x" =>
             enabled = value
@@ -94,7 +100,7 @@ fn from_url() -> PgModel? {
               .filter(s => !s.is_empty())
               .map(s => s.to_owned())
               .to_array()
-          "s" => source = b64_decode(value.to_owned())
+          "s" => source = lz_decompress(value.to_owned()).unwrap_or("")
           _ => ()
         }
       None => ()
@@ -183,7 +189,7 @@ fn pg_update(
         m,
         with_notice(
           emit,
-          "Output copied",
+          t("Output copied", "已复制输出"),
           @rabbita.effect(fn() noraise { copy_text(m.outcome.data) }),
         ),
       )
@@ -200,7 +206,7 @@ fn pg_update(
         m,
         with_notice(
           emit,
-          "Link copied",
+          t("Link copied", "链接已复制"),
           @rabbita.effect(fn() noraise {
             replace_url(url)
             copy_text(url)
@@ -235,57 +241,66 @@ fn sidebar(m : PgModel, emit : Emit[PgMsg]) -> Html {
       span([code(name), small(desc)]),
     ])
   })
-  aside(
-    class="rise card min-[961px]:sticky min-[961px]:top-20 min-[961px]:max-h-[calc(100vh-96px)] min-[961px]:overflow-auto",
-    style=["--d: 120ms"],
-    [
-      div(class="side-head", [text("Options")]),
-      label(class="opt", [
-        span([text("precision"), small("decimal places kept in numbers")]),
-        input(
-          input_type=Number,
-          class="num",
-          value=m.precision.to_string(),
-          min=0,
-          max=8,
-          on_input=emit.map(v => SetPrecision(v)),
+  aside(class="rise card min-h-0 overflow-auto", style=["--d: 80ms"], [
+    div(class="side-head", [text(t("Options", "选项"))]),
+    label(class="opt", [
+      span([
+        text(t("precision", "精度")),
+        small(
+          t("decimal places kept in numbers", "数字保留的小数位数"),
         ),
       ]),
-      label(class="opt", [
-        span([text("multipass"), small("repeat until nothing changes")]),
-        input(
-          input_type=Checkbox,
-          class="switch",
-          checked=m.multipass,
-          on_change=emit.map(_ => ToggleMultipass),
+      input(
+        input_type=Number,
+        class="num",
+        value=m.precision.to_string(),
+        min=0,
+        max=8,
+        on_input=emit.map(v => SetPrecision(v)),
+      ),
+    ]),
+    label(class="opt", [
+      span([
+        text("multipass"),
+        small(
+          t("repeat until nothing changes", "反复运行直到没有变化"),
         ),
       ]),
-      label(class="opt", [
-        span([text("pretty print"), small("indented output")]),
-        input(
-          input_type=Checkbox,
-          class="switch",
-          checked=m.pretty,
-          on_change=emit.map(_ => TogglePretty),
+      input(
+        input_type=Checkbox,
+        class="switch",
+        checked=m.multipass,
+        on_change=emit.map(_ => ToggleMultipass),
+      ),
+    ]),
+    label(class="opt", [
+      span([
+        text(t("pretty print", "格式化输出")),
+        small(t("indented output", "带缩进的输出")),
+      ]),
+      input(
+        input_type=Checkbox,
+        class="switch",
+        checked=m.pretty,
+        on_change=emit.map(_ => TogglePretty),
+      ),
+    ]),
+    div(class="side-head mt-6", [
+      span(class="flex items-center gap-2", [
+        text(t("Plugins", "插件")),
+        span(
+          class="tag normal-case tracking-normal",
+          "\{m.enabled.length()}/\{all.length()}",
         ),
       ]),
-      div(class="side-head mt-6", [
-        span(class="flex items-center gap-2", [
-          text("Plugins"),
-          span(
-            class="tag normal-case tracking-normal",
-            "\{m.enabled.length()}/\{all.length()}",
-          ),
-        ]),
-        button(
-          class="chip -my-1 normal-case tracking-normal",
-          on_click=emit(Reset),
-          "reset",
-        ),
-      ]),
-      div(class="divide-y divide-line", plugin_rows),
-    ],
-  )
+      button(
+        class="chip -my-1 normal-case tracking-normal",
+        on_click=emit(Reset),
+        t("reset", "重置"),
+      ),
+    ]),
+    div(class="divide-y divide-line", plugin_rows),
+  ])
 }
 
 ///|
@@ -314,7 +329,7 @@ fn toolbar(m : PgModel, emit : Emit[PgMsg]) -> Html {
           tabs,
         ),
         label(class="chip", for_="pg-file", [
-          text("Open .svg…"),
+          text(t("Open .svg…", "打开 .svg…")),
           input(
             id="pg-file",
             input_type=File,
@@ -326,13 +341,23 @@ fn toolbar(m : PgModel, emit : Emit[PgMsg]) -> Html {
       ]),
       div(class="ml-auto flex items-center gap-2", [
         span(class="text-[12.5px] font-semibold text-mint", m.notice),
-        button(class="btn btn-sm", on_click=emit(Copy), "Copy output"),
-        button(class="btn btn-sm", on_click=emit(Download), "Download"),
+        button(
+          class="btn btn-sm",
+          on_click=emit(Copy),
+          t("Copy output", "复制输出"),
+        ),
+        button(
+          class="btn btn-sm",
+          on_click=emit(Download),
+          t("Download", "下载"),
+        ),
         button(
           class="btn btn-primary btn-sm",
-          title="URL with the current input and options",
+          title=t(
+            "URL with the current input and options", "带当前输入和选项的链接",
+          ),
           on_click=emit(Share),
-          "Share link",
+          t("Share link", "分享链接"),
         ),
       ]),
     ],
@@ -346,10 +371,10 @@ fn applied_row(o : Outcome) -> Html {
     [
       span(
         class="mr-1.5 text-[11px] font-bold uppercase tracking-[0.1em] text-muted",
-        "changed by",
+        t("changed by", "生效插件"),
       ),
       if o.applied.is_empty() {
-        span(class="text-muted", "nothing yet")
+        span(class="text-muted", t("nothing yet", "暂无"))
       } else {
         span(
           class="flex flex-wrap gap-1.5",
@@ -361,71 +386,66 @@ fn applied_row(o : Outcome) -> Html {
 }
 
 ///|
-fn pg_view(m : PgModel, emit : Emit[PgMsg]) -> Html {
-  div([
-    top_nav(Playground, "playground"),
-    page_head(
-      "Playground · runs in your browser",
-      [text("Try it on "), span(class="grad", "your own files.")],
-      "Paste an SVG, open a file or pick a sample, then tune precision and plugins and watch the output change as you type. Copy it, download it or share a link that carries your input and options. Nothing leaves this tab: the optimizer is MoonBit compiled to JavaScript.",
-    ),
+fn pg_view(m : PgModel, p : Prefs, chrome : Chrome, emit : Emit[PgMsg]) -> Html {
+  let passes = t(
+    "\{m.outcome.passes} pass\{if m.outcome.passes == 1 { "" } else { "es" }}",
+    "\{m.outcome.passes} 轮",
+  )
+  div(class="pt-[60px]", [
+    top_nav(Playground, t("playground", "在线体验"), p, chrome.emit),
     div(
-      class="wrap grid items-start gap-5 pb-20 min-[961px]:grid-cols-[280px_minmax(0,1fr)]",
+      class="pg mx-auto grid w-[min(1480px,calc(100%-32px))] gap-4 py-4 min-[961px]:h-[calc(100dvh-60px)] min-[961px]:grid-cols-[280px_minmax(0,1fr)]",
       [
         sidebar(m, emit),
         main_(
-          class="rise overflow-hidden rounded-card border border-line bg-surface shadow-card",
-          style=["--d: 220ms"],
+          class="rise grid min-h-0 grid-rows-[auto_minmax(0,1fr)_auto_auto] overflow-hidden rounded-card border border-line bg-surface shadow-card",
+          style=["--d: 160ms"],
           [
             toolbar(m, emit),
-            div(class="grid grid-cols-2 max-[800px]:grid-cols-1", [
+            div(class="grid min-h-0 grid-cols-2 max-[800px]:grid-cols-1", [
               div(class="pane", [
-                span(class="pane-label", "input"),
-                textarea(
-                  class="!h-[min(48vh,420px)]",
-                  value=m.source,
-                  placeholder="Paste SVG or pick a sample",
-                  on_input=emit.map(s => Edit(s)),
-                  attrs=Attrs::build().spellcheck(false).aria_label("SVG input"),
-                  nothing,
+                span(class="pane-label", t("input", "输入")),
+                code_editor(
+                  m.source,
+                  emit.map(s => Edit(s)),
+                  placeholder=t(
+                    "Paste SVG or pick a sample", "粘贴 SVG，或选一个示例",
+                  ),
+                  label=t("SVG input", "SVG 输入"),
                 ),
-                svg_preview(m.source, class="preview !h-[200px]"),
+                svg_preview(m.source),
               ]),
               div(
                 class="pane border-l border-line max-[800px]:border-l-0 max-[800px]:border-t",
                 [
-                  span(class="pane-label", "svgo.mbt output"),
-                  textarea(
-                    class="!h-[min(48vh,420px)]",
-                    value=if m.outcome.error != "" {
+                  span(
+                    class="pane-label",
+                    t("svgo.mbt output", "svgo.mbt 输出"),
+                  ),
+                  code_view(
+                    if m.outcome.error != "" {
                       m.outcome.error
                     } else {
                       m.outcome.data
                     },
-                    read_only=true,
-                    attrs=Attrs::build().aria_label("optimized SVG"),
-                    nothing,
+                    label=t("optimized SVG", "优化后的 SVG"),
                   ),
-                  svg_preview(m.outcome.data, class="preview !h-[200px]"),
+                  svg_preview(m.outcome.data),
                 ],
               ),
             ]),
-            stats_bar(
-              m.outcome,
-              "\{m.outcome.passes} pass\{if m.outcome.passes == 1 { "" } else { "es" }}",
-            ),
+            stats_bar(m.outcome, passes),
             applied_row(m.outcome),
           ],
         ),
       ],
     ),
-    page_footer(),
   ])
 }
 
 ///|
-/// The playground page.
-pub fn playground_page() -> Val[Html] {
+/// The playground page. Its state outlives language and theme changes.
+pub fn playground_page(chrome : Chrome) -> Val[Html] {
   let initial = match from_url() {
     Some(m) => m
     None => {
@@ -446,5 +466,5 @@ pub fn playground_page() -> Val[Html] {
     }
   }
   let (model, emit) = @rabbita.create_state(initial, update=pg_update)
-  model.view(m => pg_view(m, emit))
+  model.view2(chrome.prefs, (m, p) => pg_view(m, p, chrome, emit))
 }

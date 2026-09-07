@@ -9,5 +9,6 @@ export const Root = () => (
     fps={HERO_FPS}
     width={HERO_WIDTH}
     height={HERO_HEIGHT}
+    defaultProps={{ theme: "light" as const }}
   />
 );

@@ -76,8 +76,8 @@ fn hero(dark : Bool) -> Html {
               class="rise mt-[22px] max-w-[54ch] text-[17px] leading-relaxed text-ink-2",
               style=["--d: 160ms"],
               t(
-                "svgo.mbt is svgo's preset-default pipeline, rewritten in MoonBit and compiled to a single wasm-gc module with no dependencies. It runs in the browser, in Node 22+, and as a native binary, and every optimization is checked with pixel diffs before it ships.",
-                "svgo.mbt 用 MoonBit 重写了 svgo 的 preset-default 流水线，编译成一个零依赖的 wasm-gc 模块，可以在浏览器、Node 22+ 和原生二进制中运行。每一项优化在发布前都经过逐像素比对。",
+                "svgo.mbt is svgo's preset-default pipeline, rewritten in MoonBit and compiled to a single wasm-gc module with no dependencies. It runs in the browser, in Node 22+, and as a native CLI. Every optimization is checked with pixel diffs before it ships.",
+                "svgo.mbt 用 MoonBit 重写了 svgo 的 preset-default 流水线，编译成一个零依赖的 wasm-gc 模块。它可以在浏览器、Node 22+ 和原生 CLI 中运行。每一项优化在发布前都经过逐像素比对。",
               ),
             ),
             div(
@@ -215,14 +215,14 @@ fn numbers_section() -> Html {
         tm(
           [
             text(
-              "Measured in a single Node process against svgo \{svgo_js_version}, both with multipass, on real editor exports and the classic large test files. The MoonBit side also pays to serialize its result as JSON; the JS side is warm. Regenerated from ",
+              "Measured in a single Node process against svgo \{svgo_js_version}, both with multipass, on real editor exports and the classic large test files. Both sides are warmed up before timing; the MoonBit side also pays to parse its config and serialize its result as JSON. Regenerated from ",
             ),
             code("packages/compare/collect.mjs"),
             text(" on \{generated_on}."),
           ],
           [
             text(
-              "在同一个 Node 进程中与 svgo \{svgo_js_version} 对比，双方均开启 multipass，样本为真实的编辑器导出文件和经典的大型测试文件。MoonBit 一侧还额外承担了结果的 JSON 序列化开销，JS 一侧则已预热。数据由 ",
+              "在同一个 Node 进程中与 svgo \{svgo_js_version} 对比，双方均开启 multipass，样本为真实的编辑器导出文件和经典的大型测试文件。计时前双方均已预热；MoonBit 一侧还额外承担了配置解析和结果 JSON 序列化的开销。数据由 ",
             ),
             code("packages/compare/collect.mjs"),
             text(" 生成于 \{generated_on}。"),

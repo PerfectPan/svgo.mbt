@@ -889,7 +889,33 @@ pub let convert_path_data : Plugin = {
   description: "optimize path data",
   run: (doc, ctx) => {
     let mut changed = false
-    let options = { ..@path.Options::default(), precision: ctx.precision, }
+    // floatPrecision overrides the global precision for this plugin.
+    let precision = ctx.param_int("floatPrecision", ctx.precision)
+    // makeArcs: convert runs of cubic beziers approximating a circular arc
+    // into `A` commands. Defaults to { threshold: 2.5, tolerance: 0.5 };
+    // `makeArcs: false` disables it.
+    let (make_arcs, ma_threshold, ma_tolerance) = match ctx.param("makeArcs") {
+      Some(False) => (false, 2.5, 0.5)
+      Some(Object(obj)) => {
+        let threshold = match obj.get("threshold") {
+          Some(Number(n, ..)) => n
+          _ => 2.5
+        }
+        let tolerance = match obj.get("tolerance") {
+          Some(Number(n, ..)) => n
+          _ => 0.5
+        }
+        (true, threshold, tolerance)
+      }
+      _ => (true, 2.5, 0.5)
+    }
+    let options = {
+      ..@path.Options::default(),
+      precision,
+      make_arcs,
+      make_arcs_threshold: ma_threshold,
+      make_arcs_tolerance: ma_tolerance,
+    }
     // Build class -> property maps from <style> elements so paths that
     // inherit marker or linecap via CSS are handled correctly.
     let linecap_by_class : Map[String, String] = Map([])
@@ -1057,25 +1083,13 @@ pub let convert_path_data : Plugin = {
                         let segs = @path.parse(path_d)
                         if scale_stroke {
                           scale_stroke_attr(
-                            e,
-                            "stroke-width",
-                            sw,
-                            scale,
-                            ctx.precision,
+                            e, "stroke-width", sw, scale, precision,
                           )
                           scale_stroke_attr(
-                            e,
-                            "stroke-dashoffset",
-                            "",
-                            scale,
-                            ctx.precision,
+                            e, "stroke-dashoffset", "", scale, precision,
                           )
                           scale_stroke_attr(
-                            e,
-                            "stroke-dasharray",
-                            "",
-                            scale,
-                            ctx.precision,
+                            e, "stroke-dasharray", "", scale, precision,
                           )
                         }
                         let transformed = @path.apply_matrix(segs, matrix)
@@ -1140,7 +1154,7 @@ pub let convert_path_data : Plugin = {
           if has_marker_se && includes_vertices && all_moveto {
             optimized.push({ cmd: 'z', args: [], })
           }
-          let out = @path.stringify(optimized, precision=ctx.precision)
+          let out = @path.stringify(optimized, precision~)
           if out != path_d {
             e.attrs["d"] = out
             changed(true)

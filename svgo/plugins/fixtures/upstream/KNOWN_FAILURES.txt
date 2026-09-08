@@ -1,8 +1,4 @@
 # Upstream svgo cases svgo.mbt does not pass yet, one per line, optional '# reason'.
 # Generated tests assert these still fail; when you fix one, delete its line. Never add one.
-# Baseline 2026-09-07: 109 of 183 runnable cases. 2026-09-08: 206 of 209; only makeArcs is left, every other plugin passes its whole suite.
-
-# convertPathData: makeArcs (curve runs turned into arcs: 14 15 16)
-convertPathData.14
-convertPathData.15
-convertPathData.16
+# Baseline 2026-09-07: 109 of 183 runnable cases. Empty since 2026-09-09: all 209 cases pass.
+# Keep it that way. A new entry here is a regression, not a baseline update.

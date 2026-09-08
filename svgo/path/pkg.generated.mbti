@@ -51,6 +51,9 @@ pub(all) struct Options {
   linecap : String
   linejoin : String
   has_stroke : Bool
+  make_arcs : Bool
+  make_arcs_threshold : Double
+  make_arcs_tolerance : Double
 } derive(@debug.Debug)
 pub fn Options::default() -> Self
 

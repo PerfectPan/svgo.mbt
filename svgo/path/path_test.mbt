@@ -106,6 +106,38 @@ test "H/V widened to L when the rounded cursor drifts from the exact one" {
 }
 
 ///|
+test "makeArcs turns a circular cubic run into an arc" {
+  // Three cubics that trace one circle of r = 6.43 (svgo's own
+  // convertPathData fixture 15). At precision 2 the arc form is shorter, so
+  // the first two curves collapse into a single `A` and the third, which
+  // leaves the circle, stays a curve.
+  inspect(
+    @path.optimize_string(
+      "M.49 8.8c-.3-.75-.44-1.55-.44-2.35 0-3.54 2.88-6.43 6.43-6.43 3.53 0 6.42 2.88 6.42 6.43 0 .8-.15 1.6-.43 2.35",
+      options={ ..@path.Options::default(), precision: 2, },
+    ),
+    content="M.49 8.8A6.44 6.44 0 0 1 6.48.02a6.44 6.44 0 0 1 5.99 8.78",
+  )
+  // The same path with one control point moved off the circle (2.88 -> 8.42):
+  // the fit fails, so that run keeps its curves.
+  inspect(
+    @path.optimize_string(
+      "M.49 8.8c-.3-.75-.44-1.55-.44-2.35 0-3.54 2.88-6.43 6.43-6.43 3.53 0 8.42 2.88 6.42 6.43 0 .8-.15 1.6-.43 2.35",
+      options={ ..@path.Options::default(), precision: 2, },
+    ),
+    content="M.49 8.8A6.44 6.44 0 0 1 6.48.02c3.53 0 8.42 2.88 6.42 6.43q0 1.21-.43 2.35",
+  )
+  // makeArcs off leaves every curve alone.
+  inspect(
+    @path.optimize_string(
+      "M.49 8.8c-.3-.75-.44-1.55-.44-2.35 0-3.54 2.88-6.43 6.43-6.43 3.53 0 6.42 2.88 6.42 6.43 0 .8-.15 1.6-.43 2.35",
+      options={ ..@path.Options::default(), precision: 2, make_arcs: false, },
+    ),
+    content="M.49 8.8Q.05 7.66.05 6.45C.05 2.91 2.93.02 6.48.02c3.53 0 6.42 2.88 6.42 6.43q0 1.21-.43 2.35",
+  )
+}
+
+///|
 test "arcs" {
   inspect(
     @path.optimize_string("M 5 5 A 5 5 0 1 1 15 5 A 5 5 0 1 1 5 5 Z"),

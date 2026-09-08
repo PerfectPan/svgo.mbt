@@ -2,7 +2,7 @@
   "generated": "2026-09-08",
   "node": "v24.18.0",
   "svgoVersion": "4.1.0",
-  "wasmBytes": 217654,
+  "wasmBytes": 226963,
   "plugins": [
     {
       "name": "removeDoctype",
@@ -146,8 +146,8 @@
       "original": 570,
       "mbt": 442,
       "js": 442,
-      "mbtMs": 0.234,
-      "jsMs": 0.465,
+      "mbtMs": 0.229,
+      "jsMs": 0.285,
       "passes": 2
     },
     {
@@ -155,8 +155,8 @@
       "original": 1149,
       "mbt": 715,
       "js": 528,
-      "mbtMs": 0.185,
-      "jsMs": 0.732,
+      "mbtMs": 0.148,
+      "jsMs": 0.576,
       "passes": 2
     },
     {
@@ -164,8 +164,8 @@
       "original": 2078,
       "mbt": 641,
       "js": 640,
-      "mbtMs": 0.183,
-      "jsMs": 0.96,
+      "mbtMs": 0.169,
+      "jsMs": 0.659,
       "passes": 2
     },
     {
@@ -173,26 +173,26 @@
       "original": 836,
       "mbt": 276,
       "js": 288,
-      "mbtMs": 0.115,
-      "jsMs": 0.366,
+      "mbtMs": 0.105,
+      "jsMs": 0.321,
       "passes": 3
     },
     {
       "file": "Ghostscript_Tiger.svg",
       "original": 68630,
-      "mbt": 52794,
+      "mbt": 52690,
       "js": 68101,
-      "mbtMs": 14.455,
-      "jsMs": 62.525,
+      "mbtMs": 12.46,
+      "jsMs": 36.45,
       "passes": 3
     },
     {
       "file": "Python_logo_and_wordmark.svg",
       "original": 5419,
-      "mbt": 4597,
+      "mbt": 4562,
       "js": 4551,
-      "mbtMs": 1.671,
-      "jsMs": 4.647,
+      "mbtMs": 0.869,
+      "jsMs": 2.71,
       "passes": 3
     },
     {
@@ -200,35 +200,35 @@
       "original": 366,
       "mbt": 302,
       "js": 302,
-      "mbtMs": 0.066,
-      "jsMs": 0.193,
+      "mbtMs": 0.057,
+      "jsMs": 0.169,
       "passes": 2
     },
     {
       "file": "SVG_logo.svg",
       "original": 4019,
-      "mbt": 3795,
+      "mbt": 3546,
       "js": 3584,
-      "mbtMs": 0.493,
-      "jsMs": 1.976,
-      "passes": 2
+      "mbtMs": 0.562,
+      "jsMs": 1.664,
+      "passes": 3
     },
     {
       "file": "Tux.svg",
       "original": 49983,
-      "mbt": 36050,
+      "mbt": 35975,
       "js": 35983,
-      "mbtMs": 6.861,
-      "jsMs": 16.653,
+      "mbtMs": 6.587,
+      "jsMs": 14.058,
       "passes": 3
     },
     {
       "file": "World_map_-_low_resolution.svg",
       "original": 84823,
-      "mbt": 47171,
+      "mbt": 46700,
       "js": 46706,
-      "mbtMs": 14.718,
-      "jsMs": 59.761,
+      "mbtMs": 12.172,
+      "jsMs": 62.994,
       "passes": 3
     }
   ]

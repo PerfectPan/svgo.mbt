@@ -3790,7 +3790,7 @@ test "upstream convertPathData.14" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3813,7 +3813,7 @@ test "upstream convertPathData.15" {
     precision=2,
     params="{ \"floatPrecision\": 2 }\n",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3836,7 +3836,7 @@ test "upstream convertPathData.16" {
     precision=0,
     params="{ \"floatPrecision\": 0 }\n",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 

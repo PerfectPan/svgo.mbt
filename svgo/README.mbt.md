@@ -2,7 +2,7 @@
 
 **An SVG optimizer written in MoonBit, shipped as WebAssembly.**
 Same plugin pipeline as [svgo](https://github.com/svg/svgo)'s preset-default,
-none of the Node.js dependency tree: a 218 KB `wasm-gc` module that runs in
+none of the Node.js dependency tree: a 227 KB `wasm-gc` module that runs in
 the browser and in Node 22+, a native CLI, and a MoonBit library.
 
 [**Website & playground**](https://perfectpan.github.io/svgo.mbt/) ·
@@ -197,16 +197,15 @@ Of svgo's 209 test cases for the plugins svgo.mbt implements (svgo e4cb29b,
 
 | | cases |
 | --- | --- |
-| pass | 206 |
-| known differences (listed in `fixtures/upstream/KNOWN_FAILURES.txt`) | 3 |
+| pass | 209 |
+| known differences | 0 |
 | skipped | 0 |
 
-The three known differences are all `convertPathData` cases for `makeArcs`,
-where svgo turns runs of cubic curves that approximate a circle into `A`
-commands. Every other rule, including baking element transforms into the path
-data, matches svgo; every other plugin passes its whole upstream suite. Each entry is an
-expected failure in the test suite: fixing one requires deleting its line, so
-the list only shrinks.
+All of them pass, byte for byte, including the rules that rewrite geometry:
+element transforms baked into the path data, curve runs turned into arcs,
+adjacent paths merged, groups collapsed. `fixtures/upstream/KNOWN_FAILURES.txt`
+is empty and the harness fails the build if a case starts failing again, so an
+entry there is a regression rather than a new baseline.
 
 ## Repository layout
 

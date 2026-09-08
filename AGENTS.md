@@ -24,8 +24,9 @@ root installs every JS package.
 | micro benchmarks as a table | `scripts/bench.sh [native\|wasm-gc\|js] [bench_test.mbt\|profile_test.mbt]` |
 | byte-for-byte output comparison against a reference build | `scripts/regress.sh <dir>` (see CONTRIBUTING) |
 | regenerate `svgo/plugins/fixtures_test.mbt` from `svgo/plugins/fixtures/**/*.txt` | `python3 scripts/gen-fixtures.py` (prints pass / known-failure / skipped counts) |
+| regenerate compact SVG tables from an svgo checkout | `node scripts/gen-svg-tables.mjs <svgo-dir>` |
 | native CLI | `moon run --target native svgo/cmd/main -- file.svg --stats` (`--json`, `--plugins a,b`) |
-| wasm artifact for `packages/svgo-mbt` and the site | `scripts/build-wasm.sh` |
+| wasm artifact for `packages/svgo-mbt` and the site | `scripts/build-wasm.sh` (release + pinned wasm-opt; run `pnpm install` first) |
 | compare with svgo-js (sizes, render diff, speed) | `pnpm compare` (or the scripts in `packages/compare/`) |
 | refresh the numbers on the site | `node packages/compare/collect.mjs` → `app/data.json` |
 | API docs data (also what mooncakes.io renders) | `pnpm docs` (= `MOON_WORK=off moon -C svgo doc`, workspace mode off because the app member is js-only) → `svgo/_build/doc/` |

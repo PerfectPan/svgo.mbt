@@ -25,9 +25,9 @@ jobs:
         run: scripts/verify.sh
       - name: Wasm artifact, size comparison, render diff, speed
         run: |
+          pnpm install --frozen-lockfile
           scripts/build-wasm.sh
           moon build --target native --release -q
-          pnpm install --frozen-lockfile
           packages/compare/compare.sh
           node packages/compare/render-diff.mjs
           node packages/compare/wasm-speed.mjs

@@ -6,7 +6,11 @@ settings:
 
 importers:
 
-  .: {}
+  .:
+    devDependencies:
+      binaryen:
+        specifier: 123.0.0
+        version: 123.0.0
 
   app:
     dependencies:
@@ -1098,6 +1102,10 @@ packages:
   baseline-browser-mapping@2.11.21:
     resolution: {integrity: sha512-uh8vpY/1/YyFkunIDFH/12p7/7VdPKA1hejMVEbdkEaWnUz0Hesvx5EbiU6XxjyHZIOju+ZMbQJkRh+es3/spQ==}
     engines: {node: '>=6.0.0'}
+    hasBin: true
+
+  binaryen@123.0.0:
+    resolution: {integrity: sha512-/hls/a309aZCc0itqP6uhoR+5DsKSlJVfB8Opd2BY9Ndghs84IScTunlyidyF4r2Xe3lQttnfBNIDjaNpj6mTw==}
     hasBin: true
 
   boolbase@1.0.0:
@@ -3056,6 +3064,8 @@ snapshots:
       tslib: 2.8.1
 
   baseline-browser-mapping@2.11.21: {}
+
+  binaryen@123.0.0: {}
 
   boolbase@1.0.0: {}
 

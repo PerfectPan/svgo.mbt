@@ -27,6 +27,8 @@ step "fixtures are in sync with svgo/plugins/fixtures/*.txt"
 python3 scripts/gen-fixtures.py --check
 
 if [ "${1:-}" = "--full" ]; then
+  step "JS build and comparison dependencies"
+  pnpm install --frozen-lockfile --silent
   step "wasm artifact"
   scripts/build-wasm.sh
   step "npm package tests (node --test)"
@@ -35,7 +37,6 @@ if [ "${1:-}" = "--full" ]; then
   moon build --target native --release -q
   "$(scripts/bin-path.sh)" svgo/testdata/sketch-icon.svg --json >/dev/null
   step "compare: sizes vs svgo-js, render diff, same-process speed"
-  pnpm install --frozen-lockfile --silent
   packages/compare/compare.sh
   node packages/compare/render-diff.mjs
   node packages/compare/wasm-speed.mjs

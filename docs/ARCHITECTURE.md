@@ -74,6 +74,12 @@ default because plugins unlock each other: `collapseGroups` exposes
 attributes that `removeUnknownsAndDefaults` can then drop, `convertShapeToPath`
 produces paths that `mergePaths` can join.
 
+SVG vocabulary tables retain svgo's shared groups in compact strings generated
+by `scripts/gen-svg-tables.mjs`. The handwritten `svg_tables_parse.mbt` parses
+groups on first use and expands each element's rules only when queried; both
+levels are cached. Color maps use the same string-pair decoder and lazy caches.
+This avoids emitting thousands of repeated Map/Set construction instructions.
+
 `Context` carries the precision, the current plugin's JSON parameters, and run-level caches: path data that
 `convertPathData` already left unchanged. The optimizer is idempotent on such
 data, so later passes skip it; this is what keeps a 3-pass run on a
@@ -100,7 +106,7 @@ that did something. `utf8_length` counts bytes without encoding.
 
 | form | package | notes |
 | --- | --- | --- |
-| wasm-gc module + JS loader | `svgo/wasm/`, `packages/svgo-mbt/` | JS String Builtins: MoonBit `String` *is* a JS string, so the boundary is two string arguments and one JSON string back. 160 KB. |
+| wasm-gc module + JS loader | `svgo/wasm/`, `packages/svgo-mbt/` | JS String Builtins: MoonBit `String` *is* a JS string, so the boundary is two string arguments and one JSON string back. about 206 KB after the pinned Binaryen `wasm-opt -Oz` build step. |
 | native CLI | `svgo/cmd/main/` | C file I/O via two `extern "C"` functions; `--json` for tooling. |
 | MoonBit library | `svgo/` | `moon add perfectpan/svgo`. The website in `app/` is the first consumer: a Rabbita app compiled to JS that calls `@svgo.optimize` directly, so the demo and the playground run the same code the tests run. |
 

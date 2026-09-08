@@ -10,5 +10,8 @@
     "docs": "MOON_WORK=off moon -C svgo doc",
     "app": "pnpm -s docs && node app/build.mjs",
     "verify": "scripts/verify.sh"
+  },
+  "devDependencies": {
+    "binaryen": "123.0.0"
   }
 }

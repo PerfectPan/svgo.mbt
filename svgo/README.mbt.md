@@ -2,7 +2,7 @@
 
 **An SVG optimizer written in MoonBit, shipped as WebAssembly.**
 Same plugin pipeline as [svgo](https://github.com/svg/svgo)'s preset-default,
-none of the Node.js dependency tree: a 165 KB `wasm-gc` module that runs in
+none of the Node.js dependency tree: a 206 KB `wasm-gc` module that runs in
 the browser and in Node 22+, a native CLI, and a MoonBit library.
 
 [**Website & playground**](https://perfectpan.github.io/svgo.mbt/) ·

@@ -87,6 +87,7 @@ pub let remove_unknowns_and_defaults : Plugin = {
   name: "removeUnknownsAndDefaults",
   description: "remove unknown elements/attributes and default attribute values",
   run: (doc, ctx) => {
+    let tables = svg_tables()
     let mut changed = false
     // collect CSS text to detect attribute selectors that would make a
     // default-valued attribute meaningful
@@ -125,10 +126,10 @@ pub let remove_unknowns_and_defaults : Plugin = {
       // only those children are kept; otherwise (empty or no set), only
       // unknown elements are removed.
       let parent_allowed = match parent {
-        Some(p) => allowed_children.get(p.name)
+        Some(p) => tables.element(p.name).map(t => t.allowed_children)
         None => None
       }
-      let is_unknown = !known_elements.contains(e.name)
+      let is_unknown = !tables.known_elements.contains(e.name)
       let not_allowed = match parent_allowed {
         Some(allowed) if allowed.length() > 0 => !allowed.contains(e.name)
         _ => is_unknown
@@ -152,8 +153,9 @@ pub let remove_unknowns_and_defaults : Plugin = {
         return
       }
       let has_id = e.attrs.contains("id")
-      let allowed = allowed_attrs.get(e.name)
-      let defaults = elem_defaults.get(e.name)
+      let element_tables = tables.element(e.name)
+      let allowed = element_tables.map(t => t.allowed_attrs)
+      let defaults = element_tables.map(t => t.defaults)
       for kv in e.attrs.to_array() {
         let (k, v) = kv
         // always keep data-*, aria-*, xmlns and xmlns:*
@@ -223,7 +225,7 @@ pub let remove_unknowns_and_defaults : Plugin = {
         if ctx.param_bool("uselessOverrides", true) &&
           !has_id &&
           inheritable.contains(k) &&
-          !presentation_non_inheritable.contains(k) {
+          !tables.presentation_non_inheritable.contains(k) {
           let mut inherited : String? = None
           let mut i = chain.length() - 1
           while i >= 0 {

@@ -48,8 +48,6 @@ removeEmptyContainers.07
 removeEmptyContainers.08
 
 # removeHiddenElems: some shape rules missing
-removeHiddenElems.03
-removeHiddenElems.06
 removeHiddenElems.08
 removeHiddenElems.11
 removeHiddenElems.12

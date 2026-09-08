@@ -620,6 +620,59 @@ test "fixture removeHiddenElems.02" {
 }
 
 ///|
+test "fixture removeHiddenElems.03" {
+  check_fixture(
+    "removeHiddenElems",
+    (
+      #|<svg xmlns="http://www.w3.org/2000/svg">
+      #|  <circle r="0"><animate attributeName="r" values="0;4;0" dur="1s"/></circle>
+      #|  <ellipse rx="0" ry="4"><animate attributeName="rx" values="0;4;0" dur="1s"/></ellipse>
+      #|  <rect width="0" height="4"><animate attributeName="width" values="0;4;0" dur="1s"/></rect>
+      #|  <circle r="0"/>
+      #|  <ellipse rx="0" ry="4"/>
+      #|  <rect width="0" height="4"/>
+      #|</svg>
+    ),
+    (
+      #|<svg xmlns="http://www.w3.org/2000/svg">
+      #|  <circle r="0"><animate attributeName="r" values="0;4;0" dur="1s"/></circle>
+      #|  <ellipse rx="0" ry="4"><animate attributeName="rx" values="0;4;0" dur="1s"/></ellipse>
+      #|  <rect width="0" height="4"><animate attributeName="width" values="0;4;0" dur="1s"/></rect>
+      #|</svg>
+    ),
+    precision=3,
+    multipass=false,
+    params="{}",
+  )
+}
+
+///|
+test "fixture removeHiddenElems.04" {
+  check_fixture(
+    "removeHiddenElems",
+    (
+      #|<svg xmlns="http://www.w3.org/2000/svg">
+      #|  <pattern width="0"/>
+      #|  <pattern height="0"/>
+      #|  <pattern width="0"><animate attributeName="width" values="0;4;0" dur="1s"/></pattern>
+      #|  <pattern id="paint" width="0"/>
+      #|  <rect width="10" height="10" fill="url(#paint) red"/>
+      #|</svg>
+    ),
+    (
+      #|<svg xmlns="http://www.w3.org/2000/svg">
+      #|  <pattern width="0"><animate attributeName="width" values="0;4;0" dur="1s"/></pattern>
+      #|  <pattern id="paint" width="0"/>
+      #|  <rect width="10" height="10" fill="url(#paint) red"/>
+      #|</svg>
+    ),
+    precision=3,
+    multipass=false,
+    params="{}",
+  )
+}
+
+///|
 test "fixture removeUnknownsAndDefaults.01" {
   check_fixture(
     "removeUnknownsAndDefaults",
@@ -5974,7 +6027,7 @@ test "upstream removeHiddenElems.03" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -6046,7 +6099,7 @@ test "upstream removeHiddenElems.06" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 

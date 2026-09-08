@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <pattern width="0"/>
+  <pattern height="0"/>
+  <pattern width="0"><animate attributeName="width" values="0;4;0" dur="1s"/></pattern>
+  <pattern id="paint" width="0"/>
+  <rect width="10" height="10" fill="url(#paint) red"/>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg">
+  <pattern width="0"><animate attributeName="width" values="0;4;0" dur="1s"/></pattern>
+  <pattern id="paint" width="0"/>
+  <rect width="10" height="10" fill="url(#paint) red"/>
+</svg>

@@ -270,11 +270,13 @@ pub let remove_hidden_elems : Plugin = {
         return true
       }
       match e.name {
-        "circle" => e.attrs.get("r") == Some("0")
+        // Children may animate geometry that is initially zero sized.
+        "circle" => e.children.is_empty() && e.attrs.get("r") == Some("0")
         "ellipse" =>
-          e.attrs.get("rx") == Some("0") || e.attrs.get("ry") == Some("0")
+          e.children.is_empty() &&
+          (e.attrs.get("rx") == Some("0") || e.attrs.get("ry") == Some("0"))
         "rect" | "image" | "pattern" =>
-          e.name != "pattern" &&
+          (e.name == "image" || e.children.is_empty()) &&
           (
             e.attrs.get("width") == Some("0") ||
             e.attrs.get("height") == Some("0")

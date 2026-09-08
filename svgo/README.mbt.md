@@ -197,8 +197,8 @@ Of svgo's 209 test cases for the plugins svgo.mbt implements (svgo e4cb29b,
 
 | | cases |
 | --- | --- |
-| pass | 174 |
-| known differences (listed in `fixtures/upstream/KNOWN_FAILURES.txt`) | 35 |
+| pass | 176 |
+| known differences (listed in `fixtures/upstream/KNOWN_FAILURES.txt`) | 33 |
 | skipped | 0 |
 
 The known differences are mostly places where svgo compresses harder

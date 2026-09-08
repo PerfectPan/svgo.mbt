@@ -29,6 +29,8 @@ python3 scripts/gen-fixtures.py --check
 if [ "${1:-}" = "--full" ]; then
   step "wasm artifact"
   scripts/build-wasm.sh
+  step "npm package tests (node --test)"
+  (cd packages/svgo-mbt && node --test)
   step "native CLI smoke test"
   moon build --target native --release -q
   "$(scripts/bin-path.sh)" svgo/testdata/sketch-icon.svg --json >/dev/null

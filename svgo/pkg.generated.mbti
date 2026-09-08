@@ -21,6 +21,7 @@ pub impl Show for UnknownPlugin
 // Types and methods
 pub(all) struct Config {
   plugins : Array[String]
+  params : Map[String, Json]
   precision : Int
   multipass : Bool
   pretty : Bool

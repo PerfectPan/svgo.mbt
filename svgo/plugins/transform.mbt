@@ -22,7 +22,10 @@ fn split_numbers(s : String) -> Array[String] {
         cur = ""
         has_dot = false
       }
-    } else if is_sign && !cur.is_empty() {
+    } else if is_sign &&
+      !cur.is_empty() &&
+      !cur.has_suffix("e") &&
+      !cur.has_suffix("E") {
       // a sign after an existing number starts a new number
       out.push(cur)
       cur = c.to_string()
@@ -185,8 +188,11 @@ fn total_digits(v : Double) -> Int {
 ///|
 /// Compute (floatPrecision, transformPrecision, degPrecision) from the
 /// transform list and the base float precision.
-fn define_precision(ts : Array[Tf], float_prec : Int) -> (Int, Int, Int) {
-  let transform_prec_default = 5
+fn define_precision(
+  ts : Array[Tf],
+  float_prec : Int,
+  transform_prec_default : Int,
+) -> (Int, Int, Int) {
   let matrix_vals : Array[Double] = []
   for t in ts {
     if t.name == "matrix" && t.args.length() >= 4 {
@@ -615,7 +621,7 @@ pub let convert_transform : Plugin = {
   description: "simplify transform lists",
   run: (doc, ctx) => {
     let mut changed = false
-    let float_prec = ctx.precision
+    let float_prec = ctx.param_int("floatPrecision", ctx.precision)
     doc.each_element((e, _) => {
       for attr in ["transform", "gradientTransform", "patternTransform"] {
         guard e.attrs.get(attr) is Some(v) else { continue }
@@ -633,7 +639,12 @@ pub let convert_transform : Plugin = {
           changed = true
           continue
         }
-        let (fp, tp, dp) = define_precision(list, float_prec)
+        let (fp, tp, auto_dp) = define_precision(
+          list,
+          float_prec,
+          ctx.param_int("transformPrecision", 5),
+        )
+        let dp = ctx.param_int("degPrecision", auto_dp)
         // collapse into one matrix
         let data = if list.length() > 1 {
           [transforms_multiply(list)]

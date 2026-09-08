@@ -1,0 +1,9 @@
+<svg><defs><filter id="f"><feFlood flood-color="red"/></filter></defs><path fill="none" filter="url(#f)"/><path fill="none" style="fill:red"/></svg>
+
+@@@
+
+<svg><defs><filter id="f"><feFlood flood-color="red"/></filter></defs><path fill="none" filter="url(#f)"/><path fill="none" style="fill:red"/></svg>
+
+@@@
+
+{"removeNone":true}

@@ -28,8 +28,7 @@ Upstream cases follow svgo's runner: the plugin runs twice and the tree must
 equal `expected` after each run (once for convertTransform, like upstream).
 Whitespace between tags is ignored when comparing.
 
-Upstream params other than `floatPrecision` (mapped to precision) are not
-supported yet; those cases are generated as skipped tests. Cases listed in
+Upstream params are passed through as JSON; `floatPrecision` also sets precision. Cases listed in
 fixtures/upstream/KNOWN_FAILURES.txt are generated as expected failures: the
 test fails if the case starts passing, so a fix must also delete the line.
 
@@ -83,6 +82,7 @@ test "fixture {path.stem}" {{
     {multiline(sections[1])},
     precision={precision},
     multipass={multipass},
+    params={json.dumps(sections[2] if len(sections) > 2 and sections[2].strip() else "{}", ensure_ascii=False)},
   )
 }}'''
 
@@ -96,15 +96,12 @@ def upstream_case(path: pathlib.Path, known: dict, stats: dict) -> str:
     if len(parts) < 2:
         sys.exit(f"{path}: expected 'input @@@ expected'")
     params = json.loads(parts[2]) if len(parts) > 2 and parts[2].strip() else {}
-    precision = int(params.pop("floatPrecision", 3))
+    precision = int(params.get("floatPrecision", 3))
     passes = 1 if plugin in SINGLE_PASS else 2
     name = path.stem
     attr = ""
     expect_fail = "false"
-    if params:
-        stats["skipped"] += 1
-        attr = f'#skip("needs plugin params: {", ".join(sorted(params))}")\n'
-    elif name in known:
+    if name in known:
         stats["known"] += 1
         expect_fail = "true"
     else:
@@ -117,6 +114,7 @@ def upstream_case(path: pathlib.Path, known: dict, stats: dict) -> str:
     {multiline(parts[0])},
     {multiline(parts[1])},
     precision={precision},
+    params={json.dumps(parts[2] if len(parts) > 2 and parts[2].strip() else "{}", ensure_ascii=False)},
     passes={passes},
     expect_fail={expect_fail},
   )

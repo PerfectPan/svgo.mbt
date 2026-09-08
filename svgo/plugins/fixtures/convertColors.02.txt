@@ -1,0 +1,9 @@
+<svg fill="fuchsia" stroke="rgb(0, 0, 255)"><path fill="#aabbcc" stroke="#ff0000"/></svg>
+
+@@@
+
+<svg fill="fuchsia" stroke="rgb(0, 0, 255)"><path fill="#aabbcc" stroke="#ff0000"/></svg>
+
+@@@
+
+{"names2hex":false,"rgb2hex":false,"shorthex":false,"shortname":false}

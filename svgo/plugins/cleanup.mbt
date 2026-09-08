@@ -19,9 +19,23 @@ pub let remove_xml_proc_inst : Plugin = {
 pub let remove_comments : Plugin = {
   name: "removeComments",
   description: "remove comments",
-  run: (doc, _) => {
+  run: (doc, ctx) => {
+    let patterns = if ctx.has_param("preservePatterns") {
+      ctx.param_strings("preservePatterns")
+    } else {
+      ["^!"]
+    }
     let pred = fn(n : @xml.Node) -> Bool {
-      n is Comment(c) && !c.has_prefix("!")
+      n is Comment(c) &&
+      !patterns
+      .iter()
+      .any(pattern => {
+        if pattern.has_prefix("^") {
+          c.has_prefix(pattern[1:])
+        } else {
+          c.contains(pattern)
+        }
+      })
     }
     let mut changed = remove_top_level(doc, pred)
     doc.each_element((e, _) => if remove_children(e, pred) { changed = true })
@@ -282,30 +296,6 @@ pub let remove_hidden_elems : Plugin = {
 }
 
 ///|
-/// Remove ids nothing refers to.
-pub let cleanup_ids : Plugin = {
-  name: "cleanupIds",
-  description: "remove unused ids",
-  run: (doc, _) => {
-    // scripts and styles may reference ids dynamically; leave them alone
-    let mut has_script = false
-    doc.each_element((e, _) => if e.name == "script" { has_script = true })
-    if has_script {
-      return false
-    }
-    let ids = referenced_ids(doc)
-    let mut changed = false
-    doc.each_element((e, _) => {
-      if e.attrs.get("id") is Some(id) && !ids.contains(id) {
-        e.attrs.remove("id")
-        changed = true
-      }
-    })
-    changed
-  },
-}
-
-///|
 /// Children of `<defs>` that have no id can never be referenced.
 pub let remove_useless_defs : Plugin = {
   name: "removeUselessDefs",
@@ -370,13 +360,25 @@ pub let remove_unused_ns : Plugin = {
 pub let sort_attrs : Plugin = {
   name: "sortAttrs",
   description: "sort attributes",
-  run: (doc, _) => {
+  run: (doc, ctx) => {
+    let order = if ctx.has_param("order") {
+      let ranks : Map[String, Int] = Map([])
+      for name in ctx.param_strings("order") {
+        if !ranks.contains(name) {
+          ranks[name] = ranks.length() + 1
+        }
+      }
+      ranks
+    } else {
+      attr_order
+    }
+    let front = ctx.param_string("xmlnsOrder", "front") == "front"
     let mut changed = false
     doc.each_element((e, _) => {
       guard e.attrs.length() > 1 else { return }
       let items = e.attrs.to_array()
       // (rank, key, value); rank computed once per attribute, not per comparison
-      let keyed = items.map(kv => (attr_rank(kv.0), kv.0, kv.1))
+      let keyed = items.map(kv => (attr_rank(kv.0, order, front), kv.0, kv.1))
       keyed.sort_by((a, b) => {
         if a.0 != b.0 {
           a.0 - b.0
@@ -428,15 +430,22 @@ let attr_order : Map[String, Int] = {
 }
 
 ///|
-fn attr_rank(k : String) -> Int {
-  if k.has_prefix("xmlns") {
-    return 0
+fn attr_rank(k : String, order : Map[String, Int], front : Bool) -> Int {
+  let namespace_rank = if front && k == "xmlns" {
+    0
+  } else if front && k.has_prefix("xmlns:") {
+    1
+  } else if k.contains(":") {
+    2
+  } else {
+    3
   }
   let base = match k.find("-") {
     Some(i) => k[:i].to_owned()
     None => k
   }
-  attr_order.get(base).unwrap_or(100)
+  namespace_rank * (order.length() + 2) +
+  order.get(base).unwrap_or(order.length() + 1)
 }
 
 ///|

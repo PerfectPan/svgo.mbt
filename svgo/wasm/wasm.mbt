@@ -1,6 +1,8 @@
 ///|
 /// Host-facing entry point. `config_json` is a JSON object with optional
-/// keys `plugins` (array of names), `precision`, `multipass`, `pretty`.
+/// keys `plugins` (names or `{name, params}` objects), `params` (plugin name to
+/// parameter object), `precision`, `multipass`, `pretty`. Entry params override
+/// top-level params for the same plugin.
 /// Returns a JSON object: `{ data, originalSize, size, passes, applied }`
 /// or `{ error }`.
 #export_name("optimize")
@@ -19,9 +21,28 @@ pub fn optimize_json(svg : String, config_json : String) -> String {
         None
       }
     }
+    let params = match field("params") {
+      Some(Object(obj)) => obj.copy()
+      _ => Map([])
+    }
     let plugins = match field("plugins") {
       Some(Array(items)) =>
-        items.filter_map(v => if v is String(s) { Some(s) } else { None })
+        items.filter_map(v => {
+          match v {
+            String(s) => Some(s)
+            Object(obj) =>
+              match obj.get("name") {
+                Some(String(name)) => {
+                  if obj.get("params") is Some(value) {
+                    params[name] = value
+                  }
+                  Some(name)
+                }
+                _ => None
+              }
+            _ => None
+          }
+        })
       _ => base.plugins
     }
     let precision = match field("precision") {
@@ -36,7 +57,7 @@ pub fn optimize_json(svg : String, config_json : String) -> String {
       Some(True) => true
       _ => false
     }
-    { plugins, precision, multipass, pretty, }
+    { plugins, params, precision, multipass, pretty, }
   } catch {
     e => return error_json("invalid config: \{e}")
   }

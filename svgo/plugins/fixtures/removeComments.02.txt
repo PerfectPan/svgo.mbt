@@ -1,0 +1,9 @@
+<!--! legal --><!-- Copyright holder --><!--noise--><svg><!--keep exactly--></svg>
+
+@@@
+
+<!-- Copyright holder --><svg><!--keep exactly--></svg>
+
+@@@
+
+{"preservePatterns":["Copyright","^keep"]}

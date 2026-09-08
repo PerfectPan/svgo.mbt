@@ -1,0 +1,9 @@
+<svg><style>path { fill: red }</style><path fill="none"/></svg>
+
+@@@
+
+<svg><style>path { fill: red }</style><path fill="none"/></svg>
+
+@@@
+
+{"removeNone":true}

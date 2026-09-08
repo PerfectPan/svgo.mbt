@@ -60,9 +60,14 @@ svgo input.svg -o out.svg --stats             # write a file, print size statist
 svgo input.svg -p 2 --pretty                  # 2 decimal places, indented output
 svgo input.svg --json                         # {data, originalSize, size, passes, applied}
 svgo input.svg --plugins convertPathData,sortAttrs
+svgo input.svg --param cleanupIds.preserve=logo,icon --param cleanupIds.minify=false
 svgo input.svg --disable convertShapeToPath --enable removeDimensions
 svgo --list                                   # available plugins
 ```
+
+`--param <plugin>.<key>=<value>` is repeatable. Values `true`/`false` become
+booleans, integers become numbers, comma-separated values become string arrays,
+and other values remain strings.
 
 **MoonBit**:
 
@@ -92,7 +97,8 @@ test "optimize" {
 }
 ```
 
-`Config` is a plain struct: plugin names in order, numeric precision,
+`Config` is a plain struct: plugin names in order, a `params : Map[String, Json]`
+of per-plugin parameter objects, numeric precision,
 multipass and pretty printing. Start from the default and override fields.
 
 ```mbt check
@@ -191,15 +197,15 @@ Of svgo's 209 test cases for the plugins svgo.mbt implements (svgo e4cb29b,
 
 | | cases |
 | --- | --- |
-| pass | 137 |
-| known differences (listed in `fixtures/upstream/KNOWN_FAILURES.txt`) | 46 |
-| need per-plugin params svgo.mbt does not have yet (`preserve`, `force`, ...) | 26 |
+| pass | 174 |
+| known differences (listed in `fixtures/upstream/KNOWN_FAILURES.txt`) | 35 |
+| skipped | 0 |
 
 The known differences are mostly places where svgo compresses harder
 (`convertPathData` applies element transforms to the path data and turns curve
 runs into arcs; `removeHiddenElems` and `removeUselessStrokeAndFill` have a few
-rules we have not ported yet), plus `cleanupIds` refusing to run when a
-`<style>` element exists. Each entry is an expected failure in the test suite:
+rules we have not ported yet). `cleanupIds` now preserves documents with styles
+or scripts by default and minifies referenced IDs in other documents. Each entry is an expected failure in the test suite:
 fixing one requires deleting its line, so the list only shrinks.
 
 ## Repository layout
@@ -220,3 +226,24 @@ scripts/              build-wasm, verify, bench, regress, gen-fixtures
 ## License
 
 MIT. Plugin semantics follow svgo (MIT, © Kir Belevich and contributors).
+
+### Plugin parameters
+
+Parameters use svgo's names and JSON shapes. Each plugin receives only its own
+object; omitted fields use these defaults:
+
+| Plugin | Parameters and defaults |
+| --- | --- |
+| cleanupIds | `remove: true`, `minify: true`, `preserve: []`, `preservePrefixes: []`, `force: false` |
+| convertColors | `currentColor: false`, `names2hex: true`, `rgb2hex: true`, `shorthex: true`, `shortname: true` |
+| convertShapeToPath | `convertArcs: false`, `floatPrecision`: config precision |
+| convertTransform | `floatPrecision`: config precision (3), `transformPrecision: 5` (limited to matrix precision), `degPrecision`: derived from matrix digits and float precision |
+| removeComments | `preservePatterns: ["^!"]`; `false` or `[]` removes all comments |
+| removeUnknownsAndDefaults | `unknownContent`, `unknownAttrs`, `defaultAttrs`, `uselessOverrides`, `keepDataAttrs`, `keepAriaAttrs`: all `true`; `keepRoleAttr: false` |
+| removeUselessStrokeAndFill | `stroke: true`, `fill: true`, `removeNone: false` |
+| sortAttrs | `xmlnsOrder: "front"`; `order: ["id", "width", "height", "x", "x1", "x2", "y", "y1", "y2", "cx", "cy", "r", "fill", "stroke", "marker", "d", "points"]` |
+
+`preserve` and `preservePrefixes` accept one string or an array of strings.
+`currentColor` accepts a boolean or an exact color string and does not replace
+colors inside masks. `preservePatterns` supports literal substring matches and
+`^`-prefixed literal prefix matches, **not full regular expressions**.

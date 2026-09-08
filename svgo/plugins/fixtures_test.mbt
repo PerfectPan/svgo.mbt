@@ -25,10 +25,8 @@ test "fixture cleanupIds.01" {
       #|<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
       #|  <defs>
       #|    <linearGradient id="g"/>
-      #|    <linearGradient/>
-      #|    <clipPath id="c">
-      #|      <rect width="1" height="1"/>
-      #|    </clipPath>
+      #|    <linearGradient id="unused"/>
+      #|    <clipPath id="c"><rect id="inner" width="1" height="1"/></clipPath>
       #|    <filter id="f"/>
       #|  </defs>
       #|  <style>.a { fill: url(#g2) }</style>
@@ -41,6 +39,71 @@ test "fixture cleanupIds.01" {
     ),
     precision=3,
     multipass=false,
+    params="{}",
+  )
+}
+
+///|
+test "fixture cleanupIds.02" {
+  check_fixture(
+    "cleanupIds",
+    (
+      #|<svg><defs><linearGradient id="gradient"/><linearGradient id="unused"/><clipPath id="clip"><rect id="inner" width="1" height="1"/></clipPath><filter id="filter"/></defs><rect id="rect" fill="url(#gradient)" clip-path="url(#clip)" style="filter:url(#filter)"/><use href="#rect"/><animate begin="rect.click"/></svg>
+    ),
+    (
+      #|<svg><defs><linearGradient id="a"/><linearGradient/><clipPath id="b"><rect width="1" height="1"/></clipPath><filter id="c"/></defs><rect id="d" fill="url(#a)" clip-path="url(#b)" style="filter:url(#c)"/><use href="#d"/><animate begin="d.click"/></svg>
+    ),
+    precision=3,
+    multipass=false,
+    params="{}",
+  )
+}
+
+///|
+test "fixture cleanupIds.03" {
+  check_fixture(
+    "cleanupIds",
+    (
+      #|<svg><path id="a"/><path id="other"/><use href="#other"/><use href="#missing"/></svg>
+    ),
+    (
+      #|<svg><path id="a"/><path id="b"/><use href="#b"/><use href="#missing"/></svg>
+    ),
+    precision=3,
+    multipass=false,
+    params="{\"remove\":false}",
+  )
+}
+
+///|
+test "fixture cleanupIds.04" {
+  check_fixture(
+    "cleanupIds",
+    (
+      #|<svg><path id="long"/><path id="unused"/><use href="#long"/></svg>
+    ),
+    (
+      #|<svg><path id="long"/><path/><use href="#long"/></svg>
+    ),
+    precision=3,
+    multipass=false,
+    params="{\"minify\":false}",
+  )
+}
+
+///|
+test "fixture cleanupIds.05" {
+  check_fixture(
+    "cleanupIds",
+    (
+      #|<svg><path id="b"/><path id="a"/><use href="#b"/><use href="#a"/><path style="fill:url(#b);stroke:url(#a);filter:url(#b)"/><animate begin="b.click;a.end" end="b.end"/></svg>
+    ),
+    (
+      #|<svg><path id="a"/><path id="b"/><use href="#a"/><use href="#b"/><path style="fill:url(#a);stroke:url(#b);filter:url(#a)"/><animate begin="a.click;b.end" end="a.end"/></svg>
+    ),
+    precision=3,
+    multipass=false,
+    params="{}",
   )
 }
 
@@ -62,6 +125,7 @@ test "fixture cleanupNumericValues.01" {
     ),
     precision=3,
     multipass=false,
+    params="{}",
   )
 }
 
@@ -81,6 +145,7 @@ test "fixture cleanupNumericValues.02" {
     ),
     precision=1,
     multipass=false,
+    params="{\"precision\": 1}",
   )
 }
 
@@ -121,6 +186,7 @@ test "fixture collapseGroups.01" {
     ),
     precision=3,
     multipass=false,
+    params="{}",
   )
 }
 
@@ -146,6 +212,39 @@ test "fixture convertColors.01" {
     ),
     precision=3,
     multipass=false,
+    params="{}",
+  )
+}
+
+///|
+test "fixture convertColors.02" {
+  check_fixture(
+    "convertColors",
+    (
+      #|<svg fill="fuchsia" stroke="rgb(0, 0, 255)"><path fill="#aabbcc" stroke="#ff0000"/></svg>
+    ),
+    (
+      #|<svg fill="fuchsia" stroke="rgb(0, 0, 255)"><path fill="#aabbcc" stroke="#ff0000"/></svg>
+    ),
+    precision=3,
+    multipass=false,
+    params="{\"names2hex\":false,\"rgb2hex\":false,\"shorthex\":false,\"shortname\":false}",
+  )
+}
+
+///|
+test "fixture convertColors.03" {
+  check_fixture(
+    "convertColors",
+    (
+      #|<svg fill="red"><mask><path fill="white"/><g><path fill="black"/></g></mask><path fill="red" stroke="none"/></svg>
+    ),
+    (
+      #|<svg fill="currentColor"><mask><path fill="#fff"/><g><path fill="#000"/></g></mask><path fill="currentColor" stroke="none"/></svg>
+    ),
+    precision=3,
+    multipass=false,
+    params="{\"currentColor\":true}",
   )
 }
 
@@ -175,6 +274,7 @@ test "fixture convertPathData.01" {
     ),
     precision=3,
     multipass=false,
+    params="{}",
   )
 }
 
@@ -196,6 +296,7 @@ test "fixture convertPathData.02" {
     ),
     precision=2,
     multipass=false,
+    params="{\"precision\": 2}",
   )
 }
 
@@ -223,6 +324,7 @@ test "fixture convertPathData.03" {
     ),
     precision=3,
     multipass=false,
+    params="{}",
   )
 }
 
@@ -244,6 +346,7 @@ test "fixture convertPathData.04" {
     ),
     precision=3,
     multipass=false,
+    params="{}",
   )
 }
 
@@ -273,6 +376,7 @@ test "fixture convertShapeToPath.01" {
     ),
     precision=3,
     multipass=false,
+    params="{}",
   )
 }
 
@@ -298,6 +402,7 @@ test "fixture convertTransform.01" {
     ),
     precision=3,
     multipass=false,
+    params="{}",
   )
 }
 
@@ -330,6 +435,7 @@ test "fixture mergePaths.01" {
     ),
     precision=3,
     multipass=false,
+    params="{}",
   )
 }
 
@@ -351,6 +457,7 @@ test "fixture mergePaths.02" {
     ),
     precision=3,
     multipass=false,
+    params="{}",
   )
 }
 
@@ -376,6 +483,23 @@ test "fixture removeComments.01" {
     ),
     precision=3,
     multipass=false,
+    params="{}",
+  )
+}
+
+///|
+test "fixture removeComments.02" {
+  check_fixture(
+    "removeComments",
+    (
+      #|<!--! legal --><!-- Copyright holder --><!--noise--><svg><!--keep exactly--></svg>
+    ),
+    (
+      #|<!-- Copyright holder --><svg><!--keep exactly--></svg>
+    ),
+    precision=3,
+    multipass=false,
+    params="{\"preservePatterns\":[\"Copyright\",\"^keep\"]}",
   )
 }
 
@@ -399,6 +523,7 @@ test "fixture removeEditorsNSData.01" {
     ),
     precision=3,
     multipass=false,
+    params="{}",
   )
 }
 
@@ -431,6 +556,7 @@ test "fixture removeEmptyContainers.01" {
     ),
     precision=3,
     multipass=false,
+    params="{}",
   )
 }
 
@@ -463,6 +589,7 @@ test "fixture removeHiddenElems.01" {
     ),
     precision=3,
     multipass=false,
+    params="{}",
   )
 }
 
@@ -488,6 +615,7 @@ test "fixture removeHiddenElems.02" {
     ),
     precision=3,
     multipass=false,
+    params="{}",
   )
 }
 
@@ -517,6 +645,23 @@ test "fixture removeUnknownsAndDefaults.01" {
     ),
     precision=3,
     multipass=false,
+    params="{}",
+  )
+}
+
+///|
+test "fixture removeUnknownsAndDefaults.02" {
+  check_fixture(
+    "removeUnknownsAndDefaults",
+    (
+      #|<svg role="img" data-a="x" aria-label="x"><alien foo="x"/><rect x="0" fill="#000" opacity="1" mystery="x"/></svg>
+    ),
+    (
+      #|<svg role="img" data-a="x" aria-label="x"><alien foo="x"/><rect x="0" fill="#000" opacity="1" mystery="x"/></svg>
+    ),
+    precision=3,
+    multipass=false,
+    params="{\"unknownContent\":false,\"unknownAttrs\":false,\"defaultAttrs\":false,\"uselessOverrides\":false,\"keepRoleAttr\":true}",
   )
 }
 
@@ -547,6 +692,7 @@ test "fixture removeUselessDefs.01" {
     ),
     precision=3,
     multipass=false,
+    params="{}",
   )
 }
 
@@ -578,6 +724,7 @@ test "fixture removeUselessStrokeAndFill.01" {
     ),
     precision=3,
     multipass=false,
+    params="{}",
   )
 }
 
@@ -609,6 +756,55 @@ test "fixture removeUselessStrokeAndFill.02" {
     ),
     precision=3,
     multipass=false,
+    params="{}",
+  )
+}
+
+///|
+test "fixture removeUselessStrokeAndFill.03" {
+  check_fixture(
+    "removeUselessStrokeAndFill",
+    (
+      #|<svg><path fill="none" fill-opacity=".5" stroke="none" stroke-width="2"/></svg>
+    ),
+    (
+      #|<svg><path fill="none" fill-opacity=".5" stroke="none" stroke-width="2"/></svg>
+    ),
+    precision=3,
+    multipass=false,
+    params="{\"stroke\":false,\"fill\":false}",
+  )
+}
+
+///|
+test "fixture removeUselessStrokeAndFill.04" {
+  check_fixture(
+    "removeUselessStrokeAndFill",
+    (
+      #|<svg><defs><filter id="f"><feFlood flood-color="red"/></filter></defs><path fill="none" filter="url(#f)"/><path fill="none" style="fill:red"/></svg>
+    ),
+    (
+      #|<svg><defs><filter id="f"><feFlood flood-color="red"/></filter></defs><path fill="none" filter="url(#f)"/><path fill="none" style="fill:red"/></svg>
+    ),
+    precision=3,
+    multipass=false,
+    params="{\"removeNone\":true}",
+  )
+}
+
+///|
+test "fixture removeUselessStrokeAndFill.05" {
+  check_fixture(
+    "removeUselessStrokeAndFill",
+    (
+      #|<svg><style>path { fill: red }</style><path fill="none"/></svg>
+    ),
+    (
+      #|<svg><style>path { fill: red }</style><path fill="none"/></svg>
+    ),
+    precision=3,
+    multipass=false,
+    params="{\"removeNone\":true}",
   )
 }
 
@@ -628,6 +824,23 @@ test "fixture sortAttrs.01" {
     ),
     precision=3,
     multipass=false,
+    params="{}",
+  )
+}
+
+///|
+test "fixture sortAttrs.02" {
+  check_fixture(
+    "sortAttrs",
+    (
+      #|<svg id="a" xmlns="svg" z="1" fill="red" data-z="2" width="3"/>
+    ),
+    (
+      #|<svg xmlns="svg" z="1" data-z="2" fill="red" id="a" width="3"/>
+    ),
+    precision=3,
+    multipass=false,
+    params="{\"order\":[\"z\",\"data\"]}",
   )
 }
 
@@ -648,6 +861,7 @@ test "upstream cleanupAttrs.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -669,6 +883,7 @@ test "upstream cleanupAttrs.02" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -733,8 +948,9 @@ test "upstream cleanupIds.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -759,8 +975,9 @@ test "upstream cleanupIds.02" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -785,6 +1002,7 @@ test "upstream cleanupIds.03" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -1235,8 +1453,9 @@ test "upstream cleanupIds.04" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -1283,13 +1502,13 @@ test "upstream cleanupIds.05" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
 ///|
-#skip("needs plugin params: force")
 test "upstream cleanupIds.06" {
   check_fixture_upstream(
     "cleanupIds",
@@ -1310,13 +1529,13 @@ test "upstream cleanupIds.06" {
       #|</svg>
     ),
     precision=3,
+    params="{\"force\": true}\n",
     passes=2,
     expect_fail=false,
   )
 }
 
 ///|
-#skip("needs plugin params: force")
 test "upstream cleanupIds.07" {
   check_fixture_upstream(
     "cleanupIds",
@@ -1337,13 +1556,13 @@ test "upstream cleanupIds.07" {
       #|</svg>
     ),
     precision=3,
+    params="{\"force\": true}\n",
     passes=2,
     expect_fail=false,
   )
 }
 
 ///|
-#skip("needs plugin params: preserve")
 test "upstream cleanupIds.08" {
   check_fixture_upstream(
     "cleanupIds",
@@ -1364,13 +1583,13 @@ test "upstream cleanupIds.08" {
       #|</svg>
     ),
     precision=3,
+    params="{\"preserve\": [\"circle\", \"rect\"]}\n",
     passes=2,
     expect_fail=false,
   )
 }
 
 ///|
-#skip("needs plugin params: force, preserve")
 test "upstream cleanupIds.09" {
   check_fixture_upstream(
     "cleanupIds",
@@ -1395,13 +1614,13 @@ test "upstream cleanupIds.09" {
       #|</svg>
     ),
     precision=3,
+    params="{\"force\": true, \"preserve\": [\"circle\", \"rect\"]}\n",
     passes=2,
     expect_fail=false,
   )
 }
 
 ///|
-#skip("needs plugin params: force, preserve")
 test "upstream cleanupIds.10" {
   check_fixture_upstream(
     "cleanupIds",
@@ -1438,6 +1657,7 @@ test "upstream cleanupIds.10" {
       #|</svg>
     ),
     precision=3,
+    params="{\"force\": true, \"preserve\": \"figure\"}\n",
     passes=2,
     expect_fail=false,
   )
@@ -1466,13 +1686,13 @@ test "upstream cleanupIds.11" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
 ///|
-#skip("needs plugin params: preservePrefixes")
 test "upstream cleanupIds.12" {
   check_fixture_upstream(
     "cleanupIds",
@@ -1493,13 +1713,13 @@ test "upstream cleanupIds.12" {
       #|</svg>
     ),
     precision=3,
+    params="{\"preservePrefixes\": [\"xyz\"]}\n",
     passes=2,
     expect_fail=false,
   )
 }
 
 ///|
-#skip("needs plugin params: force, preservePrefixes")
 test "upstream cleanupIds.13" {
   check_fixture_upstream(
     "cleanupIds",
@@ -1524,13 +1744,13 @@ test "upstream cleanupIds.13" {
       #|</svg>
     ),
     precision=3,
+    params="{\"force\": true, \"preservePrefixes\": [\"pre1_\", \"pre2_\"]}\n",
     passes=2,
     expect_fail=false,
   )
 }
 
 ///|
-#skip("needs plugin params: force, preservePrefixes")
 test "upstream cleanupIds.14" {
   check_fixture_upstream(
     "cleanupIds",
@@ -1567,13 +1787,13 @@ test "upstream cleanupIds.14" {
       #|</svg>
     ),
     precision=3,
+    params="{\"force\": true, \"preservePrefixes\": \"pre1_\"}\n",
     passes=2,
     expect_fail=false,
   )
 }
 
 ///|
-#skip("needs plugin params: preserve, preservePrefixes")
 test "upstream cleanupIds.15" {
   check_fixture_upstream(
     "cleanupIds",
@@ -1594,13 +1814,13 @@ test "upstream cleanupIds.15" {
       #|</svg>
     ),
     precision=3,
+    params="{\"preserve\": [\"circle\"], \"preservePrefixes\": [\"suffix\", \"rect\"]}\n",
     passes=2,
     expect_fail=false,
   )
 }
 
 ///|
-#skip("needs plugin params: preserve")
 test "upstream cleanupIds.16" {
   check_fixture_upstream(
     "cleanupIds",
@@ -1625,13 +1845,13 @@ test "upstream cleanupIds.16" {
       #|</svg>
     ),
     precision=3,
+    params="{\"preserve\": \"a\"}\n",
     passes=2,
     expect_fail=false,
   )
 }
 
 ///|
-#skip("needs plugin params: preservePrefixes")
 test "upstream cleanupIds.17" {
   check_fixture_upstream(
     "cleanupIds",
@@ -1656,13 +1876,13 @@ test "upstream cleanupIds.17" {
       #|</svg>
     ),
     precision=3,
+    params="{\"preservePrefixes\": \"a\"}\n",
     passes=2,
     expect_fail=false,
   )
 }
 
 ///|
-#skip("needs plugin params: preservePrefixes")
 test "upstream cleanupIds.18" {
   check_fixture_upstream(
     "cleanupIds",
@@ -1687,6 +1907,7 @@ test "upstream cleanupIds.18" {
       #|</svg>
     ),
     precision=3,
+    params="{\"preservePrefixes\": \"a\"}\n",
     passes=2,
     expect_fail=false,
   )
@@ -1721,13 +1942,13 @@ test "upstream cleanupIds.19" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
 ///|
-#skip("needs plugin params: remove")
 test "upstream cleanupIds.20" {
   check_fixture_upstream(
     "cleanupIds",
@@ -1770,6 +1991,7 @@ test "upstream cleanupIds.20" {
       #|</svg>
     ),
     precision=3,
+    params="{\"remove\": \"false\"}\n",
     passes=2,
     expect_fail=false,
   )
@@ -1824,6 +2046,7 @@ test "upstream cleanupIds.21" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -1862,8 +2085,9 @@ test "upstream cleanupIds.22" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -1890,8 +2114,9 @@ test "upstream cleanupIds.23" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -1920,8 +2145,9 @@ test "upstream cleanupIds.24" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -1946,8 +2172,9 @@ test "upstream cleanupIds.25" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -1976,8 +2203,9 @@ test "upstream cleanupIds.26" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -1996,6 +2224,7 @@ test "upstream cleanupNumericValues.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -2016,6 +2245,7 @@ test "upstream cleanupNumericValues.02" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -2032,6 +2262,7 @@ test "upstream cleanupNumericValues.03" {
       #|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 100"/>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -2056,6 +2287,7 @@ test "upstream collapseGroups.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -2106,6 +2338,7 @@ test "upstream collapseGroups.02" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -2134,6 +2367,7 @@ test "upstream collapseGroups.06" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -2166,6 +2400,7 @@ test "upstream collapseGroups.07" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -2194,6 +2429,7 @@ test "upstream collapseGroups.08" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -2252,6 +2488,7 @@ test "upstream collapseGroups.09" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -2290,6 +2527,7 @@ test "upstream collapseGroups.11" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -2342,6 +2580,7 @@ test "upstream collapseGroups.12" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -2378,6 +2617,7 @@ test "upstream collapseGroups.13" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -2419,6 +2659,7 @@ test "upstream collapseGroups.14" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -2447,6 +2688,7 @@ test "upstream collapseGroups.15" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -2473,6 +2715,7 @@ test "upstream collapseGroups.16" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -2503,6 +2746,7 @@ test "upstream collapseGroups.17" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -2555,6 +2799,7 @@ test "upstream collapseGroups.18" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -2585,6 +2830,7 @@ test "upstream convertColors.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -2605,13 +2851,13 @@ test "upstream convertColors.02" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
 }
 
 ///|
-#skip("needs plugin params: shorthex")
 test "upstream convertColors.03" {
   check_fixture_upstream(
     "convertColors",
@@ -2628,13 +2874,13 @@ test "upstream convertColors.03" {
       #|</svg>
     ),
     precision=3,
+    params="{ \"shorthex\": false }\n",
     passes=2,
     expect_fail=false,
   )
 }
 
 ///|
-#skip("needs plugin params: currentColor")
 test "upstream convertColors.04" {
   check_fixture_upstream(
     "convertColors",
@@ -2661,6 +2907,7 @@ test "upstream convertColors.04" {
       #|</svg>
     ),
     precision=3,
+    params="{ \"currentColor\": true }\n",
     passes=2,
     expect_fail=false,
   )
@@ -2691,13 +2938,13 @@ test "upstream convertColors.05" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
 }
 
 ///|
-#skip("needs plugin params: currentColor")
 test "upstream convertColors.06" {
   check_fixture_upstream(
     "convertColors",
@@ -2736,6 +2983,7 @@ test "upstream convertColors.06" {
       #|</svg>
     ),
     precision=3,
+    params="{ \"currentColor\": true }\n",
     passes=2,
     expect_fail=false,
   )
@@ -2766,6 +3014,7 @@ test "upstream convertColors.07" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -2792,6 +3041,7 @@ test "upstream convertEllipseToCircle.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -2840,6 +3090,7 @@ test "upstream convertPathData.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -2870,6 +3121,7 @@ test "upstream convertPathData.02" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -2942,6 +3194,7 @@ test "upstream convertPathData.03" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -2974,6 +3227,7 @@ test "upstream convertPathData.04" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3000,6 +3254,7 @@ test "upstream convertPathData.05" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3044,6 +3299,7 @@ test "upstream convertPathData.06" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3076,6 +3332,7 @@ test "upstream convertPathData.07" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3120,6 +3377,7 @@ test "upstream convertPathData.08" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3148,6 +3406,7 @@ test "upstream convertPathData.09" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3168,6 +3427,7 @@ test "upstream convertPathData.10" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3250,6 +3510,7 @@ test "upstream convertPathData.11" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -3296,6 +3557,7 @@ test "upstream convertPathData.12" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3316,6 +3578,7 @@ test "upstream convertPathData.13" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3352,6 +3615,7 @@ test "upstream convertPathData.14" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -3374,6 +3638,7 @@ test "upstream convertPathData.15" {
       #|</svg>
     ),
     precision=2,
+    params="{ \"floatPrecision\": 2 }\n",
     passes=2,
     expect_fail=true,
   )
@@ -3396,6 +3661,7 @@ test "upstream convertPathData.16" {
       #|</svg>
     ),
     precision=0,
+    params="{ \"floatPrecision\": 0 }\n",
     passes=2,
     expect_fail=true,
   )
@@ -3416,6 +3682,7 @@ test "upstream convertPathData.17" {
       #|</svg>
     ),
     precision=8,
+    params="{ \"floatPrecision\": 8 }\n",
     passes=2,
     expect_fail=false,
   )
@@ -3436,6 +3703,7 @@ test "upstream convertPathData.18" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -3456,6 +3724,7 @@ test "upstream convertPathData.19" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -3476,6 +3745,7 @@ test "upstream convertPathData.20" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3496,6 +3766,7 @@ test "upstream convertPathData.21" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3526,6 +3797,7 @@ test "upstream convertPathData.22" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -3548,6 +3820,7 @@ test "upstream convertPathData.23" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -3570,6 +3843,7 @@ test "upstream convertPathData.24" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -3604,6 +3878,7 @@ test "upstream convertPathData.25" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -3624,6 +3899,7 @@ test "upstream convertPathData.26" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3648,6 +3924,7 @@ test "upstream convertPathData.27" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3668,6 +3945,7 @@ test "upstream convertPathData.28" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3690,6 +3968,7 @@ test "upstream convertPathData.29" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3710,6 +3989,7 @@ test "upstream convertPathData.30" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3730,6 +4010,7 @@ test "upstream convertPathData.31" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3750,6 +4031,7 @@ test "upstream convertPathData.32" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3770,6 +4052,7 @@ test "upstream convertPathData.33" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3792,6 +4075,7 @@ test "upstream convertPathData.34" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3812,6 +4096,7 @@ test "upstream convertPathData.35" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3832,6 +4117,7 @@ test "upstream convertPathData.36" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3866,6 +4152,7 @@ test "upstream convertPathData.37" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3886,6 +4173,7 @@ test "upstream convertPathData.38" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3906,6 +4194,7 @@ test "upstream convertPathData.39" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3926,6 +4215,7 @@ test "upstream convertPathData.40" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -3962,6 +4252,7 @@ test "upstream convertShapeToPath.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -3988,6 +4279,7 @@ test "upstream convertShapeToPath.02" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -4022,13 +4314,13 @@ test "upstream convertShapeToPath.03" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
 }
 
 ///|
-#skip("needs plugin params: convertArcs")
 test "upstream convertShapeToPath.04" {
   check_fixture_upstream(
     "convertShapeToPath",
@@ -4045,13 +4337,13 @@ test "upstream convertShapeToPath.04" {
       #|</svg>
     ),
     precision=3,
+    params="{ \"convertArcs\": true }\n",
     passes=2,
     expect_fail=false,
   )
 }
 
 ///|
-#skip("needs plugin params: convertArcs")
 test "upstream convertShapeToPath.05" {
   check_fixture_upstream(
     "convertShapeToPath",
@@ -4076,8 +4368,9 @@ test "upstream convertShapeToPath.05" {
       #|</svg>
     ),
     precision=3,
+    params="{ \"floatPrecision\": 3, \"convertArcs\": true }\n",
     passes=2,
-    expect_fail=false,
+    expect_fail=true,
   )
 }
 
@@ -4130,6 +4423,7 @@ test "upstream convertTransform.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=1,
     expect_fail=false,
   )
@@ -4164,6 +4458,7 @@ test "upstream convertTransform.02" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=1,
     expect_fail=false,
   )
@@ -4196,6 +4491,7 @@ test "upstream convertTransform.03" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=1,
     expect_fail=false,
   )
@@ -4238,6 +4534,7 @@ test "upstream convertTransform.04" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=1,
     expect_fail=false,
   )
@@ -4258,13 +4555,13 @@ test "upstream convertTransform.05" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=1,
     expect_fail=false,
   )
 }
 
 ///|
-#skip("needs plugin params: degPrecision")
 test "upstream convertTransform.06" {
   check_fixture_upstream(
     "convertTransform",
@@ -4285,13 +4582,13 @@ test "upstream convertTransform.06" {
       #|</svg>
     ),
     precision=3,
+    params="{\"degPrecision\":1}",
     passes=1,
     expect_fail=false,
   )
 }
 
 ///|
-#skip("needs plugin params: degPrecision")
 test "upstream convertTransform.07" {
   check_fixture_upstream(
     "convertTransform",
@@ -4306,6 +4603,7 @@ test "upstream convertTransform.07" {
       #|</svg>
     ),
     precision=3,
+    params="{\"degPrecision\":3}",
     passes=1,
     expect_fail=false,
   )
@@ -4328,6 +4626,7 @@ test "upstream convertTransform.10" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=1,
     expect_fail=false,
   )
@@ -4348,6 +4647,7 @@ test "upstream convertTransform.11" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=1,
     expect_fail=false,
   )
@@ -4368,6 +4668,7 @@ test "upstream convertTransform.12" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=1,
     expect_fail=false,
   )
@@ -4390,13 +4691,13 @@ test "upstream convertTransform.13" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=1,
     expect_fail=false,
   )
 }
 
 ///|
-#skip("needs plugin params: degPrecision, transformPrecision")
 test "upstream convertTransform.14" {
   check_fixture_upstream(
     "convertTransform",
@@ -4411,6 +4712,7 @@ test "upstream convertTransform.14" {
       #|</svg>
     ),
     precision=6,
+    params="{\n    \"degPrecision\":4,\n    \"floatPrecision\":6,\n    \"transformPrecision\":8\n}",
     passes=1,
     expect_fail=false,
   )
@@ -4431,6 +4733,7 @@ test "upstream convertTransform.15" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=1,
     expect_fail=false,
   )
@@ -4459,6 +4762,7 @@ test "upstream mergePaths.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -4501,6 +4805,7 @@ test "upstream mergePaths.02" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -4556,6 +4861,7 @@ test "upstream mergePaths.03" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -4585,6 +4891,7 @@ test "upstream mergePaths.04" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -4615,6 +4922,7 @@ test "upstream mergePaths.05" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -4646,6 +4954,7 @@ test "upstream mergePaths.06" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -4688,6 +4997,7 @@ test "upstream mergePaths.07" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -4732,6 +5042,7 @@ test "upstream mergePaths.08" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -4776,6 +5087,7 @@ test "upstream mergePaths.09" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -4818,6 +5130,7 @@ test "upstream mergePaths.10" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -4864,6 +5177,7 @@ test "upstream mergePaths.11" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -4912,6 +5226,7 @@ test "upstream mergePaths.12" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -4935,6 +5250,7 @@ test "upstream removeComments.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -4957,13 +5273,13 @@ test "upstream removeComments.02" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
 }
 
 ///|
-#skip("needs plugin params: preservePatterns")
 test "upstream removeComments.03" {
   check_fixture_upstream(
     "removeComments",
@@ -4979,6 +5295,7 @@ test "upstream removeComments.03" {
       #|</svg>
     ),
     precision=3,
+    params="{\"preservePatterns\":false}\n",
     passes=2,
     expect_fail=false,
   )
@@ -5000,6 +5317,7 @@ test "upstream removeDesc.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -5020,6 +5338,7 @@ test "upstream removeDimensions.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -5040,6 +5359,7 @@ test "upstream removeDimensions.02" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -5060,6 +5380,7 @@ test "upstream removeDimensions.03" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -5080,6 +5401,7 @@ test "upstream removeDimensions.04" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -5100,6 +5422,7 @@ test "upstream removeDimensions.05" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -5121,6 +5444,7 @@ test "upstream removeDoctype.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -5145,6 +5469,7 @@ test "upstream removeEditorsNSData.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -5169,6 +5494,7 @@ test "upstream removeEditorsNSData.02" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -5189,6 +5515,7 @@ test "upstream removeEmptyAttrs.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -5213,6 +5540,7 @@ test "upstream removeEmptyAttrs.02" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -5239,6 +5567,7 @@ test "upstream removeEmptyContainers.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -5278,6 +5607,7 @@ test "upstream removeEmptyContainers.02" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -5317,6 +5647,7 @@ test "upstream removeEmptyContainers.03" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -5351,6 +5682,7 @@ test "upstream removeEmptyContainers.04" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -5375,6 +5707,7 @@ test "upstream removeEmptyContainers.05" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -5405,6 +5738,7 @@ test "upstream removeEmptyContainers.06" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -5437,6 +5771,7 @@ test "upstream removeEmptyContainers.07" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -5475,6 +5810,7 @@ test "upstream removeEmptyContainers.08" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -5497,6 +5833,7 @@ test "upstream removeEmptyText.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -5519,6 +5856,7 @@ test "upstream removeEmptyText.02" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -5541,6 +5879,7 @@ test "upstream removeEmptyText.03" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -5572,6 +5911,7 @@ test "upstream removeHiddenElems.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -5603,6 +5943,7 @@ test "upstream removeHiddenElems.02" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -5631,6 +5972,7 @@ test "upstream removeHiddenElems.03" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -5654,6 +5996,7 @@ test "upstream removeHiddenElems.04" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -5677,6 +6020,7 @@ test "upstream removeHiddenElems.05" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -5700,6 +6044,7 @@ test "upstream removeHiddenElems.06" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -5723,6 +6068,7 @@ test "upstream removeHiddenElems.07" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -5768,6 +6114,7 @@ test "upstream removeHiddenElems.08" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -5790,6 +6137,7 @@ test "upstream removeHiddenElems.09" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -5812,6 +6160,7 @@ test "upstream removeHiddenElems.10" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -5840,6 +6189,7 @@ test "upstream removeHiddenElems.11" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -5879,6 +6229,7 @@ test "upstream removeHiddenElems.12" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -5901,6 +6252,7 @@ test "upstream removeHiddenElems.13" {
       #|<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"/>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -5922,6 +6274,7 @@ test "upstream removeHiddenElems.14" {
       #|<svg xmlns="http://www.w3.org/2000/svg"/>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -5949,6 +6302,7 @@ test "upstream removeHiddenElems.15" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -5979,6 +6333,7 @@ test "upstream removeHiddenElems.16" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6009,6 +6364,7 @@ test "upstream removeHiddenElems.17" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6039,6 +6395,7 @@ test "upstream removeHiddenElems.18" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6074,6 +6431,7 @@ test "upstream removeHiddenElems.19" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -6095,6 +6453,7 @@ test "upstream removeMetadata.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6116,6 +6475,7 @@ test "upstream removeTitle.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6138,6 +6498,7 @@ test "upstream removeUnknownsAndDefaults.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6171,6 +6532,7 @@ test "upstream removeUnknownsAndDefaults.02" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6195,6 +6557,7 @@ test "upstream removeUnknownsAndDefaults.03" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6223,6 +6586,7 @@ test "upstream removeUnknownsAndDefaults.04" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6263,6 +6627,7 @@ test "upstream removeUnknownsAndDefaults.05" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6287,6 +6652,7 @@ test "upstream removeUnknownsAndDefaults.06" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6331,6 +6697,7 @@ test "upstream removeUnknownsAndDefaults.07" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6377,6 +6744,7 @@ test "upstream removeUnknownsAndDefaults.08" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6409,6 +6777,7 @@ test "upstream removeUnknownsAndDefaults.09" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6437,6 +6806,7 @@ test "upstream removeUnknownsAndDefaults.10" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6471,13 +6841,13 @@ test "upstream removeUnknownsAndDefaults.11" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
 }
 
 ///|
-#skip("needs plugin params: keepAriaAttrs")
 test "upstream removeUnknownsAndDefaults.12" {
   check_fixture_upstream(
     "removeUnknownsAndDefaults",
@@ -6502,6 +6872,7 @@ test "upstream removeUnknownsAndDefaults.12" {
       #|</svg>
     ),
     precision=3,
+    params="{ \"keepAriaAttrs\": false }\n",
     passes=2,
     expect_fail=false,
   )
@@ -6522,13 +6893,13 @@ test "upstream removeUnknownsAndDefaults.13" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
 }
 
 ///|
-#skip("needs plugin params: keepRoleAttr")
 test "upstream removeUnknownsAndDefaults.14" {
   check_fixture_upstream(
     "removeUnknownsAndDefaults",
@@ -6543,6 +6914,7 @@ test "upstream removeUnknownsAndDefaults.14" {
       #|</svg>
     ),
     precision=3,
+    params="{ \"keepRoleAttr\": true }\n",
     passes=2,
     expect_fail=false,
   )
@@ -6567,6 +6939,7 @@ test "upstream removeUnknownsAndDefaults.15" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6589,6 +6962,7 @@ test "upstream removeUnknownsAndDefaults.16" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6619,6 +6993,7 @@ test "upstream removeUnknownsAndDefaults.17" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6643,6 +7018,7 @@ test "upstream removeUnusedNS.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6667,6 +7043,7 @@ test "upstream removeUnusedNS.02" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6695,6 +7072,7 @@ test "upstream removeUnusedNS.03" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6723,6 +7101,7 @@ test "upstream removeUnusedNS.04" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6751,6 +7130,7 @@ test "upstream removeUnusedNS.05" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6779,6 +7159,7 @@ test "upstream removeUnusedNS.06" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6799,6 +7180,7 @@ test "upstream removeUnusedNS.07" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6826,6 +7208,7 @@ test "upstream removeUselessDefs.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6892,6 +7275,7 @@ test "upstream removeUselessDefs.02" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6936,6 +7320,7 @@ test "upstream removeUselessDefs.03" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -6966,6 +7351,7 @@ test "upstream removeUselessDefs.04" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -6996,6 +7382,7 @@ test "upstream removeUselessDefs.05" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -7048,6 +7435,7 @@ test "upstream removeUselessStrokeAndFill.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -7090,8 +7478,9 @@ test "upstream removeUselessStrokeAndFill.02" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -7122,6 +7511,7 @@ test "upstream removeUselessStrokeAndFill.03" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=true,
   )
@@ -7154,13 +7544,13 @@ test "upstream removeUselessStrokeAndFill.04" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
 }
 
 ///|
-#skip("needs plugin params: removeNone")
 test "upstream removeUselessStrokeAndFill.05" {
   check_fixture_upstream(
     "removeUselessStrokeAndFill",
@@ -7192,6 +7582,7 @@ test "upstream removeUselessStrokeAndFill.05" {
       #|</svg>
     ),
     precision=3,
+    params="{ \"removeNone\": true }\n",
     passes=2,
     expect_fail=false,
   )
@@ -7213,6 +7604,7 @@ test "upstream removeXMLProcInst.01" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -7235,6 +7627,7 @@ test "upstream removeXMLProcInst.02" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -7251,6 +7644,7 @@ test "upstream sortAttrs.01" {
       #|<svg x="" x1="" x2="" y="" y1="" y2="" cx="" cy="" r="" a="" b=""/>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -7267,6 +7661,7 @@ test "upstream sortAttrs.02" {
       #|<svg fill="" fill-opacity="" stroke="" stroke-opacity="" a=""/>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
@@ -7287,13 +7682,13 @@ test "upstream sortAttrs.03" {
       #|</svg>
     ),
     precision=3,
+    params="{}",
     passes=2,
     expect_fail=false,
   )
 }
 
 ///|
-#skip("needs plugin params: xmlnsOrder")
 test "upstream sortAttrs.04" {
   check_fixture_upstream(
     "sortAttrs",
@@ -7310,6 +7705,7 @@ test "upstream sortAttrs.04" {
       #|</svg>
     ),
     precision=3,
+    params="{ \"xmlnsOrder\": \"alphabetical\" }\n",
     passes=2,
     expect_fail=false,
   )

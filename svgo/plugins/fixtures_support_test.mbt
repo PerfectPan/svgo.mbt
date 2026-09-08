@@ -8,12 +8,14 @@ fn check_fixture(
   expected : String,
   precision~ : Int,
   multipass~ : Bool,
+  params~ : String,
 ) -> Unit raise {
   guard @plugins.find_plugin(plugin) is Some(p) else {
     fail("unknown plugin \{plugin}")
   }
   let doc = @xml.parse(input)
   let ctx = @plugins.Context::new(precision~)
+  ctx.set_params(@json.parse(params))
   let mut passes = 0
   while (p.run)(doc, ctx) && multipass && passes < 10 {
     passes += 1
@@ -36,6 +38,7 @@ fn check_fixture_upstream(
   input : String,
   expected : String,
   precision~ : Int,
+  params~ : String,
   passes~ : Int,
   expect_fail~ : Bool,
 ) -> Unit raise {
@@ -47,7 +50,9 @@ fn check_fixture_upstream(
     let doc = @xml.parse(input)
     let ctx = @plugins.Context::new(precision~)
     let mut found : String? = None
+    let parameters = @json.parse(params)
     for i in 0..<passes {
+      ctx.set_params(parameters)
       ignore((p.run)(doc, ctx))
       let actual = compact(doc.to_string())
       if actual != want {

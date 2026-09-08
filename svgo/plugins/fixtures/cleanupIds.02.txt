@@ -1,0 +1,5 @@
+<svg><defs><linearGradient id="gradient"/><linearGradient id="unused"/><clipPath id="clip"><rect id="inner" width="1" height="1"/></clipPath><filter id="filter"/></defs><rect id="rect" fill="url(#gradient)" clip-path="url(#clip)" style="filter:url(#filter)"/><use href="#rect"/><animate begin="rect.click"/></svg>
+
+@@@
+
+<svg><defs><linearGradient id="a"/><linearGradient/><clipPath id="b"><rect width="1" height="1"/></clipPath><filter id="c"/></defs><rect id="d" fill="url(#a)" clip-path="url(#b)" style="filter:url(#c)"/><use href="#d"/><animate begin="d.click"/></svg>

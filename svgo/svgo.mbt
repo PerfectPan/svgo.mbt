@@ -5,6 +5,8 @@
 pub(all) struct Config {
   /// names of plugins to run, in order; defaults to the preset
   plugins : Array[String]
+  /// per-plugin JSON parameter objects, keyed by plugin name
+  params : Map[String, Json]
   /// decimal places kept for numbers
   precision : Int
   /// repeat the pipeline until nothing changes (at most 10 passes)
@@ -18,6 +20,7 @@ pub(all) struct Config {
 pub fn Config::default() -> Config {
   {
     plugins: @plugins.preset_default.map(p => p.name),
+    params: Map([]),
     precision: 3,
     multipass: true,
     pretty: false,
@@ -83,6 +86,7 @@ pub fn optimize(
     passes += 1
     let mut changed = false
     for p in plugins {
+      ctx.set_params(config.params.get(p.name).unwrap_or(Json::object(Map([]))))
       if (p.run)(doc, ctx) {
         changed = true
         applied.add(p.name)

@@ -1,0 +1,9 @@
+<svg role="img" data-a="x" aria-label="x"><alien foo="x"/><rect x="0" fill="#000" opacity="1" mystery="x"/></svg>
+
+@@@
+
+<svg role="img" data-a="x" aria-label="x"><alien foo="x"/><rect x="0" fill="#000" opacity="1" mystery="x"/></svg>
+
+@@@
+
+{"unknownContent":false,"unknownAttrs":false,"defaultAttrs":false,"uselessOverrides":false,"keepRoleAttr":true}

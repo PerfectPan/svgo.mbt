@@ -1,0 +1,9 @@
+<svg><path fill="none" fill-opacity=".5" stroke="none" stroke-width="2"/></svg>
+
+@@@
+
+<svg><path fill="none" fill-opacity=".5" stroke="none" stroke-width="2"/></svg>
+
+@@@
+
+{"stroke":false,"fill":false}

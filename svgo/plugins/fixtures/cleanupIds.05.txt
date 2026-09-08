@@ -1,0 +1,9 @@
+<svg><path id="b"/><path id="a"/><use href="#b"/><use href="#a"/><path style="fill:url(#b);stroke:url(#a);filter:url(#b)"/><animate begin="b.click;a.end" end="b.end"/></svg>
+
+@@@
+
+<svg><path id="a"/><path id="b"/><use href="#a"/><use href="#b"/><path style="fill:url(#a);stroke:url(#b);filter:url(#a)"/><animate begin="a.click;b.end" end="a.end"/></svg>
+
+@@@
+
+{}

@@ -4,8 +4,10 @@ import {
   "moonbitlang/core/string",
   "moonbitlang/core/math",
   "moonbitlang/core/cmp",
+  "moonbitlang/core/encoding/utf8",
 }
 
 import {
   "perfectpan/svgo/xml",
+  "moonbitlang/core/json",
 } for "test"

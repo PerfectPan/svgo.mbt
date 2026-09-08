@@ -1,0 +1,9 @@
+<svg fill="red"><mask><path fill="white"/><g><path fill="black"/></g></mask><path fill="red" stroke="none"/></svg>
+
+@@@
+
+<svg fill="currentColor"><mask><path fill="#fff"/><g><path fill="#000"/></g></mask><path fill="currentColor" stroke="none"/></svg>
+
+@@@
+
+{"currentColor":true}

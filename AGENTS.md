@@ -43,13 +43,13 @@ svgo/                         the MoonBit module perfectpan/svgo
   svgo.mbt, svgo_test.mbt     public API: optimize(svg, config?) -> Result, Config, list_plugins
   xml/                        Document/Node/Element, parse, serialize (SVG-oriented, keeps prolog)
   path/                       path data: parse, optimize, stringify; number.mbt = fast number I/O
-  plugins/                    Plugin { name, description, run }, Context, preset_default order
+  plugins/                    Plugin { name, description, run }, Context (+ params.mbt accessors), preset_default order
     cleanup.mbt               removal plugins (doctype, comments, editor data, ids, empty things)
     values.mbt                numeric values and colours
     structure.mbt             tree rewrites: defaults, groups, shapes->path, path data, merging
     transform.mbt             transform attribute simplification
     preset.mbt                preset_default / optional_plugins / find_plugin
-    fixtures/*.txt            input @@@ expected [@@@ params] — regenerated into fixtures_test.mbt
+    fixtures/*.txt            input @@@ expected [@@@ params JSON] — regenerated into fixtures_test.mbt
     fixtures/upstream/        svgo's own test/plugins cases, verbatim; KNOWN_FAILURES.txt = expected failures (ratchet, only shrinks)
   cmd/main/                   native CLI (C file I/O in io.c; stubs keep other targets checking)
   wasm/                       foreign_library exporting optimize/plugins/version as JSON strings
@@ -80,6 +80,10 @@ docs/ARCHITECTURE.md          design notes
    multipass; returning `true` without a change makes every run take 10 passes.
 3. **Every plugin is independently runnable** via `Config::plugins` /
    `--plugins`, in any order, on any document, without raising.
+   Plugin parameters use svgo's names and JSON shapes: `Config::params`
+   (plugin name → JSON object), wasm `plugins: [{name, params}]` or top-level
+   `params`, CLI `--param plugin.key=value`. Inside a plugin read them only via
+   `ctx.param_bool/int/string/strings(name, default)`; defaults are svgo's.
 4. **Deterministic, idempotent output.** Optimizing the output again must
    produce the same bytes (`scripts/regress.sh` and the corpus check this).
 5. **No target-specific code outside `svgo/cmd/main/io_native.mbt` and `svgo/wasm/`.**

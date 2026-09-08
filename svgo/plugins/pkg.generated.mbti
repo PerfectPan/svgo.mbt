@@ -85,10 +85,17 @@ pub fn split_unit(String) -> (Double, String)?
 // Types and methods
 pub struct Context {
   precision : Int
+  mut params : Json
   optimized_paths : @set.Set[String]
   path_hulls : Map[String, Array[Array[(Double, Double)]]]
 } derive(@debug.Debug)
+pub fn Context::has_param(Self, String) -> Bool
 pub fn Context::new(precision? : Int) -> Self
+pub fn Context::param_bool(Self, String, Bool) -> Bool
+pub fn Context::param_int(Self, String, Int) -> Int
+pub fn Context::param_string(Self, String, String) -> String
+pub fn Context::param_strings(Self, String) -> Array[String]
+pub fn Context::set_params(Self, Json) -> Unit
 
 pub(all) struct Plugin {
   name : String

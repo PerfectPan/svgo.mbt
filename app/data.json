@@ -1,8 +1,8 @@
 {
-  "generated": "2026-09-07",
+  "generated": "2026-09-08",
   "node": "v24.18.0",
   "svgoVersion": "4.1.0",
-  "wasmBytes": 330419,
+  "wasmBytes": 349303,
   "plugins": [
     {
       "name": "removeDoctype",
@@ -41,7 +41,7 @@
     },
     {
       "name": "cleanupIds",
-      "description": "remove unused ids",
+      "description": "remove unused ids and minify referenced ids",
       "enabled": true
     },
     {
@@ -144,28 +144,28 @@
     {
       "file": "figma-export.svg",
       "original": 570,
-      "mbt": 458,
+      "mbt": 442,
       "js": 442,
-      "mbtMs": 0.149,
-      "jsMs": 0.315,
+      "mbtMs": 0.198,
+      "jsMs": 0.342,
       "passes": 2
     },
     {
       "file": "illustrator-logo.svg",
       "original": 1149,
-      "mbt": 616,
+      "mbt": 717,
       "js": 528,
-      "mbtMs": 0.153,
-      "jsMs": 0.651,
+      "mbtMs": 0.182,
+      "jsMs": 0.618,
       "passes": 2
     },
     {
       "file": "inkscape-drawing.svg",
       "original": 2078,
-      "mbt": 663,
+      "mbt": 641,
       "js": 640,
-      "mbtMs": 0.139,
-      "jsMs": 0.658,
+      "mbtMs": 0.161,
+      "jsMs": 0.661,
       "passes": 2
     },
     {
@@ -173,8 +173,8 @@
       "original": 836,
       "mbt": 276,
       "js": 288,
-      "mbtMs": 0.077,
-      "jsMs": 0.299,
+      "mbtMs": 0.089,
+      "jsMs": 0.302,
       "passes": 3
     },
     {
@@ -182,17 +182,17 @@
       "original": 68630,
       "mbt": 52794,
       "js": 68101,
-      "mbtMs": 10.677,
-      "jsMs": 37.131,
+      "mbtMs": 19.114,
+      "jsMs": 39.938,
       "passes": 3
     },
     {
       "file": "Python_logo_and_wordmark.svg",
       "original": 5419,
-      "mbt": 4566,
+      "mbt": 4606,
       "js": 4551,
-      "mbtMs": 0.746,
-      "jsMs": 2.817,
+      "mbtMs": 0.802,
+      "jsMs": 3.123,
       "passes": 3
     },
     {
@@ -200,8 +200,8 @@
       "original": 366,
       "mbt": 302,
       "js": 302,
-      "mbtMs": 0.045,
-      "jsMs": 0.183,
+      "mbtMs": 0.06,
+      "jsMs": 0.184,
       "passes": 2
     },
     {
@@ -209,26 +209,26 @@
       "original": 4019,
       "mbt": 3795,
       "js": 3584,
-      "mbtMs": 0.361,
-      "jsMs": 1.725,
+      "mbtMs": 0.419,
+      "jsMs": 1.784,
       "passes": 2
     },
     {
       "file": "Tux.svg",
       "original": 49983,
-      "mbt": 41069,
+      "mbt": 36050,
       "js": 35983,
-      "mbtMs": 4.521,
-      "jsMs": 14.607,
-      "passes": 2
+      "mbtMs": 6.766,
+      "jsMs": 16.06,
+      "passes": 3
     },
     {
       "file": "World_map_-_low_resolution.svg",
       "original": 84823,
       "mbt": 47242,
       "js": 46706,
-      "mbtMs": 10.714,
-      "jsMs": 53.579,
+      "mbtMs": 12.15,
+      "jsMs": 56.658,
       "passes": 3
     }
   ]

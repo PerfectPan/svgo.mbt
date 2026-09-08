@@ -5,18 +5,7 @@
 # cleanupAttrs: not analysed yet
 cleanupAttrs.02
 
-# cleanupIds: svgo skips the plugin when <style> is present; minify not implemented
-cleanupIds.01
-cleanupIds.02
-cleanupIds.04
-cleanupIds.05
-cleanupIds.11
-cleanupIds.19
-cleanupIds.22
-cleanupIds.23
-cleanupIds.24
-cleanupIds.25
-cleanupIds.26
+# cleanupIds: all passing
 
 # cleanupNumericValues: not analysed yet
 cleanupNumericValues.01
@@ -39,6 +28,7 @@ convertPathData.25
 # convertShapeToPath: not analysed yet
 convertShapeToPath.01
 convertShapeToPath.03
+convertShapeToPath.05 # arcs and precision work; rect still emits relative h/v instead of upstream absolute H/V
 
 # convertTransform: remaining precision/decomposition edge cases
 
@@ -74,7 +64,6 @@ removeUselessDefs.03
 
 # removeUselessStrokeAndFill: stroke inheritance rules incomplete
 removeUselessStrokeAndFill.01
-removeUselessStrokeAndFill.02
 removeUselessStrokeAndFill.03
 
 convertPathData.14

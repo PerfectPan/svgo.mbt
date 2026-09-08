@@ -74,7 +74,7 @@ default because plugins unlock each other: `collapseGroups` exposes
 attributes that `removeUnknownsAndDefaults` can then drop, `convertShapeToPath`
 produces paths that `mergePaths` can join.
 
-`Context` carries the precision and one run-level cache: path data that
+`Context` carries the precision, the current plugin's JSON parameters, and run-level caches: path data that
 `convertPathData` already left unchanged. The optimizer is idempotent on such
 data, so later passes skip it; this is what keeps a 3-pass run on a
 path-heavy file close to the cost of a single pass.
@@ -91,7 +91,8 @@ Safety rules that recur across plugins:
 ### `svgo` (root) — the API
 
 `optimize(svg, config?) -> Result raise` wires the three packages together.
-`Config` is a plain struct (plugin names in order, precision, multipass,
+`Config` is a plain struct (plugin names in order, per-plugin JSON parameter
+objects, precision, multipass,
 pretty); `Result` has the output plus byte sizes, pass count and the plugins
 that did something. `utf8_length` counts bytes without encoding.
 

@@ -1,0 +1,9 @@
+<svg><path id="long"/><path id="unused"/><use href="#long"/></svg>
+
+@@@
+
+<svg><path id="long"/><path/><use href="#long"/></svg>
+
+@@@
+
+{"minify":false}

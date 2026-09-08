@@ -13,6 +13,7 @@ const USAGE =
   #|  --disable <plugin>      skip a plugin (repeatable)
   #|  --enable <plugin>       add an optional plugin such as removeDimensions (repeatable)
   #|  --plugins <a,b,c>       run exactly these plugins, in this order
+  #|  --param <plugin>.<key>=<value>  set a plugin parameter (repeatable)
   #|  --stats                 print size statistics
   #|  --json                  print a JSON object {data, originalSize, size, passes, applied}
   #|  --bench <n>             optimize the input n times in-process and report timing
@@ -48,6 +49,7 @@ fn main {
   let mut stats = false
   let mut json = false
   let mut bench = 0
+  let params : Map[String, Json] = Map([])
   let disabled : Array[String] = []
   let enabled : Array[String] = []
   let mut explicit : Array[String]? = None
@@ -80,6 +82,13 @@ fn main {
       }
       "--enable" => {
         enabled.push(args.get(i + 1).unwrap_or(""))
+        i += 1
+      }
+      "--param" => {
+        guard args.get(i + 1) is Some(arg) && parse_param(arg, params) else {
+          println("svgo: expected --param <plugin>.<key>=<value>")
+          return
+        }
         i += 1
       }
       "--plugins" => {
@@ -124,7 +133,13 @@ fn main {
     }
   }
   if bench > 0 {
-    let config : @svgo.Config = { plugins, precision, multipass, pretty, }
+    let config : @svgo.Config = {
+      plugins,
+      params,
+      precision,
+      multipass,
+      pretty,
+    }
     // warm up once, then time the loop (@env.now is milliseconds)
     ignore(@svgo.optimize(source, config~) catch { _ => return })
     let start = @env.now()
@@ -138,6 +153,7 @@ fn main {
   }
   let result = @svgo.optimize(source, config={
     plugins,
+    params,
     precision,
     multipass,
     pretty,

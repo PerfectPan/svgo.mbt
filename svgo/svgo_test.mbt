@@ -71,7 +71,7 @@ test "hidden elements, empty containers, unused ids and defs" {
   inspect(
     r.data,
     content=(
-      #|<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><linearGradient id="used"><stop offset="0"/></linearGradient><path id="p" d="M0 0h1"/></defs><path fill="url(#used)" d="M0 0h10v10H0z"/><use xlink:href="#p"/></svg>
+      #|<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><linearGradient id="a"><stop offset="0"/></linearGradient><path id="b" d="M0 0h1"/></defs><path fill="url(#a)" d="M0 0h10v10H0z"/><use xlink:href="#b"/></svg>
     ),
   )
 }

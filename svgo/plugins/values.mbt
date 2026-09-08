@@ -68,13 +68,14 @@ let color_attrs : Set[String] = Set([
 pub let convert_colors : Plugin = {
   name: "convertColors",
   description: "convert colors to the shortest form",
-  run: (doc, _) => {
+  run: (doc, ctx) => {
     let mut changed = false
-    doc.each_element((e, _) => {
+    fn walk(e : @xml.Element, in_mask : Bool) {
+      let in_mask = in_mask || e.name == "mask"
       for kv in e.attrs.to_array() {
         let (k, v) = kv
         if color_attrs.contains(k) {
-          let c = shorten_color(v)
+          let c = convert_color(v, ctx, in_mask)
           if c != v {
             e.attrs[k] = c
             changed = true
@@ -89,7 +90,7 @@ pub let convert_colors : Plugin = {
                 ) =>
                 name.trim().to_owned() +
                 ":" +
-                shorten_color(value.trim().to_owned())
+                convert_color(value.trim().to_owned(), ctx, in_mask)
               _ => p
             }
           })
@@ -100,7 +101,15 @@ pub let convert_colors : Plugin = {
           }
         }
       }
-    })
+      for child in e.children {
+        if child is Element(x) {
+          walk(x, in_mask)
+        }
+      }
+    }
+    if doc.root() is Some(root) {
+      walk(root, false)
+    }
     changed
   },
 }
@@ -110,7 +119,22 @@ pub let convert_colors : Plugin = {
 /// `#rrggbb` collapses to `#rgb` when possible, and a color name wins when
 /// it is shorter than the hex form (`#ff0000` -> `red`).
 pub fn shorten_color(v : String) -> String {
+  convert_color(v, Context::new(), false)
+}
+
+///|
+fn convert_color(v : String, ctx : Context, in_mask : Bool) -> String {
   let t = v.trim().to_owned()
+  if !in_mask &&
+    (
+      (ctx.param_bool("currentColor", false) && t != "none") ||
+      (
+        ctx.param_string("currentColor", "") != "" &&
+        t == ctx.param_string("currentColor", "")
+      )
+    ) {
+    return "currentColor"
+  }
   let lower = t.to_lower()
   if lower == "none" ||
     lower == "currentcolor" ||
@@ -119,7 +143,9 @@ pub fn shorten_color(v : String) -> String {
     return t
   }
   // rgb(255, 0, 0) / rgb(100%, 0%, 0%)
-  if lower.has_prefix("rgb(") && lower.has_suffix(")") {
+  if ctx.param_bool("rgb2hex", true) &&
+    lower.has_prefix("rgb(") &&
+    lower.has_suffix(")") {
     let inner = lower[4:lower.length() - 1].to_owned()
     let parts = inner.split(",").map(p => p.trim().to_owned()).to_array()
     if parts.length() == 3 {
@@ -133,18 +159,26 @@ pub fn shorten_color(v : String) -> String {
           _ => return t
         }
       }
-      return shorten_hex("#" + hex2(vals[0]) + hex2(vals[1]) + hex2(vals[2]))
+      return shorten_hex(
+        "#" + hex2(vals[0]) + hex2(vals[1]) + hex2(vals[2]),
+        ctx,
+      )
     }
     return t
   }
   if lower.has_prefix("#") {
     if lower.length() == 7 || lower.length() == 4 {
-      return shorten_hex(lower)
+      return shorten_hex(lower, ctx)
     }
     return t
   }
-  match color_names.get(lower) {
-    Some(hex) => shorten_hex(hex)
+  match
+    (if ctx.param_bool("names2hex", true) {
+      color_names.get(lower)
+    } else {
+      None
+    }) {
+    Some(hex) => shorten_hex(hex, ctx)
     None => t
   }
 }
@@ -155,9 +189,10 @@ fn hex2(n : Int) -> String {
 }
 
 ///|
-fn shorten_hex(h : String) -> String {
+fn shorten_hex(h : String, ctx : Context) -> String {
   let h = h.to_lower()
-  if h.length() == 7 &&
+  if ctx.param_bool("shorthex", true) &&
+    h.length() == 7 &&
     h.get_char(1) == h.get_char(2) &&
     h.get_char(3) == h.get_char(4) &&
     h.get_char(5) == h.get_char(6) {
@@ -166,12 +201,14 @@ fn shorten_hex(h : String) -> String {
       h.get_char(3).unwrap().to_string() +
       h.get_char(5).unwrap().to_string()
     match hex_to_name.get(short) {
-      Some(name) if name.length() < short.length() => name
+      Some(name) if ctx.param_bool("shortname", true) &&
+        name.length() < short.length() => name
       _ => short
     }
   } else {
     match hex_to_name.get(h) {
-      Some(name) if name.length() < h.length() => name
+      Some(name) if ctx.param_bool("shortname", true) &&
+        name.length() < h.length() => name
       _ => h
     }
   }

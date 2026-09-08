@@ -1,0 +1,9 @@
+<svg><path id="a"/><path id="other"/><use href="#other"/><use href="#missing"/></svg>
+
+@@@
+
+<svg><path id="a"/><path id="b"/><use href="#b"/><use href="#missing"/></svg>
+
+@@@
+
+{"remove":false}

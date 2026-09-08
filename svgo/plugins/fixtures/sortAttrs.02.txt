@@ -1,0 +1,9 @@
+<svg id="a" xmlns="svg" z="1" fill="red" data-z="2" width="3"/>
+
+@@@
+
+<svg xmlns="svg" z="1" data-z="2" fill="red" id="a" width="3"/>
+
+@@@
+
+{"order":["z","data"]}

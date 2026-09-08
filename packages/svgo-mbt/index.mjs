@@ -42,7 +42,8 @@ export async function init(wasmUrl = new URL("./svgo.wasm", import.meta.url)) {
 }
 
 /**
- * Optimize an SVG string. Options: { plugins?: string[], precision?: number,
+ * Optimize an SVG string. Options: { plugins?: (string | {name: string, params?: object})[],
+ * params?: Record<string, object>, precision?: number,
  * multipass?: boolean, pretty?: boolean }. Returns { data, originalSize, size, passes, applied }.
  */
 export async function optimize(svg, options = {}) {

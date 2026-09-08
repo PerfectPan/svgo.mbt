@@ -133,7 +133,7 @@ pub let remove_unknowns_and_defaults : Plugin = {
         Some(allowed) if allowed.length() > 0 => !allowed.contains(e.name)
         _ => is_unknown
       }
-      if not_allowed {
+      if ctx.param_bool("unknownContent", true) && not_allowed {
         match parent {
           Some(p) => {
             let idx = p.children.search_by(c => {
@@ -157,20 +157,23 @@ pub let remove_unknowns_and_defaults : Plugin = {
       for kv in e.attrs.to_array() {
         let (k, v) = kv
         // always keep data-*, aria-*, xmlns and xmlns:*
-        if k.has_prefix("data-") ||
-          k.has_prefix("aria-") ||
+        if (ctx.param_bool("keepDataAttrs", true) && k.has_prefix("data-")) ||
+          (ctx.param_bool("keepAriaAttrs", true) && k.has_prefix("aria-")) ||
+          (ctx.param_bool("keepRoleAttr", false) && k == "role") ||
           k == "xmlns" ||
           k.has_prefix("xmlns:") {
           continue
         }
         // role is removed by default (keepRoleAttr = false)
-        if k == "role" {
+        if k == "role" && !ctx.param_bool("keepRoleAttr", false) {
           e.attrs.remove(k)
           changed = true
           continue
         }
         // version and baseProfile on <svg> are noise
-        if e.name == "svg" && (k == "version" || k == "baseProfile") {
+        if ctx.param_bool("unknownAttrs", true) &&
+          e.name == "svg" &&
+          (k == "version" || k == "baseProfile") {
           e.attrs.remove(k)
           changed = true
           continue
@@ -179,7 +182,8 @@ pub let remove_unknowns_and_defaults : Plugin = {
         // are always kept (they belong to other namespaces)
         let is_namespaced = k.contains(":")
         let is_xml_xlink = k.has_prefix("xml:") || k.has_prefix("xlink:")
-        if !is_namespaced || is_xml_xlink {
+        if ctx.param_bool("unknownAttrs", true) &&
+          (!is_namespaced || is_xml_xlink) {
           match allowed {
             Some(set) if !set.contains(k) => {
               e.attrs.remove(k)
@@ -204,7 +208,7 @@ pub let remove_unknowns_and_defaults : Plugin = {
               None => false
             }
         }
-        if is_default && !has_id {
+        if ctx.param_bool("defaultAttrs", true) && is_default && !has_id {
           let ancestor_sets = inheritable.contains(k) &&
             ancestors_define(chain, k)
           let css_selects = css.contains("[" + k + "]")
@@ -216,7 +220,8 @@ pub let remove_unknowns_and_defaults : Plugin = {
         }
         // useless override: an inheritable attr whose value equals the
         // inherited value from the nearest ancestor that sets it
-        if !has_id &&
+        if ctx.param_bool("uselessOverrides", true) &&
+          !has_id &&
           inheritable.contains(k) &&
           !presentation_non_inheritable.contains(k) {
           let mut inherited : String? = None
@@ -239,7 +244,7 @@ pub let remove_unknowns_and_defaults : Plugin = {
       }
       // zero-valued geometry attributes default to 0
       match zero_defaults.get(e.name) {
-        Some(list) =>
+        Some(list) if ctx.param_bool("defaultAttrs", true) =>
           for k in list {
             match e.attrs.get(k) {
               Some(v) =>
@@ -262,7 +267,7 @@ pub let remove_unknowns_and_defaults : Plugin = {
               None => ()
             }
           }
-        None => ()
+        _ => ()
       }
       chain.push(e)
       // iterate over a copy because unknown children are removed in place
@@ -298,8 +303,18 @@ fn remove_standalone_no(v : String) -> String {
 pub let remove_useless_stroke_and_fill : Plugin = {
   name: "removeUselessStrokeAndFill",
   description: "remove useless stroke and fill attributes",
-  run: (doc, _) => {
+  run: (doc, ctx) => {
     let mut changed = false
+    let mut remove_none = ctx.param_bool("removeNone", false)
+    if remove_none {
+      doc.each_element((e, _) => {
+        if e.name == "style" ||
+          e.name == "script" ||
+          e.attrs.iter().any(kv => kv.0.has_prefix("on")) {
+          remove_none = false
+        }
+      })
+    }
     // elements with ids may be referenced by <use> under different inherited values
     let ids = referenced_ids(doc)
     fn walk(e : @xml.Element, chain : Array[@xml.Element]) {
@@ -325,7 +340,7 @@ pub let remove_useless_stroke_and_fill : Plugin = {
           stroke_width == Some("0") ||
           stroke_opacity == Some("0")
         let ancestor_stroke = ancestors_define(chain, "stroke")
-        if no_stroke {
+        if ctx.param_bool("stroke", true) && no_stroke {
           for kv in e.attrs.to_array() {
             let (k, _) = kv
             if k.has_prefix("stroke") && !(k == "stroke" && ancestor_stroke) {
@@ -336,7 +351,9 @@ pub let remove_useless_stroke_and_fill : Plugin = {
           if ancestor_stroke && !e.attrs.contains("stroke") {
             e.attrs["stroke"] = "none"
           }
-        } else if stroke is None && !ancestor_stroke {
+        } else if ctx.param_bool("stroke", true) &&
+          stroke is None &&
+          !ancestor_stroke {
           // no stroke anywhere: stroke-* attributes are noise
           for kv in e.attrs.to_array() {
             let (k, _) = kv
@@ -346,9 +363,13 @@ pub let remove_useless_stroke_and_fill : Plugin = {
             }
           }
         }
-        let fill = e.attrs.get("fill")
+        let fill = match e.attrs.get("fill") {
+          Some(v) => Some(v)
+          None => inherited_attr(chain, "fill")
+        }
         let fill_opacity = e.attrs.get("fill-opacity")
-        if fill == Some("none") || fill_opacity == Some("0") {
+        if ctx.param_bool("fill", true) &&
+          (fill == Some("none") || fill_opacity == Some("0")) {
           for kv in e.attrs.to_array() {
             let (k, _) = kv
             if k.has_prefix("fill-") {
@@ -356,10 +377,37 @@ pub let remove_useless_stroke_and_fill : Plugin = {
               changed = true
             }
           }
+          if fill != Some("none") {
+            e.attrs["fill"] = "none"
+            changed = true
+          }
+        }
+        if remove_none &&
+          (
+            stroke == Some("none") ||
+            (stroke is None && !ancestor_stroke) ||
+            no_stroke
+          ) &&
+          (fill == Some("none") || e.attrs.get("fill") == Some("none")) &&
+          !has_animation_child(e) &&
+          ![
+            "style", "filter", "marker", "marker-start", "marker-mid", "marker-end",
+          ]
+          .iter()
+          .any(k => e.attrs.contains(k) || ancestors_define(chain, k)) &&
+          !ancestors_define(chain, "marker-end") &&
+          !e.attrs.contains("marker-end") {
+          if chain.last() is Some(parent) {
+            parent.children.retain(n => {
+              !(n is Element(child) && physical_equal(child, e))
+            })
+            changed = true
+          }
+          return
         }
       }
       chain.push(e)
-      for c in e.children {
+      for c in e.children.copy() {
         if c is Element(child) {
           walk(child, chain)
         }
@@ -551,7 +599,7 @@ pub let convert_shape_to_path : Plugin = {
   description: "convert rect, line, polyline and polygon to path",
   run: (doc, ctx) => {
     let mut changed = false
-    let p = ctx.precision
+    let p = ctx.param_int("floatPrecision", ctx.precision)
     let num = fn(v : Double) -> String { @path.format_number(v, p) }
     doc.each_element((e, _) => {
       let d : String? = match e.name {
@@ -569,6 +617,28 @@ pub let convert_shape_to_path : Plugin = {
             None
           }
           Some("M\{num(x)} \{num(y)}h\{num(w)}v\{num(h)}H\{num(x)}z")
+        }
+        "circle" | "ellipse" if ctx.param_bool("convertArcs", false) => {
+          let cx = attr_num(e, "cx", 0.0)
+          let cy = attr_num(e, "cy", 0.0)
+          let rx = attr_num(e, if e.name == "circle" { "r" } else { "rx" }, 0.0)
+          let ry = if e.name == "circle" { rx } else { attr_num(e, "ry", 0.0) }
+          guard rx > 0.0 &&
+            ry > 0.0 &&
+            ["cx", "cy", "r", "rx", "ry"].iter().all(k => attr_is_plain(e, k)) else {
+            None
+          }
+          Some(
+            @path.stringify(
+              [
+                { cmd: 'M', args: [cx, cy - ry], },
+                { cmd: 'A', args: [rx, ry, 0.0, 1.0, 0.0, cx, cy + ry], },
+                { cmd: 'A', args: [rx, ry, 0.0, 1.0, 0.0, cx, cy - ry], },
+                { cmd: 'z', args: [], },
+              ],
+              precision=p,
+            ),
+          )
         }
         "line" => {
           let x1 = attr_num(e, "x1", 0.0)
@@ -621,7 +691,10 @@ pub let convert_shape_to_path : Plugin = {
       match d {
         Some(d) => {
           for
-            k in ["x", "y", "x1", "y1", "x2", "y2", "width", "height", "points"] {
+            k in [
+              "x", "y", "x1", "y1", "x2", "y2", "width", "height", "points", "cx",
+              "cy", "r", "rx", "ry",
+            ] {
             e.attrs.remove(k)
           }
           e.attrs["d"] = d
@@ -1871,4 +1944,14 @@ pub let remove_title : Plugin = {
   name: "removeTitle",
   description: "remove <title>",
   run: (doc, _) => remove_elements(doc, (e, _) => e.name == "title"),
+}
+
+///|
+fn inherited_attr(chain : Array[@xml.Element], key : String) -> String? {
+  for i = chain.length() - 1; i >= 0; i = i - 1 {
+    if chain[i].attrs.get(key) is Some(value) {
+      return Some(value)
+    }
+  }
+  None
 }

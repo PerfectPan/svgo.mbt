@@ -4,6 +4,8 @@
 pub struct Context {
   /// decimal places for numeric attribute values and path data
   precision : Int
+  /// current plugin parameter object; set by the pipeline before each run
+  mut params : Json
   /// path data the optimizer has already left unchanged in this run
   optimized_paths : Set[String]
   /// convex hulls of each subpath, per path data string, for mergePaths'
@@ -15,7 +17,12 @@ pub struct Context {
 ///|
 /// A fresh context; create one per `optimize` run.
 pub fn Context::new(precision? : Int = 3) -> Context {
-  { precision, optimized_paths: Set([]), path_hulls: Map([]), }
+  {
+    precision,
+    params: Json::object(Map([])),
+    optimized_paths: Set([]),
+    path_hulls: Map([]),
+  }
 }
 
 ///|

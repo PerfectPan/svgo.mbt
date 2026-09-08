@@ -42,6 +42,7 @@ pub let cleanup_numeric_values : Plugin = {
         guard numeric_attrs.contains(k) else { continue }
         match split_unit(v) {
           Some((n, unit)) => {
+            let (n, unit) = convert_to_px(n, unit, v.length(), ctx.precision)
             let unit = if unit == "px" { "" } else { unit }
             let formatted = @path.format_number(n, ctx.precision) + unit
             if formatted != v {
@@ -55,6 +56,40 @@ pub let cleanup_numeric_values : Plugin = {
     })
     changed
   },
+}
+
+///|
+/// Absolute length units and their factor relative to pixels.
+let px_factors : Map[String, Double] = {
+  "in": 96.0,
+  "pt": 4.0 / 3.0,
+  "pc": 16.0,
+  "cm": 96.0 / 2.54,
+  "mm": 96.0 / 25.4,
+}
+
+///|
+/// Convert an absolute length to pixels when the result is shorter than the
+/// original value (e.g. `1in` -> `96`, `12pt` -> `16`). Returns the (possibly
+/// converted) number and unit.
+fn convert_to_px(
+  n : Double,
+  unit : String,
+  original_len : Int,
+  precision : Int,
+) -> (Double, String) {
+  match px_factors.get(unit) {
+    Some(factor) => {
+      let px = n * factor
+      let px_str = @path.format_number(px, precision)
+      if px_str.length() < original_len {
+        (px, "px")
+      } else {
+        (n, unit)
+      }
+    }
+    None => (n, unit)
+  }
 }
 
 ///|
@@ -142,12 +177,18 @@ fn convert_color(v : String, ctx : Context, in_mask : Bool) -> String {
     lower.has_prefix("url(") {
     return t
   }
-  // rgb(255, 0, 0) / rgb(100%, 0%, 0%)
+  // rgb(255, 0, 0) / rgb(100%, 0%, 0%) / rgb(255 0 0)
   if ctx.param_bool("rgb2hex", true) &&
     lower.has_prefix("rgb(") &&
     lower.has_suffix(")") {
     let inner = lower[4:lower.length() - 1].to_owned()
-    let parts = inner.split(",").map(p => p.trim().to_owned()).to_array()
+    // values may be comma- or space-separated
+    let parts = inner
+      .replace_all(old=",", new=" ")
+      .split(" ")
+      .filter(p => !p.is_empty())
+      .map(p => p.to_owned())
+      .to_array()
     if parts.length() == 3 {
       let vals : Array[Int] = []
       for p in parts {

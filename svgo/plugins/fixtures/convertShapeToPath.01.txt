@@ -10,7 +10,7 @@
 @@@
 
 <svg xmlns="http://www.w3.org/2000/svg">
-  <path d="M1 2h3v4H1z"/>
+  <path d="M1 2H4V6H1z"/>
   <rect width="3" height="4" rx="1"/>
   <rect width="50%" height="4"/>
   <path stroke="red" d="M1 2 3 4"/>

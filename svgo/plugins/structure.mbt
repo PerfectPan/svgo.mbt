@@ -307,16 +307,20 @@ pub let remove_useless_stroke_and_fill : Plugin = {
   description: "remove useless stroke and fill attributes",
   run: (doc, ctx) => {
     let mut changed = false
-    let mut remove_none = ctx.param_bool("removeNone", false)
-    if remove_none {
-      doc.each_element((e, _) => {
-        if e.name == "style" ||
-          e.name == "script" ||
-          e.attrs.iter().any(kv => kv.0.has_prefix("on")) {
-          remove_none = false
-        }
-      })
+    // A stylesheet, script or event handler can restyle any element, so the
+    // stroke/fill attributes are not provably useless.
+    let mut deoptimized = false
+    doc.each_element((e, _) => {
+      if e.name == "style" ||
+        e.name == "script" ||
+        e.attrs.iter().any(kv => kv.0.has_prefix("on")) {
+        deoptimized = true
+      }
+    })
+    if deoptimized {
+      return false
     }
+    let remove_none = ctx.param_bool("removeNone", false)
     // elements with ids may be referenced by <use> under different inherited values
     let ids = referenced_ids(doc)
     fn walk(e : @xml.Element, chain : Array[@xml.Element]) {
@@ -338,20 +342,38 @@ pub let remove_useless_stroke_and_fill : Plugin = {
         let stroke = e.attrs.get("stroke")
         let stroke_width = e.attrs.get("stroke-width")
         let stroke_opacity = e.attrs.get("stroke-opacity")
-        let no_stroke = stroke == Some("none") ||
-          stroke_width == Some("0") ||
+        let stroke_is_none = stroke == Some("none")
+        let stroke_invisible = stroke_width == Some("0") ||
           stroke_opacity == Some("0")
+        let no_stroke = stroke_is_none || stroke_invisible
         let ancestor_stroke = ancestors_define(chain, "stroke")
         if ctx.param_bool("stroke", true) && no_stroke {
+          let before = e.attrs.to_array()
+          if stroke_invisible {
+            // stroke is invisible because of zero width or opacity: keep it
+            // that way even if an ancestor defines a visible stroke
+            e.attrs.remove("stroke")
+            if ancestor_stroke {
+              e.attrs["stroke"] = "none"
+            }
+          } else if !ancestor_stroke {
+            // stroke is explicitly "none" and no ancestor overrides it
+            e.attrs.remove("stroke")
+          } else {
+            // stroke is "none" but an ancestor sets a visible stroke: keep
+            // the override, moved to the end like svgo does
+            e.attrs.remove("stroke")
+            e.attrs["stroke"] = "none"
+          }
+          // drop all stroke-* presentation attributes
           for kv in e.attrs.to_array() {
             let (k, _) = kv
-            if k.has_prefix("stroke") && !(k == "stroke" && ancestor_stroke) {
+            if k.has_prefix("stroke-") {
               e.attrs.remove(k)
-              changed = true
             }
           }
-          if ancestor_stroke && !e.attrs.contains("stroke") {
-            e.attrs["stroke"] = "none"
+          if e.attrs.to_array() != before {
+            changed = true
           }
         } else if ctx.param_bool("stroke", true) &&
           stroke is None &&
@@ -618,7 +640,7 @@ pub let convert_shape_to_path : Plugin = {
             attr_is_plain(e, "height") else {
             None
           }
-          Some("M\{num(x)} \{num(y)}h\{num(w)}v\{num(h)}H\{num(x)}z")
+          Some("M\{num(x)} \{num(y)}H\{num(x + w)}V\{num(y + h)}H\{num(x)}z")
         }
         "circle" | "ellipse" if ctx.param_bool("convertArcs", false) => {
           let cx = attr_num(e, "cx", 0.0)
@@ -657,35 +679,27 @@ pub let convert_shape_to_path : Plugin = {
         }
         "polyline" | "polygon" =>
           match e.attrs.get("points") {
-            Some(points) => {
-              let nums : Array[Double] = []
-              let mut ok = true
-              for tok in points.replace_all(old=",", new=" ").split(" ") {
-                if tok.is_empty() {
-                  continue
-                }
-                match split_unit(tok.to_owned()) {
-                  Some((n, "")) => nums.push(n)
-                  _ => ok = false
-                }
-              }
-              if !ok || nums.length() < 4 || nums.length() % 2 != 0 {
-                None
-              } else {
-                let sb = StringBuilder()
-                sb.write_string("M")
-                for i in 0..<(nums.length() / 2) {
-                  if i > 0 {
-                    sb.write_char(' ')
+            Some(points) =>
+              match parse_points(points) {
+                Some(nums) =>
+                  if nums.length() >= 4 && nums.length() % 2 == 0 {
+                    let cmds : Array[@path.Segment] = []
+                    cmds.push({ cmd: 'M', args: [nums[0], nums[1]], })
+                    for i in 1..<(nums.length() / 2) {
+                      cmds.push({
+                        cmd: 'L',
+                        args: [nums[i * 2], nums[i * 2 + 1]],
+                      })
+                    }
+                    if e.name == "polygon" {
+                      cmds.push({ cmd: 'z', args: [], })
+                    }
+                    Some(@path.stringify(cmds, precision=p))
+                  } else {
+                    None
                   }
-                  sb.write_string(num(nums[i * 2]) + " " + num(nums[i * 2 + 1]))
-                }
-                if e.name == "polygon" {
-                  sb.write_char('z')
-                }
-                Some(sb.to_string())
+                None => None
               }
-            }
             None => None
           }
         _ => None
@@ -706,8 +720,100 @@ pub let convert_shape_to_path : Plugin = {
         None => ()
       }
     })
+    // polyline/polygon with fewer than two points (or no points) draw nothing
+    if remove_elements(doc, is_empty_poly) {
+      changed = true
+    }
     changed
   },
+}
+
+///|
+/// True for a polyline/polygon that has fewer than two points (or none),
+/// so it cannot draw anything.
+fn is_empty_poly(e : @xml.Element, _ : @xml.Element?) -> Bool {
+  if e.name != "polyline" && e.name != "polygon" {
+    return false
+  }
+  match e.attrs.get("points") {
+    Some(points) =>
+      match parse_points(points) {
+        Some(nums) => nums.length() < 4
+        // unparsable points: a renderer draws what it can, keep the element
+        None => false
+      }
+    None => true
+  }
+}
+
+///|
+/// Parse a `points` attribute into a flat array of numbers. Returns `None`
+/// if any value is not a plain number; an odd count is the caller's problem.
+/// Numbers may be separated by whitespace, commas, or a sign character that
+/// follows a digit.
+fn parse_points(points : String) -> Array[Double]? {
+  let nums : Array[Double] = []
+  let mut i = 0
+  let n = points.length()
+  while i < n {
+    // skip separators: space, comma, tab, newline
+    while i < n {
+      let c = points.get_char(i).unwrap()
+      if c == ' ' || c == ',' || c == '\t' || c == '\n' || c == '\r' {
+        i += 1
+      } else {
+        break
+      }
+    }
+    if i >= n {
+      break
+    }
+    // a sign starts a new number only at the beginning or after a separator;
+    // after a digit, a '-' or '+' begins the next number
+    let start = i
+    // optional sign
+    if points.get_char(i).unwrap() == '-' || points.get_char(i).unwrap() == '+' {
+      i += 1
+    }
+    let mut has_digit = false
+    let mut has_dot = false
+    while i < n {
+      let c = points.get_char(i).unwrap()
+      if c.is_ascii_digit() {
+        has_digit = true
+        i += 1
+      } else if c == '.' && !has_dot {
+        has_dot = true
+        i += 1
+      } else {
+        break
+      }
+    }
+    // optional exponent
+    if i < n &&
+      (points.get_char(i).unwrap() == 'e' || points.get_char(i).unwrap() == 'E') {
+      i += 1
+      if i < n &&
+        (
+          points.get_char(i).unwrap() == '+' ||
+          points.get_char(i).unwrap() == '-'
+        ) {
+        i += 1
+      }
+      while i < n && points.get_char(i).unwrap().is_ascii_digit() {
+        i += 1
+      }
+    }
+    if !has_digit {
+      return None
+    }
+    let token = points[start:i].to_owned()
+    match split_unit(token) {
+      Some((num, "")) => nums.push(num)
+      _ => return None
+    }
+  }
+  Some(nums)
 }
 
 ///|
@@ -747,14 +853,18 @@ pub let convert_ellipse_to_circle : Plugin = {
         let rx = e.attrs.get("rx").unwrap_or("auto")
         let ry = e.attrs.get("ry").unwrap_or("auto")
         if rx == ry || rx == "auto" || ry == "auto" {
-          let r = if rx == "auto" { ry } else { rx }
-          if r != "auto" {
-            e.name = "circle"
-            e.attrs.remove("rx")
-            e.attrs.remove("ry")
-            e.attrs["r"] = r
-            changed = true
+          let r = if rx == "auto" && ry == "auto" {
+            "0"
+          } else if rx == "auto" {
+            ry
+          } else {
+            rx
           }
+          e.name = "circle"
+          e.attrs.remove("rx")
+          e.attrs.remove("ry")
+          e.attrs["r"] = r
+          changed = true
         }
       }
     })
@@ -1923,19 +2033,38 @@ fn hull_bbox(hull : Array[Pt]) -> (Double, Double, Double, Double) {
 }
 
 ///|
-/// Drop `width`/`height` when a viewBox exists so the image scales to its container.
+/// Drop `width`/`height` when a viewBox exists; otherwise, if both are
+/// unitless numbers, derive `viewBox="0 0 w h"` from them and drop them.
 pub let remove_dimensions : Plugin = {
   name: "removeDimensions",
   description: "remove width/height from the root when viewBox is present",
   run: (doc, _) => {
     guard doc.root() is Some(root) else { return false }
-    if root.attrs.contains("viewBox") &&
-      (root.attrs.contains("width") || root.attrs.contains("height")) {
-      root.attrs.remove("width")
-      root.attrs.remove("height")
-      true
+    if root.name != "svg" {
+      return false
+    }
+    if root.attrs.contains("viewBox") {
+      if root.attrs.contains("width") || root.attrs.contains("height") {
+        root.attrs.remove("width")
+        root.attrs.remove("height")
+        true
+      } else {
+        false
+      }
     } else {
-      false
+      match (root.attrs.get("width"), root.attrs.get("height")) {
+        (Some(w), Some(h)) =>
+          match (split_unit(w), split_unit(h)) {
+            (Some((_, "")), Some((_, ""))) => {
+              root.attrs["viewBox"] = "0 0 \{w} \{h}"
+              root.attrs.remove("width")
+              root.attrs.remove("height")
+              true
+            }
+            _ => false
+          }
+        _ => false
+      }
     }
   },
 }

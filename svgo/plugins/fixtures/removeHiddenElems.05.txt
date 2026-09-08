@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>.a{fill:red}</style>
+    <linearGradient id="g"><stop offset="0"/></linearGradient>
+    <linearGradient id="unused"><stop offset="0"/></linearGradient>
+  </defs>
+  <path class="a" d="M0 0h1"/>
+  <path fill="url(#g)" d="M0 0h1"/>
+  <path d="M1 1" marker-start="url(#m)"/>
+  <path d="M1 1 2 2 bogus"/>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>.a{fill:red}</style>
+    <linearGradient id="g"><stop offset="0"/></linearGradient>
+    <linearGradient id="unused"><stop offset="0"/></linearGradient>
+  </defs>
+  <path class="a" d="M0 0h1"/>
+  <path fill="url(#g)" d="M0 0h1"/>
+  <path d="M1 1" marker-start="url(#m)"/>
+  <path d="M1 1 2 2 bogus"/>
+</svg>

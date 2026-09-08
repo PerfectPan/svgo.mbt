@@ -3,18 +3,14 @@
 # Baseline 2026-09-07: 109 of 183 runnable cases (26 more need plugin params).
 
 # cleanupAttrs: not analysed yet
-cleanupAttrs.02
 
 # cleanupIds: all passing
 
 # cleanupNumericValues: not analysed yet
-cleanupNumericValues.01
 
 # convertColors: not analysed yet
-convertColors.01
 
 # convertEllipseToCircle: not analysed yet
-convertEllipseToCircle.01
 
 # convertPathData: applyTransforms (transform baked into path data) and makeArcs not implemented
 convertPathData.11
@@ -26,43 +22,24 @@ convertPathData.24
 convertPathData.25
 
 # convertShapeToPath: not analysed yet
-convertShapeToPath.01
-convertShapeToPath.03
-convertShapeToPath.05 # arcs and precision work; rect still emits relative h/v instead of upstream absolute H/V
 
 # convertTransform: remaining precision/decomposition edge cases
 
 # removeDimensions: not analysed yet
-removeDimensions.04
-removeDimensions.05
 
 # removeEditorsNSData: not analysed yet
-removeEditorsNSData.02
 
 # removeEmptyAttrs: not analysed yet
-removeEmptyAttrs.02
 
 # removeEmptyContainers: not analysed yet
-removeEmptyContainers.03
-removeEmptyContainers.07
-removeEmptyContainers.08
 
 # removeHiddenElems: some shape rules missing
-removeHiddenElems.08
-removeHiddenElems.11
-removeHiddenElems.12
-removeHiddenElems.13
-removeHiddenElems.14
-removeHiddenElems.19
 
 # removeUnknownsAndDefaults: (all passing)
 
 # removeUselessDefs: not analysed yet
-removeUselessDefs.03
 
 # removeUselessStrokeAndFill: stroke inheritance rules incomplete
-removeUselessStrokeAndFill.01
-removeUselessStrokeAndFill.03
 
 convertPathData.14
 convertPathData.15

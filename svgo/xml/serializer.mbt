@@ -16,7 +16,11 @@ pub fn SerializeOptions::default() -> SerializeOptions {
 
 ///|
 fn escape_text(s : String) -> String {
-  if !s.contains("&") && !s.contains("<") && !s.contains(">") {
+  if !s.contains("&") &&
+    !s.contains("<") &&
+    !s.contains(">") &&
+    !s.contains("'") &&
+    !s.contains("\"") {
     return s
   }
   let sb = StringBuilder()
@@ -25,6 +29,8 @@ fn escape_text(s : String) -> String {
       '&' => sb.write_string("&amp;")
       '<' => sb.write_string("&lt;")
       '>' => sb.write_string("&gt;")
+      '\'' => sb.write_string("&apos;")
+      '"' => sb.write_string("&quot;")
       _ => sb.write_char(c)
     }
   }

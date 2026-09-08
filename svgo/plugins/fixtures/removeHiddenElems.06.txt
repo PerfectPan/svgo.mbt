@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g"><stop offset="0"/></linearGradient>
+    <linearGradient id="unused"><stop offset="0"/></linearGradient>
+    <clipPath><rect width="1" height="1"/></clipPath>
+    <font id="f"/>
+  </defs>
+  <path fill="url(#g)" d="M0 0h1"/>
+  <path d="M1 1"/>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g"><stop offset="0"/></linearGradient>
+    <font id="f"/>
+  </defs>
+  <path fill="url(#g)" d="M0 0h1"/>
+</svg>

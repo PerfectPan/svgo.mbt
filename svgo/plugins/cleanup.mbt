@@ -73,16 +73,17 @@ pub let remove_desc : Plugin = {
 ///|
 /// Namespace prefixes used by editors for their private data.
 pub let editor_namespaces : Array[String] = [
-  "http://www.inkscape.org/namespaces/inkscape", "http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd",
-  "http://ns.adobe.com/AdobeIllustrator/10.0/", "http://ns.adobe.com/Graphs/1.0/",
-  "http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/", "http://ns.adobe.com/Variables/1.0/",
-  "http://ns.adobe.com/SaveForWeb/1.0/", "http://ns.adobe.com/Extensibility/1.0/",
+  "http://www.inkscape.org/namespaces/inkscape", "http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd",
+  "http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd", "http://ns.adobe.com/AdobeIllustrator/10.0/",
+  "http://ns.adobe.com/Graphs/1.0/", "http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/",
+  "http://ns.adobe.com/Variables/1.0/", "http://ns.adobe.com/SaveForWeb/1.0/", "http://ns.adobe.com/Extensibility/1.0/",
   "http://ns.adobe.com/Flows/1.0/", "http://ns.adobe.com/ImageReplacement/1.0/",
   "http://ns.adobe.com/GenericCustomNamespace/1.0/", "http://ns.adobe.com/XPath/1.0/",
   "http://schemas.microsoft.com/visio/2003/SVGExtensions/", "http://taptrix.com/vectorillustrator/svg_extensions",
   "http://www.figma.com/figma/ns", "http://purl.org/dc/elements/1.1/", "http://creativecommons.org/ns#",
   "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "http://www.serif.com/", "http://www.vector.evaxdesign.sk",
   "http://www.bohemiancoding.com/sketch/ns", "http://www.w3.org/2000/02/svg/testsuite/description/",
+  "http://krita.org/namespaces/svg/krita", "https://boxy-svg.com",
 ]
 
 ///|
@@ -171,7 +172,8 @@ fn collapse_space(v : String) -> String {
 }
 
 ///|
-/// Attributes with an empty value, except `id` and `d`.
+/// Attributes with an empty value, except `id`, `d` and the conditional
+/// processing attributes whose empty value hides the element.
 pub let remove_empty_attrs : Plugin = {
   name: "removeEmptyAttrs",
   description: "remove attributes with empty values",
@@ -179,14 +181,27 @@ pub let remove_empty_attrs : Plugin = {
     let mut changed = false
     doc.each_element((e, _) => {
       // an empty id may still be a target and an empty d is handled by
-      // removeHiddenElems; everything else empty is noise
-      if remove_attrs(e, (k, v) => v.is_empty() && k != "id" && k != "d") {
+      // removeHiddenElems; empty conditional processing attributes hide
+      // the element so they must be kept
+      if remove_attrs(e, (k, v) => {
+          v.is_empty() &&
+          k != "id" &&
+          k != "d" &&
+          !conditional_processing_attrs.contains(k)
+        }) {
         changed = true
       }
     })
     changed
   },
 }
+
+///|
+/// Conditional processing attributes: an empty value makes the element
+/// fail the test and not be rendered, so the attribute must be kept.
+let conditional_processing_attrs : Set[String] = Set([
+  "requiredFeatures", "requiredExtensions", "systemLanguage",
+])
 
 ///|
 /// `<text>`/`<tspan>` without content and `<tref>` without a target.
@@ -212,17 +227,18 @@ pub let remove_empty_containers : Plugin = {
   name: "removeEmptyContainers",
   description: "remove empty container elements",
   run: (doc, _) => {
-    remove_elements(doc, (e, parent) => {
+    let removed_ids : Set[String] = Set([])
+    let changed = remove_elements(doc, (e, parent) => {
       guard e.children.length() == 0 &&
         container_elements.contains(e.name) &&
         e.name != "svg" else {
         false
       }
-      // an empty pattern with a href still inherits content; an empty mask hides its target
-      if e.name == "pattern" &&
-        (e.attrs.contains("href") || e.attrs.contains("xlink:href")) {
+      // an empty pattern with attributes may carry reusable configuration
+      if e.name == "pattern" && e.attrs.length() > 0 {
         return false
       }
+      // an empty mask with an id hides the masked element
       if e.name == "mask" && e.attrs.contains("id") {
         return false
       }
@@ -230,9 +246,34 @@ pub let remove_empty_containers : Plugin = {
       if parent is Some(p) && p.name == "switch" {
         return false
       }
-      // filters referencing the element by id would break
-      e.attrs.get("filter") is None
+      // a <g> with a filter (attribute or inline style) still renders
+      if e.name == "g" && has_filter(e) {
+        return false
+      }
+      if e.attrs.contains("id") {
+        removed_ids.add(e.attrs.get("id").unwrap())
+      }
+      true
     })
+    // remove <use> elements that referenced a now-removed empty container
+    if removed_ids.length() > 0 &&
+      remove_elements(doc, (e, _) => {
+        if e.name != "use" {
+          return false
+        }
+        for k, v in e.attrs {
+          if (k == "href" || k.has_suffix(":href")) && v.has_prefix("#") {
+            if removed_ids.contains(v[1:].to_owned()) {
+              return true
+            }
+          }
+        }
+        false
+      }) {
+      true
+    } else {
+      changed
+    }
   },
 }
 
@@ -254,23 +295,38 @@ pub let remove_hidden_elems : Plugin = {
         css.contains(e.name)
       )
     }
-    remove_elements(doc, (e, _) => {
-      // referenced elements may still be used via <use> or as clip paths
-      if e.attrs.get("id") is Some(id) && ids.contains(id) {
-        return false
+    let non_rendering = non_rendering_elements()
+    // svgo: with a stylesheet or script in the document, an unreferenced
+    // definition is not provably unused
+    let deoptimized = !css.is_empty() || has_scripts(doc)
+    let removed_ids : Set[String] = Set([])
+    let mut changed = false
+
+    fn in_non_rendering(ancestors : Array[@xml.Element]) -> Bool {
+      ancestors.iter().any(a => non_rendering.contains(a.name))
+    }
+
+    fn walk(e : @xml.Element, ancestors : Array[@xml.Element]) {
+      // post-order: process children first so descendant visibility is known
+      for c in e.children.copy() {
+        if c is Element(child) {
+          ancestors.push(e)
+          walk(child, ancestors)
+          ignore(ancestors.pop())
+        }
       }
-      if e.attrs.get("display") == Some("none") &&
-        e.name != "marker" &&
-        !maybe_styled(e) {
-        return true
-      }
-      if e.attrs.get("opacity") == Some("0") &&
-        e.name != "svg" &&
-        !maybe_styled(e) {
-        return true
-      }
-      match e.name {
-        // Children may animate geometry that is initially zero sized.
+
+      let inside_non_rendering = in_non_rendering(ancestors)
+      let referenced = e.attrs.get("id") is Some(id) && ids.contains(id)
+
+      // shape-specific zero-size rules. Path data (`d`, `points`) cannot be
+      // overridden by <use>, so an empty/single-point path is useless even
+      // when referenced. Geometric attributes (r, width, height, ...) CAN be
+      // overridden by <use>, so zero-size shapes are kept when referenced.
+      let path_like = e.name == "path" ||
+        e.name == "polyline" ||
+        e.name == "polygon"
+      let zero_size = match e.name {
         "circle" => e.children.is_empty() && e.attrs.get("r") == Some("0")
         "ellipse" =>
           e.children.is_empty() &&
@@ -281,11 +337,7 @@ pub let remove_hidden_elems : Plugin = {
             e.attrs.get("width") == Some("0") ||
             e.attrs.get("height") == Some("0")
           )
-        "path" =>
-          match e.attrs.get("d") {
-            None => true
-            Some(d) => d.trim().is_empty()
-          }
+        "path" => is_empty_or_single_point_path(e)
         "polyline" | "polygon" =>
           match e.attrs.get("points") {
             None => true
@@ -293,20 +345,204 @@ pub let remove_hidden_elems : Plugin = {
           }
         _ => false
       }
-    })
+      if zero_size && (path_like || !referenced) {
+        remove_from_parent(e, ancestors, removed_ids)
+        changed = true
+        return
+      }
+
+      // an empty <defs> left after pruning its children is useless
+      if e.name == "defs" && e.children.is_empty() {
+        remove_from_parent(e, ancestors, removed_ids)
+        changed = true
+        return
+      }
+
+      // referenced elements may still be used via <use> or as clip paths
+      if referenced {
+        return
+      }
+
+      // opacity=0 (attribute or inline style), but not inside non-rendering
+      // containers where it affects the resource's alpha
+      let opacity_zero = e.attrs.get("opacity") == Some("0") ||
+        (match e.attrs.get("style") {
+          Some(s) => style_prop(s, "opacity") == Some("0")
+          None => false
+        })
+      if opacity_zero &&
+        e.name != "svg" &&
+        !maybe_styled(e) &&
+        !inside_non_rendering {
+        remove_from_parent(e, ancestors, removed_ids)
+        changed = true
+        return
+      }
+
+      if e.attrs.get("display") == Some("none") &&
+        e.name != "marker" &&
+        !maybe_styled(e) {
+        remove_from_parent(e, ancestors, removed_ids)
+        changed = true
+        return
+      }
+
+      // visibility=hidden: keep when a descendant resets it to visible
+      if e.attrs.get("visibility") == Some("hidden") && !maybe_styled(e) {
+        if !has_visible_descendant(e) {
+          remove_from_parent(e, ancestors, removed_ids)
+          changed = true
+          return
+        }
+      }
+
+      // a paint server, clipPath, mask, marker, symbol or filter that nothing
+      // references applies nowhere. A stylesheet or script could still reach
+      // it, so like svgo leave these alone when either is present.
+      if non_rendering.contains(e.name) &&
+        !deoptimized &&
+        !subtree_referenced(e, ids) {
+        remove_from_parent(e, ancestors, removed_ids)
+        changed = true
+        return
+      }
+    }
+
+    if doc.root() is Some(root) {
+      walk(root, [])
+    }
+    // drop <use> elements that pointed at a removed definition
+    if removed_ids.length() > 0 {
+      if remove_elements(doc, (e, _) => {
+          if e.name != "use" {
+            return false
+          }
+          for k, v in e.attrs {
+            if (k == "href" || k.has_suffix(":href")) && v.has_prefix("#") {
+              if removed_ids.contains(v[1:].to_owned()) {
+                return true
+              }
+            }
+          }
+          false
+        }) {
+        changed = true
+      }
+    }
+    changed
   },
 }
 
 ///|
-/// Children of `<defs>` that have no id can never be referenced.
+/// Remove `e` from its parent's children, recording its id so referencing
+/// `<use>` elements can be cleaned up.
+fn remove_from_parent(
+  e : @xml.Element,
+  ancestors : Array[@xml.Element],
+  removed_ids : Set[String],
+) -> Unit {
+  if e.attrs.get("id") is Some(id) {
+    removed_ids.add(id)
+  }
+  if ancestors.last() is Some(parent) {
+    parent.children.retain(n => !(n is Element(c) && physical_equal(c, e)))
+  }
+}
+
+///|
+/// True when a descendant of `e` has an id that something references.
+fn subtree_referenced(e : @xml.Element, ids : Set[String]) -> Bool {
+  for c in e.children {
+    if c is Element(child) {
+      if child.attrs.get("id") is Some(id) && ids.contains(id) {
+        return true
+      }
+      if subtree_referenced(child, ids) {
+        return true
+      }
+    }
+  }
+  false
+}
+
+///|
+/// True when the document has a `<script>` element or an event handler
+/// attribute, either of which can change anything at runtime.
+fn has_scripts(doc : @xml.Document) -> Bool {
+  let mut found = false
+  doc.each_element((e, _) => {
+    if e.name == "script" || e.attrs.iter().any(kv => kv.0.has_prefix("on")) {
+      found = true
+    }
+  })
+  found
+}
+
+///|
+/// True when a descendant of `e` carries `visibility="visible"`.
+fn has_visible_descendant(e : @xml.Element) -> Bool {
+  for c in e.children {
+    if c is Element(child) {
+      if child.attrs.get("visibility") == Some("visible") {
+        return true
+      }
+      if has_visible_descendant(child) {
+        return true
+      }
+    }
+  }
+  false
+}
+
+///|
+/// A path is removable when it has no drawing commands. An empty `d` is
+/// always removable (markers need vertices to render). A single moveto is
+/// removable only when there are no markers (a marker on the sole vertex is
+/// still visible).
+fn is_empty_or_single_point_path(e : @xml.Element) -> Bool {
+  match e.attrs.get("d") {
+    None => true
+    Some(d) => {
+      let t = d.trim()
+      if t.is_empty() {
+        return true
+      }
+      // a renderer draws the data up to the first error, so judge that part;
+      // stop at the first drawing command so long paths cost almost nothing
+      let segs = @path.parse_prefix(t.to_owned(), until_drawing=true)
+      let single_point = !segs.iter().any(s => @path.is_drawing_command(s.cmd))
+      if single_point && has_markers(e) {
+        return false
+      }
+      single_point
+    }
+  }
+}
+
+///|
+fn has_markers(e : @xml.Element) -> Bool {
+  e.attrs.contains("marker") ||
+  e.attrs.contains("marker-start") ||
+  e.attrs.contains("marker-mid") ||
+  e.attrs.contains("marker-end")
+}
+
+///|
+/// Children of `<defs>` and non-rendering elements without an id can never
+/// be referenced, so they (and the now-empty container) are removed.
 pub let remove_useless_defs : Plugin = {
   name: "removeUselessDefs",
   description: "remove <defs> children without an id",
   run: (doc, _) => {
+    let non_rendering = non_rendering_elements()
     let mut changed = false
+    // Prune children: keep only those with an id or named <style>,
+    // unwrapping their useful descendants from intermediate groups.
     doc.each_element((e, _) => {
-      if e.name == "defs" {
-        // unwrap ids from nested groups first
+      let is_defs = e.name == "defs"
+      let is_non_rendering_no_id = non_rendering.contains(e.name) &&
+        !e.attrs.contains("id")
+      if is_defs || is_non_rendering_no_id {
         let keep : Array[@xml.Node] = []
         fn collect(nodes : Array[@xml.Node]) {
           for n in nodes {
@@ -314,7 +550,7 @@ pub let remove_useless_defs : Plugin = {
               Element(x) =>
                 if x.attrs.contains("id") || x.name == "style" {
                   keep.push(n)
-                } else if x.name == "g" || x.name == "defs" {
+                } else {
                   collect(x.children)
                 }
               _ => ()
@@ -329,8 +565,26 @@ pub let remove_useless_defs : Plugin = {
         }
       }
     })
+    // Remove defs / non-rendering containers left empty by the pruning.
+    if remove_elements(doc, (e, _) => {
+        let is_defs = e.name == "defs"
+        let is_non_rendering_no_id = non_rendering.contains(e.name) &&
+          !e.attrs.contains("id")
+        (is_defs || is_non_rendering_no_id) && e.children.length() == 0
+      }) {
+      changed = true
+    }
     changed
   },
+}
+
+///|
+/// Elements that are not rendered directly (paint servers, masks, ...).
+fn non_rendering_elements() -> Set[String] {
+  match svg_tables().content_groups.get("nonRendering") {
+    Some(names) => Set::from_array(names)
+    None => Set([])
+  }
 }
 
 ///|

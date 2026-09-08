@@ -366,7 +366,7 @@ test "fixture convertShapeToPath.01" {
     ),
     (
       #|<svg xmlns="http://www.w3.org/2000/svg">
-      #|  <path d="M1 2h3v4H1z"/>
+      #|  <path d="M1 2H4V6H1z"/>
       #|  <rect width="3" height="4" rx="1"/>
       #|  <rect width="50%" height="4"/>
       #|  <path stroke="red" d="M1 2 3 4"/>
@@ -654,16 +654,85 @@ test "fixture removeHiddenElems.04" {
       #|<svg xmlns="http://www.w3.org/2000/svg">
       #|  <pattern width="0"/>
       #|  <pattern height="0"/>
-      #|  <pattern width="0"><animate attributeName="width" values="0;4;0" dur="1s"/></pattern>
+      #|  <pattern id="anim" width="0"><animate attributeName="width" values="0;4;0" dur="1s"/></pattern>
       #|  <pattern id="paint" width="0"/>
       #|  <rect width="10" height="10" fill="url(#paint) red"/>
+      #|  <rect width="10" height="10" fill="url(#anim)"/>
       #|</svg>
     ),
     (
       #|<svg xmlns="http://www.w3.org/2000/svg">
-      #|  <pattern width="0"><animate attributeName="width" values="0;4;0" dur="1s"/></pattern>
+      #|  <pattern id="anim" width="0"><animate attributeName="width" values="0;4;0" dur="1s"/></pattern>
       #|  <pattern id="paint" width="0"/>
       #|  <rect width="10" height="10" fill="url(#paint) red"/>
+      #|  <rect width="10" height="10" fill="url(#anim)"/>
+      #|</svg>
+    ),
+    precision=3,
+    multipass=false,
+    params="{}",
+  )
+}
+
+///|
+test "fixture removeHiddenElems.05" {
+  check_fixture(
+    "removeHiddenElems",
+    (
+      #|<svg xmlns="http://www.w3.org/2000/svg">
+      #|  <defs>
+      #|    <style>.a{fill:red}</style>
+      #|    <linearGradient id="g"><stop offset="0"/></linearGradient>
+      #|    <linearGradient id="unused"><stop offset="0"/></linearGradient>
+      #|  </defs>
+      #|  <path class="a" d="M0 0h1"/>
+      #|  <path fill="url(#g)" d="M0 0h1"/>
+      #|  <path d="M1 1" marker-start="url(#m)"/>
+      #|  <path d="M1 1 2 2 bogus"/>
+      #|</svg>
+    ),
+    (
+      #|<svg xmlns="http://www.w3.org/2000/svg">
+      #|  <defs>
+      #|    <style>.a{fill:red}</style>
+      #|    <linearGradient id="g"><stop offset="0"/></linearGradient>
+      #|    <linearGradient id="unused"><stop offset="0"/></linearGradient>
+      #|  </defs>
+      #|  <path class="a" d="M0 0h1"/>
+      #|  <path fill="url(#g)" d="M0 0h1"/>
+      #|  <path d="M1 1" marker-start="url(#m)"/>
+      #|  <path d="M1 1 2 2 bogus"/>
+      #|</svg>
+    ),
+    precision=3,
+    multipass=false,
+    params="{}",
+  )
+}
+
+///|
+test "fixture removeHiddenElems.06" {
+  check_fixture(
+    "removeHiddenElems",
+    (
+      #|<svg xmlns="http://www.w3.org/2000/svg">
+      #|  <defs>
+      #|    <linearGradient id="g"><stop offset="0"/></linearGradient>
+      #|    <linearGradient id="unused"><stop offset="0"/></linearGradient>
+      #|    <clipPath><rect width="1" height="1"/></clipPath>
+      #|    <font id="f"/>
+      #|  </defs>
+      #|  <path fill="url(#g)" d="M0 0h1"/>
+      #|  <path d="M1 1"/>
+      #|</svg>
+    ),
+    (
+      #|<svg xmlns="http://www.w3.org/2000/svg">
+      #|  <defs>
+      #|    <linearGradient id="g"><stop offset="0"/></linearGradient>
+      #|    <font id="f"/>
+      #|  </defs>
+      #|  <path fill="url(#g)" d="M0 0h1"/>
       #|</svg>
     ),
     precision=3,
@@ -938,7 +1007,7 @@ test "upstream cleanupAttrs.02" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -2279,7 +2348,7 @@ test "upstream cleanupNumericValues.01" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -2885,7 +2954,7 @@ test "upstream convertColors.01" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3096,7 +3165,7 @@ test "upstream convertEllipseToCircle.01" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -4307,7 +4376,7 @@ test "upstream convertShapeToPath.01" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -4369,7 +4438,7 @@ test "upstream convertShapeToPath.03" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -4423,7 +4492,7 @@ test "upstream convertShapeToPath.05" {
     precision=3,
     params="{ \"floatPrecision\": 3, \"convertArcs\": true }\n",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -5456,7 +5525,7 @@ test "upstream removeDimensions.04" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -5477,7 +5546,7 @@ test "upstream removeDimensions.05" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -5549,7 +5618,7 @@ test "upstream removeEditorsNSData.02" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -5595,7 +5664,7 @@ test "upstream removeEmptyAttrs.02" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -5702,7 +5771,7 @@ test "upstream removeEmptyContainers.03" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -5826,7 +5895,7 @@ test "upstream removeEmptyContainers.07" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -5865,7 +5934,7 @@ test "upstream removeEmptyContainers.08" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -6169,7 +6238,7 @@ test "upstream removeHiddenElems.08" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -6244,7 +6313,7 @@ test "upstream removeHiddenElems.11" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -6284,7 +6353,7 @@ test "upstream removeHiddenElems.12" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -6307,7 +6376,7 @@ test "upstream removeHiddenElems.13" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -6329,7 +6398,7 @@ test "upstream removeHiddenElems.14" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -6486,7 +6555,7 @@ test "upstream removeHiddenElems.19" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -7375,7 +7444,7 @@ test "upstream removeUselessDefs.03" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -7490,7 +7559,7 @@ test "upstream removeUselessStrokeAndFill.01" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -7566,7 +7635,7 @@ test "upstream removeUselessStrokeAndFill.03" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 

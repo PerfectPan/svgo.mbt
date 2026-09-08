@@ -37,6 +37,44 @@ fn arg_count(cmd : Char) -> Int {
 /// segments (`M 1 2 3 4` becomes `M1 2` followed by `L3 4`).
 pub fn parse(d : String) -> Array[Segment] raise PathError {
   let out : Array[Segment] = []
+  parse_into(out, d)
+  out
+}
+
+///|
+/// Like `parse`, but keeps the segments read before the first error instead
+/// of failing: browsers and svgo render a path up to its first invalid token.
+/// With `until_drawing`, parsing also stops after the first segment that
+/// draws something (see `is_drawing_command`), which is all a caller needs to
+/// tell an empty or single-point path from a visible one without reading the
+/// whole string.
+pub fn parse_prefix(
+  d : String,
+  until_drawing? : Bool = false,
+) -> Array[Segment] {
+  let out : Array[Segment] = []
+  parse_into(out, d, until_drawing~) catch {
+    _ => ()
+  }
+  out
+}
+
+///|
+/// True for the commands that produce geometry (`L H V C S Q T A` in either
+/// case); `M` and `Z` alone leave a path invisible.
+pub fn is_drawing_command(cmd : Char) -> Bool {
+  match cmd.to_ascii_lowercase() {
+    'l' | 'h' | 'v' | 'c' | 's' | 'q' | 't' | 'a' => true
+    _ => false
+  }
+}
+
+///|
+fn parse_into(
+  out : Array[Segment],
+  d : String,
+  until_drawing? : Bool = false,
+) -> Unit raise PathError {
   let cu = d.code_units()
   let n = cu.length()
   let mut i = 0
@@ -99,8 +137,10 @@ pub fn parse(d : String) -> Array[Segment] raise PathError {
       }
     }
     out.push({ cmd, args, })
+    if until_drawing && is_drawing_command(cmd) {
+      return
+    }
   }
-  out
 }
 
 ///|

@@ -1,46 +1,16 @@
 # Upstream svgo cases svgo.mbt does not pass yet, one per line, optional '# reason'.
-# Generated tests assert these still fail; when you fix one, delete its line.
-# Baseline 2026-09-07: 109 of 183 runnable cases (26 more need plugin params).
+# Generated tests assert these still fail; when you fix one, delete its line. Never add one.
+# Baseline 2026-09-07: 109 of 183 runnable cases. 2026-09-08: 199 of 209, all other plugins pass their whole suite.
 
-# cleanupAttrs: not analysed yet
-
-# cleanupIds: all passing
-
-# cleanupNumericValues: not analysed yet
-
-# convertColors: not analysed yet
-
-# convertEllipseToCircle: not analysed yet
-
-# convertPathData: applyTransforms (transform baked into path data) and makeArcs not implemented
+# convertPathData: applyTransforms (transform baked into path data: 11 18 19 22 23 24),
+# makeArcs (curve runs turned into arcs: 14 15 16), cursor after closepath (25)
 convertPathData.11
+convertPathData.14
+convertPathData.15
+convertPathData.16
 convertPathData.18
 convertPathData.19
 convertPathData.22
 convertPathData.23
 convertPathData.24
 convertPathData.25
-
-# convertShapeToPath: not analysed yet
-
-# convertTransform: remaining precision/decomposition edge cases
-
-# removeDimensions: not analysed yet
-
-# removeEditorsNSData: not analysed yet
-
-# removeEmptyAttrs: not analysed yet
-
-# removeEmptyContainers: not analysed yet
-
-# removeHiddenElems: some shape rules missing
-
-# removeUnknownsAndDefaults: (all passing)
-
-# removeUselessDefs: not analysed yet
-
-# removeUselessStrokeAndFill: stroke inheritance rules incomplete
-
-convertPathData.14
-convertPathData.15
-convertPathData.16

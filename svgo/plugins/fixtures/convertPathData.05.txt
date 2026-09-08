@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <style>path { stroke: #000 }</style>
+  <path transform="scale(2)" d="M0 0h10v10"/>
+  <path transform="rotate(90)" d="M0 0h10v10"/>
+  <path transform="translate(5 5)" d="M0 0h10v10"/>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg"><style>path { stroke: #000 }</style><path transform="scale(2)" d="M0 0h10v10"/><path transform="rotate(90)" d="M0 0h10v10"/><path d="M5 5h10v10"/></svg>

@@ -351,6 +351,57 @@ test "fixture convertPathData.04" {
 }
 
 ///|
+test "fixture convertPathData.05" {
+  check_fixture(
+    "convertPathData",
+    (
+      #|<svg xmlns="http://www.w3.org/2000/svg">
+      #|  <style>path { stroke: #000 }</style>
+      #|  <path transform="scale(2)" d="M0 0h10v10"/>
+      #|  <path transform="rotate(90)" d="M0 0h10v10"/>
+      #|  <path transform="translate(5 5)" d="M0 0h10v10"/>
+      #|</svg>
+    ),
+    (
+      #|<svg xmlns="http://www.w3.org/2000/svg"><style>path { stroke: #000 }</style><path transform="scale(2)" d="M0 0h10v10"/><path transform="rotate(90)" d="M0 0h10v10"/><path d="M5 5h10v10"/></svg>
+    ),
+    precision=3,
+    multipass=false,
+    params="{}",
+  )
+}
+
+///|
+test "fixture convertPathData.06" {
+  check_fixture(
+    "convertPathData",
+    (
+      #|<svg xmlns="http://www.w3.org/2000/svg">
+      #|  <g stroke="#000" stroke-dasharray="4 2">
+      #|    <path transform="scale(2)" d="M0 0h10v10"/>
+      #|    <path transform="scale(2)" stroke-dasharray="1 1" d="M0 0h10v10"/>
+      #|    <path transform="rotate(90)" d="M0 0h10v10"/>
+      #|  </g>
+      #|  <g stroke="#000" stroke-dashoffset="3">
+      #|    <path transform="scale(2)" stroke-dasharray="1 1" d="M0 0h10v10"/>
+      #|    <path transform="scale(2)" stroke-dasharray="1 1" stroke-dashoffset="1" d="M0 0h10v10"/>
+      #|  </g>
+      #|  <g stroke="#000" stroke-dasharray="none">
+      #|    <path transform="scale(2)" d="M0 0h10v10"/>
+      #|  </g>
+      #|  <path transform="scale(2)" stroke="#000" d="M0 0h10v10 broken"/>
+      #|</svg>
+    ),
+    (
+      #|<svg xmlns="http://www.w3.org/2000/svg"><g stroke="#000" stroke-dasharray="4 2"><path transform="scale(2)" d="M0 0h10v10"/><path stroke-dasharray="2 2" d="M0 0h20v20" stroke-width="2"/><path d="M0 0v10h-10"/></g><g stroke="#000" stroke-dashoffset="3"><path transform="scale(2)" stroke-dasharray="1 1" d="M0 0h10v10"/><path stroke-dasharray="2 2" stroke-dashoffset="2" d="M0 0h20v20" stroke-width="2"/></g><g stroke="#000" stroke-dasharray="none"><path d="M0 0h20v20" stroke-width="2"/></g><path transform="scale(2)" stroke="#000" d="M0 0h10v10 broken"/></svg>
+    ),
+    precision=3,
+    multipass=false,
+    params="{}",
+  )
+}
+
+///|
 test "fixture convertShapeToPath.01" {
   check_fixture(
     "convertShapeToPath",
@@ -3634,7 +3685,7 @@ test "upstream convertPathData.11" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3827,7 +3878,7 @@ test "upstream convertPathData.18" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3848,7 +3899,7 @@ test "upstream convertPathData.19" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3921,7 +3972,7 @@ test "upstream convertPathData.22" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3944,7 +3995,7 @@ test "upstream convertPathData.23" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -3967,7 +4018,7 @@ test "upstream convertPathData.24" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 
@@ -4002,7 +4053,7 @@ test "upstream convertPathData.25" {
     precision=3,
     params="{}",
     passes=2,
-    expect_fail=true,
+    expect_fail=false,
   )
 }
 

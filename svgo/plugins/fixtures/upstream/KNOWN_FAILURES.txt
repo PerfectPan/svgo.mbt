@@ -1,16 +1,8 @@
 # Upstream svgo cases svgo.mbt does not pass yet, one per line, optional '# reason'.
 # Generated tests assert these still fail; when you fix one, delete its line. Never add one.
-# Baseline 2026-09-07: 109 of 183 runnable cases. 2026-09-08: 199 of 209, all other plugins pass their whole suite.
+# Baseline 2026-09-07: 109 of 183 runnable cases. 2026-09-08: 206 of 209; only makeArcs is left, every other plugin passes its whole suite.
 
-# convertPathData: applyTransforms (transform baked into path data: 11 18 19 22 23 24),
-# makeArcs (curve runs turned into arcs: 14 15 16), cursor after closepath (25)
-convertPathData.11
+# convertPathData: makeArcs (curve runs turned into arcs: 14 15 16)
 convertPathData.14
 convertPathData.15
 convertPathData.16
-convertPathData.18
-convertPathData.19
-convertPathData.22
-convertPathData.23
-convertPathData.24
-convertPathData.25

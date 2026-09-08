@@ -6,6 +6,8 @@ import {
 }
 
 // Values
+pub fn apply_matrix(Array[Segment], Array[Double]) -> Array[Segment]
+
 pub fn format_number(Double, Int) -> String
 
 pub fn is_drawing_command(Char) -> Bool

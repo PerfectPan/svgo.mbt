@@ -50,6 +50,16 @@ let default_values : Map[String, String] = {
 }
 
 ///|
+/// Presentation attributes whose value may be a `url(#…)` reference to
+/// paint, markers, clipping, masking or filtering. When such a reference is
+/// present the transform must stay on the element because the referenced
+/// resource is also subject to it.
+let references_props : Set[String] = Set([
+  "clip-path", "color-profile", "fill", "filter", "marker-end", "marker-mid", "marker-start",
+  "mask", "stroke", "style",
+])
+
+///|
 /// Attributes that are 0 by default on these elements.
 let zero_defaults : Map[String, Array[String]] = {
   "rect": ["x", "y", "rx", "ry"],
@@ -911,6 +921,8 @@ pub let convert_path_data : Plugin = {
       inh_sw : String,
       inh_lc : String,
       inh_lj : String,
+      inh_dash : Bool,
+      inh_dashoffset : Bool,
       linecap_by_class : Map[String, String],
       marker_classes : Set[String],
       options : @path.Options,
@@ -924,6 +936,15 @@ pub let convert_path_data : Plugin = {
       let sw = match presentation(e, "stroke-width") {
         Some(v) => v
         None => inh_sw
+      }
+      // whether a dash pattern / offset is in effect here, for the children
+      let dash = match presentation(e, "stroke-dasharray") {
+        Some(v) => v.trim() != "none"
+        None => inh_dash
+      }
+      let dashoffset = match presentation(e, "stroke-dashoffset") {
+        Some(v) => v.trim() != "0"
+        None => inh_dashoffset
       }
       let linecap = match presentation(e, "stroke-linecap") {
         Some(v) => v.trim().to_owned()
@@ -951,19 +972,132 @@ pub let convert_path_data : Plugin = {
       }
       let has_stroke = css_strokes || (stroke != "none" && sw != "0")
       if e.name == "path" && e.attrs.get("d") is Some(d) {
-        // applyTransforms: drop identity transforms (the full transform
-        // application to path data is not implemented, but identity
-        // transforms are always safe to remove).
-        match e.attrs.get("transform") {
-          Some(tv) =>
-            match parse_transform(tv) {
-              Some(list) if list.all(is_identity) => {
-                e.attrs.remove("transform")
-                changed(true)
+        // applyTransforms: bake the element's transform into the path data
+        // when it is safe to do so. We are stricter than svgo: any `id` on
+        // the path makes us bail, because a `<use>` may add its own transform
+        // on top.
+        let apply_transforms = ctx.param_bool("applyTransforms", true)
+        let apply_stroked = ctx.param_bool("applyTransformsStroked", true)
+        let mut path_d = d
+        if apply_transforms {
+          match e.attrs.get("transform") {
+            Some(tv) if tv.length() > 0 => {
+              let mut can_apply = true
+              // a `style` attribute may override the transform or stroke
+              if e.attrs.contains("style") {
+                can_apply = false
               }
-              _ => ()
+              // any attribute referencing a url(#…) paint/marker/clip/mask/
+              // filter is transformed independently, so leave the transform
+              if can_apply {
+                for k, v in e.attrs {
+                  if references_props.contains(k) && v.contains("url(#") {
+                    can_apply = false
+                    break
+                  }
+                }
+              }
+              // an `id` could be referenced by <use> which adds its own
+              // transform; svgo does not check this but we are stricter
+              if can_apply && e.attrs.contains("id") {
+                can_apply = false
+              }
+              if can_apply {
+                match parse_transform(tv) {
+                  Some(list) => {
+                    let matrix = transforms_multiply(list).args
+                    let a = matrix[0]
+                    let b = matrix[1]
+                    let c = matrix[2]
+                    let dd = matrix[3]
+                    // A stylesheet may stroke this path with a width we
+                    // cannot rescale, so only a pure translation (which
+                    // leaves the stroke geometry alone) is safe to bake in.
+                    let translation = a == 1.0 &&
+                      b == 0.0 &&
+                      c == 0.0 &&
+                      dd == 1.0
+                    if css_strokes && !translation {
+                      can_apply = false
+                    }
+                    // uniform scale / rotation check for stroked paths
+                    let is_stroked = stroke != "none" && sw != "0"
+                    if can_apply && is_stroked {
+                      if !apply_stroked {
+                        can_apply = false
+                      } else {
+                        let uniform = (a == dd && b == -c) ||
+                          (a == -dd && b == c)
+                        if !uniform {
+                          can_apply = false
+                        }
+                      }
+                    }
+                    // stroke-width / dasharray / dashoffset are scaled for
+                    // stroked paths unless vector-effect keeps them fixed
+                    let scale = @math.hypot(a, b)
+                    let scale_stroke = is_stroked &&
+                      scale != 1.0 &&
+                      e.attrs.get("vector-effect") != Some("non-scaling-stroke")
+                    // a dash pattern or offset inherited from an ancestor
+                    // cannot be rescaled on this element alone
+                    if can_apply && scale_stroke {
+                      if inh_dash && presentation(e, "stroke-dasharray") is None {
+                        can_apply = false
+                      }
+                      if inh_dashoffset &&
+                        presentation(e, "stroke-dashoffset") is None {
+                        can_apply = false
+                      }
+                    }
+                    if can_apply {
+                      try {
+                        // parse first: nothing may be mutated when the path
+                        // data is malformed and the transform has to stay
+                        let segs = @path.parse(path_d)
+                        if scale_stroke {
+                          scale_stroke_attr(
+                            e,
+                            "stroke-width",
+                            sw,
+                            scale,
+                            ctx.precision,
+                          )
+                          scale_stroke_attr(
+                            e,
+                            "stroke-dashoffset",
+                            "",
+                            scale,
+                            ctx.precision,
+                          )
+                          scale_stroke_attr(
+                            e,
+                            "stroke-dasharray",
+                            "",
+                            scale,
+                            ctx.precision,
+                          )
+                        }
+                        let transformed = @path.apply_matrix(segs, matrix)
+                        // Stringify at full precision so the optimizer sees the
+                        // exact transformed coordinates; rounding to the target
+                        // precision happens inside optimize (matching svgo,
+                        // which applies transforms in-place and rounds once).
+                        path_d = @path.stringify(transformed, precision=15)
+                        e.attrs["d"] = path_d
+                        e.attrs.remove("transform")
+                        changed(true)
+                      } catch {
+                        _ => ()
+                      }
+                    }
+                  }
+                  None => ()
+                }
+              }
             }
-          None => ()
+            _ => ()
+          }
         }
         // marker-mid is placed on every vertex including zero-length
         // segments; marker-start/end only care about the path endpoints, so
@@ -980,7 +1114,7 @@ pub let convert_path_data : Plugin = {
         // context: with a stroke the result also depends on linecap/linejoin,
         // and the same `d` may appear on differently styled elements.
         let memo_ok = !has_marker_mid && !has_stroke
-        if memo_ok && ctx.optimized_paths.contains(d) {
+        if memo_ok && ctx.optimized_paths.contains(path_d) {
           return
         }
         let opts = if has_marker_mid {
@@ -994,7 +1128,7 @@ pub let convert_path_data : Plugin = {
           { ..options, linecap, linejoin, has_stroke, }
         }
         try {
-          let segs = @path.parse(d)
+          let segs = @path.parse(path_d)
           // marker-start/end on a path that originally had drawing commands
           // but optimizes down to only M/m needs an explicit `z` so the
           // marker renders consistently across clients.
@@ -1007,11 +1141,11 @@ pub let convert_path_data : Plugin = {
             optimized.push({ cmd: 'z', args: [], })
           }
           let out = @path.stringify(optimized, precision=ctx.precision)
-          if out != d {
+          if out != path_d {
             e.attrs["d"] = out
             changed(true)
           } else if memo_ok {
-            ctx.optimized_paths.add(d)
+            ctx.optimized_paths.add(path_d)
           }
         } catch {
           _ => ()
@@ -1020,8 +1154,8 @@ pub let convert_path_data : Plugin = {
       for c in e.children {
         if c is @xml.Element(child) {
           walk(
-            child, stroke, sw, linecap, linejoin, linecap_by_class, marker_classes,
-            options, ctx, changed,
+            child, stroke, sw, linecap, linejoin, dash, dashoffset, linecap_by_class,
+            marker_classes, options, ctx, changed,
           )
         }
       }
@@ -1034,6 +1168,8 @@ pub let convert_path_data : Plugin = {
           "1",
           "butt",
           "miter",
+          false,
+          false,
           linecap_by_class,
           marker_classes,
           options,
@@ -1044,6 +1180,83 @@ pub let convert_path_data : Plugin = {
     }
     changed
   },
+}
+
+///|
+/// Scale every numeric value in a stroke-related attribute (`stroke-width`,
+/// `stroke-dasharray`, `stroke-dashoffset`) by `scale`. If the attribute is
+/// absent, `default_value` is used as the source (so a stroked path without an
+/// explicit `stroke-width` still gets its implicit width scaled). Numbers are
+/// rounded to `precision` decimal places and trailing zeros are stripped.
+fn scale_stroke_attr(
+  e : @xml.Element,
+  name : String,
+  default_value : String,
+  scale : Double,
+  precision : Int,
+) -> Unit {
+  let raw = (match e.attrs.get(name) {
+      Some(v) => v
+      None => default_value
+    })
+    .trim()
+    .to_owned()
+  if raw.is_empty() {
+    return
+  }
+  let out = scale_numbers(raw, scale, precision)
+  e.attrs[name] = out
+}
+
+///|
+/// Replace every run of digits (with optional sign and decimal point) in `s`
+/// by that number multiplied by `scale`, preserving surrounding text. Used to
+/// scale stroke-width / dasharray / dashoffset values.
+fn scale_numbers(s : String, scale : Double, precision : Int) -> String {
+  let sb = StringBuilder()
+  let cu = s.code_units()
+  let n = cu.length()
+  let mut i = 0
+  while i < n {
+    let c = cu[i].to_char().unwrap()
+    let is_digit = c >= '0' && c <= '9'
+    let is_sign = c == '-' || c == '+'
+    let is_dot = c == '.'
+    let next_is_num = i + 1 < n &&
+      (
+        (
+          cu[i + 1].to_char().unwrap() >= '0' &&
+          cu[i + 1].to_char().unwrap() <= '9'
+        ) ||
+        cu[i + 1].to_char().unwrap() == '.'
+      )
+    if is_digit || is_dot || (is_sign && next_is_num) {
+      let start = i
+      i += 1
+      let mut has_dot = is_dot
+      while i < n {
+        let cc = cu[i].to_char().unwrap()
+        if cc >= '0' && cc <= '9' {
+          i += 1
+        } else if cc == '.' && !has_dot {
+          has_dot = true
+          i += 1
+        } else {
+          break
+        }
+      }
+      let num_str = s[start:i].to_owned()
+      match split_unit(num_str) {
+        Some((v, _)) =>
+          sb.write_string(@path.format_number(v * scale, precision))
+        None => sb.write_string(num_str)
+      }
+    } else {
+      sb.write_char(c)
+      i += 1
+    }
+  }
+  sb.to_string()
 }
 
 ///|

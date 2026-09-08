@@ -7,20 +7,20 @@ pub let generated_on : String = "2026-09-08"
 pub let svgo_js_version : String = "4.1.0"
 
 ///|
-pub let wasm_bytes : Int = 211517
+pub let wasm_bytes : Int = 217654
 
 ///|
 /// One corpus file: bytes before, after svgo.mbt and after svgo-js, plus
 /// same-process milliseconds per call for both.
 pub let bench_rows : Array[BenchRow] = [
-  { file: "figma-export.svg", original: 570, mbt: 442, js: 442, mbt_ms: 0.171, js_ms: 0.289 },
-  { file: "illustrator-logo.svg", original: 1149, mbt: 717, js: 528, mbt_ms: 0.146, js_ms: 0.59 },
-  { file: "inkscape-drawing.svg", original: 2078, mbt: 641, js: 640, mbt_ms: 0.171, js_ms: 0.683 },
-  { file: "sketch-icon.svg", original: 836, mbt: 276, js: 288, mbt_ms: 0.101, js_ms: 0.304 },
-  { file: "Ghostscript_Tiger.svg", original: 68630, mbt: 52794, js: 68101, mbt_ms: 11.374, js_ms: 38.487 },
-  { file: "Python_logo_and_wordmark.svg", original: 5419, mbt: 4604, js: 4551, mbt_ms: 0.819, js_ms: 2.946 },
-  { file: "React-icon.svg", original: 366, mbt: 302, js: 302, mbt_ms: 0.064, js_ms: 0.177 },
-  { file: "SVG_logo.svg", original: 4019, mbt: 3795, js: 3584, mbt_ms: 0.43, js_ms: 1.775 },
-  { file: "Tux.svg", original: 49983, mbt: 36050, js: 35983, mbt_ms: 6.437, js_ms: 24.832 },
-  { file: "World_map_-_low_resolution.svg", original: 84823, mbt: 47242, js: 46706, mbt_ms: 12.462, js_ms: 57.476 },
+  { file: "figma-export.svg", original: 570, mbt: 442, js: 442, mbt_ms: 0.234, js_ms: 0.465 },
+  { file: "illustrator-logo.svg", original: 1149, mbt: 715, js: 528, mbt_ms: 0.185, js_ms: 0.732 },
+  { file: "inkscape-drawing.svg", original: 2078, mbt: 641, js: 640, mbt_ms: 0.183, js_ms: 0.96 },
+  { file: "sketch-icon.svg", original: 836, mbt: 276, js: 288, mbt_ms: 0.115, js_ms: 0.366 },
+  { file: "Ghostscript_Tiger.svg", original: 68630, mbt: 52794, js: 68101, mbt_ms: 14.455, js_ms: 62.525 },
+  { file: "Python_logo_and_wordmark.svg", original: 5419, mbt: 4597, js: 4551, mbt_ms: 1.671, js_ms: 4.647 },
+  { file: "React-icon.svg", original: 366, mbt: 302, js: 302, mbt_ms: 0.066, js_ms: 0.193 },
+  { file: "SVG_logo.svg", original: 4019, mbt: 3795, js: 3584, mbt_ms: 0.493, js_ms: 1.976 },
+  { file: "Tux.svg", original: 49983, mbt: 36050, js: 35983, mbt_ms: 6.861, js_ms: 16.653 },
+  { file: "World_map_-_low_resolution.svg", original: 84823, mbt: 47171, js: 46706, mbt_ms: 14.718, js_ms: 59.761 },
 ]

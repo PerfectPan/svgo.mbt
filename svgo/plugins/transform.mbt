@@ -85,18 +85,6 @@ fn parse_transform(v : String) -> Array[Tf]? {
 }
 
 ///|
-fn is_identity(t : Tf) -> Bool {
-  match (t.name, t.args) {
-    ("translate", [0.0]) | ("translate", [0.0, 0.0]) => true
-    ("scale", [1.0]) | ("scale", [1.0, 1.0]) => true
-    ("rotate", [0.0]) | ("rotate", [0.0, _, _]) => true
-    ("skewX", [0.0]) | ("skewY", [0.0]) => true
-    ("matrix", [1.0, 0.0, 0.0, 1.0, 0.0, 0.0]) => true
-    _ => false
-  }
-}
-
-///|
 /// Convert a single transform to its 6-element matrix [a, b, c, d, e, f].
 fn transform_to_matrix(t : Tf) -> Array[Double] {
   match t.name {

@@ -90,6 +90,22 @@ test "optimize typical editor output" {
 }
 
 ///|
+test "H/V widened to L when the rounded cursor drifts from the exact one" {
+  // After `v0.0715` the emitter's rounded y (.194) differs from round(0.195)
+  // = .195, so the `h6` is no longer horizontal in rounded space and must be
+  // emitted as a line with both deltas. This used to panic in `emit` because
+  // the `H` carried a single relative argument.
+  inspect(
+    @path.optimize_string("M0 0.1235v0.0715h6"),
+    content="M0 .124v.07l6 .001",
+  )
+  inspect(
+    @path.optimize_string("M0.1235 0h0.0715v6"),
+    content="M.124 0h.07l.001 6",
+  )
+}
+
+///|
 test "arcs" {
   inspect(
     @path.optimize_string("M 5 5 A 5 5 0 1 1 15 5 A 5 5 0 1 1 5 5 Z"),

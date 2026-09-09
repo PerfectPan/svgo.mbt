@@ -10,9 +10,10 @@ dependencies. This document describes how that binary is built and distributed.
 The wasm-gc build (shipped via npm as `svgo-mbt`) is the primary delivery form
 for JavaScript users. The native binary exists for two reasons:
 
-- **Startup speed.** A native process starts in about 1 ms; the wasm build
-  pays Node startup + wasm instantiation (roughly 40 ms on a warm cache).
-  For a CLI invoked many times in a build pipeline this matters.
+- **Startup speed.** End to end on a small icon the native binary takes about
+  10 ms, the Node build about 50 ms and the svgo CLI about 160 ms
+  (`scripts/cli-bench.sh`); most of the difference is Node starting up. For a
+  CLI invoked many times in a build pipeline this matters.
 - **No Node required.** CI images and minimal containers often don't ship
   Node; a single binary is easier to drop in.
 
@@ -53,8 +54,12 @@ matrix of runners (simplest) or install cross-compilers on a Linux host.
 
 ### GitHub releases (primary)
 
-On a version tag (`vX.Y.Z`), a `release` workflow builds the binary on each
-platform and attaches it to the GitHub release. Asset naming:
+On a version tag (`vX.Y.Z`, which must equal the version in
+`packages/svgo-mbt/package.json`), `.github/workflows/release.yml` publishes the
+npm package with provenance (needs the `NPM_TOKEN` repository secret) and
+builds the binary on linux-x86_64, linux-arm64 and macos-arm64 runners, attaching
+them to the GitHub release. `workflow_dispatch` with `dry_run` runs everything
+but the two uploads. Asset naming:
 
 ```
 svgo-mbt-X.Y.Z-linux-x86_64.tar.gz

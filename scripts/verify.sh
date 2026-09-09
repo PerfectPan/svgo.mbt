@@ -8,6 +8,11 @@ cd "$(dirname "$0")/.."
 
 step() { printf '\n\033[1m== %s\033[0m\n' "$*"; }
 
+step "no merge conflict markers"
+if git grep -n -E '^(<<<<<<< |>>>>>>> )' -- . ':!node_modules'; then
+  echo "unresolved merge conflict markers (see above)" >&2
+  exit 1
+fi
 step "moon check"
 moon check -q
 step "moon fmt --check"

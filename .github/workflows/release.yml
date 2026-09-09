@@ -1,0 +1,110 @@
+name: release
+
+# A version tag (vX.Y.Z, matching packages/svgo-mbt/package.json) publishes the
+# npm package with provenance and attaches native CLI binaries to a GitHub
+# release. Run it by hand with dry_run to exercise everything except the two
+# uploads. Needs the NPM_TOKEN repository secret (an npm granular access token
+# with publish rights on svgo-mbt).
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Build and test, run npm publish --dry-run, create no release"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  npm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+          "$HOME/.moon/bin/moon" update
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      - name: Tag must match package.json
+        if: github.event_name == 'push'
+        run: |
+          tag=${GITHUB_REF_NAME#v}
+          pkg=$(node -p "require('./packages/svgo-mbt/package.json').version")
+          [ "$tag" = "$pkg" ] || { echo "tag v$tag but package.json says $pkg" >&2; exit 1; }
+      - name: Build the wasm and the JS CLI, run the package tests
+        run: |
+          pnpm install --frozen-lockfile
+          scripts/build-wasm.sh
+          scripts/build-cli.sh
+          cd packages/svgo-mbt && node --test
+      - name: Publish (dry run)
+        if: github.event_name == 'workflow_dispatch' && inputs.dry_run
+        working-directory: packages/svgo-mbt
+        run: npm publish --ignore-scripts --access public --dry-run
+      - name: Publish
+        if: github.event_name == 'push' || !inputs.dry_run
+        working-directory: packages/svgo-mbt
+        run: npm publish --ignore-scripts --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  native:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            asset: linux-x86_64
+          - os: ubuntu-24.04-arm
+            asset: linux-arm64
+          - os: macos-latest
+            asset: macos-arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+          "$HOME/.moon/bin/moon" update
+      - name: Build and smoke-test the native CLI
+        run: |
+          moon build --target native --release -q
+          bin=$(scripts/bin-path.sh)
+          "$bin" --version
+          "$bin" svgo/testdata/sketch-icon.svg --stats >/dev/null
+          version=$("$bin" --version | tr -d '[:space:]')
+          mkdir -p dist/svgo-mbt
+          cp "$bin" dist/svgo-mbt/svgo-mbt
+          cp LICENSE packages/svgo-mbt/README.md dist/svgo-mbt/
+          tar -C dist -czf "svgo-mbt-$version-${{ matrix.asset }}.tar.gz" svgo-mbt
+          ls -la svgo-mbt-*.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: svgo-mbt-${{ matrix.asset }}
+          path: svgo-mbt-*.tar.gz
+
+  release:
+    needs: [npm, native]
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: assets
+          merge-multiple: true
+      - name: Create the GitHub release with the binaries attached
+        run: gh release create "$GITHUB_REF_NAME" assets/*.tar.gz --title "$GITHUB_REF_NAME" --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}

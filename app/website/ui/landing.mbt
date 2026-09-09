@@ -476,6 +476,72 @@ fn use_section() -> Html {
 }
 
 ///|
+fn cli_section() -> Html {
+  let flag_rows = cli_flags.map(f => tr([td([code(f.flag)]), td(f.description)]))
+  section(id="cli", class="border-y border-line bg-bg-2 py-20", [
+    div(class="wrap", [
+      section_head(
+        t(
+          "The command line, in one binary.", "一个二进制，命令行直接用。",
+        ),
+        tm(
+          [
+            text(
+              "One MoonBit source, two builds. `npx` runs the Node one, which needs nothing installed; the native binary needs no runtime at all and finishes a small icon end to end in 5.8 ms against Node's 26.5 ms. Pipe an SVG in, get the optimized one out; point it at a directory and it walks the tree. The flag table below is parsed from the CLI's own usage text, so it cannot drift.",
+            ),
+          ],
+          [
+            text(
+              "同一份 MoonBit 代码，两个构建。`npx` 跑的是 Node 版，什么都不用装;原生二进制不需要运行时，处理一个小图标从启动到写完是 5.8 毫秒，Node 版是 26.5 毫秒。把 SVG 从 stdin 喂进去，优化后的结果从 stdout 出来;给它一个目录，它就递归处理。下面这张参数表是从 CLI 自己的帮助文本里解析出来的，不会和实际用法对不上。",
+            ),
+          ],
+        ),
+      ),
+      div(class="grid gap-5 min-[901px]:grid-cols-[1fr_1fr]", [
+        div(class="card reveal", [
+          h3(t("Install and run", "安装并运行")),
+          div(
+            class="sub",
+            t(
+              "npx runs the Node build of the CLI; the native binary starts faster.",
+              "npx 跑的是 CLI 的 Node 版；原生二进制启动更快。",
+            ),
+          ),
+          div(class="flex flex-wrap items-center gap-3", [
+            copy_pill("npx svgo-mbt in.svg -o out.svg"),
+          ]),
+          div(class="mt-4 use", [
+            pre([
+              text("# read from stdin, write to stdout\n"),
+              text("cat in.svg | svgo-mbt > out.svg\n\n"),
+              text("# optimize every SVG under a directory in place\n"),
+              text("svgo-mbt -r ./icons -o ./icons-opt"),
+            ]),
+          ]),
+        ]),
+        div(class="card reveal", style=["--d: 90ms"], [
+          h3(t("Flags", "参数")),
+          div(
+            class="sub",
+            t(
+              "repeatable means you can pass it more than once.", "repeatable 表示可以传多次。",
+            ),
+          ),
+          div(class="overflow-x-auto", [
+            table(class="sizes cli-flags", [
+              thead([
+                tr([th(t("flag", "参数")), th(t("what it does", "作用"))]),
+              ]),
+              tbody(flag_rows),
+            ]),
+          ]),
+        ]),
+      ]),
+    ]),
+  ])
+}
+
+///|
 fn gallery_section() -> Html {
   let shots = samples.mapi((idx, s) => {
     let o = run_optimize(s.svg)
@@ -541,6 +607,7 @@ pub fn landing_page(chrome : Chrome) -> Val[Html] {
       numbers_section(),
       plugins_section(),
       use_section(),
+      cli_section(),
       gallery_section(),
       page_footer(),
     ])

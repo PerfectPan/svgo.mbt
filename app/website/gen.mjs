@@ -2,9 +2,11 @@
 //   ui/data.mbt      benchmark rows + plugin list   (from app/website/data.json, written by packages/compare/collect.mjs)
 //   ui/samples.mbt   curated sample SVGs (testdata + compare corpus), optimized live in the browser
 //   ui/api_data.mbt  the public API                 (from `MOON_WORK=off moon -C svgo doc` → svgo/_build/doc)
+//   ui/cli_data.mbt  CLI flag table                 (parsed from the USAGE constant in app/cli/main.mbt)
 // Usage: node app/website/gen.mjs   (run by app/website/build.mjs)
 import { readFileSync, writeFileSync, readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
+import { spawnSync } from "node:child_process";
 
 const ROOT = new URL("../..", import.meta.url).pathname;
 const UI = join(ROOT, "app/website/ui");
@@ -111,3 +113,72 @@ ${p.items.map((it) => `      {
 `);
 }
 console.log(`app/website/gen.mjs: data (${data.rows.length} rows), samples (${SAMPLES.length}), api (${pkgs.length} packages)`);
+
+// ---------- cli_data.mbt ----------
+// Parse the option lines out of the CLI's USAGE constant so the site's flag
+// table always matches the binary. The USAGE string uses MoonBit's `#|` line
+// prefix; we strip that, find the block between "options:" and "exit codes:",
+// and turn each option line into { flag, description }. Continuation lines
+// (indented past the flag column) are joined onto the previous description.
+const cliMain = readFileSync(join(ROOT, "app/cli/main.mbt"), "utf8");
+const usageLines = [];
+let inUsage = false;
+for (const line of cliMain.split("\n")) {
+  if (line.match(/^\s*const USAGE\s*=/)) { inUsage = true; continue; }
+  if (inUsage) {
+    const m = line.match(/^\s*#\|(.*)$/);
+    if (m) { usageLines.push(m[1]); }
+    else if (line.trim() === "") {
+      // blank line inside the string literal is just an empty #| line; skip
+      // unless we've already seen content (the literal ends at the first
+      // non-#|, non-blank line after content).
+      if (usageLines.length > 0) { /* keep going, blank lines are part of it */ }
+    } else {
+      break; // end of the string literal
+    }
+  }
+}
+const usage = usageLines.join("\n");
+const optMatch = usage.match(/options:\n([\s\S]*?)\nexit codes:/);
+const cliFlags = [];
+if (optMatch) {
+  const block = optMatch[1];
+  for (const raw of block.split("\n")) {
+    const line = raw.replace(/\s+$/, "");
+    if (line.trim() === "") continue;
+    // An option line starts with a dash after the leading indent.
+    const isOption = /^\s+-/.test(line);
+    if (isOption) {
+      // Split on the first run of 2+ spaces: left = flag(s), right = description.
+      const split = line.match(/^(\s+-\S.*?)\s{2,}(.*)$/);
+      if (split) {
+        cliFlags.push({ flag: split[1].trim(), description: split[2].trim() });
+      } else {
+        cliFlags.push({ flag: line.trim(), description: "" });
+      }
+    } else if (cliFlags.length > 0) {
+      // Continuation: append to the previous description.
+      const prev = cliFlags[cliFlags.length - 1];
+      prev.description = prev.description
+        ? `${prev.description} ${line.trim()}`
+        : line.trim();
+    }
+  }
+} else {
+  console.warn("app/website/gen.mjs: could not find options block in app/cli/main.mbt");
+}
+writeFileSync(join(UI, "cli_data.mbt"), `${HEADER}
+///|
+/// Command-line flags, parsed from the USAGE constant in app/cli/main.mbt.
+/// Each entry is the flag string (e.g. "-o, --output <file>") and its
+/// one-line description. Add a flag to the CLI and it shows up here on the
+/// next build.
+pub let cli_flags : Array[CliFlag] = [
+${cliFlags.map((f) => `  { flag: ${str(f.flag)}, description: ${str(f.description)} },`).join("\n")}
+]
+`);
+console.log(`app/website/gen.mjs: cli (${cliFlags.length} flags)`);
+
+// The generated .mbt files must pass `moon fmt --check`. Run the formatter
+// on them so gen.mjs is re-runnable without hand edits afterwards.
+spawnSync("moon", ["fmt", join(UI, "data.mbt"), join(UI, "samples.mbt"), join(UI, "api_data.mbt"), join(UI, "cli_data.mbt")], { stdio: "inherit" });

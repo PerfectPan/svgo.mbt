@@ -23,6 +23,8 @@ pub fn app() -> @rabbita.Val[@html.Html]
 
 pub let bench_rows : Array[BenchRow]
 
+pub let cli_flags : Array[CliFlag]
+
 pub fn code_editor(String, @cmd.Emit[String], placeholder~ : String, label~ : String) -> @html.Html
 
 pub fn code_view(String, label~ : String) -> @html.Html
@@ -117,6 +119,11 @@ pub(all) struct Chrome {
   prefs : @rabbita.Val[Prefs]
   emit : @cmd.Emit[PrefMsg]
 }
+
+pub(all) struct CliFlag {
+  flag : String
+  description : String
+} derive(Eq)
 
 pub(all) enum Lang {
   En

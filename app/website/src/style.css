@@ -198,6 +198,11 @@
   .sizes .win { @apply font-bold text-mint; }
   .sizes .lose { @apply text-warn; }
 
+  /* CLI flag table */
+  .cli-flags td:first-child { @apply whitespace-nowrap font-mono text-[12.5px] font-semibold text-ink; }
+  .cli-flags td:last-child { @apply text-muted; }
+  .cli-flags th:last-child, .cli-flags td:last-child { @apply text-left; }
+
   /* plugin grid */
   .plugin { @apply rounded-[10px] border border-line bg-surface px-4 py-3.5 transition hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_12px_30px_-18px_var(--color-accent)]; }
   .plugin code { @apply text-[12.5px] font-bold text-ink; }

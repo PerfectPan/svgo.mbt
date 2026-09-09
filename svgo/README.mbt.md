@@ -175,21 +175,24 @@ Same Node process, both with multipass, milliseconds per call
 
 | file | size | svgo.mbt (wasm-gc) | svgo-js | ratio |
 | --- | ---: | ---: | ---: | ---: |
-| sketch-icon.svg | 836 B | 0.066 | 0.295 | 4.5× |
-| inkscape-drawing.svg | 2 KB | 0.116 | 0.661 | 5.7× |
-| SVG_logo.svg | 4 KB | 0.265 | 1.719 | 6.5× |
-| Tux.svg | 50 KB | 3.5 | 14.5 | 4.1× |
-| Ghostscript_Tiger.svg | 68 KB | 7.8 | 38.1 | 4.9× |
-| World map (low resolution) | 85 KB | 9.1 | 53.0 | 5.8× |
+| sketch-icon.svg | 836 B | 0.113 | 0.306 | 2.7× |
+| inkscape-drawing.svg | 2 KB | 0.197 | 0.644 | 3.3× |
+| SVG_logo.svg | 4 KB | 0.599 | 1.728 | 2.9× |
+| Tux.svg | 50 KB | 7.126 | 14.228 | 2.0× |
+| Ghostscript_Tiger.svg | 68 KB | 12.760 | 36.107 | 2.8× |
+| World map (low resolution) | 85 KB | 13.303 | 57.262 | 4.3× |
 
-In-module (`scripts/bench.sh`, native release): the Tiger takes 6.8 ms end to
-end, of which parsing is 0.23 ms and path data optimization 1.7 ms per pass.
-`benchmark/README.md` has the stage breakdown and the history of what made it
-fast.
+Between 1.5× and 4.3× depending on the file, 2.9× at the median; the wider
+gaps are on files with many paths, where svgo-js spends its time in the same
+path rewriting we do in wasm. In-module (`scripts/bench.sh`, native release)
+the Tiger takes about 12 ms end to end, of which parsing is 0.23 ms and path
+data optimization 2.5 ms per pass. `benchmark/README.md` has the stage
+breakdown and the history of what made it fast.
 
-Output sizes are on par: svgo.mbt wins on path-heavy files (Tiger 53.7 KB vs
-68.1 KB) and loses 5 to 13% on style-heavy files until `inlineStyles` and
-`minifyStyles` exist.
+Output sizes match svgo to within a few bytes on every corpus file except the
+Ghostscript tiger, where svgo.mbt is 23% smaller (52,690 against 68,101)
+because `moveGroupAttrsToElems` ships opt-in; see the deviation under
+compatibility.
 
 ## Verifying correctness
 

@@ -435,7 +435,8 @@ fn use_section() -> Html {
           1,
           t("Command line · native", "命令行 · 原生"),
           t(
-            "One binary. Cold start is about 40× faster than the svgo CLI.", "就一个二进制文件。冷启动比 svgo 的 CLI 快大概 40 倍。",
+            "One binary. A whole run on a small icon takes 9.8 ms against the svgo CLI's 174 ms, most of which is Node starting up.",
+            "就一个二进制文件。处理一个小图标从启动到结束 9.8 毫秒，svgo 的 CLI 是 174 毫秒，其中大部分是 Node 的启动时间。",
           ),
           [
             text(

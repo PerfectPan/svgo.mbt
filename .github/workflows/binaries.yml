@@ -1,7 +1,8 @@
 name: binaries
 
-# Runs on the tag `changeset publish` pushes from release.yml (svgo-mbt@X.Y.Z):
-# builds the native CLI on three platforms, attaches the tarballs to a GitHub
+# Runs for the tag `changeset publish` creates (svgo-mbt@X.Y.Z): release.yml
+# dispatches it with `tag` set, since a tag pushed with GITHUB_TOKEN triggers no
+# workflow by itself; pushing such a tag by hand also works. It builds the native CLI on three platforms, attaches the tarballs to a GitHub
 # release, and publishes the MoonBit module to mooncakes with the same version.
 # Needs the MOONCAKES_TOKEN repository secret (the `token` field of
 # ~/.moon/credentials.json after `moon login`); without it the mooncakes job
@@ -16,9 +17,16 @@ on:
         description: "Build the binaries, create no release, publish nothing"
         type: boolean
         default: true
+      tag:
+        description: "svgo-mbt@X.Y.Z to release (required when dry_run is false)"
+        type: string
+        default: ""
 
 permissions:
   contents: write
+
+env:
+  TAG: ${{ github.event_name == 'push' && github.ref_name || inputs.tag }}
 
 jobs:
   native:
@@ -58,7 +66,7 @@ jobs:
 
   release:
     needs: native
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' || !inputs.dry_run
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -67,12 +75,14 @@ jobs:
           path: assets
           merge-multiple: true
       - name: Create the GitHub release with the binaries attached
-        run: gh release create "$GITHUB_REF_NAME" assets/*.tar.gz --title "$GITHUB_REF_NAME" --generate-notes
+        run: |
+          [ -n "$TAG" ] || { echo "no tag given" >&2; exit 1; }
+          gh release create "$TAG" assets/*.tar.gz --title "$TAG" --generate-notes
         env:
           GH_TOKEN: ${{ github.token }}
 
   mooncakes:
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' || !inputs.dry_run
     runs-on: ubuntu-latest
     env:
       MOONCAKES_TOKEN: ${{ secrets.MOONCAKES_TOKEN }}
@@ -89,7 +99,8 @@ jobs:
             echo "MOONCAKES_TOKEN is not set; skipping the mooncakes publish. Run 'cd svgo && MOON_WORK=off moon publish' locally." >&2
             exit 0
           fi
-          tag=${GITHUB_REF_NAME#svgo-mbt@}
+          [ -n "$TAG" ] || { echo "no tag given" >&2; exit 1; }
+          tag=${TAG#svgo-mbt@}
           mod=$(sed -n 's/^version = "\(.*\)"/\1/p' svgo/moon.mod)
           [ "$tag" = "$mod" ] || { echo "tag $tag but svgo/moon.mod says $mod" >&2; exit 1; }
           if curl -fsS https://mooncakes.io/api/v0/modules/PerfectPan/svgo | grep -q "\"version\":\"$tag\""; then

@@ -435,8 +435,8 @@ fn use_section() -> Html {
           1,
           t("Command line · native", "命令行 · 原生"),
           t(
-            "One binary. A whole run on a small icon takes about 10 ms against the svgo CLI's 159 ms, most of which is Node starting up (scripts/cli-bench.sh).",
-            "就一个二进制文件。处理一个小图标从启动到结束约 10 毫秒，svgo 的 CLI 是 159 毫秒，其中大部分是 Node 的启动时间（scripts/cli-bench.sh）。",
+            "One binary. A whole run on a small icon takes about 10 ms against the svgo CLI's 160 or so, most of which is Node starting up (scripts/cli-bench.sh).",
+            "就一个二进制文件。处理一个小图标从启动到结束约 10 毫秒，svgo 的 CLI 约 160 毫秒，其中大部分是 Node 的启动时间（scripts/cli-bench.sh）。",
           ),
           [
             text(
@@ -488,12 +488,12 @@ fn cli_section() -> Html {
         tm(
           [
             text(
-              "One MoonBit source, two builds. `npx` runs the Node one, which needs nothing installed; the native binary needs no runtime at all and finishes a small icon end to end in about 10 ms against the Node build's 49 ms. Pipe an SVG in, get the optimized one out; point it at a directory and it walks the tree. The flag table below is parsed from the CLI's own usage text, so it cannot drift.",
+              "One MoonBit source, two builds. `npx` runs the Node one, which needs nothing installed; the native binary needs no runtime at all and finishes a small icon end to end in about 10 ms against the Node build's 50 or so. Pipe an SVG in, get the optimized one out; point it at a directory and it walks the tree. The flag table below is parsed from the CLI's own usage text, so it cannot drift.",
             ),
           ],
           [
             text(
-              "同一份 MoonBit 代码，两个构建。`npx` 跑的是 Node 版，什么都不用装;原生二进制不需要运行时，处理一个小图标从启动到写完约 10 毫秒，Node 版是 49 毫秒。把 SVG 从 stdin 喂进去，优化后的结果从 stdout 出来;给它一个目录，它就递归处理。下面这张参数表是从 CLI 自己的帮助文本里解析出来的，不会和实际用法对不上。",
+              "同一份 MoonBit 代码，两个构建。`npx` 跑的是 Node 版，什么都不用装;原生二进制不需要运行时，处理一个小图标从启动到写完约 10 毫秒，Node 版约 50 毫秒。把 SVG 从 stdin 喂进去，优化后的结果从 stdout 出来;给它一个目录，它就递归处理。下面这张参数表是从 CLI 自己的帮助文本里解析出来的，不会和实际用法对不上。",
             ),
           ],
         ),

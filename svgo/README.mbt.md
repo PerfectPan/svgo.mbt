@@ -33,8 +33,8 @@ Three properties drive the design:
   rasterized before and after with resvg and compared pixel by pixel.
 - **Fast.** In one Node process the wasm build is 1.7 to 4.4 times faster than
   svgo-js on the same files (2.9× at the median); on a small icon the native CLI
-  finishes end to end in about 10 ms, the Node build in 49 ms, the svgo CLI in
-  159 ms (`scripts/cli-bench.sh`). Numbers below.
+  finishes end to end in about 10 ms, the Node build in about 50 ms, the svgo
+  CLI in about 160 ms (`scripts/cli-bench.sh`). Numbers below.
 - **Plugins are values.** `{ name, description, run }`. The preset is an array
   in svgo's order; the CLI, the playground and the tests run any subset in
   any order.
@@ -244,8 +244,9 @@ saves 48 bytes across the rest. svgo shows the same effect on that file (68,101
 bytes with the plugin, 52,029 without), so this is a size choice, not a
 compatibility gap.
 
-svgo also has 18 opt-in plugins (removeAttrs, prefixIds, removeXMLNS and the
-like) whose cases are not imported at all, and its parser, stringifier, style and CLI unit tests are not imported either
+svgo also has 19 opt-in plugins; `removeDimensions` and `removeTitle` are
+implemented here, the other 17 (removeAttrs, prefixIds, removeXMLNS and the
+like) are not and their cases are not imported, and its parser, stringifier, style and CLI unit tests are not imported either
 since they cover svgo's internals rather than its output.
 
 ## Repository layout

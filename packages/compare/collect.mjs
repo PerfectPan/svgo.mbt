@@ -1,6 +1,6 @@
 // Collect the numbers the site shows: sizes (original / svgo.mbt / svgo-js)
 // and same-process timings (wasm-gc vs svgo-js) for every corpus file.
-// Writes app/data.json. Usage: node packages/compare/collect.mjs
+// Writes app/website/data.json. Usage: node packages/compare/collect.mjs
 // Requires scripts/build-wasm.sh and `pnpm install`.
 import { readFileSync, writeFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
@@ -50,5 +50,5 @@ const data = {
   plugins: await plugins(),
   rows,
 };
-writeFileSync(join(ROOT, "app/data.json"), JSON.stringify(data, null, 2) + "\n");
-console.log("wrote app/data.json");
+writeFileSync(join(ROOT, "app/website/data.json"), JSON.stringify(data, null, 2) + "\n");
+console.log("wrote app/website/data.json");

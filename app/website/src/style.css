@@ -5,7 +5,7 @@
 @source "../ui";
 
 /* Design tokens. Utilities reference these as CSS variables. The palette is
-   ink on white with an emerald accent; app/motion/src/style.css mirrors it. */
+   ink on white with an emerald accent; app/website/motion/src/style.css mirrors it. */
 @theme {
   --color-bg: #ffffff;
   --color-bg-2: #f6f7fb;

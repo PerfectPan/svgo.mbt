@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "perfectpan/svgo-app/ui"
+package "perfectpan/svgo-website/ui"
 
 import {
   "moonbit-community/rabbita",

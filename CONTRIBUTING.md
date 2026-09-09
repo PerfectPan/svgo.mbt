@@ -14,7 +14,7 @@ pnpm install                                                      # svgo-js, res
 scripts/verify.sh --full                                          # + wasm, sizes, pixel diffs
 
 The MoonBit module lives in `svgo/`; `packages/` holds the npm package and the
-comparison suite; `app/` the website. `moon` commands run from the root.
+comparison suite; `app/website/` the website and `app/cli/` the CLI. `moon` commands run from the root.
 ```
 
 The repository ships a pre-commit hook that runs `moon check`:
@@ -41,7 +41,7 @@ The repository ships a pre-commit hook that runs `moon check`:
    with `python3 scripts/gen-fixtures.py` and run `moon test`.
 
    Tip: to see what the current implementation produces for an input,
-   `moon run --target native svgo/cmd/main -- in.svg --plugins svgoName --no-multipass --pretty`.
+   `moon run --target native app/cli -- in.svg --plugins svgoName --no-multipass --pretty`.
 
    **svgo's own cases.** `svgo/plugins/fixtures/upstream/` holds svgo's
    `test/plugins` suite verbatim (see `NOTICE.md` there). They run with svgo's

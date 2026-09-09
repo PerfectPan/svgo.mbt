@@ -1,17 +1,18 @@
 {
   "name": "svgo.mbt-workspace",
   "private": true,
-  "description": "svgo.mbt monorepo: MoonBit module (svgo/), npm package (packages/svgo-mbt), comparison suite (packages/compare), website (app/)",
+  "description": "svgo.mbt monorepo: MoonBit module (svgo/), npm package (packages/svgo-mbt), comparison suite (packages/compare), website (app/website), CLI (app/cli)",
   "packageManager": "pnpm@9.0.0",
   "scripts": {
-    "dev": "pnpm -C app dev",
+    "dev": "pnpm -C app/website dev",
     "build:wasm": "scripts/build-wasm.sh",
     "compare": "pnpm -C packages/compare run all",
     "docs": "MOON_WORK=off moon -C svgo doc",
-    "app": "pnpm -s docs && node app/build.mjs",
+    "app": "pnpm -s docs && node app/website/build.mjs",
     "verify": "scripts/verify.sh"
   },
   "devDependencies": {
-    "binaryen": "123.0.0"
+    "binaryen": "123.0.0",
+    "svgo-mbt": "workspace:*"
   }
 }

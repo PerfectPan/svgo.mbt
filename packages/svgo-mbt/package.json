@@ -4,11 +4,15 @@
   "description": "SVG optimizer written in MoonBit, shipped as WebAssembly (wasm-gc)",
   "type": "module",
   "main": "index.mjs",
+  "bin": {
+    "svgo-mbt": "./cli.mjs"
+  },
   "exports": {
     ".": "./index.mjs"
   },
   "files": [
     "index.mjs",
+    "cli.mjs",
     "svgo.wasm",
     "README.md"
   ],

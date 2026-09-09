@@ -5,4 +5,5 @@ target/
 .moonagent/
 node_modules/
 packages/svgo-mbt/svgo.wasm
+packages/svgo-mbt/cli.mjs
 packages/compare/corpus/World_map_x12.svg

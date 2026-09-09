@@ -1,4 +1,4 @@
-name = "perfectpan/svgo-app"
+name = "perfectpan/svgo-website"
 
 version = "0.1.0"
 

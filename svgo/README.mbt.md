@@ -248,11 +248,12 @@ since they cover svgo's internals rather than its output.
 A MoonBit workspace (`moon.work`) and a pnpm workspace side by side:
 
 ```
-svgo/                 the MoonBit module: xml/ path/ plugins/ (+ fixtures) svgo.mbt cmd/main wasm/ benchmark/ testdata/
-packages/svgo-mbt/    npm package: JS loader + svgo.wasm
+svgo/                 the MoonBit module: xml/ path/ plugins/ (+ fixtures) svgo.mbt wasm/ benchmark/ testdata/
+packages/svgo-mbt/    npm package: JS loader + svgo.wasm + the CLI bin
 packages/compare/     svgo-js comparison, resvg render diff, same-process speed, site numbers
-app/                  the website: a MoonBit (Rabbita) app that imports svgo/, Tailwind v4, Remotion hero
-scripts/              build-wasm, verify, bench, regress, gen-fixtures
+app/website/          the website: a MoonBit (Rabbita) app that imports svgo/, Tailwind v4, Remotion hero
+app/cli/              the CLI: a MoonBit executable that imports svgo/, C file I/O on native
+scripts/              build-wasm, build-cli, verify, bench, regress, gen-fixtures
 ```
 
 `AGENTS.md` is the guide for coding agents (commands, invariants, conventions);

@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* the same tokens as the site (app/src/style.css) so the video matches the page */
+/* the same tokens as the site (app/website/src/style.css) so the video matches the page */
 @theme {
   --color-ink: #0b0d12;
   --color-ink-2: #3b4150;

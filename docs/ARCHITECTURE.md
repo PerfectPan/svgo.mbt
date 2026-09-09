@@ -107,8 +107,8 @@ that did something. `utf8_length` counts bytes without encoding.
 | form | package | notes |
 | --- | --- | --- |
 | wasm-gc module + JS loader | `svgo/wasm/`, `packages/svgo-mbt/` | JS String Builtins: MoonBit `String` *is* a JS string, so the boundary is two string arguments and one JSON string back. about 238 KB after the pinned Binaryen `wasm-opt -Oz` build step. |
-| native CLI | `svgo/cmd/main/` | C file I/O via two `extern "C"` functions; `--json` for tooling. |
-| MoonBit library | `svgo/` | `moon add perfectpan/svgo`. The website in `app/` is the first consumer: a Rabbita app compiled to JS that calls `@svgo.optimize` directly, so the demo and the playground run the same code the tests run. |
+| CLI | `app/cli/` | One MoonBit source, two IO backends: `extern "C"` file access on the native target, node's `fs` on the js target, which is what `packages/svgo-mbt/cli.mjs` ships. `--json` for tooling. |
+| MoonBit library | `svgo/` | `moon add perfectpan/svgo`. The website in `app/website/` is the first consumer: a Rabbita app compiled to JS that calls `@svgo.optimize` directly, so the demo and the playground run the same code the tests run. |
 
 ## Verification layers
 

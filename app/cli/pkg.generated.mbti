@@ -1,11 +1,12 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "perfectpan/svgo-app/main"
+package "perfectpan/svgo-cli"
 
 // Values
 
 // Errors
 
 // Types and methods
+type CliConfig
 
 // Type aliases
 

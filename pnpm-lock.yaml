@@ -11,12 +11,15 @@ importers:
       binaryen:
         specifier: 123.0.0
         version: 123.0.0
+      svgo-mbt:
+        specifier: workspace:*
+        version: link:packages/svgo-mbt
 
-  app:
+  app/website:
     dependencies:
       svgo-mbt:
         specifier: workspace:*
-        version: link:../packages/svgo-mbt
+        version: link:../../packages/svgo-mbt
     devDependencies:
       '@remotion/cli':
         specifier: ^4.0.0

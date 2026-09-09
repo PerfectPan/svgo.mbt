@@ -35,7 +35,7 @@ jobs:
         run: |
           moon install moonbit-community/warren
           MOON_WORK=off moon -C svgo doc
-          node app/build.mjs
+          node app/website/build.mjs
       - name: Benchmarks (native)
         if: matrix.os == 'macos-latest'
         run: scripts/bench.sh

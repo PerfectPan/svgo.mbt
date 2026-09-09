@@ -1,4 +1,5 @@
 members = [
   "./svgo",
-  "./app",
+  "./app/website",
+  "./app/cli",
 ]

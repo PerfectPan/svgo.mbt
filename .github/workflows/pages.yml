@@ -34,7 +34,7 @@ jobs:
           pnpm install --frozen-lockfile
           scripts/build-wasm.sh
           MOON_WORK=off moon -C svgo doc
-          node app/build.mjs
+          node app/website/build.mjs
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _build/app

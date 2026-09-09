@@ -82,8 +82,3 @@ jobs:
         env:
           NPM_CONFIG_PROVENANCE: "true"
           GH_TOKEN: ${{ github.token }}
-          # Bootstrap only: the first publish creates the package, and only an
-          # existing package can be given a Trusted Publisher on npmjs.com.
-          # Remove this line (and the secret) once that is configured; npm then
-          # authenticates through OIDC.
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

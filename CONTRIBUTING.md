@@ -130,10 +130,10 @@ The repository ships a pre-commit hook that runs `moon check`:
    linux-arm64 and macos-arm64 on a GitHub release, and `moon publish` of
    `PerfectPan/svgo` to mooncakes using the `MOONCAKES_TOKEN` secret.
 
-One-time setup, both on the maintainer's side: the npm package must exist
-before a Trusted Publisher can be configured for it on npmjs.com (first publish
-by hand with `npm login && npm publish` in `packages/svgo-mbt`), and the
-mooncakes token from `~/.moon/credentials.json` goes into the repository secret
-`MOONCAKES_TOKEN`. `gh workflow run release.yml -f dry_run=true` and
+One-time setup, done: `@rivus/svgo` has a Trusted Publisher on npmjs.com
+pointing at this repository and `release.yml` (the first publish needed a
+token because only an existing package can be given one), and the mooncakes
+token from `~/.moon/credentials.json` is the repository secret
+`MOONCAKES_TOKEN`. No npm token is stored anywhere. `gh workflow run release.yml -f dry_run=true` and
 `gh workflow run binaries.yml -f dry_run=true` rehearse without publishing.
 

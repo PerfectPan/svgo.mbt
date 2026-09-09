@@ -41,93 +41,112 @@ let svg_content_groups_data : String =
 
 ///|
 let svg_elements_data : String =
-  #|a|conditionalProcessing,core,graphicalEvent,presentation,xlink|class,externalResourcesRequired,style,target,transform|target=_self|animation,descriptive,paintServer,shape,structural|a,altGlyphDef,clipPath,color-profile,cursor,filter,font-face,font,foreignObject,image,marker,mask,pattern,script,style,switch,text,view,tspan
-  #|altGlyph|conditionalProcessing,core,graphicalEvent,presentation,xlink|class,dx,dy,externalResourcesRequired,format,glyphRef,rotate,style,x,y|||
-  #|altGlyphDef|core||||glyphRef
-  #|altGlyphItem|core||||glyphRef,altGlyphItem
-  #|animate|animationAddition,animationAttributeTarget,animationEvent,animationTiming,animationValue,conditionalProcessing,core,presentation,xlink|externalResourcesRequired||descriptive|
-  #|animateColor|animationAddition,animationAttributeTarget,animationEvent,animationTiming,animationValue,conditionalProcessing,core,presentation,xlink|externalResourcesRequired||descriptive|
-  #|animateMotion|animationAddition,animationEvent,animationTiming,animationValue,conditionalProcessing,core,xlink|externalResourcesRequired,keyPoints,origin,path,rotate|rotate=0|descriptive|mpath
-  #|animateTransform|animationAddition,animationAttributeTarget,animationEvent,animationTiming,animationValue,conditionalProcessing,core,xlink|externalResourcesRequired,type||descriptive|
-  #|circle|conditionalProcessing,core,graphicalEvent,presentation|class,cx,cy,externalResourcesRequired,r,style,transform|cx=0,cy=0|animation,descriptive|
-  #|clipPath|conditionalProcessing,core,presentation|class,clipPathUnits,externalResourcesRequired,style,transform|clipPathUnits=userSpaceOnUse|animation,descriptive,shape|text,use
-  #|color-profile|core,xlink|local,name,rendering-intent|name=sRGB,rendering-intent=auto|descriptive|
-  #|cursor|core,conditionalProcessing,xlink|externalResourcesRequired,x,y|x=0,y=0|descriptive|
-  #|defs|conditionalProcessing,core,graphicalEvent,presentation|class,externalResourcesRequired,style,transform||animation,descriptive,paintServer,shape,structural|a,altGlyphDef,clipPath,color-profile,cursor,filter,font-face,font,foreignObject,image,marker,mask,pattern,script,style,switch,text,view
-  #|desc|core|class,style|||
-  #|ellipse|conditionalProcessing,core,graphicalEvent,presentation|class,cx,cy,externalResourcesRequired,rx,ry,style,transform|cx=0,cy=0|animation,descriptive|
-  #|feBlend|core,presentation,filterPrimitive|class,style,in,in2,mode|mode=normal||animate,set
-  #|feColorMatrix|core,presentation,filterPrimitive|class,style,in,type,values|type=matrix||animate,set
-  #|feComponentTransfer|core,presentation,filterPrimitive|class,style,in|||feFuncA,feFuncB,feFuncG,feFuncR
-  #|feComposite|core,presentation,filterPrimitive|class,in,in2,k1,k2,k3,k4,operator,style|operator=over,k1=0,k2=0,k3=0,k4=0||animate,set
-  #|feConvolveMatrix|core,presentation,filterPrimitive|class,in,kernelMatrix,order,style,bias,divisor,edgeMode,targetX,targetY,kernelUnitLength,preserveAlpha|order=3,bias=0,edgeMode=duplicate,preserveAlpha=false||animate,set
-  #|feDiffuseLighting|core,presentation,filterPrimitive|class,diffuseConstant,in,kernelUnitLength,style,surfaceScale|surfaceScale=1,diffuseConstant=1|descriptive|feDistantLight,fePointLight,feSpotLight
-  #|feDisplacementMap|core,presentation,filterPrimitive|class,in,in2,scale,style,xChannelSelector,yChannelSelector|scale=0,xChannelSelector=A,yChannelSelector=A||animate,set
-  #|feDistantLight|core|azimuth,elevation|azimuth=0,elevation=0||animate,set
-  #|feFlood|core,presentation,filterPrimitive|class,style|||animate,animateColor,set
-  #|feFuncA|core,transferFunction||||set,animate
-  #|feFuncB|core,transferFunction||||set,animate
-  #|feFuncG|core,transferFunction||||set,animate
-  #|feFuncR|core,transferFunction||||set,animate
-  #|feGaussianBlur|core,presentation,filterPrimitive|class,style,in,stdDeviation|stdDeviation=0||set,animate
-  #|feImage|core,presentation,filterPrimitive,xlink|class,externalResourcesRequired,href,preserveAspectRatio,style,xlink:href|preserveAspectRatio=xMidYMid meet||animate,animateTransform,set
-  #|feMerge|core,presentation,filterPrimitive|class,style|||feMergeNode
-  #|feMergeNode|core|in|||animate,set
-  #|feMorphology|core,presentation,filterPrimitive|class,style,in,operator,radius|operator=erode,radius=0||animate,set
-  #|feOffset|core,presentation,filterPrimitive|class,style,in,dx,dy|dx=0,dy=0||animate,set
-  #|fePointLight|core|x,y,z|x=0,y=0,z=0||animate,set
-  #|feSpecularLighting|core,presentation,filterPrimitive|class,in,kernelUnitLength,specularConstant,specularExponent,style,surfaceScale|surfaceScale=1,specularConstant=1,specularExponent=1|descriptive,lightSource|
-  #|feSpotLight|core|limitingConeAngle,pointsAtX,pointsAtY,pointsAtZ,specularExponent,x,y,z|x=0,y=0,z=0,pointsAtX=0,pointsAtY=0,pointsAtZ=0,specularExponent=1||animate,set
-  #|feTile|core,presentation,filterPrimitive|class,style,in|||animate,set
-  #|feTurbulence|core,presentation,filterPrimitive|baseFrequency,class,numOctaves,seed,stitchTiles,style,type|baseFrequency=0,numOctaves=1,seed=0,stitchTiles=noStitch,type=turbulence||animate,set
-  #|filter|core,presentation,xlink|class,externalResourcesRequired,filterRes,filterUnits,height,href,primitiveUnits,style,width,x,xlink:href,y|primitiveUnits=userSpaceOnUse,x=-10%,y=-10%,width=120%,height=120%|descriptive,filterPrimitive|animate,set
-  #|font|core,presentation|class,externalResourcesRequired,horiz-adv-x,horiz-origin-x,horiz-origin-y,style,vert-adv-y,vert-origin-x,vert-origin-y|horiz-origin-x=0,horiz-origin-y=0|descriptive|font-face,glyph,hkern,missing-glyph,vkern
-  #|font-face|core|font-family,font-style,font-variant,font-weight,font-stretch,font-size,unicode-range,units-per-em,panose-1,stemv,stemh,slope,cap-height,x-height,accent-height,ascent,descent,widths,bbox,ideographic,alphabetic,mathematical,hanging,v-ideographic,v-alphabetic,v-mathematical,v-hanging,underline-position,underline-thickness,strikethrough-position,strikethrough-thickness,overline-position,overline-thickness|font-style=all,font-variant=normal,font-weight=all,font-stretch=normal,unicode-range=U+0-10FFFF,units-per-em=1000,panose-1=0 0 0 0 0 0 0 0 0 0,slope=0|descriptive|font-face-src
-  #|font-face-format|core|string|||
-  #|font-face-name|core|name|||
-  #|font-face-src|core||||font-face-name,font-face-uri
-  #|font-face-uri|core,xlink|href,xlink:href|||font-face-format
-  #|foreignObject|conditionalProcessing,core,graphicalEvent,presentation|class,externalResourcesRequired,height,style,transform,width,x,y|x=0,y=0||
-  #|g|conditionalProcessing,core,graphicalEvent,presentation|class,externalResourcesRequired,style,transform||animation,descriptive,paintServer,shape,structural|a,altGlyphDef,clipPath,color-profile,cursor,filter,font-face,font,foreignObject,image,marker,mask,pattern,script,style,switch,text,view
-  #|glyph|core,presentation|arabic-form,class,d,glyph-name,horiz-adv-x,lang,orientation,style,unicode,vert-adv-y,vert-origin-x,vert-origin-y|arabic-form=initial|animation,descriptive,paintServer,shape,structural|a,altGlyphDef,clipPath,color-profile,cursor,filter,font-face,font,foreignObject,image,marker,mask,pattern,script,style,switch,text,view
-  #|glyphRef|core,presentation|class,d,horiz-adv-x,style,vert-adv-y,vert-origin-x,vert-origin-y||animation,descriptive,paintServer,shape,structural|a,altGlyphDef,clipPath,color-profile,cursor,filter,font-face,font,foreignObject,image,marker,mask,pattern,script,style,switch,text,view
-  #|hatch|core,presentation,xlink|class,hatchContentUnits,hatchUnits,pitch,rotate,style,transform,x,y|hatchUnits=objectBoundingBox,hatchContentUnits=userSpaceOnUse,x=0,y=0,pitch=0,rotate=0|animation,descriptive|hatchPath
-  #|hatchPath|core,presentation,xlink|class,style,d,offset|offset=0|animation,descriptive|
-  #|hkern|core|u1,g1,u2,g2,k|||
-  #|image|conditionalProcessing,core,graphicalEvent,presentation,xlink|class,externalResourcesRequired,height,href,preserveAspectRatio,style,transform,width,x,xlink:href,y|x=0,y=0,preserveAspectRatio=xMidYMid meet|animation,descriptive|
-  #|line|conditionalProcessing,core,graphicalEvent,presentation|class,externalResourcesRequired,style,transform,x1,x2,y1,y2|x1=0,y1=0,x2=0,y2=0|animation,descriptive|
-  #|linearGradient|core,presentation,xlink|class,externalResourcesRequired,gradientTransform,gradientUnits,href,spreadMethod,style,x1,x2,xlink:href,y1,y2|x1=0,y1=0,x2=100%,y2=0,spreadMethod=pad|descriptive|animate,animateTransform,set,stop
-  #|marker|core,presentation|class,externalResourcesRequired,markerHeight,markerUnits,markerWidth,orient,preserveAspectRatio,refX,refY,style,viewBox|markerUnits=strokeWidth,refX=0,refY=0,markerWidth=3,markerHeight=3|animation,descriptive,paintServer,shape,structural|a,altGlyphDef,clipPath,color-profile,cursor,filter,font-face,font,foreignObject,image,marker,mask,pattern,script,style,switch,text,view
-  #|mask|conditionalProcessing,core,presentation|class,externalResourcesRequired,height,mask-type,maskContentUnits,maskUnits,style,width,x,y|maskUnits=objectBoundingBox,maskContentUnits=userSpaceOnUse,x=-10%,y=-10%,width=120%,height=120%|animation,descriptive,paintServer,shape,structural|a,altGlyphDef,clipPath,color-profile,cursor,filter,font-face,font,foreignObject,image,marker,mask,pattern,script,style,switch,text,view
-  #|metadata|core||||
-  #|missing-glyph|core,presentation|class,d,horiz-adv-x,style,vert-adv-y,vert-origin-x,vert-origin-y||animation,descriptive,paintServer,shape,structural|a,altGlyphDef,clipPath,color-profile,cursor,filter,font-face,font,foreignObject,image,marker,mask,pattern,script,style,switch,text,view
-  #|mpath|core,xlink|externalResourcesRequired,href,xlink:href||descriptive|
-  #|path|conditionalProcessing,core,graphicalEvent,presentation|class,d,externalResourcesRequired,pathLength,style,transform||animation,descriptive|
-  #|pattern|conditionalProcessing,core,presentation,xlink|class,externalResourcesRequired,height,href,patternContentUnits,patternTransform,patternUnits,preserveAspectRatio,style,viewBox,width,x,xlink:href,y|patternUnits=objectBoundingBox,patternContentUnits=userSpaceOnUse,x=0,y=0,width=0,height=0,preserveAspectRatio=xMidYMid meet|animation,descriptive,paintServer,shape,structural|a,altGlyphDef,clipPath,color-profile,cursor,filter,font-face,font,foreignObject,image,marker,mask,pattern,script,style,switch,text,view
-  #|polygon|conditionalProcessing,core,graphicalEvent,presentation|class,externalResourcesRequired,points,style,transform||animation,descriptive|
-  #|polyline|conditionalProcessing,core,graphicalEvent,presentation|class,externalResourcesRequired,points,style,transform||animation,descriptive|
-  #|radialGradient|core,presentation,xlink|class,cx,cy,externalResourcesRequired,fr,fx,fy,gradientTransform,gradientUnits,href,r,spreadMethod,style,xlink:href|gradientUnits=objectBoundingBox,cx=50%,cy=50%,r=50%|descriptive|animate,animateTransform,set,stop
-  #|meshGradient|core,presentation,xlink|class,style,x,y,gradientUnits,transform||descriptive,paintServer,animation|meshRow
-  #|meshRow|core,presentation|class,style||descriptive|meshPatch
-  #|meshPatch|core,presentation|class,style||descriptive|stop
-  #|rect|conditionalProcessing,core,graphicalEvent,presentation|class,externalResourcesRequired,height,rx,ry,style,transform,width,x,y|x=0,y=0|animation,descriptive|
-  #|script|core,xlink|externalResourcesRequired,type,href,xlink:href|||
-  #|set|animation,animationAttributeTarget,animationTiming,conditionalProcessing,core,xlink|externalResourcesRequired,to||descriptive|
-  #|solidColor|core,presentation|class,style||paintServer|
-  #|stop|core,presentation|class,style,offset,path|||animate,animateColor,set
-  #|style|core|type,media,title|type=text/css||
-  #|svg|conditionalProcessing,core,documentEvent,graphicalEvent,presentation|baseProfile,class,contentScriptType,contentStyleType,height,preserveAspectRatio,style,version,viewBox,width,x,y,zoomAndPan|x=0,y=0,width=100%,height=100%,preserveAspectRatio=xMidYMid meet,zoomAndPan=magnify,version=1.1,baseProfile=none,contentScriptType=application/ecmascript,contentStyleType=text/css|animation,descriptive,paintServer,shape,structural|a,altGlyphDef,clipPath,color-profile,cursor,filter,font-face,font,foreignObject,image,marker,mask,pattern,script,style,switch,text,view
-  #|switch|conditionalProcessing,core,graphicalEvent,presentation|class,externalResourcesRequired,style,transform||animation,descriptive,shape|a,foreignObject,g,image,svg,switch,text,use
-  #|symbol|core,graphicalEvent,presentation|class,externalResourcesRequired,preserveAspectRatio,refX,refY,style,viewBox|refX=0,refY=0|animation,descriptive,paintServer,shape,structural|a,altGlyphDef,clipPath,color-profile,cursor,filter,font-face,font,foreignObject,image,marker,mask,pattern,script,style,switch,text,view
-  #|text|conditionalProcessing,core,graphicalEvent,presentation|class,dx,dy,externalResourcesRequired,lengthAdjust,rotate,style,textLength,transform,x,y|x=0,y=0,lengthAdjust=spacing|animation,descriptive,textContentChild|a
-  #|textPath|conditionalProcessing,core,graphicalEvent,presentation,xlink|class,d,externalResourcesRequired,href,method,spacing,startOffset,style,xlink:href|startOffset=0,method=align,spacing=exact|descriptive|a,altGlyph,animate,animateColor,set,tref,tspan
-  #|title|core|class,style|||
-  #|tref|conditionalProcessing,core,graphicalEvent,presentation,xlink|class,externalResourcesRequired,href,style,xlink:href||descriptive|animate,animateColor,set
-  #|tspan|conditionalProcessing,core,graphicalEvent,presentation|class,dx,dy,externalResourcesRequired,lengthAdjust,rotate,style,textLength,x,y||descriptive|a,altGlyph,animate,animateColor,set,tref,tspan
-  #|use|conditionalProcessing,core,graphicalEvent,presentation,xlink|class,externalResourcesRequired,height,href,style,transform,width,x,xlink:href,y|x=0,y=0|animation,descriptive|
-  #|view|core|externalResourcesRequired,preserveAspectRatio,viewBox,viewTarget,zoomAndPan||descriptive|
-  #|vkern|core|u1,g1,u2,g2,k|||
+  #|a|conditionalProcessing,core,graphicalEvent,presentation,xlink|class,externalResourcesRequired,style,target,transform|target=_self|animation,descriptive,paintServer,shape,structural|a,altGlyphDef,clipPath,color-profile,cursor,filter,font-face,font,foreignObject,image,marker,mask,pattern,script,style,switch,text,view,tspan||
+  #|altGlyph|conditionalProcessing,core,graphicalEvent,presentation,xlink|class,dx,dy,externalResourcesRequired,format,glyphRef,rotate,style,x,y|||||
+  #|altGlyphDef|core||||glyphRef||
+  #|altGlyphItem|core||||glyphRef,altGlyphItem||
+  #|animate|animationAddition,animationAttributeTarget,animationEvent,animationTiming,animationValue,conditionalProcessing,core,presentation,xlink|externalResourcesRequired||descriptive|||
+  #|animateColor|animationAddition,animationAttributeTarget,animationEvent,animationTiming,animationValue,conditionalProcessing,core,presentation,xlink|externalResourcesRequired||descriptive|||
+  #|animateMotion|animationAddition,animationEvent,animationTiming,animationValue,conditionalProcessing,core,xlink|externalResourcesRequired,keyPoints,origin,path,rotate|rotate=0|descriptive|mpath||
+  #|animateTransform|animationAddition,animationAttributeTarget,animationEvent,animationTiming,animationValue,conditionalProcessing,core,xlink|externalResourcesRequired,type||descriptive|||
+  #|circle|conditionalProcessing,core,graphicalEvent,presentation|class,cx,cy,externalResourcesRequired,r,style,transform|cx=0,cy=0|animation,descriptive|||
+  #|clipPath|conditionalProcessing,core,presentation|class,clipPathUnits,externalResourcesRequired,style,transform|clipPathUnits=userSpaceOnUse|animation,descriptive,shape|text,use||
+  #|color-profile|core,xlink|local,name,rendering-intent|name=sRGB,rendering-intent=auto|descriptive|||name
+  #|cursor|core,conditionalProcessing,xlink|externalResourcesRequired,x,y|x=0,y=0|descriptive|||
+  #|defs|conditionalProcessing,core,graphicalEvent,presentation|class,externalResourcesRequired,style,transform||animation,descriptive,paintServer,shape,structural|a,altGlyphDef,clipPath,color-profile,cursor,filter,font-face,font,foreignObject,image,marker,mask,pattern,script,style,switch,text,view||
+  #|desc|core|class,style|||||
+  #|ellipse|conditionalProcessing,core,graphicalEvent,presentation|class,cx,cy,externalResourcesRequired,rx,ry,style,transform|cx=0,cy=0|animation,descriptive|||
+  #|feBlend|core,presentation,filterPrimitive|class,style,in,in2,mode|mode=normal||animate,set||
+  #|feColorMatrix|core,presentation,filterPrimitive|class,style,in,type,values|type=matrix||animate,set||
+  #|feComponentTransfer|core,presentation,filterPrimitive|class,style,in|||feFuncA,feFuncB,feFuncG,feFuncR||
+  #|feComposite|core,presentation,filterPrimitive|class,in,in2,k1,k2,k3,k4,operator,style|operator=over,k1=0,k2=0,k3=0,k4=0||animate,set||
+  #|feConvolveMatrix|core,presentation,filterPrimitive|class,in,kernelMatrix,order,style,bias,divisor,edgeMode,targetX,targetY,kernelUnitLength,preserveAlpha|order=3,bias=0,edgeMode=duplicate,preserveAlpha=false||animate,set||
+  #|feDiffuseLighting|core,presentation,filterPrimitive|class,diffuseConstant,in,kernelUnitLength,style,surfaceScale|surfaceScale=1,diffuseConstant=1|descriptive|feDistantLight,fePointLight,feSpotLight||
+  #|feDisplacementMap|core,presentation,filterPrimitive|class,in,in2,scale,style,xChannelSelector,yChannelSelector|scale=0,xChannelSelector=A,yChannelSelector=A||animate,set||
+  #|feDistantLight|core|azimuth,elevation|azimuth=0,elevation=0||animate,set||
+  #|feFlood|core,presentation,filterPrimitive|class,style|||animate,animateColor,set||
+  #|feFuncA|core,transferFunction||||set,animate||
+  #|feFuncB|core,transferFunction||||set,animate||
+  #|feFuncG|core,transferFunction||||set,animate||
+  #|feFuncR|core,transferFunction||||set,animate||
+  #|feGaussianBlur|core,presentation,filterPrimitive|class,style,in,stdDeviation|stdDeviation=0||set,animate||
+  #|feImage|core,presentation,filterPrimitive,xlink|class,externalResourcesRequired,href,preserveAspectRatio,style,xlink:href|preserveAspectRatio=xMidYMid meet||animate,animateTransform,set||
+  #|feMerge|core,presentation,filterPrimitive|class,style|||feMergeNode||
+  #|feMergeNode|core|in|||animate,set||
+  #|feMorphology|core,presentation,filterPrimitive|class,style,in,operator,radius|operator=erode,radius=0||animate,set||
+  #|feOffset|core,presentation,filterPrimitive|class,style,in,dx,dy|dx=0,dy=0||animate,set||
+  #|fePointLight|core|x,y,z|x=0,y=0,z=0||animate,set||
+  #|feSpecularLighting|core,presentation,filterPrimitive|class,in,kernelUnitLength,specularConstant,specularExponent,style,surfaceScale|surfaceScale=1,specularConstant=1,specularExponent=1|descriptive,lightSource|||
+  #|feSpotLight|core|limitingConeAngle,pointsAtX,pointsAtY,pointsAtZ,specularExponent,x,y,z|x=0,y=0,z=0,pointsAtX=0,pointsAtY=0,pointsAtZ=0,specularExponent=1||animate,set||
+  #|feTile|core,presentation,filterPrimitive|class,style,in|||animate,set||
+  #|feTurbulence|core,presentation,filterPrimitive|baseFrequency,class,numOctaves,seed,stitchTiles,style,type|baseFrequency=0,numOctaves=1,seed=0,stitchTiles=noStitch,type=turbulence||animate,set||
+  #|filter|core,presentation,xlink|class,externalResourcesRequired,filterRes,filterUnits,height,href,primitiveUnits,style,width,x,xlink:href,y|primitiveUnits=userSpaceOnUse,x=-10%,y=-10%,width=120%,height=120%|descriptive,filterPrimitive|animate,set||filterRes
+  #|font|core,presentation|class,externalResourcesRequired,horiz-adv-x,horiz-origin-x,horiz-origin-y,style,vert-adv-y,vert-origin-x,vert-origin-y|horiz-origin-x=0,horiz-origin-y=0|descriptive|font-face,glyph,hkern,missing-glyph,vkern||horiz-origin-x,horiz-origin-y,vert-adv-y,vert-origin-x,vert-origin-y
+  #|font-face|core|font-family,font-style,font-variant,font-weight,font-stretch,font-size,unicode-range,units-per-em,panose-1,stemv,stemh,slope,cap-height,x-height,accent-height,ascent,descent,widths,bbox,ideographic,alphabetic,mathematical,hanging,v-ideographic,v-alphabetic,v-mathematical,v-hanging,underline-position,underline-thickness,strikethrough-position,strikethrough-thickness,overline-position,overline-thickness|font-style=all,font-variant=normal,font-weight=all,font-stretch=normal,unicode-range=U+0-10FFFF,units-per-em=1000,panose-1=0 0 0 0 0 0 0 0 0 0,slope=0|descriptive|font-face-src||accent-height,alphabetic,ascent,bbox,cap-height,descent,hanging,ideographic,mathematical,panose-1,slope,stemh,stemv,unicode-range,units-per-em,v-alphabetic,v-hanging,v-ideographic,v-mathematical,widths,x-height
+  #|font-face-format|core|string|||||string
+  #|font-face-name|core|name|||||name
+  #|font-face-src|core||||font-face-name,font-face-uri||
+  #|font-face-uri|core,xlink|href,xlink:href|||font-face-format||
+  #|foreignObject|conditionalProcessing,core,graphicalEvent,presentation|class,externalResourcesRequired,height,style,transform,width,x,y|x=0,y=0||||
+  #|g|conditionalProcessing,core,graphicalEvent,presentation|class,externalResourcesRequired,style,transform||animation,descriptive,paintServer,shape,structural|a,altGlyphDef,clipPath,color-profile,cursor,filter,font-face,font,foreignObject,image,marker,mask,pattern,script,style,switch,text,view||
+  #|glyph|core,presentation|arabic-form,class,d,glyph-name,horiz-adv-x,lang,orientation,style,unicode,vert-adv-y,vert-origin-x,vert-origin-y|arabic-form=initial|animation,descriptive,paintServer,shape,structural|a,altGlyphDef,clipPath,color-profile,cursor,filter,font-face,font,foreignObject,image,marker,mask,pattern,script,style,switch,text,view||arabic-form,glyph-name,horiz-adv-x,orientation,unicode,vert-adv-y,vert-origin-x,vert-origin-y
+  #|glyphRef|core,presentation|class,d,horiz-adv-x,style,vert-adv-y,vert-origin-x,vert-origin-y||animation,descriptive,paintServer,shape,structural|a,altGlyphDef,clipPath,color-profile,cursor,filter,font-face,font,foreignObject,image,marker,mask,pattern,script,style,switch,text,view||horiz-adv-x,vert-adv-y,vert-origin-x,vert-origin-y
+  #|hatch|core,presentation,xlink|class,hatchContentUnits,hatchUnits,pitch,rotate,style,transform,x,y|hatchUnits=objectBoundingBox,hatchContentUnits=userSpaceOnUse,x=0,y=0,pitch=0,rotate=0|animation,descriptive|hatchPath||
+  #|hatchPath|core,presentation,xlink|class,style,d,offset|offset=0|animation,descriptive|||
+  #|hkern|core|u1,g1,u2,g2,k|||||g1,g2,k,u1,u2
+  #|image|conditionalProcessing,core,graphicalEvent,presentation,xlink|class,externalResourcesRequired,height,href,preserveAspectRatio,style,transform,width,x,xlink:href,y|x=0,y=0,preserveAspectRatio=xMidYMid meet|animation,descriptive|||
+  #|line|conditionalProcessing,core,graphicalEvent,presentation|class,externalResourcesRequired,style,transform,x1,x2,y1,y2|x1=0,y1=0,x2=0,y2=0|animation,descriptive|||
+  #|linearGradient|core,presentation,xlink|class,externalResourcesRequired,gradientTransform,gradientUnits,href,spreadMethod,style,x1,x2,xlink:href,y1,y2|x1=0,y1=0,x2=100%,y2=0,spreadMethod=pad|descriptive|animate,animateTransform,set,stop||
+  #|marker|core,presentation|class,externalResourcesRequired,markerHeight,markerUnits,markerWidth,orient,preserveAspectRatio,refX,refY,style,viewBox|markerUnits=strokeWidth,refX=0,refY=0,markerWidth=3,markerHeight=3|animation,descriptive,paintServer,shape,structural|a,altGlyphDef,clipPath,color-profile,cursor,filter,font-face,font,foreignObject,image,marker,mask,pattern,script,style,switch,text,view||
+  #|mask|conditionalProcessing,core,presentation|class,externalResourcesRequired,height,mask-type,maskContentUnits,maskUnits,style,width,x,y|maskUnits=objectBoundingBox,maskContentUnits=userSpaceOnUse,x=-10%,y=-10%,width=120%,height=120%|animation,descriptive,paintServer,shape,structural|a,altGlyphDef,clipPath,color-profile,cursor,filter,font-face,font,foreignObject,image,marker,mask,pattern,script,style,switch,text,view||
+  #|metadata|core||||||
+  #|missing-glyph|core,presentation|class,d,horiz-adv-x,style,vert-adv-y,vert-origin-x,vert-origin-y||animation,descriptive,paintServer,shape,structural|a,altGlyphDef,clipPath,color-profile,cursor,filter,font-face,font,foreignObject,image,marker,mask,pattern,script,style,switch,text,view||horiz-adv-x,vert-adv-y,vert-origin-x,vert-origin-y
+  #|mpath|core,xlink|externalResourcesRequired,href,xlink:href||descriptive|||
+  #|path|conditionalProcessing,core,graphicalEvent,presentation|class,d,externalResourcesRequired,pathLength,style,transform||animation,descriptive|||
+  #|pattern|conditionalProcessing,core,presentation,xlink|class,externalResourcesRequired,height,href,patternContentUnits,patternTransform,patternUnits,preserveAspectRatio,style,viewBox,width,x,xlink:href,y|patternUnits=objectBoundingBox,patternContentUnits=userSpaceOnUse,x=0,y=0,width=0,height=0,preserveAspectRatio=xMidYMid meet|animation,descriptive,paintServer,shape,structural|a,altGlyphDef,clipPath,color-profile,cursor,filter,font-face,font,foreignObject,image,marker,mask,pattern,script,style,switch,text,view||
+  #|polygon|conditionalProcessing,core,graphicalEvent,presentation|class,externalResourcesRequired,points,style,transform||animation,descriptive|||
+  #|polyline|conditionalProcessing,core,graphicalEvent,presentation|class,externalResourcesRequired,points,style,transform||animation,descriptive|||
+  #|radialGradient|core,presentation,xlink|class,cx,cy,externalResourcesRequired,fr,fx,fy,gradientTransform,gradientUnits,href,r,spreadMethod,style,xlink:href|gradientUnits=objectBoundingBox,cx=50%,cy=50%,r=50%|descriptive|animate,animateTransform,set,stop||
+  #|meshGradient|core,presentation,xlink|class,style,x,y,gradientUnits,transform||descriptive,paintServer,animation|meshRow||
+  #|meshRow|core,presentation|class,style||descriptive|meshPatch||
+  #|meshPatch|core,presentation|class,style||descriptive|stop||
+  #|rect|conditionalProcessing,core,graphicalEvent,presentation|class,externalResourcesRequired,height,rx,ry,style,transform,width,x,y|x=0,y=0|animation,descriptive|||
+  #|script|core,xlink|externalResourcesRequired,type,href,xlink:href|||||
+  #|set|animation,animationAttributeTarget,animationTiming,conditionalProcessing,core,xlink|externalResourcesRequired,to||descriptive|||
+  #|solidColor|core,presentation|class,style||paintServer|||
+  #|stop|core,presentation|class,style,offset,path|||animate,animateColor,set||
+  #|style|core|type,media,title|type=text/css||||
+  #|svg|conditionalProcessing,core,documentEvent,graphicalEvent,presentation|baseProfile,class,contentScriptType,contentStyleType,height,preserveAspectRatio,style,version,viewBox,width,x,y,zoomAndPan|x=0,y=0,width=100%,height=100%,preserveAspectRatio=xMidYMid meet,zoomAndPan=magnify,version=1.1,baseProfile=none,contentScriptType=application/ecmascript,contentStyleType=text/css|animation,descriptive,paintServer,shape,structural|a,altGlyphDef,clipPath,color-profile,cursor,filter,font-face,font,foreignObject,image,marker,mask,pattern,script,style,switch,text,view|version|baseProfile,contentScriptType,contentStyleType,zoomAndPan
+  #|switch|conditionalProcessing,core,graphicalEvent,presentation|class,externalResourcesRequired,style,transform||animation,descriptive,shape|a,foreignObject,g,image,svg,switch,text,use||
+  #|symbol|core,graphicalEvent,presentation|class,externalResourcesRequired,preserveAspectRatio,refX,refY,style,viewBox|refX=0,refY=0|animation,descriptive,paintServer,shape,structural|a,altGlyphDef,clipPath,color-profile,cursor,filter,font-face,font,foreignObject,image,marker,mask,pattern,script,style,switch,text,view||
+  #|text|conditionalProcessing,core,graphicalEvent,presentation|class,dx,dy,externalResourcesRequired,lengthAdjust,rotate,style,textLength,transform,x,y|x=0,y=0,lengthAdjust=spacing|animation,descriptive,textContentChild|a||
+  #|textPath|conditionalProcessing,core,graphicalEvent,presentation,xlink|class,d,externalResourcesRequired,href,method,spacing,startOffset,style,xlink:href|startOffset=0,method=align,spacing=exact|descriptive|a,altGlyph,animate,animateColor,set,tref,tspan||
+  #|title|core|class,style|||||
+  #|tref|conditionalProcessing,core,graphicalEvent,presentation,xlink|class,externalResourcesRequired,href,style,xlink:href||descriptive|animate,animateColor,set||
+  #|tspan|conditionalProcessing,core,graphicalEvent,presentation|class,dx,dy,externalResourcesRequired,lengthAdjust,rotate,style,textLength,x,y||descriptive|a,altGlyph,animate,animateColor,set,tref,tspan||
+  #|use|conditionalProcessing,core,graphicalEvent,presentation,xlink|class,externalResourcesRequired,height,href,style,transform,width,x,xlink:href,y|x=0,y=0|animation,descriptive|||
+  #|view|core|externalResourcesRequired,preserveAspectRatio,viewBox,viewTarget,zoomAndPan||descriptive|||viewTarget,zoomAndPan
+  #|vkern|core|u1,g1,u2,g2,k|||||g1,g2,k,u1,u2
 
 ///|
 let svg_non_inheritable_data : String =
   #|clip-path,display,filter,mask,opacity,text-decoration,transform,unicode-bidi
+
+///|
+let svg_inheritable_data : String =
+  #|clip-rule,color,color-interpolation,color-interpolation-filters,color-profile,color-rendering,cursor,direction,dominant-baseline,fill,fill-opacity,fill-rule,font,font-family,font-size,font-size-adjust,font-stretch,font-style,font-variant,font-weight,glyph-orientation-horizontal,glyph-orientation-vertical,image-rendering,letter-spacing,marker,marker-end,marker-mid,marker-start,paint-order,pointer-events,shape-rendering,stroke,stroke-dasharray,stroke-dashoffset,stroke-linecap,stroke-linejoin,stroke-miterlimit,stroke-opacity,stroke-width,text-anchor,text-rendering,transform,visibility,word-spacing,writing-mode
+
+///|
+let svg_path_elems_data : String =
+  #|glyph,missing-glyph,path
+
+///|
+let svg_references_props_data : String =
+  #|clip-path,color-profile,fill,filter,marker-end,marker-mid,marker-start,mask,stroke,style
+
+///|
+let svg_deprecated_groups_data : String =
+  #|animationAttributeTarget||attributeType
+  #|conditionalProcessing||requiredFeatures
+  #|core||xml:base,xml:lang,xml:space
+  #|presentation||clip,color-profile,enable-background,glyph-orientation-horizontal,glyph-orientation-vertical,kerning

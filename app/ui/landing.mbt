@@ -76,8 +76,8 @@ fn hero(dark : Bool) -> Html {
               class="rise mt-[22px] max-w-[54ch] text-[17px] leading-relaxed text-ink-2",
               style=["--d: 160ms"],
               t(
-                "svgo.mbt rewrites 25 of svgo's 34 default optimizations in MoonBit. It ships as one \{wasm_bytes / 1024} KB wasm file that runs in the browser, in Node, or as a command-line tool. Every optimization is checked against the original pixel by pixel, so your SVGs get smaller and still look the same.",
-                "svgo.mbt 把 svgo 默认 34 个插件里的 25 个用 MoonBit 重写了一遍，打包成一个 \{wasm_bytes / 1024} KB 的 wasm 文件。浏览器里能跑，Node 里能跑，也有命令行版本。每一项优化都和原图逐像素比过：文件变小，图不会变样。",
+                "svgo.mbt rewrites 31 of svgo's 34 default optimizations in MoonBit. It ships as one \{wasm_bytes / 1024} KB wasm file that runs in the browser, in Node, or as a command-line tool. Every optimization is checked against the original pixel by pixel, so your SVGs get smaller and still look the same.",
+                "svgo.mbt 把 svgo 默认 34 个插件里的 31 个用 MoonBit 重写了一遍，打包成一个 \{wasm_bytes / 1024} KB 的 wasm 文件。浏览器里能跑，Node 里能跑，也有命令行版本。每一项优化都和原图逐像素比过：文件变小，图不会变样。",
               ),
             ),
             div(

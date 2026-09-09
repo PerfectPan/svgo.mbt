@@ -58,12 +58,6 @@ NOT_IMPLEMENTED = {
     "inlineStyles": "needs a CSS parser (selector matching and specificity)",
     "minifyStyles": "needs a CSS parser",
     "mergeStyles": "needs a CSS parser",
-    "moveElemsAttrsToGroup": "attribute motion across a group boundary",
-    "moveGroupAttrsToElems": "attribute motion across a group boundary",
-    "removeNonInheritableGroupAttrs": "plugin not written yet",
-    "removeDeprecatedAttrs": "plugin not written yet",
-    "cleanupEnableBackground": "plugin not written yet",
-    "sortDefsChildren": "plugin not written yet",
 }
 
 

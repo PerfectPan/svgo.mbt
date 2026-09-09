@@ -10,6 +10,8 @@ import {
 // Values
 pub let cleanup_attrs : Plugin
 
+pub let cleanup_enable_background : Plugin
+
 pub let cleanup_ids : Plugin
 
 pub let cleanup_numeric_values : Plugin
@@ -34,6 +36,10 @@ pub fn find_plugin(String) -> Plugin?
 
 pub let merge_paths : Plugin
 
+pub let move_elems_attrs_to_group : Plugin
+
+pub let move_group_attrs_to_elems : Plugin
+
 pub let optional_plugins : Array[Plugin]
 
 pub let preset_default : Array[Plugin]
@@ -43,6 +49,8 @@ pub let reference_attrs : @set.Set[String]
 pub fn referenced_ids(@xml.Document) -> @set.Set[String]
 
 pub let remove_comments : Plugin
+
+pub let remove_deprecated_attrs : Plugin
 
 pub let remove_desc : Plugin
 
@@ -62,6 +70,8 @@ pub let remove_hidden_elems : Plugin
 
 pub let remove_metadata : Plugin
 
+pub let remove_non_inheritable_group_attrs : Plugin
+
 pub let remove_title : Plugin
 
 pub let remove_unknowns_and_defaults : Plugin
@@ -77,6 +87,8 @@ pub let remove_xml_proc_inst : Plugin
 pub fn shorten_color(String) -> String
 
 pub let sort_attrs : Plugin
+
+pub let sort_defs_children : Plugin
 
 pub fn split_unit(String) -> (Double, String)?
 

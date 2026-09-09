@@ -1,8 +1,8 @@
 {
-  "generated": "2026-09-08",
+  "generated": "2026-09-09",
   "node": "v24.18.0",
   "svgoVersion": "4.1.0",
-  "wasmBytes": 226963,
+  "wasmBytes": 238010,
   "plugins": [
     {
       "name": "removeDoctype",
@@ -20,6 +20,11 @@
       "enabled": true
     },
     {
+      "name": "removeDeprecatedAttrs",
+      "description": "removes deprecated attributes",
+      "enabled": true
+    },
+    {
       "name": "removeMetadata",
       "description": "remove <metadata>",
       "enabled": true
@@ -32,11 +37,6 @@
     {
       "name": "cleanupAttrs",
       "description": "clean up whitespace in attribute values",
-      "enabled": true
-    },
-    {
-      "name": "removeDesc",
-      "description": "remove editor generated <desc>",
       "enabled": true
     },
     {
@@ -65,8 +65,18 @@
       "enabled": true
     },
     {
+      "name": "removeNonInheritableGroupAttrs",
+      "description": "removes non-inheritable group's presentational attributes",
+      "enabled": true
+    },
+    {
       "name": "removeUselessStrokeAndFill",
       "description": "remove useless stroke and fill attributes",
+      "enabled": true
+    },
+    {
+      "name": "cleanupEnableBackground",
+      "description": "remove or cleanup enable-background attribute when possible",
       "enabled": true
     },
     {
@@ -87,6 +97,11 @@
     {
       "name": "convertEllipseToCircle",
       "description": "convert ellipses with equal radii to circles",
+      "enabled": true
+    },
+    {
+      "name": "moveElemsAttrsToGroup",
+      "description": "Move common attributes of group children to the group",
       "enabled": true
     },
     {
@@ -130,6 +145,16 @@
       "enabled": true
     },
     {
+      "name": "sortDefsChildren",
+      "description": "sorts children of <defs> to improve compression",
+      "enabled": true
+    },
+    {
+      "name": "removeDesc",
+      "description": "remove editor generated <desc>",
+      "enabled": true
+    },
+    {
       "name": "removeDimensions",
       "description": "remove width/height from the root when viewBox is present",
       "enabled": false
@@ -137,6 +162,11 @@
     {
       "name": "removeTitle",
       "description": "remove <title>",
+      "enabled": false
+    },
+    {
+      "name": "moveGroupAttrsToElems",
+      "description": "moves some group attributes to the content elements",
       "enabled": false
     }
   ],
@@ -146,17 +176,17 @@
       "original": 570,
       "mbt": 442,
       "js": 442,
-      "mbtMs": 0.229,
-      "jsMs": 0.285,
+      "mbtMs": 0.223,
+      "jsMs": 0.325,
       "passes": 2
     },
     {
       "file": "illustrator-logo.svg",
       "original": 1149,
-      "mbt": 715,
+      "mbt": 672,
       "js": 528,
-      "mbtMs": 0.148,
-      "jsMs": 0.576,
+      "mbtMs": 0.182,
+      "jsMs": 0.667,
       "passes": 2
     },
     {
@@ -164,8 +194,8 @@
       "original": 2078,
       "mbt": 641,
       "js": 640,
-      "mbtMs": 0.169,
-      "jsMs": 0.659,
+      "mbtMs": 0.209,
+      "jsMs": 0.712,
       "passes": 2
     },
     {
@@ -173,8 +203,8 @@
       "original": 836,
       "mbt": 276,
       "js": 288,
-      "mbtMs": 0.105,
-      "jsMs": 0.321,
+      "mbtMs": 0.118,
+      "jsMs": 0.329,
       "passes": 3
     },
     {
@@ -182,8 +212,8 @@
       "original": 68630,
       "mbt": 52690,
       "js": 68101,
-      "mbtMs": 12.46,
-      "jsMs": 36.45,
+      "mbtMs": 14.265,
+      "jsMs": 41.627,
       "passes": 3
     },
     {
@@ -191,8 +221,8 @@
       "original": 5419,
       "mbt": 4562,
       "js": 4551,
-      "mbtMs": 0.869,
-      "jsMs": 2.71,
+      "mbtMs": 0.977,
+      "jsMs": 3.106,
       "passes": 3
     },
     {
@@ -200,8 +230,8 @@
       "original": 366,
       "mbt": 302,
       "js": 302,
-      "mbtMs": 0.057,
-      "jsMs": 0.169,
+      "mbtMs": 0.073,
+      "jsMs": 0.173,
       "passes": 2
     },
     {
@@ -209,8 +239,8 @@
       "original": 4019,
       "mbt": 3546,
       "js": 3584,
-      "mbtMs": 0.562,
-      "jsMs": 1.664,
+      "mbtMs": 0.593,
+      "jsMs": 1.86,
       "passes": 3
     },
     {
@@ -218,8 +248,8 @@
       "original": 49983,
       "mbt": 35975,
       "js": 35983,
-      "mbtMs": 6.587,
-      "jsMs": 14.058,
+      "mbtMs": 7.813,
+      "jsMs": 16.238,
       "passes": 3
     },
     {
@@ -227,8 +257,8 @@
       "original": 84823,
       "mbt": 46700,
       "js": 46706,
-      "mbtMs": 12.172,
-      "jsMs": 62.994,
+      "mbtMs": 13.308,
+      "jsMs": 59.082,
       "passes": 3
     }
   ]

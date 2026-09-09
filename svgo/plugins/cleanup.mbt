@@ -746,3 +746,236 @@ fn style_text(doc : @xml.Document) -> String {
   })
   sb.to_string()
 }
+
+///|
+/// Remove presentation attributes on `<g>` that are neither inheritable nor
+/// in the non-inheritable-group set (clip-path, display, filter, mask,
+/// opacity, text-decoration, transform, unicode-bidi). Such attributes on a
+/// group have no effect on the group's children.
+pub let remove_non_inheritable_group_attrs : Plugin = {
+  name: "removeNonInheritableGroupAttrs",
+  description: "removes non-inheritable group's presentational attributes",
+  run: (doc, _) => {
+    let tables = svg_tables()
+    let presentation = match tables.attr_groups.get("presentation") {
+      Some(names) => Set::from_array(names)
+      None => Set([])
+    }
+    let mut changed = false
+    doc.each_element((e, _) => {
+      if e.name != "g" {
+        return
+      }
+      if remove_attrs(e, (k, _) => {
+          presentation.contains(k) &&
+          !tables.inheritable.contains(k) &&
+          !tables.presentation_non_inheritable.contains(k)
+        }) {
+        changed = true
+      }
+    })
+    changed
+  },
+}
+
+///|
+/// Parse an `enable-background="new 0 0 W H"` value into (W, H) when it
+/// matches the standard form; otherwise None.
+fn parse_enable_background_new(value : String) -> (String, String)? {
+  let parts = value.trim().split(" ").filter(s => !s.is_empty()).to_array()
+  if parts.length() != 5 {
+    return None
+  }
+  if parts[0].to_owned() != "new" ||
+    parts[1].to_owned() != "0" ||
+    parts[2].to_owned() != "0" {
+    return None
+  }
+  Some((parts[3].to_owned(), parts[4].to_owned()))
+}
+
+///|
+/// Remove or clean up the `enable-background` attribute. When the document
+/// has no `<filter>`, the attribute is always redundant and is dropped.
+/// Otherwise, on `<svg>`, `<mask>` and `<pattern>` with explicit `width` and
+/// `height`, a value of `new 0 0 W H` matching those dimensions is redundant:
+/// for `<svg>` it is removed, for `<mask>`/`<pattern>` it is shortened to
+/// `new`. Inline `style` declarations are handled the same way.
+pub let cleanup_enable_background : Plugin = {
+  name: "cleanupEnableBackground",
+  description: "remove or cleanup enable-background attribute when possible",
+  run: (doc, _) => {
+    let mut has_filter = false
+    let mut has_enable_background = false
+    doc.each_element((e, _) => {
+      if e.name == "filter" {
+        has_filter = true
+      }
+      if e.attrs.contains("enable-background") {
+        has_enable_background = true
+      } else if e.attrs.get("style") is Some(s) &&
+        s.contains("enable-background") {
+        has_enable_background = true
+      }
+    })
+    if !has_filter && !has_enable_background {
+      return false
+    }
+    let mut changed = false
+    doc.each_element((e, _) => {
+      // handle inline style's enable-background declaration
+      if e.attrs.get("style") is Some(style) {
+        let new_style = remove_enable_background_from_style(style)
+        if new_style != style {
+          if new_style.is_empty() {
+            e.attrs.remove("style")
+          } else {
+            e.attrs["style"] = new_style
+          }
+          changed = true
+        }
+      }
+
+      if !has_filter {
+        if e.attrs.contains("enable-background") {
+          e.attrs.remove("enable-background")
+          changed = true
+        }
+        return
+      }
+
+      let has_dimensions = e.attrs.contains("width") &&
+        e.attrs.contains("height")
+      if (e.name == "svg" || e.name == "mask" || e.name == "pattern") &&
+        has_dimensions {
+        match e.attrs.get("enable-background") {
+          Some(value) => {
+            let width = e.attrs.get("width").unwrap()
+            let height = e.attrs.get("height").unwrap()
+            match parse_enable_background_new(value) {
+              Some((w, h)) if w == width && h == height => {
+                if e.name == "svg" {
+                  e.attrs.remove("enable-background")
+                } else {
+                  e.attrs["enable-background"] = "new"
+                }
+                changed = true
+              }
+              _ => ()
+            }
+          }
+          None => ()
+        }
+      }
+    })
+    changed
+  },
+}
+
+///|
+/// Remove all `enable-background` declarations from an inline style string.
+/// Keeps the remaining declarations in order.
+fn remove_enable_background_from_style(style : String) -> String {
+  let kept : Array[String] = []
+  for decl in style.split(";") {
+    let d = decl.trim().to_owned()
+    if d.is_empty() {
+      continue
+    }
+    if d.split(":").to_array()[0].trim() == "enable-background" {
+      continue
+    }
+    kept.push(d)
+  }
+  kept.join(";")
+}
+
+///|
+/// Extract attribute names referenced by CSS attribute selectors
+/// (`[attr]`, `[attr=value]`, ...) from a stylesheet. Used to avoid removing
+/// deprecated attributes that a stylesheet still selects on.
+fn css_attribute_names(css : String) -> Set[String] {
+  let names : Set[String] = Set([])
+  let mut i = 0
+  let n = css.length()
+  while i < n {
+    if css.get_char(i).unwrap() == '[' {
+      i += 1
+      let start = i
+      while i < n {
+        let c = css.get_char(i).unwrap()
+        if c.is_ascii_alphabetic() ||
+          c.is_ascii_digit() ||
+          c == '-' ||
+          c == '_' ||
+          c == ':' ||
+          c == '*' {
+          i += 1
+        } else {
+          break
+        }
+      }
+      if i > start {
+        names.add(css[start:i].to_owned())
+      }
+    } else {
+      i += 1
+    }
+  }
+  names
+}
+
+///|
+/// Remove deprecated attributes. Safe deprecated attributes are always
+/// removed; unsafe ones only when the `removeUnsafe` parameter is set.
+/// Attributes referenced by CSS attribute selectors are kept. The special
+/// `xml:lang` attribute is removed when a `lang` attribute is also present.
+pub let remove_deprecated_attrs : Plugin = {
+  name: "removeDeprecatedAttrs",
+  description: "removes deprecated attributes",
+  run: (doc, ctx) => {
+    let tables = svg_tables()
+    let remove_unsafe = ctx.param_bool("removeUnsafe", false)
+    let css = style_text(doc)
+    let css_attrs = if css.is_empty() {
+      Set([])
+    } else {
+      css_attribute_names(css)
+    }
+    let mut changed = false
+
+    doc.each_element((e, _) => {
+      let elem_tables = tables.element(e.name)
+      guard elem_tables is Some(et) else { return }
+
+      // Special case: xml:lang is safe to remove when lang is present.
+      if e.attrs.contains("xml:lang") &&
+        e.attrs.contains("lang") &&
+        !css_attrs.contains("xml:lang") {
+        e.attrs.remove("xml:lang")
+        changed = true
+      }
+
+      let safe = et.deprecated_safe
+      let unsafe_attrs = et.deprecated_unsafe
+      if safe.length() == 0 && (!remove_unsafe || unsafe_attrs.length() == 0) {
+        return
+      }
+      for name in safe {
+        if !css_attrs.contains(name) && e.attrs.contains(name) {
+          e.attrs.remove(name)
+          changed = true
+        }
+      }
+      if remove_unsafe {
+        for name in unsafe_attrs {
+          if !css_attrs.contains(name) && e.attrs.contains(name) {
+            e.attrs.remove(name)
+            changed = true
+          }
+        }
+      }
+    })
+    changed
+  },
+}

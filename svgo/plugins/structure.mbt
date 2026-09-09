@@ -2313,3 +2313,231 @@ fn inherited_attr(chain : Array[@xml.Element], key : String) -> String? {
   }
   None
 }
+
+///|
+/// Sort children of `<defs>` to improve compression: first by element name
+/// frequency (descending), then by name length (descending), then by name
+/// (descending). Non-element children keep their relative position.
+pub let sort_defs_children : Plugin = {
+  name: "sortDefsChildren",
+  description: "sorts children of <defs> to improve compression",
+  run: (doc, _) => {
+    let mut changed = false
+    doc.each_element((e, _) => {
+      if e.name != "defs" {
+        return
+      }
+      let frequencies : Map[String, Int] = Map([])
+      for c in e.children {
+        if c is @xml.Element(child) {
+          let f = frequencies.get(child.name).unwrap_or(0)
+          frequencies[child.name] = f + 1
+        }
+      }
+      let items = e.children
+      let sorted = items.copy()
+      sorted.sort_by((a, b) => {
+        match (a, b) {
+          (@xml.Element(ae), @xml.Element(be)) => {
+            let fa = frequencies.get(ae.name).unwrap_or(0)
+            let fb = frequencies.get(be.name).unwrap_or(0)
+            if fa != fb {
+              return fb - fa
+            }
+            let la = ae.name.length()
+            let lb = be.name.length()
+            if la != lb {
+              return lb - la
+            }
+            be.name.lexical_compare(ae.name)
+          }
+          _ => 0
+        }
+      })
+      let mut same = true
+      for i, it in items {
+        match (it, sorted[i]) {
+          (@xml.Element(x), @xml.Element(y)) if physical_equal(x, y) => ()
+          _ => {
+            same = false
+            break
+          }
+        }
+      }
+      if !same {
+        e.children.clear()
+        e.children.append(sorted[:])
+        changed = true
+      }
+    })
+    changed
+  },
+}
+
+///|
+/// Move a group's `transform` attribute onto its children when every child
+/// is a path-like element, `<g>` or `<text>` without an `id`, and the group
+/// has no paint-server/url reference that would make the transform apply to
+/// the referenced resource as well. The group's transform is prepended to
+/// each child's existing transform.
+pub let move_group_attrs_to_elems : Plugin = {
+  name: "moveGroupAttrsToElems",
+  description: "moves some group attributes to the content elements",
+  run: (doc, _) => {
+    let tables = svg_tables()
+    let mut changed = false
+    doc.each_element((g, _) => {
+      if g.name != "g" || g.children.length() == 0 {
+        return
+      }
+      let transform = match g.attrs.get("transform") {
+        Some(t) => t
+        None => return
+      }
+      // don't move transform when the group references a paint server,
+      // clip path, mask or filter: the transform also applies to that
+      // resource's coordinate space.
+      let has_url_ref = g.attrs
+        .iter()
+        .any(kv => {
+          tables.references_props.contains(kv.0) && kv.1.contains("url(")
+        })
+      if has_url_ref {
+        return
+      }
+      // all children must be elements of the allowed types without an id
+      let mut all_movable = true
+      for c in g.children {
+        match c {
+          @xml.Element(child) => {
+            if !tables.path_elems.contains(child.name) &&
+              child.name != "g" &&
+              child.name != "text" {
+              all_movable = false
+              break
+            }
+            if child.attrs.contains("id") {
+              all_movable = false
+              break
+            }
+          }
+          _ => {
+            all_movable = false
+            break
+          }
+        }
+      }
+      if !all_movable {
+        return
+      }
+      for c in g.children {
+        if c is @xml.Element(child) {
+          match child.attrs.get("transform") {
+            Some(child_transform) =>
+              child.attrs["transform"] = transform + " " + child_transform
+            None => child.attrs["transform"] = transform
+          }
+        }
+      }
+      g.attrs.remove("transform")
+      changed = true
+    })
+    changed
+  },
+}
+
+///|
+/// Move inheritable attributes shared by all children of a `<g>` up to the
+/// group. Runs bottom-up so nested groups are processed first. Deoptimized
+/// when a `<style>` element is present (selectors may rely on the moved
+/// attributes). `transform` is kept on children when the group has a
+/// `filter`, `clip-path` or `mask`, or when every child is a path (so
+/// `convertPathData` can fold the transform into the path data).
+pub let move_elems_attrs_to_group : Plugin = {
+  name: "moveElemsAttrsToGroup",
+  description: "Move common attributes of group children to the group",
+  run: (doc, _) => {
+    let tables = svg_tables()
+    let mut has_style = false
+    doc.each_element((e, _) => if e.name == "style" { has_style = true })
+    let mut changed = false
+    doc.each_element_post((g, _) => {
+      if g.name != "g" || g.children.length() <= 1 {
+        return
+      }
+      if has_style {
+        return
+      }
+      // collect inheritable attributes common to all children
+      let common : Map[String, String] = Map([])
+      let mut initial = true
+      let mut every_child_is_path = true
+      let mut all_children_are_elements = true
+      for c in g.children {
+        match c {
+          @xml.Element(child) => {
+            if !tables.path_elems.contains(child.name) {
+              every_child_is_path = false
+            }
+            if initial {
+              initial = false
+              for k, v in child.attrs {
+                if tables.inheritable.contains(k) {
+                  common[k] = v
+                }
+              }
+            } else {
+              for k in common.keys() {
+                if child.attrs.get(k) != common.get(k) {
+                  common.remove(k)
+                }
+              }
+              if common.length() == 0 {
+                break
+              }
+            }
+          }
+          _ => {
+            all_children_are_elements = false
+            break
+          }
+        }
+      }
+      if !all_children_are_elements {
+        return
+      }
+      // preserve transform on children when the group has filter, clip-path
+      // or mask, or when all children are paths.
+      if g.attrs.contains("filter") ||
+        g.attrs.contains("clip-path") ||
+        g.attrs.contains("mask") ||
+        every_child_is_path {
+        common.remove("transform")
+      }
+      if common.length() == 0 {
+        return
+      }
+      // move common attributes to the group
+      for k, v in common {
+        if k == "transform" {
+          match g.attrs.get("transform") {
+            Some(gt) => g.attrs["transform"] = gt + " " + v
+            None => g.attrs["transform"] = v
+          }
+        } else {
+          g.attrs[k] = v
+        }
+      }
+      // remove common attributes from children
+      for c in g.children {
+        if c is @xml.Element(child) {
+          for k in common.keys() {
+            child.attrs.remove(k)
+          }
+        }
+      }
+      changed = true
+    })
+    changed
+  },
+}

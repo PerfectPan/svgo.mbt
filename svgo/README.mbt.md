@@ -1,11 +1,11 @@
 # svgo.mbt
 
 **An SVG optimizer written in MoonBit, shipped as WebAssembly.**
-25 of the 34 plugins in [svgo](https://github.com/svg/svgo)'s preset-default,
+31 of the 34 plugins in [svgo](https://github.com/svg/svgo)'s preset-default,
 in its order and with its semantics, and none of the Node.js dependency tree:
-a 227 KB `wasm-gc` module that runs in the browser and in Node 22+, a native
-CLI, and a MoonBit library. The nine that are missing are listed under
-[compatibility](#compatibility-with-svgo-measured).
+a 238 KB `wasm-gc` module that runs in the browser and in Node 22+, a native
+CLI, and a MoonBit library. The three that are missing all need a CSS parser;
+see [compatibility](#compatibility-with-svgo-measured).
 
 [**Website & playground**](https://perfectpan.github.io/svgo.mbt/) ·
 [API reference](https://perfectpan.github.io/svgo.mbt/api.html) ·
@@ -138,21 +138,24 @@ Enabled by default, in svgo's `preset-default` order:
 | cleanupNumericValues | round numbers, remove `px` |
 | convertColors | `rgb()` / names / `#RRGGBB` to the shortest form |
 | removeUnknownsAndDefaults | drop attributes equal to their defaults, unless an ancestor overrides them |
+| removeDeprecatedAttrs | drop attributes the SVG spec deprecated, keeping the ones that still render |
+| removeNonInheritableGroupAttrs | drop presentation attributes off a `<g>` that children cannot inherit |
 | removeUselessStrokeAndFill | drop `stroke-*` when nothing is stroked, `fill-*` when nothing is filled |
+| cleanupEnableBackground | drop `enable-background` unless a filter uses `BackgroundImage` |
 | removeHiddenElems, removeEmptyText | zero-size shapes, `display:none`, empty paths and texts |
 | convertShapeToPath, convertEllipseToCircle | `rect` / `line` / `polyline` / `polygon` to `path`, equal-radius ellipses to circles |
+| moveElemsAttrsToGroup | lift an attribute every child shares onto their group |
 | collapseGroups | unwrap groups and push their attributes down |
-| convertPathData | relative/absolute per segment, `H`/`V`/`S`/`T` shorthands, straight curves to lines, precision with drift compensation |
-| convertTransform | round transform arguments, drop identity and redundant ones |
-| mergePaths | join adjacent paths with identical attributes when their bounding boxes do not overlap |
-| removeEmptyAttrs, removeEmptyContainers, removeUnusedNS, sortAttrs | final cleanup |
+| convertPathData | element transforms baked into the data, curve runs to arcs, relative/absolute per segment, `H`/`V`/`S`/`T` shorthands, straight curves to lines, precision with drift compensation |
+| convertTransform | multiply, decompose and round transform lists, drop identity and redundant ones |
+| mergePaths | join adjacent paths with identical attributes when their outlines do not intersect |
+| removeEmptyAttrs, removeEmptyContainers, removeUnusedNS, sortAttrs, sortDefsChildren | final cleanup |
 
-Optional: `removeDimensions`, `removeTitle`.
+Optional: `removeDimensions`, `removeTitle`, `moveGroupAttrsToElems` (see the
+deviation noted under compatibility).
 
-Not implemented yet compared to svgo: `inlineStyles`, `minifyStyles`,
-`mergeStyles` (they need a CSS parser), `moveElemsAttrsToGroup`,
-`moveGroupAttrsToElems`, matrix folding in `convertTransform`,
-`applyTransforms`, `removeNonInheritableGroupAttrs`, `prefixIds`.
+Not implemented compared to svgo: `inlineStyles`, `minifyStyles` and
+`mergeStyles`, which need a CSS parser.
 
 ## Performance
 
@@ -201,38 +204,44 @@ them (svgo e4cb29b, 2026-08-27):
 
 | | cases |
 | --- | --- |
-| pass | 209 |
+| pass | 238 |
 | known differences | 0 |
 | skipped | 0 |
 
-All 209 match byte for byte, including the rules that rewrite geometry:
+All 238 match byte for byte, including the rules that rewrite geometry:
 element transforms baked into the path data, curve runs turned into arcs,
 adjacent paths merged, groups collapsed. `fixtures/upstream/KNOWN_FAILURES.txt`
 is empty and the harness fails the build if a case starts failing again, so an
 entry there is a regression rather than a new baseline.
 
-**Is the pipeline complete?** Not yet. svgo's `preset-default` runs 34 plugins;
-svgo.mbt runs 25 of them plus `removeDimensions` and `removeTitle`, which svgo
-keeps opt-in. The cases for the nine missing plugins are imported too and
-generated as skipped tests, so the gap shows up in every test run:
+**Is the pipeline complete?** Three plugins short. svgo's `preset-default` runs
+34 plugins; svgo.mbt implements 31 of them, and runs 30 by default plus
+`removeDimensions` and `removeTitle`, which svgo keeps opt-in. The cases for the
+three missing plugins are imported too and generated as skipped tests, so the
+gap shows up in every test run:
 
 | missing plugin | cases | what it would take |
 | --- | --- | --- |
 | `inlineStyles` | 28 | a CSS parser: selector matching, specificity, at-rules |
 | `mergeStyles` | 12 | same |
-| `minifyStyles` | 11 | same |
-| `moveElemsAttrsToGroup` | 7 | attribute motion across a group boundary, with inheritance rules |
-| `moveGroupAttrsToElems` | 6 | same |
-| `removeDeprecatedAttrs` | 8 | a table lookup |
-| `cleanupEnableBackground` | 5 | one deprecated attribute |
-| `removeNonInheritableGroupAttrs` | 2 | drop non-inheritable presentation attributes off a group |
-| `sortDefsChildren` | 1 | sort the children of `<defs>` |
+| `minifyStyles` | 11 | same, plus most of a CSS minifier (svgo delegates to `csso`) |
 
-That is 80 skipped cases against 209 passing, and deleting a plugin's entry
-from `NOT_IMPLEMENTED` in `scripts/gen-fixtures.py` makes its cases live. svgo
-also has 17 opt-in plugins (88 further cases) that are not imported at all, and
-its parser, stringifier, style and CLI unit tests are not imported either since
-they cover svgo's internals rather than its output.
+That is 51 skipped cases against 238 passing, and deleting a plugin's entry from
+`NOT_IMPLEMENTED` in `scripts/gen-fixtures.py` makes its cases live.
+
+One deliberate deviation: `moveGroupAttrsToElems` is implemented and passes
+svgo's cases, but it ships opt-in (`--enable moveGroupAttrsToElems`). Pushing a
+group's `transform` onto its children lets `convertPathData` bake the matrix
+into every path, which lengthens coordinates and leaves formerly identical
+siblings unmergeable. Over the eleven files in `svgo/testdata/` and
+`packages/compare/corpus/` it costs 15,859 bytes on the Ghostscript tiger and
+saves 48 bytes across the rest. svgo shows the same effect on that file (68,101
+bytes with the plugin, 52,029 without), so this is a size choice, not a
+compatibility gap.
+
+svgo also has 17 opt-in plugins (88 further cases) that are not imported at all,
+and its parser, stringifier, style and CLI unit tests are not imported either
+since they cover svgo's internals rather than its output.
 
 ## Repository layout
 

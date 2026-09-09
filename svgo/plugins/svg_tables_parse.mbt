@@ -9,6 +9,16 @@ priv struct SvgTables {
   expanded : Map[String, SvgElementTables]
   known_elements : Set[String]
   presentation_non_inheritable : Set[String]
+  inheritable : Set[String]
+  path_elems : Set[String]
+  references_props : Set[String]
+  deprecated_groups : Map[String, DeprecatedAttrs]
+}
+
+///|
+priv struct DeprecatedAttrs {
+  safe : Set[String]
+  unsafe_attrs : Set[String]
 }
 
 ///|
@@ -16,6 +26,8 @@ priv struct SvgElementTables {
   allowed_attrs : Set[String]
   defaults : Map[String, String]
   allowed_children : Set[String]
+  deprecated_safe : Set[String]
+  deprecated_unsafe : Set[String]
 }
 
 ///|
@@ -49,6 +61,23 @@ fn table_groups(raw : String) -> Map[String, Array[String]] {
 }
 
 ///|
+fn deprecated_groups(raw : String) -> Map[String, DeprecatedAttrs] {
+  let groups : Map[String, DeprecatedAttrs] = Map([])
+  for row in raw.split("\n") {
+    let fields = row.split("|").to_array()
+    if fields.length() < 3 {
+      continue
+    }
+    let name = fields[0].to_owned()
+    groups[name] = {
+      safe: Set::from_array(table_list(fields[1])),
+      unsafe_attrs: Set::from_array(table_list(fields[2])),
+    }
+  }
+  groups
+}
+
+///|
 fn svg_tables() -> SvgTables {
   if svg_tables_cache.val is Some(tables) {
     return tables
@@ -69,6 +98,10 @@ fn svg_tables() -> SvgTables {
     presentation_non_inheritable: Set::from_array(
       table_list(svg_non_inheritable_data[:]),
     ),
+    inheritable: Set::from_array(table_list(svg_inheritable_data[:])),
+    path_elems: Set::from_array(table_list(svg_path_elems_data[:])),
+    references_props: Set::from_array(table_list(svg_references_props_data[:])),
+    deprecated_groups: deprecated_groups(svg_deprecated_groups_data),
   }
   for row in svg_elements_data.split("\n") {
     let fields = row.split("|").to_array()
@@ -110,10 +143,33 @@ fn SvgTables::element(self : SvgTables, name : String) -> SvgElementTables? {
       }
     }
   }
+  let deprecated_safe = if fields.length() > 6 {
+    Set::from_array(table_list(fields[6]))
+  } else {
+    Set([])
+  }
+  let deprecated_unsafe = if fields.length() > 7 {
+    Set::from_array(table_list(fields[7]))
+  } else {
+    Set([])
+  }
+  // merge group-level deprecated attributes into the element's sets
+  for group in table_list(fields[1]) {
+    if self.deprecated_groups.get(group) is Some(dep) {
+      for name in dep.safe {
+        deprecated_safe.add(name)
+      }
+      for name in dep.unsafe_attrs {
+        deprecated_unsafe.add(name)
+      }
+    }
+  }
   let element : SvgElementTables = {
     allowed_attrs: attrs,
     defaults,
     allowed_children: children,
+    deprecated_safe,
+    deprecated_unsafe,
   }
   self.expanded[name] = element
   Some(element)

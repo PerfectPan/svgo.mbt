@@ -1063,7 +1063,6 @@ test "upstream cleanupAttrs.02" {
 }
 
 ///|
-#skip("plugin not written yet")
 test "upstream cleanupEnableBackground.01" {
   check_fixture_upstream(
     "cleanupEnableBackground",
@@ -1095,7 +1094,6 @@ test "upstream cleanupEnableBackground.01" {
 }
 
 ///|
-#skip("plugin not written yet")
 test "upstream cleanupEnableBackground.02" {
   check_fixture_upstream(
     "cleanupEnableBackground",
@@ -1127,7 +1125,6 @@ test "upstream cleanupEnableBackground.02" {
 }
 
 ///|
-#skip("plugin not written yet")
 test "upstream cleanupEnableBackground.03" {
   check_fixture_upstream(
     "cleanupEnableBackground",
@@ -1163,7 +1160,6 @@ test "upstream cleanupEnableBackground.03" {
 }
 
 ///|
-#skip("plugin not written yet")
 test "upstream cleanupEnableBackground.04" {
   check_fixture_upstream(
     "cleanupEnableBackground",
@@ -1189,7 +1185,6 @@ test "upstream cleanupEnableBackground.04" {
 }
 
 ///|
-#skip("plugin not written yet")
 test "upstream cleanupEnableBackground.05" {
   check_fixture_upstream(
     "cleanupEnableBackground",
@@ -7309,7 +7304,6 @@ test "upstream minifyStyles.11" {
 }
 
 ///|
-#skip("attribute motion across a group boundary")
 test "upstream moveElemsAttrsToGroup.01" {
   check_fixture_upstream(
     "moveElemsAttrsToGroup",
@@ -7349,7 +7343,6 @@ test "upstream moveElemsAttrsToGroup.01" {
 }
 
 ///|
-#skip("attribute motion across a group boundary")
 test "upstream moveElemsAttrsToGroup.02" {
   check_fixture_upstream(
     "moveElemsAttrsToGroup",
@@ -7377,7 +7370,6 @@ test "upstream moveElemsAttrsToGroup.02" {
 }
 
 ///|
-#skip("attribute motion across a group boundary")
 test "upstream moveElemsAttrsToGroup.03" {
   check_fixture_upstream(
     "moveElemsAttrsToGroup",
@@ -7411,7 +7403,6 @@ test "upstream moveElemsAttrsToGroup.03" {
 }
 
 ///|
-#skip("attribute motion across a group boundary")
 test "upstream moveElemsAttrsToGroup.04" {
   check_fixture_upstream(
     "moveElemsAttrsToGroup",
@@ -7465,7 +7456,6 @@ test "upstream moveElemsAttrsToGroup.04" {
 }
 
 ///|
-#skip("attribute motion across a group boundary")
 test "upstream moveElemsAttrsToGroup.06" {
   check_fixture_upstream(
     "moveElemsAttrsToGroup",
@@ -7493,7 +7483,6 @@ test "upstream moveElemsAttrsToGroup.06" {
 }
 
 ///|
-#skip("attribute motion across a group boundary")
 test "upstream moveElemsAttrsToGroup.07" {
   check_fixture_upstream(
     "moveElemsAttrsToGroup",
@@ -7527,7 +7516,6 @@ test "upstream moveElemsAttrsToGroup.07" {
 }
 
 ///|
-#skip("attribute motion across a group boundary")
 test "upstream moveElemsAttrsToGroup.08" {
   check_fixture_upstream(
     "moveElemsAttrsToGroup",
@@ -7565,7 +7553,6 @@ test "upstream moveElemsAttrsToGroup.08" {
 }
 
 ///|
-#skip("attribute motion across a group boundary")
 test "upstream moveGroupAttrsToElems.01" {
   check_fixture_upstream(
     "moveGroupAttrsToElems",
@@ -7593,7 +7580,6 @@ test "upstream moveGroupAttrsToElems.01" {
 }
 
 ///|
-#skip("attribute motion across a group boundary")
 test "upstream moveGroupAttrsToElems.02" {
   check_fixture_upstream(
     "moveGroupAttrsToElems",
@@ -7621,7 +7607,6 @@ test "upstream moveGroupAttrsToElems.02" {
 }
 
 ///|
-#skip("attribute motion across a group boundary")
 test "upstream moveGroupAttrsToElems.03" {
   check_fixture_upstream(
     "moveGroupAttrsToElems",
@@ -7653,7 +7638,6 @@ test "upstream moveGroupAttrsToElems.03" {
 }
 
 ///|
-#skip("attribute motion across a group boundary")
 test "upstream moveGroupAttrsToElems.04" {
   check_fixture_upstream(
     "moveGroupAttrsToElems",
@@ -7691,7 +7675,6 @@ test "upstream moveGroupAttrsToElems.04" {
 }
 
 ///|
-#skip("attribute motion across a group boundary")
 test "upstream moveGroupAttrsToElems.05" {
   check_fixture_upstream(
     "moveGroupAttrsToElems",
@@ -7719,7 +7702,6 @@ test "upstream moveGroupAttrsToElems.05" {
 }
 
 ///|
-#skip("attribute motion across a group boundary")
 test "upstream moveGroupAttrsToElems.06" {
   check_fixture_upstream(
     "moveGroupAttrsToElems",
@@ -7816,7 +7798,6 @@ test "upstream removeComments.03" {
 }
 
 ///|
-#skip("plugin not written yet")
 test "upstream removeDeprecatedAttrs.01" {
   check_fixture_upstream(
     "removeDeprecatedAttrs",
@@ -7838,7 +7819,6 @@ test "upstream removeDeprecatedAttrs.01" {
 }
 
 ///|
-#skip("plugin not written yet")
 test "upstream removeDeprecatedAttrs.02" {
   check_fixture_upstream(
     "removeDeprecatedAttrs",
@@ -7860,7 +7840,6 @@ test "upstream removeDeprecatedAttrs.02" {
 }
 
 ///|
-#skip("plugin not written yet")
 test "upstream removeDeprecatedAttrs.03" {
   check_fixture_upstream(
     "removeDeprecatedAttrs",
@@ -7882,7 +7861,6 @@ test "upstream removeDeprecatedAttrs.03" {
 }
 
 ///|
-#skip("plugin not written yet")
 test "upstream removeDeprecatedAttrs.04" {
   check_fixture_upstream(
     "removeDeprecatedAttrs",
@@ -7914,7 +7892,6 @@ test "upstream removeDeprecatedAttrs.04" {
 }
 
 ///|
-#skip("plugin not written yet")
 test "upstream removeDeprecatedAttrs.05" {
   check_fixture_upstream(
     "removeDeprecatedAttrs",
@@ -7936,7 +7913,6 @@ test "upstream removeDeprecatedAttrs.05" {
 }
 
 ///|
-#skip("plugin not written yet")
 test "upstream removeDeprecatedAttrs.06" {
   check_fixture_upstream(
     "removeDeprecatedAttrs",
@@ -7958,7 +7934,6 @@ test "upstream removeDeprecatedAttrs.06" {
 }
 
 ///|
-#skip("plugin not written yet")
 test "upstream removeDeprecatedAttrs.07" {
   check_fixture_upstream(
     "removeDeprecatedAttrs",
@@ -7980,7 +7955,6 @@ test "upstream removeDeprecatedAttrs.07" {
 }
 
 ///|
-#skip("plugin not written yet")
 test "upstream removeDeprecatedAttrs.08" {
   check_fixture_upstream(
     "removeDeprecatedAttrs",
@@ -9166,7 +9140,6 @@ test "upstream removeMetadata.01" {
 }
 
 ///|
-#skip("plugin not written yet")
 test "upstream removeNonInheritableGroupAttrs.01" {
   check_fixture_upstream(
     "removeNonInheritableGroupAttrs",
@@ -9192,7 +9165,6 @@ test "upstream removeNonInheritableGroupAttrs.01" {
 }
 
 ///|
-#skip("plugin not written yet")
 test "upstream removeNonInheritableGroupAttrs.02" {
   check_fixture_upstream(
     "removeNonInheritableGroupAttrs",
@@ -10470,7 +10442,6 @@ test "upstream sortAttrs.04" {
 }
 
 ///|
-#skip("plugin not written yet")
 test "upstream sortDefsChildren.01" {
   check_fixture_upstream(
     "sortDefsChildren",

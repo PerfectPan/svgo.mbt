@@ -1,7 +1,7 @@
 {
   "name": "svgo-mbt",
   "version": "0.1.0",
-  "description": "SVG optimizer written in MoonBit, shipped as WebAssembly (wasm-gc)",
+  "description": "SVG optimizer written in MoonBit: a wasm-gc library and the svgo-mbt command line tool",
   "type": "module",
   "main": "index.mjs",
   "bin": {
@@ -17,7 +17,8 @@
     "README.md"
   ],
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "prepublishOnly": "cd ../.. && scripts/build-wasm.sh && scripts/build-cli.sh"
   },
   "engines": {
     "node": ">=22"

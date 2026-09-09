@@ -2,10 +2,11 @@
 
 WebAssembly build of [svgo.mbt](https://github.com/PerfectPan/svgo.mbt), an
 SVG optimizer written in MoonBit: 31 of the 34 plugins in svgo's preset-default, in its order and with its semantics.
-One 165 KB `wasm-gc` file plus a 2 KB loader, no other dependencies.
+One 238 KB `wasm-gc` file plus a 2 KB loader, no other dependencies.
 
 ```bash
-npm i svgo-mbt
+npm i svgo-mbt          # the library
+npx svgo-mbt in.svg -o out.svg   # the command line tool, no install
 ```
 
 ```js
@@ -25,6 +26,22 @@ r.applied;       // plugins that changed something
 
 await plugins(); // [{ name, description, enabled }]
 ```
+
+## Command line
+
+The bin is the same optimizer compiled for node, so it needs no toolchain:
+
+```bash
+npx svgo-mbt in.svg -o out.svg
+cat in.svg | npx svgo-mbt > out.svg   # stdin, or pass "-" as the input
+npx svgo-mbt icons -r -o dist         # a directory, recursively
+npx svgo-mbt in.svg --stats           # size statistics on stderr
+npx svgo-mbt in.svg --json            # {data, originalSize, size, passes, applied}
+npx svgo-mbt --list                   # available plugins
+```
+
+Exit codes: 0 on success, 1 for a usage error, 2 when a file could not be
+parsed, with the failing names on stderr.
 
 In a browser the module is fetched relative to the loader; pass your own URL
 to `init(url)` before the first `optimize` call if you host it elsewhere.

@@ -53,19 +53,31 @@ const r = await optimize(svg, { precision: 3 });
 r.data; r.originalSize; r.size; r.passes; r.applied;
 ```
 
-**Command line** (native, one binary):
+**Command line**, without a toolchain (Node 22+):
+
+```bash
+npx svgo-mbt input.svg -o out.svg
+cat input.svg | npx svgo-mbt > out.svg          # stdin, or pass "-" as the input
+npx svgo-mbt icons -r -o dist                   # a directory, recursively
+```
+
+Or build the native binary, which is the same MoonBit source with C file I/O
+instead of node's `fs`:
 
 ```bash
 moon build --target native --release          # -> $(scripts/bin-path.sh), under _build/native/release/
-svgo input.svg                                # optimized SVG on stdout
-svgo input.svg -o out.svg --stats             # write a file, print size statistics
-svgo input.svg -p 2 --pretty                  # 2 decimal places, indented output
-svgo input.svg --json                         # {data, originalSize, size, passes, applied}
-svgo input.svg --plugins convertPathData,sortAttrs
-svgo input.svg --param cleanupIds.preserve=logo,icon --param cleanupIds.minify=false
-svgo input.svg --disable convertShapeToPath --enable removeDimensions
-svgo --list                                   # available plugins
+svgo-mbt input.svg                            # optimized SVG on stdout
+svgo-mbt input.svg -o out.svg --stats         # write a file, print size statistics
+svgo-mbt input.svg -p 2 --pretty              # 2 decimal places, indented output
+svgo-mbt input.svg --json                     # {data, originalSize, size, passes, applied}
+svgo-mbt input.svg --plugins convertPathData,sortAttrs
+svgo-mbt input.svg --param cleanupIds.preserve=logo,icon --param cleanupIds.minify=false
+svgo-mbt input.svg --disable convertShapeToPath --enable moveGroupAttrsToElems
+svgo-mbt --list                               # available plugins
 ```
+
+Exit codes: 0 on success, 1 for a usage error, 2 when a file could not be
+parsed (the names go to stderr, so a shell loop can act on them).
 
 `--param <plugin>.<key>=<value>` is repeatable. Values `true`/`false` become
 booleans, integers become numbers, comma-separated values become string arrays,

@@ -13,6 +13,8 @@ if git grep -n -E '^(<<<<<<< |>>>>>>> )' -- . ':!node_modules'; then
   echo "unresolved merge conflict markers (see above)" >&2
   exit 1
 fi
+step "one version everywhere (scripts/sync-version.mjs)"
+node scripts/sync-version.mjs --check
 step "moon check"
 moon check -q
 step "moon fmt --check"

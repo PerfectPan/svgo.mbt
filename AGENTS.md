@@ -35,8 +35,8 @@ root installs every JS package.
 | dev server with live reload | `pnpm dev` → http://localhost:4173 (warren dev + tailwind --watch) |
 | regenerate the site's data files | `node app/website/gen.mjs` (after collect.mjs or moon doc changed) |
 | re-render the hero animation | `pnpm -C app/website motion:render` |
-| publish the MoonBit module | `cd svgo && MOON_WORK=off moon publish` (namespace `PerfectPan` must match the mooncakes login) |
-| publish npm + native binaries | bump the version in `svgo/moon.mod`, `app/*/moon.mod`, `app/cli/main.mbt`, `svgo/wasm/wasm.mbt`, `packages/svgo-mbt/package.json`, then `git tag vX.Y.Z && git push --tags` (`release.yml`; needs the `NPM_TOKEN` secret; `gh workflow run release.yml -f dry_run=true` to rehearse) |
+| record a user-visible change for the changelog | `pnpm changeset` in the PR (writes `.changeset/*.md`) |
+| release (npm via OIDC, then native binaries + GitHub release + mooncakes) | release PR: `pnpm version-packages` (changesets bump + `scripts/sync-version.mjs` copies the version into the MoonBit modules), merge it; `release.yml` publishes to npm and tags `svgo-mbt@X.Y.Z`, `binaries.yml` does the rest (needs the `MOONCAKES_TOKEN` secret). Rehearse with `gh workflow run release.yml -f dry_run=true`. See CONTRIBUTING.md "Releasing". |
 
 ## Layout
 

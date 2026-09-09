@@ -9,9 +9,13 @@
     "compare": "pnpm -C packages/compare run all",
     "docs": "MOON_WORK=off moon -C svgo doc",
     "app": "pnpm -s docs && node app/website/build.mjs",
-    "verify": "scripts/verify.sh"
+    "verify": "scripts/verify.sh",
+    "changeset": "changeset",
+    "version-packages": "changeset version && node scripts/sync-version.mjs && moon info"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "1.0.1",
+    "@changesets/cli": "3.0.2",
     "binaryen": "123.0.0",
     "svgo-mbt": "workspace:*"
   }

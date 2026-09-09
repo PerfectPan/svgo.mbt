@@ -54,12 +54,13 @@ matrix of runners (simplest) or install cross-compilers on a Linux host.
 
 ### GitHub releases (primary)
 
-On a version tag (`vX.Y.Z`, which must equal the version in
-`packages/svgo-mbt/package.json`), `.github/workflows/release.yml` publishes the
-npm package with provenance (needs the `NPM_TOKEN` repository secret) and
-builds the binary on linux-x86_64, linux-arm64 and macos-arm64 runners, attaching
-them to the GitHub release. `workflow_dispatch` with `dry_run` runs everything
-but the two uploads. Asset naming:
+When a release pull request lands, `release.yml` publishes the npm package
+(OIDC trusted publishing, provenance attached) and tags the commit
+`svgo-mbt@X.Y.Z`. That tag runs `binaries.yml`: the binary is built on
+linux-x86_64, linux-arm64 and macos-arm64 runners and attached to a GitHub
+release, and the MoonBit module is published to mooncakes (needs the
+`MOONCAKES_TOKEN` secret). Both workflows have a `workflow_dispatch` dry run.
+Asset naming:
 
 ```
 svgo-mbt-X.Y.Z-linux-x86_64.tar.gz

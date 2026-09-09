@@ -1606,11 +1606,7 @@ fn mergeable(
     return false
   }
   // paths must not intersect so fill rules cannot interact
-  !hulls_intersect(
-    a_hulls,
-    path_hulls(ctx, db),
-    @math.pow(10.0, -ctx.precision.to_double()),
-  )
+  !hulls_intersect(a_hulls, path_hulls(ctx, db), @path.epsilon(ctx.precision))
 }
 
 ///|
@@ -1907,10 +1903,10 @@ fn arc_to_curves(
   let res : Array[Array[Double]] = []
 
   fn rotate_x(x : Double, y : Double, r : Double) -> Double {
-    x * @math.cos(r) - y * @math.sin(r)
+    x * @path.cos(r) - y * @path.sin(r)
   }
   fn rotate_y(x : Double, y : Double, r : Double) -> Double {
-    x * @math.sin(r) + y * @math.cos(r)
+    x * @path.sin(r) + y * @path.cos(r)
   }
 
   let mut x1 = x1
@@ -1949,8 +1945,8 @@ fn arc_to_curves(
     .sqrt()
   cx = k * rx * y / ry + (x1 + x2) / 2.0
   cy = k * -ry * x / rx + (y1 + y2) / 2.0
-  f1 = @math.asin((y1 - cy) / ry)
-  f2 = @math.asin((y2 - cy) / ry)
+  f1 = @path.asin((y1 - cy) / ry)
+  f2 = @path.asin((y2 - cy) / ry)
   f1 = if x1 < cx { pi - f1 } else { f1 }
   f2 = if x2 < cx { pi - f2 } else { f2 }
   if f1 < 0.0 {
@@ -1971,19 +1967,19 @@ fn arc_to_curves(
     let x2old = x2
     let y2old = y2
     f2 = f1 + _120 * (if sweep == 1.0 && f2 > f1 { 1.0 } else { -1.0 })
-    x2 = cx + rx * @math.cos(f2)
-    y2 = cy + ry * @math.sin(f2)
+    x2 = cx + rx * @path.cos(f2)
+    y2 = cy + ry * @path.sin(f2)
     let sub = arc_to_curves(x2, y2, rx, ry, angle, 0.0, sweep, x2old, y2old)
     for s in sub {
       res.push(s)
     }
   }
   df = f2 - f1
-  let c1 = @math.cos(f1)
-  let s1 = @math.sin(f1)
-  let c2 = @math.cos(f2)
-  let s2 = @math.sin(f2)
-  let t = @math.tan(df / 4.0)
+  let c1 = @path.cos(f1)
+  let s1 = @path.sin(f1)
+  let c2 = @path.cos(f2)
+  let s2 = @path.sin(f2)
+  let t = @path.tan(df / 4.0)
   let hx = 4.0 / 3.0 * rx * t
   let hy = 4.0 / 3.0 * ry * t
   let m = [
@@ -2035,11 +2031,14 @@ fn convex_hull(pts : Array[Pt]) -> Array[Pt] {
     return pts
   }
   let sorted = pts
-  sorted.sort_by((a, b) => {
+  // svgo compares with the raw difference; JavaScript's sort only looks at
+  // its sign, so truncating it to an Int (which made 0.5 compare equal to 0)
+  // was wrong. Compare the coordinates directly.
+  stable_sort_by(sorted, (a, b) => {
     if a.0 == b.0 {
-      (a.1 - b.1).to_int()
+      a.1.compare(b.1)
     } else {
-      (a.0 - b.0).to_int()
+      a.0.compare(b.0)
     }
   })
   fn cross(o : Pt, a : Pt, b : Pt) -> Double {
@@ -2336,7 +2335,7 @@ pub let sort_defs_children : Plugin = {
       }
       let items = e.children
       let sorted = items.copy()
-      sorted.sort_by((a, b) => {
+      stable_sort_by(sorted, (a, b) => {
         match (a, b) {
           (@xml.Element(ae), @xml.Element(be)) => {
             let fa = frequencies.get(ae.name).unwrap_or(0)

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # The whole verification suite in one command; CI runs the same steps.
-#   scripts/verify.sh          fast: check, fmt, interface drift, tests on 3 backends
+#   scripts/verify.sh          fast: check, fmt, interface drift, tests on js and native
 #   scripts/verify.sh --full   also builds wasm, compares sizes with svgo-js and
 #                              renders every fixture to check for pixel diffs
 set -euo pipefail
@@ -19,7 +19,10 @@ if ! git diff --quiet -- '*.mbti'; then
   git --no-pager diff --stat -- '*.mbti' >&2
   exit 1
 fi
-for target in wasm-gc js native; do
+# Not wasm-gc: svgo/path/host_wasm.mbt imports Math and Number.parseFloat from
+# the embedder, which moonrun does not provide. The wasm artifact is tested
+# through node in --full (packages/svgo-mbt, including the fixture suite).
+for target in js native; do
   step "moon test --target $target"
   moon test --target "$target" -q
 done

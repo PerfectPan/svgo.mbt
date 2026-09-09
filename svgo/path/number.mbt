@@ -15,6 +15,31 @@ let pow10_i64 : Array[Int64] = [
 ]
 
 ///|
+/// `10^-precision` as svgo computes it (`+Math.pow(.1, precision).toFixed(precision)`),
+/// i.e. the correctly rounded value. A single division gives exactly that;
+/// `pow` does not for precision 4 and 5.
+pub fn epsilon(precision : Int) -> Double {
+  if precision < 0 {
+    pow10[if precision < -22 { 22 } else { -precision }]
+  } else {
+    1.0 / pow10[if precision > 22 { 22 } else { precision }]
+  }
+}
+
+///|
+/// Parse `s` as exactly one number (sign, digits, fraction, exponent);
+/// None for anything else, including surrounding whitespace.
+pub fn parse_number(s : String) -> Double? {
+  let cu = s.code_units()
+  let (v, end) = scan_number(cu, 0) catch { _ => return None }
+  if end == cu.length() {
+    Some(v)
+  } else {
+    None
+  }
+}
+
+///|
 /// Round to `precision` decimal places (0..15; anything larger is identity).
 pub fn round_to(v : Double, precision : Int) -> Double {
   if precision >= 15 {
@@ -69,10 +94,12 @@ fn scan_number(
     neg = cu[j] == 45
     j += 1
   }
+  let unsigned_start = j
   let mut mantissa : Int64 = 0
   let mut sig = 0 // significant digits folded into `mantissa`
   let mut exp10 = 0 // decimal exponent to apply to `mantissa`
   let mut digits = 0
+  let mut inexact = false // a non-zero digit beyond the 15 kept ones
   while j < n && cu[j] >= 48 && cu[j] <= 57 {
     if sig < 15 {
       mantissa = mantissa * 10 + (cu[j].to_int() - 48).to_int64()
@@ -81,6 +108,9 @@ fn scan_number(
       }
     } else {
       exp10 += 1
+      if cu[j] != 48 {
+        inexact = true
+      }
     }
     j += 1
     digits += 1
@@ -94,6 +124,8 @@ fn scan_number(
           sig += 1
         }
         exp10 -= 1
+      } else if cu[j] != 48 {
+        inexact = true
       }
       j += 1
       digits += 1
@@ -121,6 +153,10 @@ fn scan_number(
   }
   let v = if mantissa == 0 {
     0.0
+  } else if inexact {
+    // More than 15 significant digits: one rounding of the truncated
+    // mantissa is not enough for a correctly rounded result.
+    slow_path(cu, unsigned_start, j)
   } else if exp10 == 0 {
     mantissa.to_double()
   } else if exp10 < 0 && exp10 >= -22 {
@@ -128,14 +164,26 @@ fn scan_number(
   } else if exp10 > 0 && exp10 <= 22 {
     mantissa.to_double() * pow10[exp10]
   } else {
-    let text = String::from_iter(
-      cu[start:j].iter().map(u => u.to_int().unsafe_to_char()),
-    )
-    @string.parse_double(text) catch {
-      _ => raise PathError("bad number '\{text}'")
-    }
+    slow_path(cu, unsigned_start, j)
   }
   (if neg { -v } else { v }, j)
+}
+
+///|
+/// The general, correctly rounded parser for `cu[start:end]`, which holds the
+/// digits without their sign (the caller applies it).
+fn slow_path(
+  cu : ArrayView[UInt16],
+  start : Int,
+  end : Int,
+) -> Double raise PathError {
+  let text = String::from_iter(
+    cu[start:end].iter().map(u => u.to_int().unsafe_to_char()),
+  )
+  match parse_double_slow(text) {
+    Some(v) => v
+    None => raise PathError("bad number '\{text}'")
+  }
 }
 
 ///|

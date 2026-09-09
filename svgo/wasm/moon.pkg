@@ -1,6 +1,6 @@
 import {
   "perfectpan/svgo",
-  "moonbitlang/core/json",
+  "perfectpan/svgo/path",
 }
 
 pkgtype(kind: "foreign_library")

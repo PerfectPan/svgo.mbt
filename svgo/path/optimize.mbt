@@ -596,7 +596,7 @@ fn find_arc_angle(
   } else {
     let cos = (x1 * x2 + y1 * y2) / denom
     // clamp to [-1, 1] to dodge acos NaNs from floating point drift
-    @math.acos(if cos > 1.0 { 1.0 } else if cos < -1.0 { -1.0 } else { cos })
+    acos(if cos > 1.0 { 1.0 } else if cos < -1.0 { -1.0 } else { cos })
   }
 }
 
@@ -614,7 +614,7 @@ fn make_arcs(segments : Array[Segment], options : Options) -> Array[Segment] {
     return segments
   }
   let p = options.precision
-  let error = @math.pow(10.0, -p.to_double())
+  let error = epsilon(p)
   let threshold = options.make_arcs_threshold
   let tolerance_pct = options.make_arcs_tolerance
   // Convert every segment to relative coordinates so the arc math (which
@@ -848,7 +848,7 @@ fn make_arcs(segments : Array[Segment], options : Options) -> Array[Segment] {
       // control points are collinear with its start/end (within the rounding
       // tolerance): svgo would have turned it into a line, and lines can't
       // be merged into arcs.
-      let straight_tol = @math.pow(10.0, -p.to_double())
+      let straight_tol = epsilon(p)
       let prev_straight = collinear(
           0.0,
           0.0,
@@ -1130,7 +1130,7 @@ pub fn optimize(
   // used to resolve S/T control points (which reflect the previous curve's
   // control point even if that curve was collapsed to a line)
   let mut prev_orig_kind : Char = ' '
-  let tolerance = @math.pow(10.0, -p.to_double())
+  let tolerance = epsilon(p)
   for seg in segments {
     let a = to_absolute(seg, cx, cy)
     let mut kind : Char = ' '
@@ -1800,8 +1800,8 @@ fn transform_arc(
   let mut rx = arc[0]
   let mut ry = arc[1]
   let rot = arc[2] * @math.PI / 180.0
-  let cos = @math.cos(rot)
-  let sin = @math.sin(rot)
+  let cos = cos(rot)
+  let sin = sin(rot)
   if rx > 0.0 && ry > 0.0 {
     let mut h = (x * cos + y * sin) * (x * cos + y * sin) / (4.0 * rx * rx) +
       (y * cos - x * sin) * (y * cos - x * sin) / (4.0 * ry * ry)
@@ -1840,7 +1840,7 @@ fn transform_arc(
     let value = if major { term1 } else { term2 }
     let sign = if major { term2 < 0.0 } else { term1 > 0.0 }
     let angle = (if sign { -1.0 } else { 1.0 }) *
-      @math.acos(value / @math.hypot(term1, term2)) *
+      acos(value / @math.hypot(term1, term2)) *
       180.0 /
       @math.PI
     (nrx, nry, angle)

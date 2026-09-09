@@ -164,3 +164,58 @@ test "errors" {
     }
   }
 }
+
+///|
+test "numbers beyond the exact fast path keep their sign" {
+  // 17 significant digits fall back to the general parser; the sign is
+  // applied once, after it.
+  let segs = @path.parse("M-0.30000000000000004 1.2345678901234567e5")
+  debug_inspect(
+    segs[0].args,
+    content=(
+      #|[-0.30000000000000004, 123456.78901234567]
+    ),
+  )
+}
+
+///|
+test "parse_number accepts exactly one number" {
+  debug_inspect(
+    @path.parse_number("1e+21"),
+    content=(
+      #|Some(1e+21)
+    ),
+  )
+  debug_inspect(
+    @path.parse_number("-.5"),
+    content=(
+      #|Some(-0.5)
+    ),
+  )
+  debug_inspect(
+    @path.parse_number(" 1"),
+    content=(
+      #|None
+    ),
+  )
+  debug_inspect(
+    @path.parse_number("1px"),
+    content=(
+      #|None
+    ),
+  )
+  debug_inspect(
+    @path.parse_number(""),
+    content=(
+      #|None
+    ),
+  )
+}
+
+///|
+test "epsilon is the correctly rounded power of ten" {
+  inspect(@path.epsilon(3), content="0.001")
+  inspect(@path.epsilon(4), content="0.0001")
+  inspect(@path.epsilon(5), content="0.00001")
+  inspect(@path.epsilon(0), content="1")
+}

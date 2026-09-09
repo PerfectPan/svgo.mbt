@@ -104,8 +104,8 @@ fn transform_to_matrix(t : Tf) -> Array[Double] {
       let cx = if t.args.length() > 1 { t.args[1] } else { 0.0 }
       let cy = if t.args.length() > 2 { t.args[2] } else { 0.0 }
       let rad = a * @math.PI / 180.0
-      let cos = @math.cos(rad)
-      let sin = @math.sin(rad)
+      let cos = @path.cos(rad)
+      let sin = @path.sin(rad)
       [
         cos,
         sin,
@@ -117,11 +117,11 @@ fn transform_to_matrix(t : Tf) -> Array[Double] {
     }
     "skewX" => {
       let rad = t.args[0] * @math.PI / 180.0
-      [1.0, 0.0, @math.tan(rad), 1.0, 0.0, 0.0]
+      [1.0, 0.0, @path.tan(rad), 1.0, 0.0, 0.0]
     }
     "skewY" => {
       let rad = t.args[0] * @math.PI / 180.0
-      [1.0, @math.tan(rad), 0.0, 1.0, 0.0, 0.0]
+      [1.0, @path.tan(rad), 0.0, 1.0, 0.0, 0.0]
     }
     _ => [1.0, 0.0, 0.0, 1.0, 0.0, 0.0]
   }
@@ -289,7 +289,7 @@ fn decompose_qr_ab(m : Array[Double]) -> Array[Tf]? {
   }
   let cos_angle = a / r
   if cos_angle != 1.0 {
-    let rad = @math.acos(cos_angle)
+    let rad = @path.acos(cos_angle)
     let deg = rad * 180.0 / @math.PI
     let angle = if b < 0.0 { -deg } else { deg }
     out.push({ name: "rotate", args: [angle, 0.0, 0.0], })
@@ -301,7 +301,7 @@ fn decompose_qr_ab(m : Array[Double]) -> Array[Tf]? {
   }
   let ac_plus_bd = a * c + b * d
   if ac_plus_bd != 0.0 {
-    let angle = @math.atan(ac_plus_bd / (a * a + b * b)) * 180.0 / @math.PI
+    let angle = @path.atan(ac_plus_bd / (a * a + b * b)) * 180.0 / @math.PI
     out.push({ name: "skewX", args: [angle], })
   }
   Some(out)
@@ -329,7 +329,7 @@ fn decompose_qr_cd(m : Array[Double]) -> Array[Tf]? {
     out.push({ name: "translate", args: [e, f], })
   }
   let sign = if d < 0.0 { -1.0 } else { 1.0 }
-  let rad = @math.PI / 2.0 - sign * @math.acos(-c / s)
+  let rad = @math.PI / 2.0 - sign * @path.acos(-c / s)
   let angle = rad * 180.0 / @math.PI
   out.push({ name: "rotate", args: [angle, 0.0, 0.0], })
   let sx = delta / s
@@ -339,7 +339,7 @@ fn decompose_qr_cd(m : Array[Double]) -> Array[Tf]? {
   }
   let ac_plus_bd = a * c + b * d
   if ac_plus_bd != 0.0 {
-    let angle = @math.atan(ac_plus_bd / (c * c + d * d)) * 180.0 / @math.PI
+    let angle = @path.atan(ac_plus_bd / (c * c + d * d)) * 180.0 / @math.PI
     out.push({ name: "skewY", args: [angle], })
   }
   Some(out)
@@ -360,8 +360,8 @@ fn is_identity_transform(t : Tf) -> Bool {
 /// Merge translate(tx, ty) rotate(a) into rotate(a, cx, cy).
 fn merge_translate_and_rotate(tx : Double, ty : Double, a : Double) -> Tf {
   let rad = a * @math.PI / 180.0
-  let d = 1.0 - @math.cos(rad)
-  let e = @math.sin(rad)
+  let d = 1.0 - @path.cos(rad)
+  let e = @path.sin(rad)
   let cy = (d * ty + e * tx) / (d * d + e * e)
   let cx = (tx - e * cy) / d
   { name: "rotate", args: [a, cx, cy], }

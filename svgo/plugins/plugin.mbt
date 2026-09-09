@@ -104,7 +104,7 @@ pub fn split_unit(s : String) -> (Double, String)? {
   if end == 0 {
     return None
   }
-  let v = @string.parse_double(t[:end].to_owned()) catch { _ => return None }
+  guard @path.parse_number(t[:end].to_owned()) is Some(v) else { return None }
   Some((v, t[end:].to_owned()))
 }
 

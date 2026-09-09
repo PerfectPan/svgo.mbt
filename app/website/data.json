@@ -2,7 +2,7 @@
   "generated": "2026-09-09",
   "node": "v24.18.0",
   "svgoVersion": "4.1.0",
-  "wasmBytes": 269227,
+  "wasmBytes": 200430,
   "plugins": [
     {
       "name": "removeDoctype",
@@ -191,8 +191,8 @@
       "original": 570,
       "mbt": 442,
       "js": 442,
-      "mbtMs": 0.186,
-      "jsMs": 0.28,
+      "mbtMs": 0.17,
+      "jsMs": 0.283,
       "passes": 2
     },
     {
@@ -200,8 +200,8 @@
       "original": 1149,
       "mbt": 528,
       "js": 528,
-      "mbtMs": 0.163,
-      "jsMs": 0.568,
+      "mbtMs": 0.156,
+      "jsMs": 0.569,
       "passes": 2
     },
     {
@@ -209,8 +209,8 @@
       "original": 2078,
       "mbt": 641,
       "js": 640,
-      "mbtMs": 0.197,
-      "jsMs": 0.644,
+      "mbtMs": 0.188,
+      "jsMs": 0.669,
       "passes": 2
     },
     {
@@ -218,8 +218,8 @@
       "original": 836,
       "mbt": 276,
       "js": 288,
-      "mbtMs": 0.113,
-      "jsMs": 0.306,
+      "mbtMs": 0.119,
+      "jsMs": 0.319,
       "passes": 3
     },
     {
@@ -227,8 +227,8 @@
       "original": 68630,
       "mbt": 52690,
       "js": 68101,
-      "mbtMs": 12.76,
-      "jsMs": 36.107,
+      "mbtMs": 12.485,
+      "jsMs": 36.016,
       "passes": 3
     },
     {
@@ -236,8 +236,8 @@
       "original": 5419,
       "mbt": 4562,
       "js": 4551,
-      "mbtMs": 0.909,
-      "jsMs": 2.72,
+      "mbtMs": 0.911,
+      "jsMs": 2.716,
       "passes": 3
     },
     {
@@ -245,8 +245,8 @@
       "original": 366,
       "mbt": 302,
       "js": 302,
-      "mbtMs": 0.07,
-      "jsMs": 0.166,
+      "mbtMs": 0.068,
+      "jsMs": 0.165,
       "passes": 2
     },
     {
@@ -254,8 +254,8 @@
       "original": 4019,
       "mbt": 3546,
       "js": 3584,
-      "mbtMs": 0.599,
-      "jsMs": 1.728,
+      "mbtMs": 0.579,
+      "jsMs": 1.674,
       "passes": 3
     },
     {
@@ -263,8 +263,8 @@
       "original": 49983,
       "mbt": 35975,
       "js": 35983,
-      "mbtMs": 7.126,
-      "jsMs": 14.228,
+      "mbtMs": 7.092,
+      "jsMs": 14.238,
       "passes": 3
     },
     {
@@ -272,8 +272,8 @@
       "original": 84823,
       "mbt": 46700,
       "js": 46706,
-      "mbtMs": 13.303,
-      "jsMs": 57.262,
+      "mbtMs": 11.889,
+      "jsMs": 51.867,
       "passes": 3
     }
   ]

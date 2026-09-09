@@ -2,7 +2,7 @@
 
 WebAssembly build of [svgo.mbt](https://github.com/PerfectPan/svgo.mbt), an
 SVG optimizer written in MoonBit: all 34 plugins in svgo's preset-default, in its order and with its semantics.
-One 269 KB `wasm-gc` file plus a 2 KB loader, no other dependencies.
+One 200 KB `wasm-gc` file plus a 2 KB loader, no other dependencies.
 
 ```bash
 npm i svgo-mbt          # the library

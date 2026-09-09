@@ -344,7 +344,7 @@ fn run_inline_styles(doc : @xml.Document, ctx : Context) -> Bool {
   let mut changed = false
 
   // Sort selectors by specificity descending, then by order descending
-  all_selectors.sort_by(fn(a, b) {
+  stable_sort_by(all_selectors, fn(a, b) {
     let cmp = b.specificity.compare(a.specificity)
     if cmp != 0 {
       cmp

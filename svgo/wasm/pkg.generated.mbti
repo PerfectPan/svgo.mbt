@@ -2,9 +2,9 @@
 package "perfectpan/svgo/wasm"
 
 // Values
-pub fn optimize_json(String, String) -> String
+pub fn optimize_wire(String, String) -> String
 
-pub fn plugins_json() -> String
+pub fn plugins_wire() -> String
 
 pub fn version() -> String
 

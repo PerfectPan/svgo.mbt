@@ -635,7 +635,7 @@ pub let sort_attrs : Plugin = {
       let items = e.attrs.to_array()
       // (rank, key, value); rank computed once per attribute, not per comparison
       let keyed = items.map(kv => (attr_rank(kv.0, order, front), kv.0, kv.1))
-      keyed.sort_by((a, b) => {
+      stable_sort_by(keyed, (a, b) => {
         if a.0 != b.0 {
           a.0 - b.0
         } else {

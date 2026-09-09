@@ -17,11 +17,11 @@ root installs every JS package.
 | goal | command |
 | --- | --- |
 | type check every package on the default backend | `moon check` |
-| run all tests (unit tests plus generated fixtures) | `moon test --target native` (also `wasm-gc`, `js`) |
+| run all tests (unit tests plus generated fixtures) | `moon test --target native` (also `js`; not `wasm-gc`: moonrun lacks the `Math` / `Number` imports of `svgo/path/host_wasm.mbt`, the wasm artifact is tested with `node --test` in `packages/svgo-mbt`) |
 | update snapshot expectations after an intended output change | `moon test --update` |
 | format and refresh the generated `.mbti` interface files | `moon fmt && moon info` |
 | everything CI checks, in one go | `scripts/verify.sh` (`--full` adds wasm build, svgo-js comparison, render diff) |
-| micro benchmarks as a table | `scripts/bench.sh [native\|wasm-gc\|js] [bench_test.mbt\|profile_test.mbt]` |
+| micro benchmarks as a table | `scripts/bench.sh [native\|js] [bench_test.mbt\|profile_test.mbt]` |
 | byte-for-byte output comparison against a reference build | `scripts/regress.sh <dir>` (see CONTRIBUTING) |
 | regenerate `svgo/plugins/fixtures_test.mbt` from `svgo/plugins/fixtures/**/*.txt` | `python3 scripts/gen-fixtures.py` (prints pass / known-failure / skipped counts) |
 | regenerate compact SVG tables from an svgo checkout | `node scripts/gen-svg-tables.mjs <svgo-dir>` |
@@ -43,7 +43,7 @@ moon.work, package.json       workspace roots (MoonBit members / pnpm packages),
 svgo/                         the MoonBit module perfectpan/svgo
   svgo.mbt, svgo_test.mbt     public API: optimize(svg, config?) -> Result, Config, list_plugins
   xml/                        Document/Node/Element, parse, serialize (SVG-oriented, keeps prolog)
-  path/                       path data: parse, optimize, stringify; number.mbt = fast number I/O
+  path/                       path data: parse, optimize, stringify; number.mbt = fast number I/O; host_wasm.mbt / host_default.mbt = trig and slow number parsing per target
   plugins/                    Plugin { name, description, run }, Context (+ params.mbt accessors), preset_default order
     cleanup.mbt               removal plugins (doctype, comments, editor data, ids, empty things)
     values.mbt                numeric values and colours
@@ -52,7 +52,7 @@ svgo/                         the MoonBit module perfectpan/svgo
     preset.mbt                preset_default / optional_plugins / find_plugin
     fixtures/*.txt            input @@@ expected [@@@ params JSON] — regenerated into fixtures_test.mbt
     fixtures/upstream/        svgo's preset-default cases, verbatim; KNOWN_FAILURES.txt = expected failures (ratchet, only shrinks); unwritten plugins' cases are skipped via NOT_IMPLEMENTED in gen-fixtures.py
-  wasm/                       foreign_library exporting optimize/plugins/version as JSON strings
+  wasm/                       foreign_library exporting optimize/plugins/version; strings cross as length-prefixed tokens (no JSON in the wasm), decoded by packages/svgo-mbt/index.mjs
   benchmark/                  moon bench tests over an embedded corpus (corpus.mbt is generated)
   testdata/                   editor exports used by tests, the render diff and the site gallery
 packages/svgo-mbt/            npm package: JS loader + svgo.wasm (built by scripts/build-wasm.sh)
@@ -91,8 +91,13 @@ docs/ARCHITECTURE.md          design notes
    `ctx.param_bool/int/string/strings(name, default)`; defaults are svgo's.
 4. **Deterministic, idempotent output.** Optimizing the output again must
    produce the same bytes (`scripts/regress.sh` and the corpus check this).
-5. **No target-specific code outside `app/cli/io_native.mbt` and `svgo/wasm/`.**
-   The library compiles unchanged to wasm-gc, js and native.
+5. **No target-specific code outside `app/cli/io_native.mbt`, `svgo/wasm/` and
+   `svgo/path/host_*.mbt`.** The library compiles unchanged to wasm-gc, js and
+   native. The `host_*` pair is the one exception: on wasm-gc the
+   transcendentals and the slow path of number parsing are host imports
+   (`Math`, `Number.parseFloat`), which keeps about 20 KB of core out of the
+   artifact; the other targets call core. Keep it to pure functions with
+   identical results.
 
 ## Conventions
 

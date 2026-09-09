@@ -21,7 +21,7 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - name: Check, format, interfaces, fixtures, tests on wasm-gc / js / native
+      - name: Check, format, interfaces, fixtures, tests on js / native
         run: scripts/verify.sh
       - name: Wasm artifact, size comparison, render diff, speed
         run: |

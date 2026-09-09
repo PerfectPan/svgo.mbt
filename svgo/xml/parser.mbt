@@ -306,19 +306,9 @@ pub fn decode_entities(s : String) -> String {
           "apos" => Some("'")
           _ =>
             if ent.has_prefix("#x") || ent.has_prefix("#X") {
-              try {
-                let code = @string.parse_int(ent[2:], base=16)
-                code.to_char().map(ch => ch.to_string())
-              } catch {
-                _ => None
-              }
+              parse_code(ent[2:], 16).map(ch => ch.to_string())
             } else if ent.has_prefix("#") {
-              try {
-                let code = @string.parse_int(ent[1:])
-                code.to_char().map(ch => ch.to_string())
-              } catch {
-                _ => None
-              }
+              parse_code(ent[1:], 10).map(ch => ch.to_string())
             } else {
               None
             }
@@ -341,4 +331,32 @@ pub fn decode_entities(s : String) -> String {
     }
   }
   sb.to_string()
+}
+
+///|
+/// The code point written in a character reference, `base` 10 or 16; None for
+/// no digits, a non-digit, or a value outside the Unicode range.
+fn parse_code(digits : StringView, base : Int) -> Char? {
+  let mut code = 0
+  let mut count = 0
+  for c in digits {
+    let d = if c >= '0' && c <= '9' {
+      c.to_int() - 48
+    } else if base == 16 && c >= 'a' && c <= 'f' {
+      c.to_int() - 87
+    } else if base == 16 && c >= 'A' && c <= 'F' {
+      c.to_int() - 55
+    } else {
+      return None
+    }
+    code = code * base + d
+    count += 1
+    if code > 0x10FFFF {
+      return None
+    }
+  }
+  if count == 0 {
+    return None
+  }
+  code.to_char()
 }

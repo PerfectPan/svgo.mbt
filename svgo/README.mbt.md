@@ -2,7 +2,7 @@
 
 **An SVG optimizer written in MoonBit, shipped as WebAssembly.**
 All 34 plugins in [svgo](https://github.com/svg/svgo)'s preset-default, in its
-order and with its semantics, and none of the Node.js dependency tree: a 269 KB
+order and with its semantics, and none of the Node.js dependency tree: a 200 KB
 `wasm-gc` module that runs in the browser and in Node 22+, a CLI that installs
 with `npx`, and a MoonBit library.
 
@@ -175,14 +175,14 @@ Same Node process, both with multipass, milliseconds per call
 
 | file | size | svgo.mbt (wasm-gc) | svgo-js | ratio |
 | --- | ---: | ---: | ---: | ---: |
-| sketch-icon.svg | 836 B | 0.113 | 0.306 | 2.7× |
-| inkscape-drawing.svg | 2 KB | 0.197 | 0.644 | 3.3× |
-| SVG_logo.svg | 4 KB | 0.599 | 1.728 | 2.9× |
-| Tux.svg | 50 KB | 7.126 | 14.228 | 2.0× |
-| Ghostscript_Tiger.svg | 68 KB | 12.760 | 36.107 | 2.8× |
-| World map (low resolution) | 85 KB | 13.303 | 57.262 | 4.3× |
+| sketch-icon.svg | 836 B | 0.119 | 0.319 | 2.7× |
+| inkscape-drawing.svg | 2 KB | 0.188 | 0.669 | 3.6× |
+| SVG_logo.svg | 4 KB | 0.579 | 1.674 | 2.9× |
+| Tux.svg | 50 KB | 7.092 | 14.238 | 2.0× |
+| Ghostscript_Tiger.svg | 68 KB | 12.485 | 36.016 | 2.9× |
+| World map (low resolution) | 85 KB | 11.889 | 51.867 | 4.4× |
 
-Between 1.5× and 4.3× depending on the file, 2.9× at the median; the wider
+Between 1.7× and 4.4× depending on the file, 2.9× at the median; the wider
 gaps are on files with many paths, where svgo-js spends its time in the same
 path rewriting we do in wasm. In-module (`scripts/bench.sh`, native release)
 the Tiger takes about 12 ms end to end, of which parsing is 0.23 ms and path

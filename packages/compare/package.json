@@ -12,7 +12,7 @@
     "all": "./compare.sh && node render-diff.mjs && node wasm-speed.mjs"
   },
   "dependencies": {
-    "svgo-mbt": "workspace:*",
+    "@rivus/svgo": "workspace:*",
     "@resvg/resvg-js": "^2.6.2",
     "pixelmatch": "^6.0.0",
     "pngjs": "^7.0.0",

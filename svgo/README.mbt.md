@@ -9,7 +9,7 @@ with `npx`, and a MoonBit library.
 [**Website & playground**](https://perfectpan.github.io/svgo.mbt/) ·
 [API reference](https://perfectpan.github.io/svgo.mbt/#/api) ·
 [mooncakes.io](https://mooncakes.io/docs/PerfectPan/svgo) ·
-[npm `svgo-mbt`](https://www.npmjs.com/package/svgo-mbt)
+[npm `@rivus/svgo`](https://www.npmjs.com/package/@rivus/svgo)
 
 ```
 $ svgo testdata/sketch-icon.svg --stats
@@ -44,11 +44,11 @@ Three properties drive the design:
 **JavaScript** (Node 24+, Chrome 130+, Firefox 134+, Safari 18.4+; JS String Builtins need V8 13.6):
 
 ```bash
-npm i svgo-mbt
+npm i @rivus/svgo
 ```
 
 ```js
-import { optimize } from "svgo-mbt";
+import { optimize } from "@rivus/svgo";
 const r = await optimize(svg, { precision: 3 });
 r.data; r.originalSize; r.size; r.passes; r.applied;
 ```
@@ -56,9 +56,10 @@ r.data; r.originalSize; r.size; r.passes; r.applied;
 **Command line**, without a toolchain (Node 24+):
 
 ```bash
-npx svgo-mbt input.svg -o out.svg
-cat input.svg | npx svgo-mbt > out.svg          # stdin, or pass "-" as the input
-npx svgo-mbt icons -r -o dist                   # a directory, recursively
+npx @rivus/svgo input.svg -o out.svg
+cat input.svg | npx @rivus/svgo > out.svg       # stdin, or pass "-" as the input
+npx @rivus/svgo icons -r -o dist                # a directory, recursively
+# installed (npm i -g @rivus/svgo) the command is `svgo-mbt`
 ```
 
 Or build the native binary, which is the same MoonBit source with C file I/O

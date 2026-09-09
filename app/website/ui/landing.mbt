@@ -89,7 +89,7 @@ fn hero(dark : Bool) -> Html {
                   href="#/playground",
                   t("Open the playground", "打开在线体验"),
                 ),
-                copy_pill("npm i svgo-mbt"),
+                copy_pill("npm i @rivus/svgo"),
                 copy_pill("moon add PerfectPan/svgo"),
               ],
             ),
@@ -417,7 +417,7 @@ fn use_section() -> Html {
             k("import"),
             text(" { optimize } "),
             k("from"),
-            text(" \"svgo-mbt\";\n\n"),
+            text(" \"@rivus/svgo\";\n\n"),
             k("const"),
             text(" r = "),
             k("await"),
@@ -509,7 +509,7 @@ fn cli_section() -> Html {
             ),
           ),
           div(class="flex flex-wrap items-center gap-3", [
-            copy_pill("npx svgo-mbt in.svg -o out.svg"),
+            copy_pill("npx @rivus/svgo in.svg -o out.svg"),
           ]),
           div(class="mt-4 use", [
             pre([

@@ -3,7 +3,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { optimize as jsOptimize } from "svgo";
-import { optimize as mbtOptimize, init } from "svgo-mbt";
+import { optimize as mbtOptimize, init } from "@rivus/svgo";
 
 const ROOT = new URL("../../", import.meta.url).pathname;
 await init();

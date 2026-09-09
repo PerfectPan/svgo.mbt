@@ -125,7 +125,7 @@ The repository ships a pre-commit hook that runs `moon check`:
    `scripts/verify.sh` fails if those ever disagree.
 3. Merging that PR runs `release.yml`: build, tests, `changeset publish` (npm,
    OIDC trusted publishing, so no token lives in the repo) and the tag
-   `svgo-mbt@X.Y.Z`.
+   `@rivus/svgo@X.Y.Z`.
 4. The tag runs `binaries.yml`: native CLI tarballs for linux-x86_64,
    linux-arm64 and macos-arm64 on a GitHub release, and `moon publish` of
    `PerfectPan/svgo` to mooncakes using the `MOONCAKES_TOKEN` secret.

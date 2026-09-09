@@ -8,7 +8,7 @@ with `npx`, and a MoonBit library.
 
 [**Website & playground**](https://perfectpan.github.io/svgo.mbt/) ·
 [API reference](https://perfectpan.github.io/svgo.mbt/api.html) ·
-[mooncakes.io](https://mooncakes.io/docs/perfectpan/svgo) ·
+[mooncakes.io](https://mooncakes.io/docs/PerfectPan/svgo) ·
 [npm `svgo-mbt`](https://www.npmjs.com/package/svgo-mbt)
 
 ```
@@ -85,7 +85,7 @@ and other values remain strings.
 **MoonBit**:
 
 ```bash
-moon add perfectpan/svgo
+moon add PerfectPan/svgo
 ```
 
 ```mbt check

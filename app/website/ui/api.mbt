@@ -50,8 +50,8 @@ fn api_member(pkg : ApiPackage, it : ApiItem) -> Html {
     ])
   })
   let impls = it.impls.map(tr => h4("impl \{tr}"))
-  let src_dir = match pkg.path.find("perfectpan/svgo/") {
-    Some(_) => pkg.path["perfectpan/svgo/".length():].to_owned() + "/"
+  let src_dir = match pkg.path.find("PerfectPan/svgo/") {
+    Some(_) => pkg.path["PerfectPan/svgo/".length():].to_owned() + "/"
     None => ""
   }
   div(class="member", id=anchor(pkg, it.name), [
@@ -133,8 +133,8 @@ pub fn api_page(chrome : Chrome) -> Val[Html] {
           span(class="grad", "没有全局变量。"),
         ]),
         t(
-          "The public API of perfectpan/svgo and its packages, pulled from the doc comments in the source. Same text you see on mooncakes.io, and every item links to the file that defines it.",
-          "perfectpan/svgo 及其子包的公开接口，都是从源码里的文档注释提出来的，和 mooncakes.io 上看到的是同一份。每一项都能点进定义它的源文件。",
+          "The public API of PerfectPan/svgo and its packages, pulled from the doc comments in the source. Same text you see on mooncakes.io, and every item links to the file that defines it.",
+          "PerfectPan/svgo 及其子包的公开接口，都是从源码里的文档注释提出来的，和 mooncakes.io 上看到的是同一份。每一项都能点进定义它的源文件。",
         ),
       ),
       div(

@@ -1,4 +1,4 @@
 import {
-  "perfectpan/svgo/xml",
-  "perfectpan/svgo/plugins",
+  "PerfectPan/svgo/xml",
+  "PerfectPan/svgo/plugins",
 }

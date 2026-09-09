@@ -1,5 +1,5 @@
 import {
-  "perfectpan/svgo/xml",
+  "PerfectPan/svgo/xml",
   "moonbitlang/core/string",
   "moonbitlang/core/math",
 }

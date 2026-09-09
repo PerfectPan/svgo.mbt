@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "perfectpan/svgo/benchmark"
+package "PerfectPan/svgo/benchmark"
 
 // Values
 pub let corpus : Array[(String, String, Int)]

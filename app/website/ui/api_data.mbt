@@ -4,7 +4,7 @@
 /// The public API, extracted from `moon doc` output.
 pub let api_packages : Array[ApiPackage] = [
   {
-    path: "perfectpan/svgo",
+    path: "PerfectPan/svgo",
     short: "@svgo",
     items: [
       {
@@ -64,7 +64,7 @@ pub let api_packages : Array[ApiPackage] = [
     ],
   },
   {
-    path: "perfectpan/svgo/xml",
+    path: "PerfectPan/svgo/xml",
     short: "@xml",
     items: [
       {
@@ -142,7 +142,7 @@ pub let api_packages : Array[ApiPackage] = [
     ],
   },
   {
-    path: "perfectpan/svgo/path",
+    path: "PerfectPan/svgo/path",
     short: "@path",
     items: [
       {
@@ -292,7 +292,7 @@ pub let api_packages : Array[ApiPackage] = [
     ],
   },
   {
-    path: "perfectpan/svgo/plugins",
+    path: "PerfectPan/svgo/plugins",
     short: "@plugins",
     items: [
       {
@@ -307,7 +307,7 @@ pub let api_packages : Array[ApiPackage] = [
       {
         kind: "type",
         name: "Plugin",
-        signature: "pub(all) struct Plugin {\n  name : String\n  description : String\n  run : (@perfectpan/svgo/xml.Document, Context) -> Bool\n}",
+        signature: "pub(all) struct Plugin {\n  name : String\n  description : String\n  run : (@PerfectPan/svgo/xml.Document, Context) -> Bool\n}",
         doc: "\n A plugin transforms the document in place and reports whether it changed\n anything, which drives multipass optimization.",
         file: "plugin.mbt#L31",
         methods: [],
@@ -487,7 +487,7 @@ pub let api_packages : Array[ApiPackage] = [
       {
         kind: "fn",
         name: "referenced_ids",
-        signature: "fn referenced_ids(doc : @perfectpan/svgo/xml.Document) -> @moonbitlang/core/set.Set[String]",
+        signature: "fn referenced_ids(doc : @PerfectPan/svgo/xml.Document) -> @moonbitlang/core/set.Set[String]",
         doc: "\n Collect every id referenced anywhere in the document: `href=\"#id\"`,\n `url(#id)` in attributes and `<style>` text, and `begin=\"id.click\"`.",
         file: "plugin.mbt#L129",
         methods: [],
@@ -694,7 +694,7 @@ pub let api_packages : Array[ApiPackage] = [
     ],
   },
   {
-    path: "perfectpan/svgo/wasm",
+    path: "PerfectPan/svgo/wasm",
     short: "@wasm",
     items: [
       {

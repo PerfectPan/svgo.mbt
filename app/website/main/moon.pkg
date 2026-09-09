@@ -1,6 +1,6 @@
 import {
   "moonbit-community/rabbita",
-  "perfectpan/svgo-website/ui",
+  "PerfectPan/svgo-website/ui",
 }
 
 supported_targets = "js"

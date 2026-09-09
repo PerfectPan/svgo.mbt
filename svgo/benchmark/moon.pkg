@@ -3,10 +3,10 @@ import {
 }
 
 import {
-  "perfectpan/svgo",
-  "perfectpan/svgo/xml",
-  "perfectpan/svgo/path",
-  "perfectpan/svgo/plugins",
+  "PerfectPan/svgo",
+  "PerfectPan/svgo/xml",
+  "PerfectPan/svgo/path",
+  "PerfectPan/svgo/plugins",
 } for "test"
 
 formatter(ignore: [ "corpus.mbt" ])

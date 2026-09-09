@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "perfectpan/svgo/path"
+package "PerfectPan/svgo/path"
 
 import {
   "moonbitlang/core/debug",

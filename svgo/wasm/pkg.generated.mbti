@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "perfectpan/svgo/wasm"
+package "PerfectPan/svgo/wasm"
 
 // Values
 pub fn optimize_wire(String, String) -> String

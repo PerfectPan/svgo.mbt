@@ -1,13 +1,13 @@
 import {
-  "perfectpan/svgo/xml",
-  "perfectpan/svgo/path",
-  "perfectpan/svgo/css",
+  "PerfectPan/svgo/xml",
+  "PerfectPan/svgo/path",
+  "PerfectPan/svgo/css",
   "moonbitlang/core/string",
   "moonbitlang/core/math",
   "moonbitlang/core/cmp",
 }
 
 import {
-  "perfectpan/svgo/xml",
+  "PerfectPan/svgo/xml",
   "moonbitlang/core/json",
 } for "test"

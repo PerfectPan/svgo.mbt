@@ -90,7 +90,7 @@ fn hero(dark : Bool) -> Html {
                   t("Open the playground", "打开在线体验"),
                 ),
                 copy_pill("npm i svgo-mbt"),
-                copy_pill("moon add perfectpan/svgo"),
+                copy_pill("moon add PerfectPan/svgo"),
               ],
             ),
           ]),

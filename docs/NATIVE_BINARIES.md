@@ -1,6 +1,6 @@
 # Native binaries
 
-The CLI (`app/cli/`) is a MoonBit executable that imports `perfectpan/svgo`.
+The CLI (`app/cli/`) is a MoonBit executable that imports `PerfectPan/svgo`.
 On the `native` target MoonBit compiles it to C and links it with the system C
 compiler, producing a single statically-linked binary with no runtime
 dependencies. This document describes how that binary is built and distributed.

@@ -5,7 +5,7 @@ pub const REPO_URL = "https://github.com/PerfectPan/svgo.mbt"
 pub const NPM_URL = "https://www.npmjs.com/package/svgo-mbt"
 
 ///|
-pub const MOONCAKES_URL = "https://mooncakes.io/docs/perfectpan/svgo"
+pub const MOONCAKES_URL = "https://mooncakes.io/docs/PerfectPan/svgo"
 
 ///|
 /// The logo mark, as an inline SVG. Uses the theme's ink so it inverts in

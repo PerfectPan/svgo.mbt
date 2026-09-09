@@ -1,9 +1,9 @@
-name = "perfectpan/svgo-cli"
+name = "PerfectPan/svgo-cli"
 
 version = "0.1.0"
 
 import {
-  "perfectpan/svgo@0.1.0",
+  "PerfectPan/svgo@0.1.0",
 }
 
 readme = "../../README.mbt.md"

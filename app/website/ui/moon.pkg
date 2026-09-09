@@ -5,7 +5,7 @@ import {
   "moonbit-community/rabbita/nav",
   "moonbit-community/rabbita/url",
   "moonbit-community/rabbita/js",
-  "perfectpan/svgo",
+  "PerfectPan/svgo",
   "moonbitlang/core/math",
   "moonbitlang/core/string",
 }

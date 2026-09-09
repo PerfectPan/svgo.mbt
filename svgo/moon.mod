@@ -9,7 +9,7 @@
 //   "moonbitlang/x@0.4.6",
 // }
 
-name = "perfectpan/svgo"
+name = "PerfectPan/svgo"
 
 version = "0.1.0"
 

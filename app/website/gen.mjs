@@ -61,7 +61,7 @@ ${SAMPLES.map(([name, f]) => `  { name: ${str(name)}, file: ${str(f.split("/").p
 // `moon doc` must run with workspace mode off (the app member only builds
 // for js): `MOON_WORK=off moon -C svgo doc` writes svgo/_build/doc. The old
 // workspace location is still accepted.
-const DOC = ["svgo/_build/doc/perfectpan/svgo", "_build/doc/perfectpan/svgo"].map((d) => join(ROOT, d)).find(existsSync);
+const DOC = ["svgo/_build/doc/PerfectPan/svgo", "_build/doc/PerfectPan/svgo"].map((d) => join(ROOT, d)).find(existsSync);
 function findPackages(dir, rel = "") {
   const out = [];
   if (existsSync(join(dir, "package_data.json"))) out.push({ dir, rel });
@@ -88,7 +88,7 @@ else {
         });
       }
     }
-    return { path: rel ? `perfectpan/svgo/${rel}` : "perfectpan/svgo", alias: rel ? `@${rel.split("/").pop()}` : "@svgo", items };
+    return { path: rel ? `PerfectPan/svgo/${rel}` : "PerfectPan/svgo", alias: rel ? `@${rel.split("/").pop()}` : "@svgo", items };
   });
   writeFileSync(join(UI, "api_data.mbt"), `${HEADER}
 ///|

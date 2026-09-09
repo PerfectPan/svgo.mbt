@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "perfectpan/svgo-website/ui"
+package "PerfectPan/svgo-website/ui"
 
 import {
   "moonbit-community/rabbita",
@@ -9,7 +9,7 @@ import {
 }
 
 // Values
-pub const MOONCAKES_URL : String = "https://mooncakes.io/docs/perfectpan/svgo"
+pub const MOONCAKES_URL : String = "https://mooncakes.io/docs/PerfectPan/svgo"
 
 pub const NPM_URL : String = "https://www.npmjs.com/package/svgo-mbt"
 

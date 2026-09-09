@@ -16,7 +16,8 @@ pub(all) struct Config {
 } derive(Debug)
 
 ///|
-/// svgo's preset-default plugins, 3 decimal places, multipass on, compact output.
+/// The implemented subset of svgo's preset-default plugins, 3 decimal places,
+/// multipass on, compact output.
 pub fn Config::default() -> Config {
   {
     plugins: @plugins.preset_default.map(p => p.name),

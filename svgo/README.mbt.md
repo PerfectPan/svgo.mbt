@@ -1,9 +1,11 @@
 # svgo.mbt
 
 **An SVG optimizer written in MoonBit, shipped as WebAssembly.**
-Same plugin pipeline as [svgo](https://github.com/svg/svgo)'s preset-default,
-none of the Node.js dependency tree: a 227 KB `wasm-gc` module that runs in
-the browser and in Node 22+, a native CLI, and a MoonBit library.
+25 of the 34 plugins in [svgo](https://github.com/svg/svgo)'s preset-default,
+in its order and with its semantics, and none of the Node.js dependency tree:
+a 227 KB `wasm-gc` module that runs in the browser and in Node 22+, a native
+CLI, and a MoonBit library. The nine that are missing are listed under
+[compatibility](#compatibility-with-svgo-measured).
 
 [**Website & playground**](https://perfectpan.github.io/svgo.mbt/) ·
 [API reference](https://perfectpan.github.io/svgo.mbt/api.html) ·
@@ -192,8 +194,10 @@ rasterizes every fixture before and after. Details in `docs/ARCHITECTURE.md`.
 
 ### Compatibility with svgo, measured
 
-Of svgo's 209 test cases for the plugins svgo.mbt implements (svgo e4cb29b,
-2026-08-27):
+Two numbers matter here, and they answer different questions.
+
+**Do the implemented plugins behave like svgo?** Yes, on svgo's own cases for
+them (svgo e4cb29b, 2026-08-27):
 
 | | cases |
 | --- | --- |
@@ -201,11 +205,27 @@ Of svgo's 209 test cases for the plugins svgo.mbt implements (svgo e4cb29b,
 | known differences | 0 |
 | skipped | 0 |
 
-All of them pass, byte for byte, including the rules that rewrite geometry:
+All 209 match byte for byte, including the rules that rewrite geometry:
 element transforms baked into the path data, curve runs turned into arcs,
 adjacent paths merged, groups collapsed. `fixtures/upstream/KNOWN_FAILURES.txt`
 is empty and the harness fails the build if a case starts failing again, so an
 entry there is a regression rather than a new baseline.
+
+**Is the pipeline complete?** Not yet. svgo's `preset-default` runs 34 plugins;
+svgo.mbt runs 25 of them plus `removeDimensions` and `removeTitle`, which svgo
+keeps opt-in. Nine preset plugins are missing:
+
+| missing plugin | what it would take |
+| --- | --- |
+| `inlineStyles`, `minifyStyles`, `mergeStyles` | a CSS parser: selector matching, specificity, at-rules |
+| `moveElemsAttrsToGroup`, `moveGroupAttrsToElems` | attribute motion across a group boundary, with inheritance rules |
+| `removeNonInheritableGroupAttrs`, `removeDeprecatedAttrs`, `cleanupEnableBackground`, `sortDefsChildren` | small, self-contained ports |
+
+Counting svgo's whole plugin suite rather than the implemented subset, that is
+209 of 377 cases across 27 of 53 plugins; the remaining cases belong to plugins
+svgo.mbt does not have, most of which svgo itself leaves off by default. The
+`svgo/` library also does not import svgo's parser, stringifier, style or CLI
+unit tests, which cover its internals rather than its output.
 
 ## Repository layout
 

@@ -11,35 +11,7 @@ with `npx`, and a MoonBit library.
 [mooncakes.io](https://mooncakes.io/docs/PerfectPan/svgo) ·
 [npm `@rivus/svgo`](https://www.npmjs.com/package/@rivus/svgo)
 
-```
-$ svgo testdata/sketch-icon.svg --stats
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><title>icon/action/close</title><g fill="red" transform="translate(2 2)"><path stroke="red" stroke-linecap="round" stroke-width="2" d="M4 4l12 12M16 4 4 16"/><path d="M0 0h20v20H0z"/></g></svg>
-testdata/sketch-icon.svg: 836 -> 276 bytes (-67%), 3 pass(es), plugins: removeXMLProcInst, removeComments, ...
-```
-
-## Why
-
-Every front-end build runs an SVG optimizer (svgo-loader, SVGR,
-vite-plugin-svgo, imagemin, icon pipelines) and every one of them pulls in
-svgo plus Node. svgo.mbt is the same idea as a dependency-free artifact:
-drop the wasm file next to your bundler, call it from a service worker, embed
-the native binary in a CI image, or use the MoonBit packages directly.
-
-Three properties drive the design:
-
-- **Safe by construction and by test.** Plugins only remove what a renderer
-  cannot observe; ids that are referenced anywhere survive; inherited
-  defaults are only dropped when no ancestor overrides them. Every fixture is
-  rasterized before and after with resvg and compared pixel by pixel.
-- **Fast.** In one Node process the wasm build is 1.7 to 4.4 times faster than
-  svgo-js on the same files (2.9× at the median); on a small icon the native CLI
-  finishes end to end in about 10 ms, the Node build in about 50 ms, the svgo
-  CLI in about 160 ms (`scripts/cli-bench.sh`). Numbers below.
-- **Plugins are values.** `{ name, description, run }`. The preset is an array
-  in svgo's order; the CLI, the playground and the tests run any subset in
-  any order.
-
-## Install and use
+## Quickstart
 
 **JavaScript** (Node 24+, Chrome 130+, Firefox 134+, Safari 18.4+; JS String Builtins need V8 13.6):
 
@@ -61,28 +33,6 @@ cat input.svg | npx @rivus/svgo > out.svg       # stdin, or pass "-" as the inpu
 npx @rivus/svgo icons -r -o dist                # a directory, recursively
 # installed (npm i -g @rivus/svgo) the command is `svgo-mbt`
 ```
-
-Or build the native binary, which is the same MoonBit source with C file I/O
-instead of node's `fs`:
-
-```bash
-moon build --target native --release          # -> $(scripts/bin-path.sh), under _build/native/release/
-svgo-mbt input.svg                            # optimized SVG on stdout
-svgo-mbt input.svg -o out.svg --stats         # write a file, print size statistics
-svgo-mbt input.svg -p 2 --pretty              # 2 decimal places, indented output
-svgo-mbt input.svg --json                     # {data, originalSize, size, passes, applied}
-svgo-mbt input.svg --plugins convertPathData,sortAttrs
-svgo-mbt input.svg --param cleanupIds.preserve=logo,icon --param cleanupIds.minify=false
-svgo-mbt input.svg --disable convertShapeToPath --enable moveGroupAttrsToElems
-svgo-mbt --list                               # available plugins
-```
-
-Exit codes: 0 on success, 1 for a usage error, 2 when a file could not be
-parsed (the names go to stderr, so a shell loop can act on them).
-
-`--param <plugin>.<key>=<value>` is repeatable. Values `true`/`false` become
-booleans, integers become numbers, comma-separated values become string arrays,
-and other values remain strings.
 
 **MoonBit**:
 
@@ -112,32 +62,24 @@ test "optimize" {
 }
 ```
 
-`Config` is a plain struct: plugin names in order, a `params : Map[String, Json]`
-of per-plugin parameter objects, numeric precision,
-multipass and pretty printing. Start from the default and override fields.
+`Config` provides plugin selection, `params : Map[String, Json]`, precision, multipass, and pretty printing; see the [API reference](https://perfectpan.github.io/svgo.mbt/#/api) for all fields.
 
-```mbt check
-///|
-test "config" {
-  let config = { ..@svgo.Config::default(), precision: 1, pretty: true, }
-  let r = @svgo.optimize(
-    "<svg xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M0.123 0.456 L 10 10\"/></svg>",
-    config~,
-  )
-  inspect(
-    r.data,
-    content=(
-      #|<svg xmlns="http://www.w3.org/2000/svg">
-      #|  <path d="M.1.5 10 10"/>
-      #|</svg>
-      #|
-    ),
-  )
-}
+## Command line
+
+```bash
+svgo-mbt input.svg                            # optimized SVG on stdout
+svgo-mbt input.svg -o out.svg --stats         # write a file, print size statistics
+svgo-mbt input.svg -p 2 --pretty              # 2 decimal places, indented output
+svgo-mbt input.svg --json                     # {data, originalSize, size, passes, applied}
+svgo-mbt input.svg --plugins convertPathData,sortAttrs
+svgo-mbt input.svg --param cleanupIds.preserve=logo,icon --param cleanupIds.minify=false
+svgo-mbt input.svg --disable convertShapeToPath --enable moveGroupAttrsToElems
+svgo-mbt --list                               # available plugins
 ```
 
-The `xml` and `path` packages are usable on their own, for example
-`@path.optimize_string("M 0,0 L 10,10")` gives `"M0 0l10 10"`.
+Exit codes: 0 on success, 1 for a usage error, 2 when a file could not be parsed (the names go to stderr, so a shell loop can act on them).
+
+`--param <plugin>.<key>=<value>` is repeatable. Values `true`/`false` become booleans, integers become numbers, comma-separated values become string arrays, and other values remain strings.
 
 ## Plugins
 
@@ -165,115 +107,9 @@ Enabled by default, in svgo's `preset-default` order:
 | mergePaths | join adjacent paths with identical attributes when their outlines do not intersect |
 | removeEmptyAttrs, removeEmptyContainers, removeUnusedNS, sortAttrs, sortDefsChildren | final cleanup |
 
-Optional: `removeDimensions`, `removeTitle`, `moveGroupAttrsToElems` (see the
-deviation noted under compatibility).
+Optional: `removeDimensions`, `removeTitle`, `moveGroupAttrsToElems`.
 
-Every plugin in svgo's preset-default is implemented.
-
-## Performance
-
-Same Node process, both with multipass, milliseconds per call
-(`node packages/compare/collect.mjs`, Node 24, svgo 4.1.0):
-
-| file | size | svgo.mbt (wasm-gc) | svgo-js | ratio |
-| --- | ---: | ---: | ---: | ---: |
-| sketch-icon.svg | 836 B | 0.119 | 0.319 | 2.7× |
-| inkscape-drawing.svg | 2 KB | 0.188 | 0.669 | 3.6× |
-| SVG_logo.svg | 4 KB | 0.579 | 1.674 | 2.9× |
-| Tux.svg | 50 KB | 7.092 | 14.238 | 2.0× |
-| Ghostscript_Tiger.svg | 68 KB | 12.485 | 36.016 | 2.9× |
-| World map (low resolution) | 85 KB | 11.889 | 51.867 | 4.4× |
-
-Between 1.7× and 4.4× depending on the file, 2.9× at the median; the wider
-gaps are on files with many paths, where svgo-js spends its time in the same
-path rewriting we do in wasm. In-module (`scripts/bench.sh`, native release)
-the Tiger takes about 12 ms end to end, of which parsing is 0.23 ms and path
-data optimization 2.5 ms per pass. `benchmark/README.md` has the stage
-breakdown and the history of what made it fast.
-
-Output sizes match svgo to within a few bytes on every corpus file except the
-Ghostscript tiger, where svgo.mbt is 23% smaller (52,690 against 68,101)
-because `moveGroupAttrsToElems` ships opt-in; see the deviation under
-compatibility.
-
-## Verifying correctness
-
-```bash
-scripts/verify.sh            # check, fmt, .mbti drift, fixtures, tests on js / native
-scripts/verify.sh --full     # + wasm build, sizes vs svgo-js, resvg pixel diff, speed (needs pnpm install)
-scripts/regress.sh <ref-dir> # byte-for-byte output comparison against a reference build
-```
-
-Five layers: unit and snapshot tests per package; our own svgo-style fixture
-files (`svgo/plugins/fixtures/*.txt`, one plugin each); **svgo's own plugin
-test suite**, copied verbatim into `svgo/plugins/fixtures/upstream/` and run
-with svgo's rules (one plugin, twice, both results must match); a corpus that
-must reproduce byte for byte across refactors; and a render diff that
-rasterizes every fixture before and after. Details in `docs/ARCHITECTURE.md`.
-
-### Compatibility with svgo, measured
-
-Two numbers matter here, and they answer different questions.
-
-**Do the implemented plugins behave like svgo?** Yes, on svgo's own cases for
-them (svgo e4cb29b, 2026-08-27):
-
-| | cases |
-| --- | --- |
-| pass | 289 |
-| known differences | 0 |
-| skipped | 0 |
-
-All 289 match byte for byte, including the rules that rewrite geometry:
-element transforms baked into the path data, curve runs turned into arcs,
-adjacent paths merged, groups collapsed. `fixtures/upstream/KNOWN_FAILURES.txt`
-is empty and the harness fails the build if a case starts failing again, so an
-entry there is a regression rather than a new baseline.
-
-**Is the pipeline complete?** Yes for `preset-default`: all 34 plugins are
-implemented, 33 of them on by default, plus `removeDimensions` and
-`removeTitle`, which svgo keeps opt-in. Nothing is skipped, so every imported
-case runs on every test run.
-
-One deliberate deviation: `moveGroupAttrsToElems` is implemented and passes
-svgo's cases, but it ships opt-in (`--enable moveGroupAttrsToElems`). Pushing a
-group's `transform` onto its children lets `convertPathData` bake the matrix
-into every path, which lengthens coordinates and leaves formerly identical
-siblings unmergeable. Over the eleven files in `svgo/testdata/` and
-`packages/compare/corpus/` it costs 15,859 bytes on the Ghostscript tiger and
-saves 48 bytes across the rest. svgo shows the same effect on that file (68,101
-bytes with the plugin, 52,029 without), so this is a size choice, not a
-compatibility gap.
-
-svgo also has 19 opt-in plugins; `removeDimensions` and `removeTitle` are
-implemented here, the other 17 (removeAttrs, prefixIds, removeXMLNS and the
-like) are not and their cases are not imported, and its parser, stringifier, style and CLI unit tests are not imported either
-since they cover svgo's internals rather than its output.
-
-## Repository layout
-
-A MoonBit workspace (`moon.work`) and a pnpm workspace side by side:
-
-```
-svgo/                 the MoonBit module: xml/ path/ plugins/ (+ fixtures) svgo.mbt wasm/ benchmark/ testdata/
-packages/svgo-mbt/    npm package: JS loader + svgo.wasm + the CLI bin
-packages/compare/     svgo-js comparison, resvg render diff, same-process speed, site numbers
-app/website/          the website: a MoonBit (Rabbita) app that imports svgo/, Tailwind v4, Remotion hero
-app/cli/              the CLI: a MoonBit executable that imports svgo/, C file I/O on native
-scripts/              build-wasm, build-cli, verify, bench, regress, gen-fixtures
-```
-
-`AGENTS.md` is the guide for coding agents (commands, invariants, conventions);
-`CONTRIBUTING.md` explains how to add a plugin or a fixture.
-
-## License
-
-MIT. Plugin semantics follow svgo (MIT, © Kir Belevich and contributors).
-
-### Plugin parameters
-
-Parameters use svgo's names and JSON shapes. Each plugin receives only its own
-object; omitted fields use these defaults:
+Parameters use svgo's names and JSON shapes. Each plugin receives only its own object; omitted fields use these defaults:
 
 | Plugin | Parameters and defaults |
 | --- | --- |
@@ -286,7 +122,46 @@ object; omitted fields use these defaults:
 | removeUselessStrokeAndFill | `stroke: true`, `fill: true`, `removeNone: false` |
 | sortAttrs | `xmlnsOrder: "front"`; `order: ["id", "width", "height", "x", "x1", "x2", "y", "y1", "y2", "cx", "cy", "r", "fill", "stroke", "marker", "d", "points"]` |
 
-`preserve` and `preservePrefixes` accept one string or an array of strings.
-`currentColor` accepts a boolean or an exact color string and does not replace
-colors inside masks. `preservePatterns` supports literal substring matches and
-`^`-prefixed literal prefix matches, **not full regular expressions**.
+`preserve` and `preservePrefixes` accept one string or an array of strings. `currentColor` accepts a boolean or an exact color string and does not replace colors inside masks. `preservePatterns` supports literal substring matches and `^`-prefixed literal prefix matches, **not full regular expressions**.
+
+## Performance
+
+Same Node process, both with multipass, milliseconds per call (`node packages/compare/collect.mjs`, Node 24, svgo 4.1.0):
+
+| file | size | svgo.mbt (wasm-gc) | svgo-js | ratio |
+| --- | ---: | ---: | ---: | ---: |
+| sketch-icon.svg | 836 B | 0.119 | 0.319 | 2.7× |
+| inkscape-drawing.svg | 2 KB | 0.188 | 0.669 | 3.6× |
+| SVG_logo.svg | 4 KB | 0.579 | 1.674 | 2.9× |
+| Tux.svg | 50 KB | 7.092 | 14.238 | 2.0× |
+| Ghostscript_Tiger.svg | 68 KB | 12.485 | 36.016 | 2.9× |
+| World map (low resolution) | 85 KB | 11.889 | 51.867 | 4.4× |
+
+Between 1.7× and 4.4× depending on the file, 2.9× at the median. Cold start on a small icon, whole process (`scripts/cli-bench.sh`): native CLI about 10 ms, Node build about 50 ms, svgo CLI about 160 ms.
+
+## Compatibility with svgo
+
+Upstream cases (svgo e4cb29b, 2026-08-27):
+
+| | cases |
+| --- | --- |
+| pass | 289 |
+| known differences | 0 |
+| skipped | 0 |
+
+`moveGroupAttrsToElems` ships opt-in (`--enable moveGroupAttrsToElems`). Pushing a group's `transform` onto its children lets `convertPathData` bake the matrix into every path, which lengthens coordinates and leaves formerly identical siblings unmergeable. Across the test corpus files it costs 15,859 bytes on the Ghostscript tiger and saves 48 bytes across the rest. svgo shows the same effect on that file (68,101 bytes with the plugin, 52,029 without, against 52,690 for svgo.mbt).
+
+svgo also has 19 opt-in plugins; `removeDimensions` and `removeTitle` are implemented, and the other 17 are not.
+
+## Verification
+
+```bash
+scripts/verify.sh            # check, fmt, .mbti drift, fixtures, tests on js / native
+scripts/verify.sh --full     # + wasm build, sizes vs svgo-js, resvg pixel diff, speed (needs pnpm install)
+```
+
+Runs unit tests, svgo's own fixture suite, resvg pixel diff, and byte-for-byte corpus checks. Details and developer guides: [docs/ARCHITECTURE.md](https://github.com/PerfectPan/svgo.mbt/blob/main/docs/ARCHITECTURE.md), [CONTRIBUTING.md](https://github.com/PerfectPan/svgo.mbt/blob/main/CONTRIBUTING.md), [AGENTS.md](https://github.com/PerfectPan/svgo.mbt/blob/main/AGENTS.md).
+
+## License
+
+MIT. Plugin semantics follow svgo (MIT, © Kir Belevich and contributors).

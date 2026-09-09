@@ -1,0 +1,97 @@
+name: binaries
+
+# Runs on the tag `changeset publish` pushes from release.yml (svgo-mbt@X.Y.Z):
+# builds the native CLI on three platforms, attaches the tarballs to a GitHub
+# release, and publishes the MoonBit module to mooncakes with the same version.
+# Needs the MOONCAKES_TOKEN repository secret (the `token` field of
+# ~/.moon/credentials.json after `moon login`); without it the mooncakes job
+# is skipped and says so.
+
+on:
+  push:
+    tags: ["svgo-mbt@*"]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Build the binaries, create no release, publish nothing"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  native:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            asset: linux-x86_64
+          - os: ubuntu-24.04-arm
+            asset: linux-arm64
+          - os: macos-latest
+            asset: macos-arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+          "$HOME/.moon/bin/moon" update
+      - name: Build and smoke-test the native CLI
+        run: |
+          moon build --target native --release -q
+          bin=$(scripts/bin-path.sh)
+          "$bin" --version
+          "$bin" svgo/testdata/sketch-icon.svg --stats >/dev/null
+          version=$("$bin" --version | tr -d '[:space:]')
+          mkdir -p dist/svgo-mbt
+          cp "$bin" dist/svgo-mbt/svgo-mbt
+          cp LICENSE packages/svgo-mbt/README.md dist/svgo-mbt/
+          tar -C dist -czf "svgo-mbt-$version-${{ matrix.asset }}.tar.gz" svgo-mbt
+          ls -la svgo-mbt-*.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: svgo-mbt-${{ matrix.asset }}
+          path: svgo-mbt-*.tar.gz
+
+  release:
+    needs: native
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: assets
+          merge-multiple: true
+      - name: Create the GitHub release with the binaries attached
+        run: gh release create "$GITHUB_REF_NAME" assets/*.tar.gz --title "$GITHUB_REF_NAME" --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  mooncakes:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    env:
+      MOONCAKES_TOKEN: ${{ secrets.MOONCAKES_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+          "$HOME/.moon/bin/moon" update
+      - name: Publish PerfectPan/svgo
+        run: |
+          if [ -z "$MOONCAKES_TOKEN" ]; then
+            echo "MOONCAKES_TOKEN is not set; skipping the mooncakes publish. Run 'cd svgo && MOON_WORK=off moon publish' locally." >&2
+            exit 0
+          fi
+          tag=${GITHUB_REF_NAME#svgo-mbt@}
+          mod=$(sed -n 's/^version = "\(.*\)"/\1/p' svgo/moon.mod)
+          [ "$tag" = "$mod" ] || { echo "tag $tag but svgo/moon.mod says $mod" >&2; exit 1; }
+          mkdir -p ~/.moon
+          printf '{"token":"%s","username":"PerfectPan"}\n' "$MOONCAKES_TOKEN" > ~/.moon/credentials.json
+          cd svgo && MOON_WORK=off moon publish

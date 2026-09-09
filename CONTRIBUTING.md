@@ -110,3 +110,30 @@ The repository ships a pre-commit hook that runs `moon check`:
 
 `type(scope): summary` with `feat`, `fix`, `perf`, `docs`, `bench`, `compare`, `site`,
 `build`, `chore`. The body says what changed in behavior or numbers.
+
+## Releasing
+
+`main` is protected: every change is a pull request, merged by rebase or squash
+(no merge commits), with CI green.
+
+1. A PR that changes what users get runs `pnpm changeset` and commits the file
+   it writes under `.changeset/` (bump level + one line for the changelog).
+2. To release, open a PR from `pnpm version-packages`: changesets bumps
+   `packages/svgo-mbt/package.json` and writes `CHANGELOG.md`, then
+   `scripts/sync-version.mjs` copies the version into `svgo/moon.mod`, the app
+   modules' dependency, the CLI's `--version` and the wasm's `version()`.
+   `scripts/verify.sh` fails if those ever disagree.
+3. Merging that PR runs `release.yml`: build, tests, `changeset publish` (npm,
+   OIDC trusted publishing, so no token lives in the repo) and the tag
+   `svgo-mbt@X.Y.Z`.
+4. The tag runs `binaries.yml`: native CLI tarballs for linux-x86_64,
+   linux-arm64 and macos-arm64 on a GitHub release, and `moon publish` of
+   `PerfectPan/svgo` to mooncakes using the `MOONCAKES_TOKEN` secret.
+
+One-time setup, both on the maintainer's side: the npm package must exist
+before a Trusted Publisher can be configured for it on npmjs.com (first publish
+by hand with `npm login && npm publish` in `packages/svgo-mbt`), and the
+mooncakes token from `~/.moon/credentials.json` goes into the repository secret
+`MOONCAKES_TOKEN`. `gh workflow run release.yml -f dry_run=true` and
+`gh workflow run binaries.yml -f dry_run=true` rehearse without publishing.
+

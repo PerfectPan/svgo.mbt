@@ -4,12 +4,13 @@
 /// last because svgo removes descriptions after the structural passes.
 pub let preset_default : Array[Plugin] = [
   remove_doctype, remove_xml_proc_inst, remove_comments, remove_deprecated_attrs,
-  remove_metadata, remove_editors_ns_data, cleanup_attrs, cleanup_ids, remove_useless_defs,
-  cleanup_numeric_values, convert_colors, remove_unknowns_and_defaults, remove_non_inheritable_group_attrs,
-  remove_useless_stroke_and_fill, cleanup_enable_background, remove_hidden_elems,
-  remove_empty_text, convert_shape_to_path, convert_ellipse_to_circle, move_elems_attrs_to_group,
-  collapse_groups, convert_path_data, convert_transform, merge_paths, remove_empty_attrs,
-  remove_empty_containers, remove_unused_ns, sort_attrs, sort_defs_children, remove_desc,
+  remove_metadata, remove_editors_ns_data, cleanup_attrs, merge_styles, inline_styles,
+  minify_styles, cleanup_ids, remove_useless_defs, cleanup_numeric_values, convert_colors,
+  remove_unknowns_and_defaults, remove_non_inheritable_group_attrs, remove_useless_stroke_and_fill,
+  cleanup_enable_background, remove_hidden_elems, remove_empty_text, convert_shape_to_path,
+  convert_ellipse_to_circle, move_elems_attrs_to_group, collapse_groups, convert_path_data,
+  convert_transform, remove_empty_attrs, remove_empty_containers, merge_paths, remove_unused_ns,
+  sort_attrs, sort_defs_children, remove_desc,
 ]
 
 ///|

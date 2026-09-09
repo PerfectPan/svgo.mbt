@@ -1,11 +1,10 @@
 # svgo.mbt
 
 **An SVG optimizer written in MoonBit, shipped as WebAssembly.**
-31 of the 34 plugins in [svgo](https://github.com/svg/svgo)'s preset-default,
-in its order and with its semantics, and none of the Node.js dependency tree:
-a 238 KB `wasm-gc` module that runs in the browser and in Node 22+, a native
-CLI, and a MoonBit library. The three that are missing all need a CSS parser;
-see [compatibility](#compatibility-with-svgo-measured).
+All 34 plugins in [svgo](https://github.com/svg/svgo)'s preset-default, in its
+order and with its semantics, and none of the Node.js dependency tree: a 269 KB
+`wasm-gc` module that runs in the browser and in Node 22+, a CLI that installs
+with `npx`, and a MoonBit library.
 
 [**Website & playground**](https://perfectpan.github.io/svgo.mbt/) ·
 [API reference](https://perfectpan.github.io/svgo.mbt/api.html) ·
@@ -149,6 +148,7 @@ Enabled by default, in svgo's `preset-default` order:
 | cleanupAttrs, removeDesc, cleanupIds, removeUselessDefs | normalise whitespace, drop `Created with ...` descriptions, unused ids and unreferenced `<defs>` children |
 | cleanupNumericValues | round numbers, remove `px` |
 | convertColors | `rgb()` / names / `#RRGGBB` to the shortest form |
+| mergeStyles, inlineStyles, minifyStyles | merge `<style>` elements, inline matching rules to `style="..."`, minify CSS and drop unused selectors |
 | removeUnknownsAndDefaults | drop attributes equal to their defaults, unless an ancestor overrides them |
 | removeDeprecatedAttrs | drop attributes the SVG spec deprecated, keeping the ones that still render |
 | removeNonInheritableGroupAttrs | drop presentation attributes off a `<g>` that children cannot inherit |
@@ -166,8 +166,7 @@ Enabled by default, in svgo's `preset-default` order:
 Optional: `removeDimensions`, `removeTitle`, `moveGroupAttrsToElems` (see the
 deviation noted under compatibility).
 
-Not implemented compared to svgo: `inlineStyles`, `minifyStyles` and
-`mergeStyles`, which need a CSS parser.
+Every plugin in svgo's preset-default is implemented.
 
 ## Performance
 
@@ -216,30 +215,21 @@ them (svgo e4cb29b, 2026-08-27):
 
 | | cases |
 | --- | --- |
-| pass | 238 |
+| pass | 289 |
 | known differences | 0 |
 | skipped | 0 |
 
-All 238 match byte for byte, including the rules that rewrite geometry:
+All 289 match byte for byte, including the rules that rewrite geometry:
 element transforms baked into the path data, curve runs turned into arcs,
 adjacent paths merged, groups collapsed. `fixtures/upstream/KNOWN_FAILURES.txt`
 is empty and the harness fails the build if a case starts failing again, so an
 entry there is a regression rather than a new baseline.
 
-**Is the pipeline complete?** Three plugins short. svgo's `preset-default` runs
-34 plugins; svgo.mbt implements 31 of them, and runs 30 by default plus
-`removeDimensions` and `removeTitle`, which svgo keeps opt-in. The cases for the
-three missing plugins are imported too and generated as skipped tests, so the
-gap shows up in every test run:
-
-| missing plugin | cases | what it would take |
-| --- | --- | --- |
-| `inlineStyles` | 28 | a CSS parser: selector matching, specificity, at-rules |
-| `mergeStyles` | 12 | same |
-| `minifyStyles` | 11 | same, plus most of a CSS minifier (svgo delegates to `csso`) |
-
-That is 51 skipped cases against 238 passing, and deleting a plugin's entry from
-`NOT_IMPLEMENTED` in `scripts/gen-fixtures.py` makes its cases live.
+<<<<<<< HEAD
+**Is the pipeline complete?** Yes for `preset-default`: all 34 plugins are
+implemented, 33 of them on by default, plus `removeDimensions` and
+`removeTitle`, which svgo keeps opt-in. Nothing is skipped, so every imported
+case runs on every test run.
 
 One deliberate deviation: `moveGroupAttrsToElems` is implemented and passes
 svgo's cases, but it ships opt-in (`--enable moveGroupAttrsToElems`). Pushing a
@@ -254,6 +244,27 @@ compatibility gap.
 svgo also has 17 opt-in plugins (88 further cases) that are not imported at all,
 and its parser, stringifier, style and CLI unit tests are not imported either
 since they cover svgo's internals rather than its output.
+=======
+**Is the pipeline complete?** Not yet. svgo's `preset-default` runs 34 plugins;
+svgo.mbt runs 28 of them plus `removeDimensions` and `removeTitle`, which svgo
+keeps opt-in. The cases for the six missing plugins are imported too and
+generated as skipped tests, so the gap shows up in every test run:
+
+| missing plugin | cases | what it would take |
+| --- | --- | --- |
+| `moveElemsAttrsToGroup` | 7 | attribute motion across a group boundary, with inheritance rules |
+| `moveGroupAttrsToElems` | 6 | same |
+| `removeDeprecatedAttrs` | 8 | a table lookup |
+| `cleanupEnableBackground` | 5 | one deprecated attribute |
+| `removeNonInheritableGroupAttrs` | 2 | drop non-inheritable presentation attributes off a group |
+| `sortDefsChildren` | 1 | sort the children of `<defs>` |
+
+That is 29 skipped cases against 260 passing, and deleting a plugin's entry
+from `NOT_IMPLEMENTED` in `scripts/gen-fixtures.py` makes its cases live. svgo
+also has 17 opt-in plugins (88 further cases) that are not imported at all, and
+its parser, stringifier, style and CLI unit tests are not imported either since
+they cover svgo's internals rather than its output.
+>>>>>>> 24e327c (plugins: a CSS module and the three style plugins (upstream 209 → 260 cases))
 
 ## Repository layout
 

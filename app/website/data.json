@@ -2,7 +2,7 @@
   "generated": "2026-09-09",
   "node": "v24.18.0",
   "svgoVersion": "4.1.0",
-  "wasmBytes": 238010,
+  "wasmBytes": 269227,
   "plugins": [
     {
       "name": "removeDoctype",
@@ -37,6 +37,21 @@
     {
       "name": "cleanupAttrs",
       "description": "clean up whitespace in attribute values",
+      "enabled": true
+    },
+    {
+      "name": "mergeStyles",
+      "description": "merge multiple style elements into one",
+      "enabled": true
+    },
+    {
+      "name": "inlineStyles",
+      "description": "inline styles from style elements into style attributes",
+      "enabled": true
+    },
+    {
+      "name": "minifyStyles",
+      "description": "minify styles in style elements and style attributes",
       "enabled": true
     },
     {
@@ -120,11 +135,6 @@
       "enabled": true
     },
     {
-      "name": "mergePaths",
-      "description": "merge adjacent non-overlapping paths with the same attributes",
-      "enabled": true
-    },
-    {
       "name": "removeEmptyAttrs",
       "description": "remove attributes with empty values",
       "enabled": true
@@ -132,6 +142,11 @@
     {
       "name": "removeEmptyContainers",
       "description": "remove empty container elements",
+      "enabled": true
+    },
+    {
+      "name": "mergePaths",
+      "description": "merge adjacent non-overlapping paths with the same attributes",
       "enabled": true
     },
     {
@@ -176,17 +191,17 @@
       "original": 570,
       "mbt": 442,
       "js": 442,
-      "mbtMs": 0.223,
-      "jsMs": 0.325,
+      "mbtMs": 0.186,
+      "jsMs": 0.28,
       "passes": 2
     },
     {
       "file": "illustrator-logo.svg",
       "original": 1149,
-      "mbt": 672,
+      "mbt": 528,
       "js": 528,
-      "mbtMs": 0.182,
-      "jsMs": 0.667,
+      "mbtMs": 0.163,
+      "jsMs": 0.568,
       "passes": 2
     },
     {
@@ -194,8 +209,8 @@
       "original": 2078,
       "mbt": 641,
       "js": 640,
-      "mbtMs": 0.209,
-      "jsMs": 0.712,
+      "mbtMs": 0.197,
+      "jsMs": 0.644,
       "passes": 2
     },
     {
@@ -203,8 +218,8 @@
       "original": 836,
       "mbt": 276,
       "js": 288,
-      "mbtMs": 0.118,
-      "jsMs": 0.329,
+      "mbtMs": 0.113,
+      "jsMs": 0.306,
       "passes": 3
     },
     {
@@ -212,8 +227,8 @@
       "original": 68630,
       "mbt": 52690,
       "js": 68101,
-      "mbtMs": 14.265,
-      "jsMs": 41.627,
+      "mbtMs": 12.76,
+      "jsMs": 36.107,
       "passes": 3
     },
     {
@@ -221,8 +236,8 @@
       "original": 5419,
       "mbt": 4562,
       "js": 4551,
-      "mbtMs": 0.977,
-      "jsMs": 3.106,
+      "mbtMs": 0.909,
+      "jsMs": 2.72,
       "passes": 3
     },
     {
@@ -230,8 +245,8 @@
       "original": 366,
       "mbt": 302,
       "js": 302,
-      "mbtMs": 0.073,
-      "jsMs": 0.173,
+      "mbtMs": 0.07,
+      "jsMs": 0.166,
       "passes": 2
     },
     {
@@ -239,8 +254,8 @@
       "original": 4019,
       "mbt": 3546,
       "js": 3584,
-      "mbtMs": 0.593,
-      "jsMs": 1.86,
+      "mbtMs": 0.599,
+      "jsMs": 1.728,
       "passes": 3
     },
     {
@@ -248,8 +263,8 @@
       "original": 49983,
       "mbt": 35975,
       "js": 35983,
-      "mbtMs": 7.813,
-      "jsMs": 16.238,
+      "mbtMs": 7.126,
+      "jsMs": 14.228,
       "passes": 3
     },
     {
@@ -257,8 +272,8 @@
       "original": 84823,
       "mbt": 46700,
       "js": 46706,
-      "mbtMs": 13.308,
-      "jsMs": 59.082,
+      "mbtMs": 13.303,
+      "jsMs": 57.262,
       "passes": 3
     }
   ]

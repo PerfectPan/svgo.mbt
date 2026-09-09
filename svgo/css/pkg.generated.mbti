@@ -1,0 +1,142 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "perfectpan/svgo/css"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/set",
+  "perfectpan/svgo/xml",
+}
+
+// Values
+pub fn complex_specificity(ComplexSelector) -> Specificity
+
+pub fn compound_specificity(CompoundSelector) -> Specificity
+
+pub fn compress_box_properties(Array[Declaration]) -> Array[Declaration]
+
+pub fn match_complex(DocumentContext, Int, ComplexSelector) -> Bool
+
+pub fn match_compound(DocumentContext, Int, CompoundSelector) -> Bool
+
+pub fn match_simple(DocumentContext, Int, SimpleSelector) -> Bool
+
+pub fn min_box_shorthand(String, String, String, String) -> String
+
+pub fn minify_declarations(Array[Declaration]) -> Array[Declaration]
+
+pub fn minify_stylesheet_with_usage(StyleSheet, Usage?) -> StyleSheet
+
+pub fn minify_value(String, String) -> String
+
+pub fn parse_complex_selector(String) -> ComplexSelector?
+
+pub fn parse_declarations(String) -> Array[Declaration]
+
+pub fn parse_selector_list(String) -> Array[ComplexSelector]
+
+pub fn parse_stylesheet(String) -> StyleSheet
+
+pub fn serialize_declarations(Array[Declaration]) -> String
+
+// Errors
+
+// Types and methods
+pub(all) enum AttrMatcher {
+  Exists
+  Equals(String)
+  Includes(String)
+  DashMatch(String)
+  PrefixMatch(String)
+  SuffixMatch(String)
+  SubstringMatch(String)
+} derive(Eq, @debug.Debug)
+
+pub(all) enum Combinator {
+  Descendant
+  Child
+  NextSibling
+  SubsequentSibling
+  Deep
+} derive(Eq, @debug.Debug)
+
+pub(all) struct ComplexSelector {
+  head : CompoundSelector
+  tail : Array[(Combinator, CompoundSelector)]
+  raw : String
+} derive(Eq, @debug.Debug)
+pub fn ComplexSelector::specificity(Self) -> Specificity
+pub fn ComplexSelector::to_css(Self) -> String
+pub fn ComplexSelector::write_css(Self, StringBuilder) -> Unit
+
+pub(all) struct CompoundSelector {
+  simples : Array[SimpleSelector]
+} derive(Eq, @debug.Debug)
+pub fn CompoundSelector::write_css(Self, StringBuilder) -> Unit
+
+pub(all) struct Declaration {
+  name : String
+  value : String
+  important : Bool
+} derive(Eq, @debug.Debug)
+pub fn Declaration::to_css(Self) -> String
+pub fn Declaration::write_css(Self, StringBuilder) -> Unit
+
+pub(all) struct DocumentContext {
+  elements : Array[@xml.Element]
+  parents : Array[Int]
+  prev_siblings : Array[Int]
+}
+pub fn DocumentContext::build(@xml.Document) -> Self
+pub fn DocumentContext::find_all_matches(Self, ComplexSelector) -> Array[Int]
+
+pub(all) struct Rule {
+  selectors : Array[ComplexSelector]
+  declarations : Array[Declaration]
+} derive(@debug.Debug)
+pub fn Rule::to_css(Self) -> String
+pub fn Rule::write_css(Self, StringBuilder) -> Unit
+
+pub(all) enum SimpleSelector {
+  Universal
+  Type(String)
+  Id(String)
+  Class(String)
+  Attribute(String, AttrMatcher)
+  PseudoClass(String, String?)
+  PseudoElement(String)
+} derive(Eq, @debug.Debug)
+pub fn SimpleSelector::write_css(Self, StringBuilder) -> Unit
+
+pub(all) struct Specificity {
+  a : Int
+  b : Int
+  c : Int
+  d : Int
+} derive(Compare, Eq, @debug.Debug)
+pub fn Specificity::add(Self, Self) -> Self
+pub fn Specificity::compare(Self, Self) -> Int
+pub fn Specificity::new(Int, Int, Int, Int) -> Self
+pub impl Show for Specificity
+
+pub(all) struct StyleSheet {
+  items : Array[StyleSheetItem]
+} derive(@debug.Debug)
+pub fn StyleSheet::to_css(Self) -> String
+
+pub(all) enum StyleSheetItem {
+  Rule(Rule)
+  Declarations(Array[Declaration])
+  AtRule(String, String, Array[StyleSheetItem]?)
+  Raw(String)
+} derive(@debug.Debug)
+pub fn StyleSheetItem::write_css(Self, StringBuilder) -> Unit
+
+pub(all) struct Usage {
+  tags : @set.Set[String]?
+  ids : @set.Set[String]?
+  classes : @set.Set[String]?
+}
+
+// Type aliases
+
+// Traits

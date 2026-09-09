@@ -34,7 +34,13 @@ pub let editor_namespaces : Array[String]
 
 pub fn find_plugin(String) -> Plugin?
 
+pub let inline_styles : Plugin
+
 pub let merge_paths : Plugin
+
+pub let merge_styles : Plugin
+
+pub let minify_styles : Plugin
 
 pub let move_elems_attrs_to_group : Plugin
 

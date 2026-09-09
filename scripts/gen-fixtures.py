@@ -54,11 +54,7 @@ SINGLE_PASS = {"addAttributesToSVGElement", "convertTransform"}
 # visible in the test summary instead of only in the README. Delete an entry
 # when the plugin lands; its cases go live and must pass (or be listed in
 # KNOWN_FAILURES.txt with a reason).
-NOT_IMPLEMENTED = {
-    "inlineStyles": "needs a CSS parser (selector matching and specificity)",
-    "minifyStyles": "needs a CSS parser",
-    "mergeStyles": "needs a CSS parser",
-}
+NOT_IMPLEMENTED : dict[str, str] = {}
 
 
 def multiline(text: str) -> str:

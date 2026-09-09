@@ -5056,7 +5056,6 @@ test "upstream convertTransform.15" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.01" {
   check_fixture_upstream(
     "inlineStyles",
@@ -5078,7 +5077,6 @@ test "upstream inlineStyles.01" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.02" {
   check_fixture_upstream(
     "inlineStyles",
@@ -5103,7 +5101,6 @@ test "upstream inlineStyles.02" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.03" {
   check_fixture_upstream(
     "inlineStyles",
@@ -5140,7 +5137,6 @@ test "upstream inlineStyles.03" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.04" {
   check_fixture_upstream(
     "inlineStyles",
@@ -5166,7 +5162,6 @@ test "upstream inlineStyles.04" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.05" {
   check_fixture_upstream(
     "inlineStyles",
@@ -5196,7 +5191,6 @@ test "upstream inlineStyles.05" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.06" {
   check_fixture_upstream(
     "inlineStyles",
@@ -5228,7 +5222,6 @@ test "upstream inlineStyles.06" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.07" {
   check_fixture_upstream(
     "inlineStyles",
@@ -5258,7 +5251,6 @@ test "upstream inlineStyles.07" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.08" {
   check_fixture_upstream(
     "inlineStyles",
@@ -5288,7 +5280,6 @@ test "upstream inlineStyles.08" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.09" {
   check_fixture_upstream(
     "inlineStyles",
@@ -5318,7 +5309,6 @@ test "upstream inlineStyles.09" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.10" {
   check_fixture_upstream(
     "inlineStyles",
@@ -5345,7 +5335,6 @@ test "upstream inlineStyles.10" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.11" {
   check_fixture_upstream(
     "inlineStyles",
@@ -5374,7 +5363,6 @@ test "upstream inlineStyles.11" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.12" {
   check_fixture_upstream(
     "inlineStyles",
@@ -5399,7 +5387,6 @@ test "upstream inlineStyles.12" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.13" {
   check_fixture_upstream(
     "inlineStyles",
@@ -5478,7 +5465,6 @@ test "upstream inlineStyles.13" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.14" {
   check_fixture_upstream(
     "inlineStyles",
@@ -5517,7 +5503,6 @@ test "upstream inlineStyles.14" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.15" {
   check_fixture_upstream(
     "inlineStyles",
@@ -5597,7 +5582,6 @@ test "upstream inlineStyles.15" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.16" {
   check_fixture_upstream(
     "inlineStyles",
@@ -5645,7 +5629,6 @@ test "upstream inlineStyles.16" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.17" {
   check_fixture_upstream(
     "inlineStyles",
@@ -5679,7 +5662,6 @@ test "upstream inlineStyles.17" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.18" {
   check_fixture_upstream(
     "inlineStyles",
@@ -5726,7 +5708,6 @@ test "upstream inlineStyles.18" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.19" {
   check_fixture_upstream(
     "inlineStyles",
@@ -5791,7 +5772,6 @@ test "upstream inlineStyles.19" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.20" {
   check_fixture_upstream(
     "inlineStyles",
@@ -5829,7 +5809,6 @@ test "upstream inlineStyles.20" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.21" {
   check_fixture_upstream(
     "inlineStyles",
@@ -5861,7 +5840,6 @@ test "upstream inlineStyles.21" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.22" {
   check_fixture_upstream(
     "inlineStyles",
@@ -5895,7 +5873,6 @@ test "upstream inlineStyles.22" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.23" {
   check_fixture_upstream(
     "inlineStyles",
@@ -5924,7 +5901,6 @@ test "upstream inlineStyles.23" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.24" {
   check_fixture_upstream(
     "inlineStyles",
@@ -5951,7 +5927,6 @@ test "upstream inlineStyles.24" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.25" {
   check_fixture_upstream(
     "inlineStyles",
@@ -5991,7 +5966,6 @@ test "upstream inlineStyles.25" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.26" {
   check_fixture_upstream(
     "inlineStyles",
@@ -6030,7 +6004,6 @@ test "upstream inlineStyles.26" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.27" {
   check_fixture_upstream(
     "inlineStyles",
@@ -6057,7 +6030,6 @@ test "upstream inlineStyles.27" {
 }
 
 ///|
-#skip("needs a CSS parser (selector matching and specificity)")
 test "upstream inlineStyles.28" {
   check_fixture_upstream(
     "inlineStyles",
@@ -6580,7 +6552,6 @@ test "upstream mergePaths.12" {
 }
 
 ///|
-#skip("needs a CSS parser")
 test "upstream mergeStyles.01" {
   check_fixture_upstream(
     "mergeStyles",
@@ -6608,7 +6579,6 @@ test "upstream mergeStyles.01" {
 }
 
 ///|
-#skip("needs a CSS parser")
 test "upstream mergeStyles.02" {
   check_fixture_upstream(
     "mergeStyles",
@@ -6637,7 +6607,6 @@ test "upstream mergeStyles.02" {
 }
 
 ///|
-#skip("needs a CSS parser")
 test "upstream mergeStyles.03" {
   check_fixture_upstream(
     "mergeStyles",
@@ -6664,7 +6633,6 @@ test "upstream mergeStyles.03" {
 }
 
 ///|
-#skip("needs a CSS parser")
 test "upstream mergeStyles.04" {
   check_fixture_upstream(
     "mergeStyles",
@@ -6692,7 +6660,6 @@ test "upstream mergeStyles.04" {
 }
 
 ///|
-#skip("needs a CSS parser")
 test "upstream mergeStyles.05" {
   check_fixture_upstream(
     "mergeStyles",
@@ -6714,7 +6681,6 @@ test "upstream mergeStyles.05" {
 }
 
 ///|
-#skip("needs a CSS parser")
 test "upstream mergeStyles.06" {
   check_fixture_upstream(
     "mergeStyles",
@@ -6743,7 +6709,6 @@ test "upstream mergeStyles.06" {
 }
 
 ///|
-#skip("needs a CSS parser")
 test "upstream mergeStyles.07" {
   check_fixture_upstream(
     "mergeStyles",
@@ -6768,7 +6733,6 @@ test "upstream mergeStyles.07" {
 }
 
 ///|
-#skip("needs a CSS parser")
 test "upstream mergeStyles.08" {
   check_fixture_upstream(
     "mergeStyles",
@@ -6800,7 +6764,6 @@ test "upstream mergeStyles.08" {
 }
 
 ///|
-#skip("needs a CSS parser")
 test "upstream mergeStyles.09" {
   check_fixture_upstream(
     "mergeStyles",
@@ -6840,7 +6803,6 @@ test "upstream mergeStyles.09" {
 }
 
 ///|
-#skip("needs a CSS parser")
 test "upstream mergeStyles.10" {
   check_fixture_upstream(
     "mergeStyles",
@@ -6864,7 +6826,6 @@ test "upstream mergeStyles.10" {
 }
 
 ///|
-#skip("needs a CSS parser")
 test "upstream mergeStyles.11" {
   check_fixture_upstream(
     "mergeStyles",
@@ -6897,7 +6858,6 @@ test "upstream mergeStyles.11" {
 }
 
 ///|
-#skip("needs a CSS parser")
 test "upstream mergeStyles.12" {
   check_fixture_upstream(
     "mergeStyles",
@@ -6933,7 +6893,6 @@ test "upstream mergeStyles.12" {
 }
 
 ///|
-#skip("needs a CSS parser")
 test "upstream minifyStyles.01" {
   check_fixture_upstream(
     "minifyStyles",
@@ -6961,7 +6920,6 @@ test "upstream minifyStyles.01" {
 }
 
 ///|
-#skip("needs a CSS parser")
 test "upstream minifyStyles.02" {
   check_fixture_upstream(
     "minifyStyles",
@@ -6993,7 +6951,6 @@ test "upstream minifyStyles.02" {
 }
 
 ///|
-#skip("needs a CSS parser")
 test "upstream minifyStyles.03" {
   check_fixture_upstream(
     "minifyStyles",
@@ -7023,7 +6980,6 @@ test "upstream minifyStyles.03" {
 }
 
 ///|
-#skip("needs a CSS parser")
 test "upstream minifyStyles.04" {
   check_fixture_upstream(
     "minifyStyles",
@@ -7060,7 +7016,6 @@ test "upstream minifyStyles.04" {
 }
 
 ///|
-#skip("needs a CSS parser")
 test "upstream minifyStyles.05" {
   check_fixture_upstream(
     "minifyStyles",
@@ -7097,7 +7052,6 @@ test "upstream minifyStyles.05" {
 }
 
 ///|
-#skip("needs a CSS parser")
 test "upstream minifyStyles.06" {
   check_fixture_upstream(
     "minifyStyles",
@@ -7134,7 +7088,6 @@ test "upstream minifyStyles.06" {
 }
 
 ///|
-#skip("needs a CSS parser")
 test "upstream minifyStyles.07" {
   check_fixture_upstream(
     "minifyStyles",
@@ -7173,7 +7126,6 @@ test "upstream minifyStyles.07" {
 }
 
 ///|
-#skip("needs a CSS parser")
 test "upstream minifyStyles.08" {
   check_fixture_upstream(
     "minifyStyles",
@@ -7206,7 +7158,6 @@ test "upstream minifyStyles.08" {
 }
 
 ///|
-#skip("needs a CSS parser")
 test "upstream minifyStyles.09" {
   check_fixture_upstream(
     "minifyStyles",
@@ -7245,7 +7196,6 @@ test "upstream minifyStyles.09" {
 }
 
 ///|
-#skip("needs a CSS parser")
 test "upstream minifyStyles.10" {
   check_fixture_upstream(
     "minifyStyles",
@@ -7277,7 +7227,6 @@ test "upstream minifyStyles.10" {
 }
 
 ///|
-#skip("needs a CSS parser")
 test "upstream minifyStyles.11" {
   check_fixture_upstream(
     "minifyStyles",

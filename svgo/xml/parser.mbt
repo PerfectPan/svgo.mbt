@@ -152,7 +152,17 @@ fn Parser::parse_children(
       }
       let raw = self.slice(start, self.pos)
       if keep_space {
-        out.push(Text(decode_entities(raw)))
+        if parent == Some("style") {
+          // In svgo/sax, whitespace-only text tokens adjacent to CDATA or tags in <style> are discarded
+          // if they are just indentation/newlines, but meaningful text is preserved.
+          // Entity decoding is still applied: CSS may legitimately contain `&gt;` etc.
+          // written for XML, which must be decoded before the CSS parser sees them.
+          if !raw.is_blank() {
+            out.push(Text(decode_entities(raw.trim().to_owned())))
+          }
+        } else {
+          out.push(Text(decode_entities(raw)))
+        }
       } else if !raw.is_blank() {
         // collapse surrounding whitespace like svgo does
         out.push(Text(decode_entities(raw.trim().to_owned())))

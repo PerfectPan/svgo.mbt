@@ -77,24 +77,59 @@ fn check_fixture_upstream(
 
 ///|
 /// Drop whitespace around tags and around the document, so pretty-printed
-/// and compact serializations compare equal.
+/// and compact serializations compare equal. Also trims whitespace at the
+/// boundaries of XML comments, matching svgo's serializer.
 fn compact(s : String) -> String {
   let sb = StringBuilder()
   let mut pending = ""
   let mut after_tag = false
-  for c in s.trim() {
-    if c == '\n' || c == '\r' || c == '\t' || c == ' ' {
-      if !after_tag {
-        pending = pending + c.to_string()
+  let mut in_comment = false
+  let trimmed = s.trim().to_owned()
+  let cu = trimmed.code_units()
+  let len = cu.length()
+  let mut i = 0
+  while i < len {
+    let c = cu[i]
+    if c == 10 || c == 13 || c == 9 || c == 32 {
+      if !after_tag && !in_comment {
+        pending = pending + " "
       }
+      i += 1
       continue
     }
-    if c != '<' && pending.length() > 0 {
+    if c != 60 && pending.length() > 0 {
       sb.write_string(pending)
     }
     pending = ""
-    after_tag = c == '>'
-    sb.write_char(c)
+    // detect comment start <!--
+    if c == 60 &&
+      i + 3 < len &&
+      cu[i + 1] == 33 &&
+      cu[i + 2] == 45 &&
+      cu[i + 3] == 45 {
+      in_comment = true
+      sb.write_string("<!--")
+      i += 4
+      continue
+    }
+    // detect comment end -->
+    if in_comment &&
+      c == 45 &&
+      i + 2 < len &&
+      cu[i + 1] == 45 &&
+      cu[i + 2] == 62 {
+      in_comment = false
+      sb.write_string("-->")
+      after_tag = true
+      i += 3
+      continue
+    }
+    after_tag = c == 62
+    match c.to_char() {
+      Some(ch) => sb.write_char(ch)
+      None => ()
+    }
+    i += 1
   }
   sb.to_string()
 }

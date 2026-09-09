@@ -1,6 +1,7 @@
 import {
   "perfectpan/svgo/xml",
   "perfectpan/svgo/path",
+  "perfectpan/svgo/css",
   "moonbitlang/core/string",
   "moonbitlang/core/math",
   "moonbitlang/core/cmp",

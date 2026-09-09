@@ -197,7 +197,7 @@ compatibility.
 ## Verifying correctness
 
 ```bash
-scripts/verify.sh            # check, fmt, .mbti drift, fixtures, tests on wasm-gc / js / native
+scripts/verify.sh            # check, fmt, .mbti drift, fixtures, tests on js / native
 scripts/verify.sh --full     # + wasm build, sizes vs svgo-js, resvg pixel diff, speed (needs pnpm install)
 scripts/regress.sh <ref-dir> # byte-for-byte output comparison against a reference build
 ```

@@ -112,7 +112,7 @@ that did something. `utf8_length` counts bytes without encoding.
 
 ## Verification layers
 
-1. **Unit and snapshot tests** in each package (`moon test`, 3 backends).
+1. **Unit and snapshot tests** in each package (`moon test` on js and native; the wasm-gc artifact runs the same fixture suite under node, see `packages/svgo-mbt/fixtures.test.mjs`).
 2. **Fixtures** (`svgo/plugins/fixtures/*.txt`, svgo's `@@@` format) generated into
    a test file; one plugin at a time.
 3. **Corpus regression** (`scripts/regress.sh`): byte-identical output across

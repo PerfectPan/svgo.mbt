@@ -290,7 +290,7 @@ fn Parser::parse_simple_selector(self : Parser) -> SimpleSelector? {
 
 ///|
 fn Parser::parse_compound_selector(self : Parser) -> CompoundSelector? {
-  let simples = Array::new()
+  let simples = []
   while !self.eof() {
     let c = self.peek()
     if c == 32 ||
@@ -331,7 +331,7 @@ pub fn parse_complex_selector(raw_str : String) -> ComplexSelector? {
     Some(h) => h
     None => return None
   }
-  let tail = Array::new()
+  let tail = []
   while !p.eof() {
     let prev_pos = p.pos
     p.skip_ws_and_comments()
@@ -374,7 +374,7 @@ pub fn parse_complex_selector(raw_str : String) -> ComplexSelector? {
 
 ///|
 pub fn parse_selector_list(s : String) -> Array[ComplexSelector] {
-  let res = Array::new()
+  let res = []
   let len = s.length()
   let mut start = 0
   let mut depth = 0
@@ -420,7 +420,7 @@ pub fn parse_selector_list(s : String) -> Array[ComplexSelector] {
 ///|
 pub fn parse_declarations(s : String) -> Array[Declaration] {
   let p = Parser::new(s)
-  let res = Array::new()
+  let res = []
   while !p.eof() {
     p.skip_ws_and_comments()
     if p.eof() {
@@ -493,7 +493,7 @@ pub fn parse_declarations(s : String) -> Array[Declaration] {
 /// selector lists.
 fn parse_at_rule_block(body : String) -> Array[StyleSheetItem] {
   let p = Parser::new(body)
-  let items = Array::new()
+  let items = []
   while !p.eof() {
     p.skip_ws_and_comments()
     if p.eof() {
@@ -596,7 +596,7 @@ fn parse_at_rule_block(body : String) -> Array[StyleSheetItem] {
 ///|
 pub fn parse_stylesheet(css_text : String) -> StyleSheet {
   let p = Parser::new(css_text)
-  let items = Array::new()
+  let items = []
 
   while !p.eof() {
     p.skip_ws_and_comments()

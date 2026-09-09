@@ -21,7 +21,7 @@
     "prepublishOnly": "cd ../.. && scripts/build-wasm.sh && scripts/build-cli.sh"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   },
   "license": "MIT",
   "keywords": [

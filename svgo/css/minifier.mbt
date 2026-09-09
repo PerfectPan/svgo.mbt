@@ -75,7 +75,7 @@ pub fn compress_box_properties(
         // If all 4 have the same important flag
         if t_i == r_i && r_i == b_i && b_i == l_i {
           let shorthand_val = min_box_shorthand(t_v, r_v, b_v, l_v)
-          let next = Array::new()
+          let next = []
           let mut inserted = false
           for d in current {
             if d.name == top_key ||
@@ -144,7 +144,7 @@ pub fn minify_value(prop : String, val : String) -> String {
 /// Minifies a declaration list (box compression + value compression)
 pub fn minify_declarations(decls : Array[Declaration]) -> Array[Declaration] {
   let compressed = compress_box_properties(decls)
-  let result = Array::new()
+  let result = []
   for d in compressed {
     result.push({
       name: d.name,

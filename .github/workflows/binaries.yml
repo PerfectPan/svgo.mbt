@@ -92,6 +92,10 @@ jobs:
           tag=${GITHUB_REF_NAME#svgo-mbt@}
           mod=$(sed -n 's/^version = "\(.*\)"/\1/p' svgo/moon.mod)
           [ "$tag" = "$mod" ] || { echo "tag $tag but svgo/moon.mod says $mod" >&2; exit 1; }
+          if curl -fsS https://mooncakes.io/api/v0/modules/PerfectPan/svgo | grep -q "\"version\":\"$tag\""; then
+            echo "PerfectPan/svgo $tag is already on mooncakes; nothing to publish."
+            exit 0
+          fi
           mkdir -p ~/.moon
           printf '{"token":"%s","username":"PerfectPan"}\n' "$MOONCAKES_TOKEN" > ~/.moon/credentials.json
           cd svgo && MOON_WORK=off moon publish

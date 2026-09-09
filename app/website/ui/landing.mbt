@@ -54,7 +54,7 @@ fn hero(dark : Bool) -> Html {
           div([
             div(class="eyebrow rise", [
               span(class="dot", nothing),
-              text(" MoonBit · WebAssembly · \{wasm_bytes / 1024} KB"),
+              text(" MoonBit · WebAssembly · \{wasm_bytes / 1000} KB"),
             ]),
             h1(
               class="display rise mt-3.5 text-[clamp(42px,5.6vw,68px)] leading-[1.02]",
@@ -76,8 +76,8 @@ fn hero(dark : Bool) -> Html {
               class="rise mt-[22px] max-w-[54ch] text-[17px] leading-relaxed text-ink-2",
               style=["--d: 160ms"],
               t(
-                "svgo.mbt rewrites all 34 of svgo's default optimizations in MoonBit. It ships as one \{wasm_bytes / 1024} KB wasm file that runs in the browser, in Node, or as a command-line tool. Every optimization is checked against the original pixel by pixel, so your SVGs get smaller and still look the same.",
-                "svgo.mbt 把 svgo 默认那 34 个插件全部用 MoonBit 重写了一遍，打包成一个 \{wasm_bytes / 1024} KB 的 wasm 文件。浏览器里能跑，Node 里能跑，也有命令行版本。每一项优化都和原图逐像素比过：文件变小，图不会变样。",
+                "svgo.mbt rewrites all 34 of svgo's default optimizations in MoonBit. It ships as one \{wasm_bytes / 1000} KB wasm file that runs in the browser, in Node, or as a command-line tool. Every optimization is checked against the original pixel by pixel, so your SVGs get smaller and still look the same.",
+                "svgo.mbt 把 svgo 默认那 34 个插件全部用 MoonBit 重写了一遍，打包成一个 \{wasm_bytes / 1000} KB 的 wasm 文件。浏览器里能跑，Node 里能跑，也有命令行版本。每一项优化都和原图逐像素比过：文件变小，图不会变样。",
               ),
             ),
             div(
@@ -210,7 +210,7 @@ fn numbers_section() -> Html {
     div(class="wrap", [
       section_head(
         t(
-          "Same pipeline, one fifth of the time.", "同一条流水线，五分之一的时间。",
+          "Same pipeline, a third of the time.", "同一条流水线，三分之一的时间。",
         ),
         tm(
           [
@@ -245,9 +245,9 @@ fn numbers_section() -> Html {
           b(
             attrs=Attrs::build().data_set(
               "count",
-              (wasm_bytes / 1024).to_string(),
+              (wasm_bytes / 1000).to_string(),
             ),
-            "\{wasm_bytes / 1024}",
+            "\{wasm_bytes / 1000}",
           ),
           span(
             t(
@@ -353,7 +353,7 @@ fn plugins_section() -> Html {
             text("一个插件就是一个值："),
             code("{ name, description, run }"),
             text(
-              "。默认 \{count} 个，顺序和 svgo 一样。每个插件会说自己改没改东西，multipass 靠这个知道什么时候停。下面这份列表是页面加载时直接从库里读出来的，包括两个可选插件。",
+              "。默认 \{count} 个，顺序和 svgo 一样。每个插件会说自己改没改东西，multipass 靠这个知道什么时候停。下面这份列表是页面加载时直接从库里读出来的，包括三个可选插件。",
             ),
           ],
         ),
@@ -435,8 +435,8 @@ fn use_section() -> Html {
           1,
           t("Command line · native", "命令行 · 原生"),
           t(
-            "One binary. A whole run on a small icon takes 9.8 ms against the svgo CLI's 174 ms, most of which is Node starting up.",
-            "就一个二进制文件。处理一个小图标从启动到结束 9.8 毫秒，svgo 的 CLI 是 174 毫秒，其中大部分是 Node 的启动时间。",
+            "One binary. A whole run on a small icon takes about 10 ms against the svgo CLI's 159 ms, most of which is Node starting up (scripts/cli-bench.sh).",
+            "就一个二进制文件。处理一个小图标从启动到结束约 10 毫秒，svgo 的 CLI 是 159 毫秒，其中大部分是 Node 的启动时间（scripts/cli-bench.sh）。",
           ),
           [
             text(
@@ -488,12 +488,12 @@ fn cli_section() -> Html {
         tm(
           [
             text(
-              "One MoonBit source, two builds. `npx` runs the Node one, which needs nothing installed; the native binary needs no runtime at all and finishes a small icon end to end in 5.8 ms against Node's 26.5 ms. Pipe an SVG in, get the optimized one out; point it at a directory and it walks the tree. The flag table below is parsed from the CLI's own usage text, so it cannot drift.",
+              "One MoonBit source, two builds. `npx` runs the Node one, which needs nothing installed; the native binary needs no runtime at all and finishes a small icon end to end in about 10 ms against the Node build's 49 ms. Pipe an SVG in, get the optimized one out; point it at a directory and it walks the tree. The flag table below is parsed from the CLI's own usage text, so it cannot drift.",
             ),
           ],
           [
             text(
-              "同一份 MoonBit 代码，两个构建。`npx` 跑的是 Node 版，什么都不用装;原生二进制不需要运行时，处理一个小图标从启动到写完是 5.8 毫秒，Node 版是 26.5 毫秒。把 SVG 从 stdin 喂进去，优化后的结果从 stdout 出来;给它一个目录，它就递归处理。下面这张参数表是从 CLI 自己的帮助文本里解析出来的，不会和实际用法对不上。",
+              "同一份 MoonBit 代码，两个构建。`npx` 跑的是 Node 版，什么都不用装;原生二进制不需要运行时，处理一个小图标从启动到写完约 10 毫秒，Node 版是 49 毫秒。把 SVG 从 stdin 喂进去，优化后的结果从 stdout 出来;给它一个目录，它就递归处理。下面这张参数表是从 CLI 自己的帮助文本里解析出来的，不会和实际用法对不上。",
             ),
           ],
         ),
@@ -576,7 +576,7 @@ fn gallery_section() -> Html {
             ),
             code("moon test"),
             text(
-              " runs on wasm-gc, JS and native. Left is the original; right was optimized in your browser just now.",
+              " runs on JS and native, and the wasm build runs the same fixtures under Node. Left is the original; right was optimized in your browser just now.",
             ),
           ],
           [

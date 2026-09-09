@@ -1,6 +1,6 @@
 {
   "name": "svgo-mbt",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "SVG optimizer written in MoonBit: a wasm-gc library and the svgo-mbt command line tool",
   "type": "module",
   "main": "index.mjs",

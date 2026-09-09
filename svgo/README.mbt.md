@@ -7,7 +7,7 @@ order and with its semantics, and none of the Node.js dependency tree: a 200 KB
 with `npx`, and a MoonBit library.
 
 [**Website & playground**](https://perfectpan.github.io/svgo.mbt/) ·
-[API reference](https://perfectpan.github.io/svgo.mbt/api.html) ·
+[API reference](https://perfectpan.github.io/svgo.mbt/#/api) ·
 [mooncakes.io](https://mooncakes.io/docs/PerfectPan/svgo) ·
 [npm `svgo-mbt`](https://www.npmjs.com/package/svgo-mbt)
 
@@ -31,9 +31,10 @@ Three properties drive the design:
   cannot observe; ids that are referenced anywhere survive; inherited
   defaults are only dropped when no ancestor overrides them. Every fixture is
   rasterized before and after with resvg and compared pixel by pixel.
-- **Fast.** In one Node process the wasm build is 4 to 6 times faster than
-  svgo-js on the same files; the native CLI starts about 40 times faster than
-  the svgo CLI. Numbers below.
+- **Fast.** In one Node process the wasm build is 1.7 to 4.4 times faster than
+  svgo-js on the same files (2.9× at the median); on a small icon the native CLI
+  finishes end to end in about 10 ms, the Node build in 49 ms, the svgo CLI in
+  159 ms (`scripts/cli-bench.sh`). Numbers below.
 - **Plugins are values.** `{ name, description, run }`. The preset is an array
   in svgo's order; the CLI, the playground and the tests run any subset in
   any order.
@@ -228,7 +229,6 @@ adjacent paths merged, groups collapsed. `fixtures/upstream/KNOWN_FAILURES.txt`
 is empty and the harness fails the build if a case starts failing again, so an
 entry there is a regression rather than a new baseline.
 
-<<<<<<< HEAD
 **Is the pipeline complete?** Yes for `preset-default`: all 34 plugins are
 implemented, 33 of them on by default, plus `removeDimensions` and
 `removeTitle`, which svgo keeps opt-in. Nothing is skipped, so every imported
@@ -244,30 +244,9 @@ saves 48 bytes across the rest. svgo shows the same effect on that file (68,101
 bytes with the plugin, 52,029 without), so this is a size choice, not a
 compatibility gap.
 
-svgo also has 17 opt-in plugins (88 further cases) that are not imported at all,
-and its parser, stringifier, style and CLI unit tests are not imported either
+svgo also has 18 opt-in plugins (removeAttrs, prefixIds, removeXMLNS and the
+like) whose cases are not imported at all, and its parser, stringifier, style and CLI unit tests are not imported either
 since they cover svgo's internals rather than its output.
-=======
-**Is the pipeline complete?** Not yet. svgo's `preset-default` runs 34 plugins;
-svgo.mbt runs 28 of them plus `removeDimensions` and `removeTitle`, which svgo
-keeps opt-in. The cases for the six missing plugins are imported too and
-generated as skipped tests, so the gap shows up in every test run:
-
-| missing plugin | cases | what it would take |
-| --- | --- | --- |
-| `moveElemsAttrsToGroup` | 7 | attribute motion across a group boundary, with inheritance rules |
-| `moveGroupAttrsToElems` | 6 | same |
-| `removeDeprecatedAttrs` | 8 | a table lookup |
-| `cleanupEnableBackground` | 5 | one deprecated attribute |
-| `removeNonInheritableGroupAttrs` | 2 | drop non-inheritable presentation attributes off a group |
-| `sortDefsChildren` | 1 | sort the children of `<defs>` |
-
-That is 29 skipped cases against 260 passing, and deleting a plugin's entry
-from `NOT_IMPLEMENTED` in `scripts/gen-fixtures.py` makes its cases live. svgo
-also has 17 opt-in plugins (88 further cases) that are not imported at all, and
-its parser, stringifier, style and CLI unit tests are not imported either since
-they cover svgo's internals rather than its output.
->>>>>>> 24e327c (plugins: a CSS module and the three style plugins (upstream 209 → 260 cases))
 
 ## Repository layout
 

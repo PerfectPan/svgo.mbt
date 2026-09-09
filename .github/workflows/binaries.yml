@@ -1,6 +1,6 @@
 name: binaries
 
-# Runs for the tag `changeset publish` creates (svgo-mbt@X.Y.Z): release.yml
+# Runs for the tag `changeset publish` creates (@rivus/svgo@X.Y.Z): release.yml
 # dispatches it with `tag` set, since a tag pushed with GITHUB_TOKEN triggers no
 # workflow by itself; pushing such a tag by hand also works. It builds the native CLI on three platforms, attaches the tarballs to a GitHub
 # release, and publishes the MoonBit module to mooncakes with the same version.
@@ -10,7 +10,7 @@ name: binaries
 
 on:
   push:
-    tags: ["svgo-mbt@*"]
+    tags: ["@rivus/svgo@*"]
   workflow_dispatch:
     inputs:
       dry_run:
@@ -18,7 +18,7 @@ on:
         type: boolean
         default: true
       tag:
-        description: "svgo-mbt@X.Y.Z to release (required when dry_run is false)"
+        description: "@rivus/svgo@X.Y.Z to release (required when dry_run is false)"
         type: string
         default: ""
 
@@ -100,7 +100,7 @@ jobs:
             exit 0
           fi
           [ -n "$TAG" ] || { echo "no tag given" >&2; exit 1; }
-          tag=${TAG#svgo-mbt@}
+          tag=${TAG#@rivus/svgo@}
           mod=$(sed -n 's/^version = "\(.*\)"/\1/p' svgo/moon.mod)
           [ "$tag" = "$mod" ] || { echo "tag $tag but svgo/moon.mod says $mod" >&2; exit 1; }
           if curl -fsS https://mooncakes.io/api/v0/modules/PerfectPan/svgo | grep -q "\"version\":\"$tag\""; then

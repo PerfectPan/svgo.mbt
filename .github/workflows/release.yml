@@ -1,13 +1,13 @@
 name: release
 
-# Publishes svgo-mbt to npm when a release pull request lands on main.
+# Publishes @rivus/svgo to npm when a release pull request lands on main.
 #
 # Flow: pull requests add changesets (`pnpm changeset`); a release PR runs
 # `pnpm version-packages`, which bumps packages/svgo-mbt/package.json and
 # CHANGELOG.md and copies the version into the MoonBit modules. Once that PR is
 # merged, this workflow builds, tests and runs `changeset publish`, which
 # publishes only if the version is not on npm yet and tags the commit
-# `svgo-mbt@X.Y.Z`. That tag triggers binaries.yml (native CLI builds, the
+# `@rivus/svgo@X.Y.Z`. That tag triggers binaries.yml (native CLI builds, the
 # GitHub release and the mooncakes publish).
 #
 # npm authentication is OIDC trusted publishing (no token in the repo): the
@@ -68,12 +68,12 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          before=" $(git tag -l 'svgo-mbt@*' | tr '\n' ' ') "
+          before=" $(git tag -l '@rivus/svgo@*' | tr '\n' ' ') "
           pnpm changeset publish
           git push --tags
           # A tag pushed with GITHUB_TOKEN does not trigger workflows on its
           # own, so start binaries.yml for each tag this run created.
-          for t in $(git tag -l 'svgo-mbt@*'); do
+          for t in $(git tag -l '@rivus/svgo@*'); do
             case "$before" in *" $t "*) ;; *)
               echo "dispatching binaries.yml for $t"
               gh workflow run binaries.yml --ref main -f dry_run=false -f tag="$t" ;;

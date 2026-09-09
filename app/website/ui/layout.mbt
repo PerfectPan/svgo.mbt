@@ -2,7 +2,7 @@
 pub const REPO_URL = "https://github.com/PerfectPan/svgo.mbt"
 
 ///|
-pub const NPM_URL = "https://www.npmjs.com/package/svgo-mbt"
+pub const NPM_URL = "https://www.npmjs.com/package/@rivus/svgo"
 
 ///|
 pub const MOONCAKES_URL = "https://mooncakes.io/docs/PerfectPan/svgo"

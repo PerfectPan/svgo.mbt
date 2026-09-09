@@ -17,6 +17,6 @@
     "@changesets/changelog-github": "1.0.1",
     "@changesets/cli": "3.0.2",
     "binaryen": "123.0.0",
-    "svgo-mbt": "workspace:*"
+    "@rivus/svgo": "workspace:*"
   }
 }

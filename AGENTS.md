@@ -36,7 +36,7 @@ root installs every JS package.
 | regenerate the site's data files | `node app/website/gen.mjs` (after collect.mjs or moon doc changed) |
 | re-render the hero animation | `pnpm -C app/website motion:render` |
 | record a user-visible change for the changelog | `pnpm changeset` in the PR (writes `.changeset/*.md`) |
-| release (npm via OIDC, then native binaries + GitHub release + mooncakes) | release PR: `pnpm version-packages` (changesets bump + `scripts/sync-version.mjs` copies the version into the MoonBit modules), merge it; `release.yml` publishes to npm and tags `svgo-mbt@X.Y.Z`, `binaries.yml` does the rest (needs the `MOONCAKES_TOKEN` secret). Rehearse with `gh workflow run release.yml -f dry_run=true`. See CONTRIBUTING.md "Releasing". |
+| release (npm via OIDC, then native binaries + GitHub release + mooncakes) | release PR: `pnpm version-packages` (changesets bump + `scripts/sync-version.mjs` copies the version into the MoonBit modules), merge it; `release.yml` publishes to npm and tags `@rivus/svgo@X.Y.Z`, `binaries.yml` does the rest (needs the `MOONCAKES_TOKEN` secret). Rehearse with `gh workflow run release.yml -f dry_run=true`. See CONTRIBUTING.md "Releasing". |
 
 ## Layout
 
@@ -57,7 +57,7 @@ svgo/                         the MoonBit module PerfectPan/svgo
   wasm/                       foreign_library exporting optimize/plugins/version; strings cross as length-prefixed tokens (no JSON in the wasm), decoded by packages/svgo-mbt/index.mjs
   benchmark/                  moon bench tests over an embedded corpus (corpus.mbt is generated)
   testdata/                   editor exports used by tests, the render diff and the site gallery
-packages/svgo-mbt/            npm package: JS loader + svgo.wasm (built by scripts/build-wasm.sh)
+packages/svgo-mbt/            npm package @rivus/svgo (bin `svgo-mbt`): JS loader + svgo.wasm (built by scripts/build-wasm.sh)
 packages/compare/             svgo-js comparison: sizes, resvg pixel diff, same-process speed, collect.mjs
 app/website/                  the website, itself a MoonBit module (PerfectPan/svgo-website) built with Rabbita
   main/                       browser entry (js backend), mounts ui.app

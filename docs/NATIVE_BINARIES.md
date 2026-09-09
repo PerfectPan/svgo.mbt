@@ -7,7 +7,7 @@ dependencies. This document describes how that binary is built and distributed.
 
 ## Why native binaries
 
-The wasm-gc build (shipped via npm as `svgo-mbt`) is the primary delivery form
+The wasm-gc build (shipped via npm as `@rivus/svgo`) is the primary delivery form
 for JavaScript users. The native binary exists for two reasons:
 
 - **Startup speed.** End to end on a small icon the native binary takes about
@@ -56,7 +56,7 @@ matrix of runners (simplest) or install cross-compilers on a Linux host.
 
 When a release pull request lands, `release.yml` publishes the npm package
 (OIDC trusted publishing, provenance attached) and tags the commit
-`svgo-mbt@X.Y.Z`. That tag runs `binaries.yml`: the binary is built on
+`@rivus/svgo@X.Y.Z`. That tag runs `binaries.yml`: the binary is built on
 linux-x86_64, linux-arm64 and macos-arm64 runners and attached to a GitHub
 release, and the MoonBit module is published to mooncakes (needs the
 `MOONCAKES_TOKEN` secret). Both workflows have a `workflow_dispatch` dry run.
@@ -88,7 +88,7 @@ curl -fsSL https://raw.githubusercontent.com/PerfectPan/svgo.mbt/main/scripts/in
 
 - **Homebrew** (macOS/Linux): a tap formula that downloads the release tarball.
 - **Scoop** (Windows): a manifest in a scoop bucket.
-- **npm**: the `svgo-mbt` package already ships a JS CLI (`cli.mjs`); the
+- **npm**: the `@rivus/svgo` package already ships a JS CLI (`cli.mjs`); the
   native binary could be an optional dependency via `optionalDependencies`
   keyed on `os`/`cpu`, but that adds complexity and is not planned.
 

@@ -14,7 +14,7 @@
     "motion:render:dark": "remotion render motion/src/index.ts Hero public/hero-dark.mp4 --codec h264 --crf 22 --props='{\"theme\":\"dark\"}' && remotion still motion/src/index.ts Hero public/hero-dark-poster.jpg --frame 150 --image-format jpeg --jpeg-quality 85 --props='{\"theme\":\"dark\"}'"
   },
   "dependencies": {
-    "svgo-mbt": "workspace:*"
+    "@rivus/svgo": "workspace:*"
   },
   "devDependencies": {
     "@remotion/cli": "^4.0.0",

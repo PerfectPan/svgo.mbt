@@ -1,16 +1,16 @@
-# svgo-mbt
+# @rivus/svgo
 
 WebAssembly build of [svgo.mbt](https://github.com/PerfectPan/svgo.mbt), an
 SVG optimizer written in MoonBit: all 34 plugins in svgo's preset-default, in its order and with its semantics.
 One 200 KB `wasm-gc` file plus a 2 KB loader, no other dependencies.
 
 ```bash
-npm i svgo-mbt          # the library
-npx svgo-mbt in.svg -o out.svg   # the command line tool, no install
+npm i @rivus/svgo       # the library
+npx @rivus/svgo in.svg -o out.svg   # the command line tool, no install (installed: `svgo-mbt`)
 ```
 
 ```js
-import { optimize, plugins } from "svgo-mbt";
+import { optimize, plugins } from "@rivus/svgo";
 
 const r = await optimize(svgText, {
   precision: 3,        // decimal places (default 3)
@@ -32,12 +32,12 @@ await plugins(); // [{ name, description, enabled }]
 The bin is the same optimizer compiled for node, so it needs no toolchain:
 
 ```bash
-npx svgo-mbt in.svg -o out.svg
-cat in.svg | npx svgo-mbt > out.svg   # stdin, or pass "-" as the input
-npx svgo-mbt icons -r -o dist         # a directory, recursively
-npx svgo-mbt in.svg --stats           # size statistics on stderr
-npx svgo-mbt in.svg --json            # {data, originalSize, size, passes, applied}
-npx svgo-mbt --list                   # available plugins
+npx @rivus/svgo in.svg -o out.svg
+cat in.svg | npx @rivus/svgo > out.svg   # stdin, or pass "-" as the input
+npx @rivus/svgo icons -r -o dist         # a directory, recursively
+npx @rivus/svgo in.svg --stats           # size statistics on stderr
+npx @rivus/svgo in.svg --json            # {data, originalSize, size, passes, applied}
+npx @rivus/svgo --list                   # available plugins
 ```
 
 Exit codes: 0 on success, 1 for a usage error, 2 when a file could not be

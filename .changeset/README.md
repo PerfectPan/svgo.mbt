@@ -1,6 +1,6 @@
 # Changesets
 
-Every pull request that changes what `svgo-mbt` ships adds a changeset:
+Every pull request that changes what `@rivus/svgo` ships adds a changeset:
 
     pnpm changeset
 

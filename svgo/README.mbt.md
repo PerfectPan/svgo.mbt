@@ -213,19 +213,26 @@ entry there is a regression rather than a new baseline.
 
 **Is the pipeline complete?** Not yet. svgo's `preset-default` runs 34 plugins;
 svgo.mbt runs 25 of them plus `removeDimensions` and `removeTitle`, which svgo
-keeps opt-in. Nine preset plugins are missing:
+keeps opt-in. The cases for the nine missing plugins are imported too and
+generated as skipped tests, so the gap shows up in every test run:
 
-| missing plugin | what it would take |
-| --- | --- |
-| `inlineStyles`, `minifyStyles`, `mergeStyles` | a CSS parser: selector matching, specificity, at-rules |
-| `moveElemsAttrsToGroup`, `moveGroupAttrsToElems` | attribute motion across a group boundary, with inheritance rules |
-| `removeNonInheritableGroupAttrs`, `removeDeprecatedAttrs`, `cleanupEnableBackground`, `sortDefsChildren` | small, self-contained ports |
+| missing plugin | cases | what it would take |
+| --- | --- | --- |
+| `inlineStyles` | 28 | a CSS parser: selector matching, specificity, at-rules |
+| `mergeStyles` | 12 | same |
+| `minifyStyles` | 11 | same |
+| `moveElemsAttrsToGroup` | 7 | attribute motion across a group boundary, with inheritance rules |
+| `moveGroupAttrsToElems` | 6 | same |
+| `removeDeprecatedAttrs` | 8 | a table lookup |
+| `cleanupEnableBackground` | 5 | one deprecated attribute |
+| `removeNonInheritableGroupAttrs` | 2 | drop non-inheritable presentation attributes off a group |
+| `sortDefsChildren` | 1 | sort the children of `<defs>` |
 
-Counting svgo's whole plugin suite rather than the implemented subset, that is
-209 of 377 cases across 27 of 53 plugins; the remaining cases belong to plugins
-svgo.mbt does not have, most of which svgo itself leaves off by default. The
-`svgo/` library also does not import svgo's parser, stringifier, style or CLI
-unit tests, which cover its internals rather than its output.
+That is 80 skipped cases against 209 passing, and deleting a plugin's entry
+from `NOT_IMPLEMENTED` in `scripts/gen-fixtures.py` makes its cases live. svgo
+also has 17 opt-in plugins (88 further cases) that are not imported at all, and
+its parser, stringifier, style and CLI unit tests are not imported either since
+they cover svgo's internals rather than its output.
 
 ## Repository layout
 

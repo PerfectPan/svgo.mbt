@@ -51,7 +51,7 @@ svgo/                         the MoonBit module perfectpan/svgo
     transform.mbt             transform attribute simplification
     preset.mbt                preset_default / optional_plugins / find_plugin
     fixtures/*.txt            input @@@ expected [@@@ params JSON] — regenerated into fixtures_test.mbt
-    fixtures/upstream/        svgo's own test/plugins cases, verbatim; KNOWN_FAILURES.txt = expected failures (ratchet, only shrinks)
+    fixtures/upstream/        svgo's preset-default cases, verbatim; KNOWN_FAILURES.txt = expected failures (ratchet, only shrinks); unwritten plugins' cases are skipped via NOT_IMPLEMENTED in gen-fixtures.py
   cmd/main/                   native CLI (C file I/O in io.c; stubs keep other targets checking)
   wasm/                       foreign_library exporting optimize/plugins/version as JSON strings
   benchmark/                  moon bench tests over an embedded corpus (corpus.mbt is generated)
@@ -101,7 +101,10 @@ docs/ARCHITECTURE.md          design notes
   `python3 scripts/gen-fixtures.py && moon test --target native -p perfectpan/svgo/plugins`:
   an upstream case that starts passing fails with "now passes: remove it from
   KNOWN_FAILURES.txt"; delete that line in the same change. Never add lines
-  to KNOWN_FAILURES.txt without a reason.
+  to KNOWN_FAILURES.txt without a reason. Cases whose plugin does not exist yet
+  are imported anyway and skipped through `NOT_IMPLEMENTED` in
+  `scripts/gen-fixtures.py`; when you write one of those plugins, delete its
+  entry there so its cases run.
 - Lookups in hot paths use `Set`/`Map`, never linear `Array::contains` over
   string lists. Measure with `scripts/bench.sh` before and after; the
   numbers in `svgo/benchmark/README.md` are the reference.

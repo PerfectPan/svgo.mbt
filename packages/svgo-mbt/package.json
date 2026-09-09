@@ -2,6 +2,13 @@
   "name": "svgo-mbt",
   "version": "0.1.2",
   "description": "SVG optimizer written in MoonBit: a wasm-gc library and the svgo-mbt command line tool",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PerfectPan/svgo.mbt.git",
+    "directory": "packages/svgo-mbt"
+  },
+  "homepage": "https://perfectpan.github.io/svgo.mbt/",
+  "bugs": "https://github.com/PerfectPan/svgo.mbt/issues",
   "type": "module",
   "main": "index.mjs",
   "bin": {

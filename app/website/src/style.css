@@ -123,8 +123,8 @@
   .seg[aria-pressed="true"] { @apply bg-ink text-bg; }
   .icon-btn { @apply inline-flex size-8 cursor-pointer items-center justify-center rounded-full border border-line bg-surface text-ink-2 transition hover:border-accent hover:text-accent; }
 
-  .btn { @apply inline-flex cursor-pointer items-center gap-2 rounded-full border border-line-2 bg-surface px-[18px] py-[11px] text-sm font-semibold transition hover:-translate-y-px hover:border-accent hover:text-ink hover:shadow-[0_8px_24px_-12px_var(--color-accent)]; }
-  .btn-primary { @apply border-transparent bg-ink text-bg shadow-[0_10px_30px_-12px_rgb(0_0_0/0.5)] hover:bg-accent hover:text-white; }
+  .btn { @apply inline-flex cursor-pointer items-center gap-2 rounded-full border border-line-2 bg-surface px-[18px] py-[11px] text-sm font-semibold text-ink transition hover:-translate-y-px hover:border-ink/40 hover:bg-surface-2 hover:shadow-[0_8px_24px_-14px_rgb(0_0_0/0.35)]; }
+  .btn-primary { @apply border-transparent bg-ink text-bg shadow-[0_10px_30px_-12px_rgb(0_0_0/0.5)] hover:border-transparent hover:bg-[color-mix(in_srgb,var(--color-ink)_86%,var(--color-bg))] hover:text-bg; }
   .btn-sm { @apply px-[13px] py-[7px] text-[13px]; }
   .install { @apply inline-flex items-center gap-2.5 rounded-full border border-line bg-surface py-[9px] pl-3.5 pr-3 text-[13px]; }
   .install code { @apply text-[13px]; }

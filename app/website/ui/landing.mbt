@@ -54,7 +54,7 @@ fn hero(dark : Bool) -> Html {
           div([
             div(class="eyebrow rise", [
               span(class="dot", nothing),
-              text(" MoonBit · WebAssembly · \{wasm_bytes / 1000} KB"),
+              text(" svgo · MoonBit · WebAssembly · \{wasm_bytes / 1000} KB"),
             ]),
             h1(
               class="display rise mt-3.5 text-[clamp(42px,5.6vw,68px)] leading-[1.02]",
@@ -77,15 +77,17 @@ fn hero(dark : Bool) -> Html {
               style=["--d: 160ms"],
               tm(
                 [
+                  text("svgo.mbt is "),
                   a(class="font-medium text-ink", href=SVGO_URL, "svgo"),
                   text(
-                    "'s 34 preset-default plugins, rewritten in MoonBit and compiled to a single \{wasm_bytes / 1000} KB wasm module. Runs in the browser, in Node.js and on the command line. Every output is render-checked pixel by pixel: smaller files, identical rendering.",
+                    " in MoonBit: the same 34 preset-default plugins with the same behaviour, compiled to a single \{wasm_bytes / 1000} KB wasm module that runs in the browser, in Node.js and on the command line. Every output is render-checked pixel by pixel: smaller files, identical rendering.",
                   ),
                 ],
                 [
+                  text("svgo.mbt 是 "),
                   a(class="font-medium text-ink", href=SVGO_URL, "svgo"),
                   text(
-                    " preset-default 的 34 个插件，用 MoonBit 重写，编译为单个 \{wasm_bytes / 1000} KB wasm 模块，可在浏览器、Node.js 与命令行中运行。每次输出均经逐像素渲染比对：文件更小，渲染结果不变。",
+                    " 的 MoonBit 实现：同样的 34 个 preset-default 插件、同样的行为，编译为单个 \{wasm_bytes / 1000} KB wasm 模块，可在浏览器、Node.js 与命令行中运行。每次输出均经逐像素渲染比对：文件更小，渲染结果不变。",
                   ),
                 ],
               ),
@@ -111,18 +113,22 @@ fn hero(dark : Bool) -> Html {
               ],
             ),
             p(
-              class="rise mt-5 text-[12.5px] text-muted",
+              class="rise mt-5 text-[13px] text-ink-2",
               style=["--d: 360ms"],
               tm(
                 [
-                  text("Plugin semantics follow "),
-                  a(class="text-ink-2", href=SVGO_URL, "svgo"),
-                  text(" by Kir Belevich and contributors (MIT)."),
+                  text("Built on "),
+                  a(class="font-medium text-ink", href=SVGO_URL, "svgo"),
+                  text(
+                    " by Kir Belevich and contributors (MIT). Plugin behaviour follows svgo; every known difference is listed in the README.",
+                  ),
                 ],
                 [
-                  text("插件行为与 "),
-                  a(class="text-ink-2", href=SVGO_URL, "svgo"),
-                  text("（Kir Belevich 及贡献者，MIT）保持一致。"),
+                  text("基于 "),
+                  a(class="font-medium text-ink", href=SVGO_URL, "svgo"),
+                  text(
+                    "（Kir Belevich 及贡献者，MIT）。插件行为与 svgo 保持一致，已知差异逐条记录在 README 中。",
+                  ),
                 ],
               ),
             ),
@@ -241,7 +247,7 @@ fn numbers_section() -> Html {
     div(class="wrap", [
       section_head(
         t(
-          "Same pipeline, a third of the time.", "同一条流水线，三分之一的时间。",
+          "Compared with svgo: the same sizes, a third of the time.", "对比 svgo：输出体积相当，耗时三分之一。",
         ),
       ),
       div(class="mb-5 grid grid-cols-3 gap-4 max-sm:grid-cols-1", [
@@ -252,7 +258,7 @@ fn numbers_section() -> Html {
           ),
           span(
             t(
-              "median speedup over svgo-js, same process", "相对 svgo-js 的中位加速比，同一进程",
+              "median speedup over svgo, same process", "相对 svgo 的中位加速比，同一进程",
             ),
           ),
         ]),
@@ -291,7 +297,7 @@ fn numbers_section() -> Html {
           div(class="grid gap-3", bar_rows),
           div(class="legend", [
             span([i(class="bg-grad", nothing), text("svgo.mbt (wasm-gc)")]),
-            span([i(class="bg-bar-b", nothing), text("svgo-js")]),
+            span([i(class="bg-bar-b", nothing), text("svgo \{svgo_js_version}")]),
           ]),
           p(
             class="mt-3.5 text-[12.5px] text-muted",
@@ -325,7 +331,7 @@ fn numbers_section() -> Html {
                 th(t("file", "文件")),
                 th(t("original", "原始")),
                 th("svgo.mbt"),
-                th("svgo-js"),
+                th("svgo"),
               ]),
             ]),
             tbody(size_rows),
@@ -335,14 +341,14 @@ fn numbers_section() -> Html {
             tm(
               [
                 text(
-                  "Where svgo-js is smaller, the difference is a leading zero inside a style attribute and cubic curves that svgo also rewrites as quadratics (",
+                  "Where svgo is smaller, the difference is a leading zero inside a style attribute and cubic curves that svgo also rewrites as quadratics (",
                 ),
                 code("q"),
                 text("). Neither is implemented yet."),
               ],
               [
                 text(
-                  "svgo-js 更小的那几个文件，差在 style 属性中数字的前导零，以及 svgo 会把三次曲线改写成二次曲线（",
+                  "svgo 更小的那几个文件，差在 style 属性中数字的前导零，以及 svgo 会把三次曲线改写成二次曲线（",
                 ),
                 code("q"),
                 text("）。两项均尚未实现。"),

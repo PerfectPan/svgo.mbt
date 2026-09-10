@@ -1,5 +1,6 @@
 /* svgo.mbt site — Tailwind CSS v4 entry. Build: pnpm css (or node build.mjs). */
 @import "tailwindcss";
+@import "./fonts.css";
 
 /* class names live in the MoonBit views */
 @source "../ui";

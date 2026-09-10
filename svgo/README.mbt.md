@@ -3,7 +3,7 @@
 **An SVG optimizer written in MoonBit, shipped as WebAssembly.**
 All 34 plugins in [svgo](https://github.com/svg/svgo)'s preset-default, in its
 order and with its semantics, and none of the Node.js dependency tree: a 200 KB
-`wasm-gc` module that runs in the browser, Node 24+ and Bun 1.4+, a CLI that installs
+`wasm-gc` module that runs in the browser, Node, Bun and Deno, a CLI that installs
 with `npx`, and a MoonBit library.
 
 [**Website & playground**](https://perfectpan.github.io/svgo.mbt/) ·
@@ -13,7 +13,7 @@ with `npx`, and a MoonBit library.
 
 ## Quickstart
 
-**JavaScript** (Node 24+, Bun 1.4+, Chrome 130+, Firefox 134+, Safari 18.4+; the engine needs WebAssembly GC and JS String Builtins):
+**JavaScript** (Node 24+, Bun 1.4+, Deno 2, Chrome 130+, Firefox 134+, Safari 18.4+; see [Runtime compatibility](#runtime-compatibility)):
 
 ```bash
 npm i @rivus/svgo
@@ -25,7 +25,7 @@ const r = await optimize(svg, { precision: 3 });
 r.data; r.originalSize; r.size; r.passes; r.applied;
 ```
 
-**Command line**, without a toolchain (Node 24+ or Bun 1.4+, via `bunx`):
+**Command line**, without a toolchain (Node 24+; `bunx` and `deno run -A npm:@rivus/svgo` work too):
 
 ```bash
 npx @rivus/svgo input.svg -o out.svg
@@ -138,6 +138,17 @@ Same Node process, both with multipass, milliseconds per call (`node packages/co
 | World map (low resolution) | 85 KB | 11.889 | 51.867 | 4.4× |
 
 Between 1.7× and 4.4× depending on the file, 2.9× at the median. Cold start on a small icon, whole process (`scripts/cli-bench.sh`): native CLI about 10 ms, Node build about 50 ms, svgo CLI about 160 ms.
+
+## Runtime compatibility
+
+| Artifact | Runs on | Checked by |
+| --- | --- | --- |
+| `@rivus/svgo` (wasm-gc) | Node 24+, Bun 1.4+, Deno 2 (tested with 2.9); Chrome 130+, Firefox 134+, Safari 18.4+ | CI runs the 330-case fixture suite through the shipped wasm under Node, Bun and Deno on every push |
+| `svgo-mbt` CLI, Node build | the same runtimes, via `npx` / `bunx` / `deno run -A` | same suite plus a CLI smoke test |
+| `svgo-mbt` native binary | linux x86_64, linux arm64, macOS arm64 from [GitHub releases](https://github.com/PerfectPan/svgo.mbt/releases); any other platform with `moon build --target native --release app/cli` | built by `binaries.yml` on each release |
+| `PerfectPan/svgo` MoonBit library | targets wasm-gc, js and native; current MoonBit toolchain (CI installs the latest release) | `moon test` on js and native in CI |
+
+The wasm needs an engine with WebAssembly GC and JS String Builtins (imported string constants). Older engines fail at instantiate rather than at runtime: Node 22 and 23 report `Import module="_"`, Bun 1.2 reports `import wasm:js-string:length must be an object`. This cannot be polyfilled from JavaScript because `fromCharCodeArray` takes a wasm-gc array. The optimizer itself does no I/O; the loader fetches the wasm over `http(s)` and reads `file:` URLs through `node:fs`, which Bun and Deno provide.
 
 ## Compatibility with svgo
 

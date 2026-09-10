@@ -49,3 +49,8 @@ fn svgo_list_dir(_path : String) -> String {
 fn svgo_mkdir_p(_path : String) -> Int {
   -1
 }
+
+///|
+fn svgo_args() -> Array[String] {
+  []
+}

@@ -46,8 +46,9 @@ parsed, with the failing names on stderr.
 In a browser the module is fetched relative to the loader; pass your own URL
 to `init(url)` before the first `optimize` call if you host it elsewhere.
 
-Requires WebAssembly GC and JS String Builtins: Node 24+, Bun 1.4+, Chrome 130+,
-Firefox 134+, Safari 18.4+.
+Requires WebAssembly GC and JS String Builtins: Node 24+, Bun 1.4+, Deno 2,
+Chrome 130+, Firefox 134+, Safari 18.4+. CI runs the fixture suite under Node,
+Bun and Deno; details in the repository README under "Runtime compatibility".
 
 Same-process timings against svgo 4.1 (ms per call, both multipass): a Sketch
 icon 0.07 vs 0.30, a 50 KB Inkscape drawing 3.5 vs 14.5, the 68 KB

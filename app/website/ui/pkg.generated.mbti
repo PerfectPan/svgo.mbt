@@ -43,6 +43,8 @@ pub fn highlight(String) -> Array[@html.Html]
 
 pub let highlight_limit : Int
 
+pub fn highlight_mbt(String) -> Array[@html.Html]
+
 pub fn landing_page(Chrome) -> @rabbita.Val[@html.Html]
 
 pub let lang : @ref.Ref[Lang]
@@ -76,6 +78,8 @@ pub fn t(String, String) -> String
 pub fn tm(Array[@html.Html], Array[@html.Html]) -> Array[@html.Html]
 
 pub fn tokenize(String) -> Array[(String, String)]
+
+pub fn tokenize_mbt(String) -> Array[(String, String)]
 
 pub fn top_nav(Route, String, Prefs, @cmd.Emit[PrefMsg]) -> @html.Html
 

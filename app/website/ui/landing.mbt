@@ -455,21 +455,12 @@ fn use_section() -> Html {
             "Plain structs, no globals. The xml, path and plugins packages each work on their own.",
             "都是普通结构体，没有全局变量。xml、path、plugins 这几个包都能单独用。",
           ),
-          [
-            k("let"),
-            text(
-              " r = @svgo.optimize(svg, config={\n  ..@svgo.Config::default(),\n  precision: 2,\n})\nr.saved_percent()  ",
+          highlight_mbt(
+            t(
+              "let r = @svgo.optimize(svg, config={\n  ..@svgo.Config::default(),\n  precision: 2,\n})\nr.saved_percent()  // 67.0\n\n// or just the path optimizer\n@path.optimize_string(\"M 0,0 L 10,10\")  // \"M0 0l10 10\"",
+              "let r = @svgo.optimize(svg, config={\n  ..@svgo.Config::default(),\n  precision: 2,\n})\nr.saved_percent()  // 67.0\n\n// 或者只用路径优化器\n@path.optimize_string(\"M 0,0 L 10,10\")  // \"M0 0l10 10\"",
             ),
-            c("// 67.0"),
-            text("\n\n"),
-            c(
-              t(
-                "// or just the path optimizer", "// 或者只用路径优化器",
-              ),
-            ),
-            text("\n@path.optimize_string(\"M 0,0 L 10,10\")  "),
-            c("// \"M0 0l10 10\""),
-          ],
+          ),
         ),
       ]),
     ]),

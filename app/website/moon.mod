@@ -4,7 +4,7 @@ version = "0.1.0"
 
 import {
   "moonbit-community/rabbita@0.15.6",
-  "PerfectPan/svgo@0.1.3",
+  "PerfectPan/svgo@0.2.0",
 }
 
 readme = "README.md"

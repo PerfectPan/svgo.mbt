@@ -15,6 +15,8 @@ pub const NPM_URL : String = "https://www.npmjs.com/package/@rivus/svgo"
 
 pub const REPO_URL : String = "https://github.com/PerfectPan/svgo.mbt"
 
+pub const SVGO_URL : String = "https://github.com/svg/svgo"
+
 pub let api_packages : Array[ApiPackage]
 
 pub fn api_page(Chrome) -> @rabbita.Val[@html.Html]
@@ -28,6 +30,8 @@ pub let cli_flags : Array[CliFlag]
 pub fn code_editor(String, @cmd.Emit[String], placeholder~ : String, label~ : String) -> @html.Html
 
 pub fn code_view(String, label~ : String) -> @html.Html
+
+pub fn flag_description(String, String, Lang) -> String
 
 pub fn fmt_int(Int) -> String
 

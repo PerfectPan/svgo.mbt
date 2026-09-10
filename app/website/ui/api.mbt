@@ -94,17 +94,12 @@ fn side_nav() -> Html {
         class="mb-1.5 text-xs text-muted",
         tm(
           [
-            text("From "),
-            code("moon doc"),
-            text(". Also on "),
+            text("Also on "),
             a(class="text-ink-2", href=MOONCAKES_URL, "mooncakes.io"),
           ],
           [
-            text("来自 "),
-            code("moon doc"),
-            text("，"),
+            text("也见 "),
             a(class="text-ink-2", href=MOONCAKES_URL, "mooncakes.io"),
-            text(" 上也有"),
           ],
         ),
       ),
@@ -130,8 +125,8 @@ pub fn api_page(chrome : Chrome) -> Val[Html] {
         "PerfectPan/svgo",
         [text(t("API reference", "API 文档"))],
         t(
-          "The public API of PerfectPan/svgo and its packages, pulled from the doc comments in the source. Same text you see on mooncakes.io.",
-          "PerfectPan/svgo 及其子包的公开接口，从源码里的文档注释提取，和 mooncakes.io 上看到的是同一份。",
+          "Types, functions and options of PerfectPan/svgo and its packages: xml parsing, path data, plugins and the optimizer itself.",
+          "PerfectPan/svgo 及其子包的类型、函数与配置项：XML 解析、路径数据、插件，以及优化器本身。",
         ),
       ),
       div(

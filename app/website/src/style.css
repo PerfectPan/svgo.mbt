@@ -202,7 +202,7 @@
   .sizes .lose { @apply text-warn; }
 
   /* CLI flag table */
-  .cli-flags td:first-child { @apply whitespace-nowrap font-mono text-[12.5px] font-semibold text-ink; }
+  .cli-flags td:first-child { @apply whitespace-nowrap pr-4 font-mono text-[12.5px] font-semibold text-ink; }
   .cli-flags td:last-child { @apply text-muted; }
   .cli-flags th:last-child, .cli-flags td:last-child { @apply text-left; }
 
@@ -217,7 +217,7 @@
   .use { @apply flex flex-col overflow-hidden rounded-card border border-line bg-surface; }
   .use h3 { @apply px-[18px] pt-4 text-[15px] font-bold; }
   .use .sub { @apply px-[18px] pb-3.5 pt-0.5 text-[13px] text-muted; }
-  .use pre { @apply mt-auto bg-code px-[18px] py-4 text-[12.5px] leading-relaxed text-code-fg; }
+  .use pre { @apply mt-auto overflow-x-auto bg-code px-[18px] py-4 text-[12.5px] leading-relaxed text-code-fg; }
   .use pre .c { @apply text-code-dim; }
   .use pre .k { @apply text-code-k; }
   /* hl-* tokens inside the dark code card: use the dark-theme palette so

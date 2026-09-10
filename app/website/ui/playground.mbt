@@ -400,8 +400,8 @@ fn pg_view(m : PgModel, p : Prefs, chrome : Chrome, emit : Emit[PgMsg]) -> Html 
           "svgo.mbt",
           [text(t("Playground", "在线体验"))],
           t(
-            "Paste an SVG, open a file or pick a sample; the output updates as you type. Nothing leaves this tab: the optimizer is MoonBit compiled to JavaScript. Share links carry the input and options in the URL.",
-            "粘贴一段 SVG、打开文件或选一个示例，输出随输入实时更新。所有内容都不离开这个标签页：优化器是 MoonBit 编译成的 JavaScript。分享链接把输入和选项都放在 URL 里。",
+            "Paste an SVG, open a file or pick a sample; the output updates as you type. Everything runs locally in the browser and nothing is uploaded. Share links carry the input and options in the URL.",
+            "粘贴一段 SVG、打开文件或选一个示例，输出随输入实时更新。全部在浏览器本地完成，不上传任何内容。分享链接将输入和选项编码在 URL 中。",
           ),
           inline=true,
         ),

@@ -75,9 +75,19 @@ fn hero(dark : Bool) -> Html {
             p(
               class="rise mt-[22px] max-w-[54ch] text-[17px] leading-relaxed text-ink-2",
               style=["--d: 160ms"],
-              t(
-                "svgo's 34 preset optimizations, rewritten in MoonBit and compiled to a single \{wasm_bytes / 1000} KB wasm file. Runs in the browser, in Node.js and on the command line. Every output is render-checked pixel by pixel: smaller files, identical rendering.",
-                "svgo 预设的 34 个优化插件，用 MoonBit 完整重写，编译为一个 \{wasm_bytes / 1000} KB 的 wasm 文件，可在浏览器、Node.js 和命令行中使用。每次输出都经过逐像素渲染比对：文件更小，渲染结果不变。",
+              tm(
+                [
+                  a(class="font-medium text-ink", href=SVGO_URL, "svgo"),
+                  text(
+                    "'s 34 preset optimizations, rewritten in MoonBit and compiled to a single \{wasm_bytes / 1000} KB wasm file. Runs in the browser, in Node.js and on the command line. Every output is render-checked pixel by pixel: smaller files, identical rendering.",
+                  ),
+                ],
+                [
+                  a(class="font-medium text-ink", href=SVGO_URL, "svgo"),
+                  text(
+                    " 预设的 34 个优化插件，用 MoonBit 完整重写，编译为一个 \{wasm_bytes / 1000} KB 的 wasm 文件，可在浏览器、Node.js 和命令行中使用。每次输出都经过逐像素渲染比对：文件更小，渲染结果不变。",
+                  ),
+                ],
               ),
             ),
             div(
@@ -89,9 +99,32 @@ fn hero(dark : Bool) -> Html {
                   href="#/playground",
                   t("Open the playground", "打开在线体验"),
                 ),
+                a(class="btn", href=REPO_URL, [github_icon(), text("GitHub")]),
+              ],
+            ),
+            div(
+              class="rise mt-4 flex flex-wrap items-center gap-3",
+              style=["--d: 300ms"],
+              [
                 copy_pill("npm i @rivus/svgo"),
                 copy_pill("moon add PerfectPan/svgo"),
               ],
+            ),
+            p(
+              class="rise mt-5 text-[12.5px] text-muted",
+              style=["--d: 360ms"],
+              tm(
+                [
+                  text("Plugin semantics follow "),
+                  a(class="text-ink-2", href=SVGO_URL, "svgo"),
+                  text(" by Kir Belevich and contributors (MIT)."),
+                ],
+                [
+                  text("插件行为与 "),
+                  a(class="text-ink-2", href=SVGO_URL, "svgo"),
+                  text("（Kir Belevich 及贡献者，MIT）保持一致。"),
+                ],
+              ),
             ),
           ]),
           div(
@@ -130,13 +163,10 @@ fn hero(dark : Bool) -> Html {
 }
 
 ///|
-fn section_head(title : String, blurb : Array[Html]) -> Html {
-  div(
-    class="reveal mb-9 grid items-end gap-8 max-[800px]:gap-3 min-[801px]:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]",
-    [
-      h2(class="display text-[clamp(30px,3.4vw,42px)] leading-[1.08]", title),
-      p(class="max-w-[58ch] text-base text-ink-2", blurb),
-    ],
+fn section_head(title : String) -> Html {
+  h2(
+    class="display reveal mb-9 text-[clamp(30px,3.4vw,42px)] leading-[1.08]",
+    title,
   )
 }
 
@@ -213,14 +243,6 @@ fn numbers_section() -> Html {
         t(
           "Same pipeline, a third of the time.", "同一条流水线，三分之一的时间。",
         ),
-        [
-          text(
-            t(
-              "svgo \{svgo_js_version} and svgo.mbt optimizing the same files in the same Node process, multipass on, both warmed up. Real editor exports and a few classic large SVGs.",
-              "svgo \{svgo_js_version} 与 svgo.mbt 在同一个 Node 进程中处理相同的文件，均开启 multipass 并预热。样本为真实的编辑器导出文件和几张经典大图。",
-            ),
-          ),
-        ],
       ),
       div(class="mb-5 grid grid-cols-3 gap-4 max-sm:grid-cols-1", [
         div(class="kpi reveal", [
@@ -230,7 +252,7 @@ fn numbers_section() -> Html {
           ),
           span(
             t(
-              "median speedup over svgo-js in the same process", "同进程下相对 svgo-js 的加速比（中位数）",
+              "median speedup over svgo-js, same process", "相对 svgo-js 的中位加速比，同一进程",
             ),
           ),
         ]),
@@ -240,11 +262,11 @@ fn numbers_section() -> Html {
               "count",
               (wasm_bytes / 1000).to_string(),
             ),
-            "\{wasm_bytes / 1000}",
+            "\{wasm_bytes / 1000} KB",
           ),
           span(
             t(
-              "KB wasm-gc, no dependencies, loads in milliseconds", "KB 的 wasm-gc 模块，零依赖，毫秒级加载",
+              "wasm-gc module, no dependencies, loads in milliseconds", "wasm-gc 模块，零依赖，毫秒级加载",
             ),
           ),
         ]),
@@ -252,8 +274,7 @@ fn numbers_section() -> Html {
           b("0 px"),
           span(
             t(
-              "of rendering difference across every editor export in the corpus (resvg + pixelmatch)",
-              "语料库中所有编辑器导出文件的渲染差异（resvg + pixelmatch）",
+              "rendering difference across all samples (resvg + pixelmatch)", "全部样图的渲染差异（resvg + pixelmatch）",
             ),
           ),
         ]),
@@ -276,14 +297,18 @@ fn numbers_section() -> Html {
             class="mt-3.5 text-[12.5px] text-muted",
             tm(
               [
-                text("Generated by "),
+                text(
+                  "svgo \{svgo_js_version} and svgo.mbt in the same Node process, multipass on, warmed up; editor exports and classic large SVGs. ",
+                ),
                 code("packages/compare/collect.mjs"),
-                text(" on \{generated_on}."),
+                text(", \{generated_on}."),
               ],
               [
-                text("数据由 "),
+                text(
+                  "svgo \{svgo_js_version} 与 svgo.mbt 在同一 Node 进程中处理相同文件，开启 multipass 并预热；样本为编辑器导出文件和经典大图。",
+                ),
                 code("packages/compare/collect.mjs"),
-                text(" 于 \{generated_on} 生成。"),
+                text("，\{generated_on}。"),
               ],
             ),
           ),
@@ -344,31 +369,25 @@ fn plugins_section() -> Html {
       [code(name), p(plugin_description(name, desc, lang.val))],
     )
   })
-  let count = @svgo.list_plugins().filter(it => it.2).length()
+  let count = @svgo.list_plugins().length()
   section(id="plugins", class="border-y border-line bg-bg-2 py-20", [
     div(class="wrap", [
       section_head(
-        t("Every plugin is a value.", "每个插件都是一个值。"),
-        tm(
-          [
-            text("A plugin is a value: "),
-            code("{ name, description, run }"),
-            text(
-              ". The default set contains \{count}, in svgo's order; each reports whether it changed the document, which is what drives multipass. The list below is read from the library at page load, optional plugins included.",
-            ),
-          ],
-          [
-            text("插件是一个值："),
-            code("{ name, description, run }"),
-            text(
-              "。默认集合包含 \{count} 个，顺序与 svgo 一致；每个插件返回是否修改了文档，multipass 以此判断何时结束。以下列表在页面加载时从库中读取，包含三个可选插件。",
-            ),
-          ],
+        t(
+          "\{count} plugins, svgo's names and order.",
+          "\{count} 个插件，与 svgo 同名同序。",
         ),
       ),
       div(
         class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-2.5",
         cards,
+      ),
+      p(
+        class="mt-5 text-[12.5px] text-muted",
+        t(
+          "All 34 plugins of svgo's preset-default are implemented; moveGroupAttrsToElems is off by default. removeDimensions and removeTitle are optional.",
+          "svgo preset-default 的 34 个插件全部实现，其中 moveGroupAttrsToElems 默认关闭；removeDimensions、removeTitle 为可选插件。",
+        ),
       ),
     ]),
   ])
@@ -404,14 +423,6 @@ fn use_section() -> Html {
     div(class="wrap", [
       section_head(
         t("Three ways in, one codebase.", "三种用法，一套代码。"),
-        [
-          text(
-            t(
-              "The wasm build is the primary artifact. The same source also compiles to a native CLI and a MoonBit library for use in other tools; this page uses it as a MoonBit dependency.",
-              "wasm 是主要产物。同一份源码还可编译为原生 CLI 和 MoonBit 库，供其他工具直接引用；本页面即以 MoonBit 依赖的方式使用它。",
-            ),
-          ),
-        ],
       ),
       div(class="grid gap-4 min-[901px]:grid-cols-3", [
         snippet(
@@ -429,7 +440,7 @@ fn use_section() -> Html {
             k("const"),
             text(" r = "),
             k("await"),
-            text(" optimize(svg, { precision: 3 });\nr.data          "),
+            text(" optimize(svg, {\n  precision: 3,\n});\nr.data          "),
             c("// optimized SVG"),
             text("\nr.originalSize  "),
             c("// 836"),
@@ -452,7 +463,7 @@ fn use_section() -> Html {
             ),
             c("| jq .size"),
             text(
-              "\nsvgo-mbt icon.svg --plugins convertPathData,sortAttrs\nsvgo-mbt --list",
+              "\nsvgo-mbt icon.svg \\\n  --plugins convertPathData,sortAttrs\nsvgo-mbt --list",
             ),
           ],
         ),
@@ -465,8 +476,8 @@ fn use_section() -> Html {
           ),
           highlight_mbt(
             t(
-              "let r = @svgo.optimize(svg, config={\n  ..@svgo.Config::default(),\n  precision: 2,\n})\nr.saved_percent()  // 67.0\n\n// or just the path optimizer\n@path.optimize_string(\"M 0,0 L 10,10\")  // \"M0 0l10 10\"",
-              "let r = @svgo.optimize(svg, config={\n  ..@svgo.Config::default(),\n  precision: 2,\n})\nr.saved_percent()  // 67.0\n\n// 或者只用路径优化器\n@path.optimize_string(\"M 0,0 L 10,10\")  // \"M0 0l10 10\"",
+              "let r = @svgo.optimize(svg, config={\n  ..@svgo.Config::default(),\n  precision: 2,\n})\nr.saved_percent()  // 67.0\n\n// or just the path optimizer\n@path.optimize_string(\"M 0,0 L 10,10\")\n// \"M0 0l10 10\"",
+              "let r = @svgo.optimize(svg, config={\n  ..@svgo.Config::default(),\n  precision: 2,\n})\nr.saved_percent()  // 67.0\n\n// 或者只用路径优化器\n@path.optimize_string(\"M 0,0 L 10,10\")\n// \"M0 0l10 10\"",
             ),
           ),
         ),
@@ -477,31 +488,20 @@ fn use_section() -> Html {
 
 ///|
 fn cli_section() -> Html {
-  let flag_rows = cli_flags.map(f => tr([td([code(f.flag)]), td(f.description)]))
+  let flag_rows = cli_flags.map(f => {
+    tr([
+      td([code(f.flag)]),
+      td(flag_description(f.flag, f.description, lang.val)),
+    ])
+  })
   section(id="cli", class="border-y border-line bg-bg-2 py-20", [
     div(class="wrap", [
       section_head(
         t(
           "The command line, in one binary.", "命令行，一个二进制文件。",
         ),
-        tm(
-          [
-            text("One MoonBit source, two builds. "),
-            code("npx"),
-            text(
-              " runs the Node build with nothing to install; the native binary needs no runtime and processes a small icon in about 10 ms, against about 50 ms for the Node build. It reads from stdin and writes to stdout, or walks a directory recursively. The flag table below is parsed from the CLI's own usage text, so it stays in sync.",
-            ),
-          ],
-          [
-            text("同一份 MoonBit 源码，两种构建。"),
-            code("npx"),
-            text(
-              " 运行 Node 版，无需安装；原生二进制不依赖运行时，处理一个小图标约 10 毫秒，Node 版约 50 毫秒。支持从 stdin 读入、向 stdout 输出，也可递归处理整个目录。下表由 CLI 的帮助文本解析生成，与实际用法保持一致。",
-            ),
-          ],
-        ),
       ),
-      div(class="grid gap-5 min-[901px]:grid-cols-[1fr_1fr]", [
+      div(class="grid items-start gap-5 min-[901px]:grid-cols-[1fr_1fr]", [
         div(class="card reveal", [
           h3(t("Install and run", "安装并运行")),
           div(
@@ -528,7 +528,7 @@ fn cli_section() -> Html {
           div(
             class="sub",
             t(
-              "repeatable means you can pass it more than once.", "repeatable 表示可以传多次。",
+              "repeatable means you can pass it more than once.", "标注“可重复”的参数可以传多次。",
             ),
           ),
           div(class="overflow-x-auto", [
@@ -570,32 +570,17 @@ fn gallery_section() -> Html {
   })
   section(id="verified", class="border-y border-line bg-bg-2 py-20", [
     div(class="wrap", [
-      section_head(
-        t("Verified, not just smaller.", "不只变小了，还验证过。"),
-        tm(
-          [
-            text(
-              "Every sample is rendered before and after with resvg and compared pixel by pixel. Plugin behavior is pinned by test fixtures in svgo's format, performance changes must reproduce the whole corpus byte for byte, ",
-            ),
-            code("moon test"),
-            text(
-              " runs on the JS and native backends, and the wasm build runs the same fixtures under Node. Left: the original. Right: optimized in your browser just now.",
-            ),
-          ],
-          [
-            text(
-              "每张样图在优化前后各用 resvg 渲染一次，逐像素比对。插件行为由 svgo 格式的测试用例固定；性能改动须在整个语料库上逐字节复现；",
-            ),
-            code("moon test"),
-            text(
-              " 覆盖 JS 与原生后端，wasm 构建在 Node 中运行同一套用例。左侧为原图，右侧为刚在浏览器中优化的结果。",
-            ),
-          ],
-        ),
-      ),
+      section_head(t("Verified pixel by pixel.", "逐像素验证。")),
       div(
         class="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4",
         shots,
+      ),
+      p(
+        class="mt-5 text-[12.5px] text-muted",
+        t(
+          "Left: the original. Right: optimized live in your browser. Every sample is rendered before and after with resvg and compared pixel by pixel; the wasm build runs the same fixture suite under Node, Bun and Deno.",
+          "左侧为原图，右侧为浏览器中实时优化的结果。每张样图在优化前后各用 resvg 渲染一次，逐像素比对；wasm 构建在 Node、Bun、Deno 中运行同一套测试用例。",
+        ),
       ),
     ]),
   ])
@@ -606,7 +591,7 @@ fn gallery_section() -> Html {
 pub fn landing_page(chrome : Chrome) -> Val[Html] {
   chrome.prefs.view(p => {
     div(class="pt-[60px]", [
-      top_nav(Landing, "0.1", p, chrome.emit),
+      top_nav(Landing, "", p, chrome.emit),
       hero(p.dark),
       numbers_section(),
       plugins_section(),

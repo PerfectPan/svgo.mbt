@@ -57,7 +57,7 @@ pub fn lz_decompress(String) -> String?
 
 pub fn page_footer() -> @html.Html
 
-pub fn page_head(String, Array[@html.Html], String) -> @html.Html
+pub fn page_head(String, Array[@html.Html], String, inline? : Bool) -> @html.Html
 
 pub fn playground_page(Chrome) -> @rabbita.Val[@html.Html]
 

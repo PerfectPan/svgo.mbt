@@ -418,8 +418,8 @@ fn use_section() -> Html {
           0,
           "JavaScript · npm",
           t(
-            "Node 24+, Chrome 130+, Firefox 134+, Safari 18.4+ (JS String Builtins).",
-            "Node 24+、Chrome 130+、Firefox 134+、Safari 18.4+（JS String Builtins）。",
+            "Node 24+, Bun 1.4+, Chrome 130+, Firefox 134+, Safari 18.4+ (JS String Builtins).",
+            "Node 24+、Bun 1.4+、Chrome 130+、Firefox 134+、Safari 18.4+（JS String Builtins）。",
           ),
           [
             k("import"),

@@ -3,7 +3,7 @@
 **An SVG optimizer written in MoonBit, shipped as WebAssembly.**
 All 34 plugins in [svgo](https://github.com/svg/svgo)'s preset-default, in its
 order and with its semantics, and none of the Node.js dependency tree: a 200 KB
-`wasm-gc` module that runs in the browser and in Node 24+, a CLI that installs
+`wasm-gc` module that runs in the browser, Node 24+ and Bun 1.4+, a CLI that installs
 with `npx`, and a MoonBit library.
 
 [**Website & playground**](https://perfectpan.github.io/svgo.mbt/) ·
@@ -13,7 +13,7 @@ with `npx`, and a MoonBit library.
 
 ## Quickstart
 
-**JavaScript** (Node 24+, Chrome 130+, Firefox 134+, Safari 18.4+; JS String Builtins need V8 13.6):
+**JavaScript** (Node 24+, Bun 1.4+, Chrome 130+, Firefox 134+, Safari 18.4+; the engine needs WebAssembly GC and JS String Builtins):
 
 ```bash
 npm i @rivus/svgo
@@ -25,7 +25,7 @@ const r = await optimize(svg, { precision: 3 });
 r.data; r.originalSize; r.size; r.passes; r.applied;
 ```
 
-**Command line**, without a toolchain (Node 24+):
+**Command line**, without a toolchain (Node 24+ or Bun 1.4+, via `bunx`):
 
 ```bash
 npx @rivus/svgo input.svg -o out.svg

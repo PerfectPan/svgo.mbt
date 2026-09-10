@@ -2,6 +2,9 @@
 pub const REPO_URL = "https://github.com/PerfectPan/svgo.mbt"
 
 ///|
+pub const SVGO_URL = "https://github.com/svg/svgo"
+
+///|
 pub const NPM_URL = "https://www.npmjs.com/package/@rivus/svgo"
 
 ///|
@@ -162,7 +165,7 @@ pub fn page_footer() -> Html {
         tm(
           [
             text("svgo.mbt · MIT · plugin behavior follows "),
-            a(class="text-ink-2", href="https://github.com/svg/svgo", "svgo"),
+            a(class="text-ink-2", href=SVGO_URL, "svgo"),
             text(" (MIT) · this site is also MoonBit, built with "),
             a(
               class="text-ink-2",
@@ -172,7 +175,7 @@ pub fn page_footer() -> Html {
           ],
           [
             text("svgo.mbt · MIT · 插件行为与 "),
-            a(class="text-ink-2", href="https://github.com/svg/svgo", "svgo"),
+            a(class="text-ink-2", href=SVGO_URL, "svgo"),
             text(" 一致（MIT）· 本站同样以 MoonBit 编写，基于 "),
             a(
               class="text-ink-2",

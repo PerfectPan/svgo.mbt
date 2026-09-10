@@ -7,7 +7,7 @@ pub let generated_on : String = "2026-09-09"
 pub let svgo_js_version : String = "4.1.0"
 
 ///|
-pub let wasm_bytes : Int = 200430
+pub let wasm_bytes : Int = 200607
 
 ///|
 /// One corpus file: bytes before, after svgo.mbt and after svgo-js, plus

@@ -1,6 +1,6 @@
 ///|
 /// `<!DOCTYPE ...>` carries nothing a renderer needs.
-pub let remove_doctype : Plugin = {
+let remove_doctype : Plugin = {
   name: "removeDoctype",
   description: "remove the doctype declaration",
   run: (doc, _) => remove_top_level(doc, n => n is Doctype(_)),
@@ -8,7 +8,7 @@ pub let remove_doctype : Plugin = {
 
 ///|
 /// `<?xml ...?>` is optional for UTF-8 documents.
-pub let remove_xml_proc_inst : Plugin = {
+let remove_xml_proc_inst : Plugin = {
   name: "removeXMLProcInst",
   description: "remove the <?xml ...?> declaration",
   run: (doc, _) => remove_top_level(doc, n => n is ProcInst("xml", _)),
@@ -16,7 +16,7 @@ pub let remove_xml_proc_inst : Plugin = {
 
 ///|
 /// Comments starting with `!` are legal notices and are kept.
-pub let remove_comments : Plugin = {
+let remove_comments : Plugin = {
   name: "removeComments",
   description: "remove comments",
   run: (doc, ctx) => {
@@ -45,7 +45,7 @@ pub let remove_comments : Plugin = {
 
 ///|
 /// `<metadata>` holds RDF/Dublin Core data from editors.
-pub let remove_metadata : Plugin = {
+let remove_metadata : Plugin = {
   name: "removeMetadata",
   description: "remove <metadata>",
   run: (doc, _) => remove_elements(doc, (e, _) => e.name == "metadata"),
@@ -53,7 +53,7 @@ pub let remove_metadata : Plugin = {
 
 ///|
 /// Descriptions produced by editors ("Created with Sketch.") carry no meaning.
-pub let remove_desc : Plugin = {
+let remove_desc : Plugin = {
   name: "removeDesc",
   description: "remove editor generated <desc>",
   run: (doc, _) => {
@@ -72,7 +72,7 @@ pub let remove_desc : Plugin = {
 
 ///|
 /// Namespace prefixes used by editors for their private data.
-pub let editor_namespaces : Array[String] = [
+let editor_namespaces : Array[String] = [
   "http://www.inkscape.org/namespaces/inkscape", "http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd",
   "http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd", "http://ns.adobe.com/AdobeIllustrator/10.0/",
   "http://ns.adobe.com/Graphs/1.0/", "http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/",
@@ -89,7 +89,7 @@ pub let editor_namespaces : Array[String] = [
 ///|
 /// Drop the namespace declarations, elements and attributes of the editors
 /// listed in `editor_namespaces`.
-pub let remove_editors_ns_data : Plugin = {
+let remove_editors_ns_data : Plugin = {
   name: "removeEditorsNSData",
   description: "remove editor namespaces, elements and attributes",
   run: (doc, _) => {
@@ -131,7 +131,7 @@ pub let remove_editors_ns_data : Plugin = {
 
 ///|
 /// Collapse whitespace inside attribute values.
-pub let cleanup_attrs : Plugin = {
+let cleanup_attrs : Plugin = {
   name: "cleanupAttrs",
   description: "clean up whitespace in attribute values",
   run: (doc, _) => {
@@ -174,7 +174,7 @@ fn collapse_space(v : String) -> String {
 ///|
 /// Attributes with an empty value, except `id`, `d` and the conditional
 /// processing attributes whose empty value hides the element.
-pub let remove_empty_attrs : Plugin = {
+let remove_empty_attrs : Plugin = {
   name: "removeEmptyAttrs",
   description: "remove attributes with empty values",
   run: (doc, _) => {
@@ -205,7 +205,7 @@ let conditional_processing_attrs : Set[String] = Set([
 
 ///|
 /// `<text>`/`<tspan>` without content and `<tref>` without a target.
-pub let remove_empty_text : Plugin = {
+let remove_empty_text : Plugin = {
   name: "removeEmptyText",
   description: "remove empty <text>, <tspan> and <tref>",
   run: (doc, _) => {
@@ -223,7 +223,7 @@ pub let remove_empty_text : Plugin = {
 ///|
 /// Container elements (`<g>`, `<defs>`, ...) with no children, unless they
 /// are referenced or otherwise meaningful (masks, `<switch>` branches, filters).
-pub let remove_empty_containers : Plugin = {
+let remove_empty_containers : Plugin = {
   name: "removeEmptyContainers",
   description: "remove empty container elements",
   run: (doc, _) => {
@@ -279,7 +279,7 @@ pub let remove_empty_containers : Plugin = {
 
 ///|
 /// Elements that are never rendered.
-pub let remove_hidden_elems : Plugin = {
+let remove_hidden_elems : Plugin = {
   name: "removeHiddenElems",
   description: "remove elements that are not rendered",
   run: (doc, _) => {
@@ -509,8 +509,7 @@ fn is_empty_or_single_point_path(e : @xml.Element) -> Bool {
       }
       // a renderer draws the data up to the first error, so judge that part;
       // stop at the first drawing command so long paths cost almost nothing
-      let segs = @path.parse_prefix(t.to_owned(), until_drawing=true)
-      let single_point = !segs.iter().any(s => @path.is_drawing_command(s.cmd))
+      let single_point = !@path.has_geometry(t.to_owned())
       if single_point && has_markers(e) {
         return false
       }
@@ -530,7 +529,7 @@ fn has_markers(e : @xml.Element) -> Bool {
 ///|
 /// Children of `<defs>` and non-rendering elements without an id can never
 /// be referenced, so they (and the now-empty container) are removed.
-pub let remove_useless_defs : Plugin = {
+let remove_useless_defs : Plugin = {
   name: "removeUselessDefs",
   description: "remove <defs> children without an id",
   run: (doc, _) => {
@@ -589,7 +588,7 @@ fn non_rendering_elements() -> Set[String] {
 
 ///|
 /// `xmlns:prefix` declarations whose prefix appears on no element or attribute.
-pub let remove_unused_ns : Plugin = {
+let remove_unused_ns : Plugin = {
   name: "removeUnusedNS",
   description: "remove unused namespace declarations",
   run: (doc, _) => {
@@ -613,7 +612,7 @@ pub let remove_unused_ns : Plugin = {
 
 ///|
 /// Alphabetical attribute order compresses better and diffs cleanly.
-pub let sort_attrs : Plugin = {
+let sort_attrs : Plugin = {
   name: "sortAttrs",
   description: "sort attributes",
   run: (doc, ctx) => {
@@ -752,7 +751,7 @@ fn style_text(doc : @xml.Document) -> String {
 /// in the non-inheritable-group set (clip-path, display, filter, mask,
 /// opacity, text-decoration, transform, unicode-bidi). Such attributes on a
 /// group have no effect on the group's children.
-pub let remove_non_inheritable_group_attrs : Plugin = {
+let remove_non_inheritable_group_attrs : Plugin = {
   name: "removeNonInheritableGroupAttrs",
   description: "removes non-inheritable group's presentational attributes",
   run: (doc, _) => {
@@ -801,7 +800,7 @@ fn parse_enable_background_new(value : String) -> (String, String)? {
 /// `height`, a value of `new 0 0 W H` matching those dimensions is redundant:
 /// for `<svg>` it is removed, for `<mask>`/`<pattern>` it is shortened to
 /// `new`. Inline `style` declarations are handled the same way.
-pub let cleanup_enable_background : Plugin = {
+let cleanup_enable_background : Plugin = {
   name: "cleanupEnableBackground",
   description: "remove or cleanup enable-background attribute when possible",
   run: (doc, _) => {
@@ -930,7 +929,7 @@ fn css_attribute_names(css : String) -> Set[String] {
 /// removed; unsafe ones only when the `removeUnsafe` parameter is set.
 /// Attributes referenced by CSS attribute selectors are kept. The special
 /// `xml:lang` attribute is removed when a `lang` attribute is also present.
-pub let remove_deprecated_attrs : Plugin = {
+let remove_deprecated_attrs : Plugin = {
   name: "removeDeprecatedAttrs",
   description: "removes deprecated attributes",
   run: (doc, ctx) => {

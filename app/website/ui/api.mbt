@@ -137,12 +137,19 @@ fn api_member(pkg : ApiPackage, it : ApiItem) -> Html {
 }
 
 ///|
+/// Packages excluded from the API pages (e.g. wasm FFI exports).
+let excluded_packages : Set[String] = Set(["wasm"])
+
+///|
 /// Left column: every package, the current one expanded into its members
 /// grouped by kind. Member links carry `data-target` for the scrollspy.
 fn side_nav(current : ApiPackage) -> Html {
   let blocks : Array[Html] = []
   for pkg in api_packages {
     let name = short_name(pkg)
+    if excluded_packages.contains(name) {
+      continue
+    }
     let is_current = name == short_name(current)
     blocks.push(
       a(
@@ -240,6 +247,11 @@ test "api routes parse" {
 ///|
 test "every package name has a page" {
   for pkg in api_packages {
-    assert_true(api_package_names.contains(short_name(pkg)), msg=pkg.short)
+    let name = short_name(pkg)
+    // wasm is excluded from the API pages (FFI exports only)
+    if excluded_packages.contains(name) {
+      continue
+    }
+    assert_true(api_package_names.contains(name), msg=pkg.short)
   }
 }

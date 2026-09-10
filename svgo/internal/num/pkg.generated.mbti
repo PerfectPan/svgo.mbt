@@ -1,0 +1,50 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "PerfectPan/svgo/internal/num"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn acos(Double) -> Double
+
+pub fn asin(Double) -> Double
+
+pub fn atan(Double) -> Double
+
+pub fn cos(Double) -> Double
+
+pub fn decompose(Double, Int) -> (Bool, Int64, Int64, Int)
+
+pub fn epsilon(Int) -> Double
+
+pub fn format_number(Double, Int) -> String
+
+pub fn number_shape(Double, Int) -> Int
+
+pub fn parse_number(String) -> Double?
+
+pub fn round_to(Double, Int) -> Double
+
+pub fn scan_number(ArrayView[UInt16], Int) -> (Double, Int) raise NumError
+
+pub fn sin(Double) -> Double
+
+pub fn strong_round(Double, Int) -> Double
+
+pub fn tan(Double) -> Double
+
+pub fn write_number(StringBuilder, Double, Int) -> Unit
+
+pub fn write_number_shaped(StringBuilder, Double, Int) -> Int
+
+// Errors
+pub suberror NumError {
+  NumError(String)
+} derive(@debug.Debug)
+
+// Types and methods
+
+// Type aliases
+
+// Traits

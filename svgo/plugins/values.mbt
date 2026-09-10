@@ -10,7 +10,7 @@ let numeric_attrs : Set[String] = Set([
 
 ///|
 /// Round numbers in attribute values and drop the default `px` unit.
-pub let cleanup_numeric_values : Plugin = {
+let cleanup_numeric_values : Plugin = {
   name: "cleanupNumericValues",
   description: "round numeric values and remove px units",
   run: (doc, ctx) => {
@@ -28,7 +28,7 @@ pub let cleanup_numeric_values : Plugin = {
             .to_array()
           let cleaned = parts.map(s => {
             match split_unit(s) {
-              Some((n, "")) => @path.format_number(n, ctx.precision)
+              Some((n, "")) => @num.format_number(n, ctx.precision)
               _ => s
             }
           })
@@ -44,7 +44,7 @@ pub let cleanup_numeric_values : Plugin = {
           Some((n, unit)) => {
             let (n, unit) = convert_to_px(n, unit, v.length(), ctx.precision)
             let unit = if unit == "px" { "" } else { unit }
-            let formatted = @path.format_number(n, ctx.precision) + unit
+            let formatted = @num.format_number(n, ctx.precision) + unit
             if formatted != v {
               e.attrs[k] = formatted
               changed = true
@@ -81,7 +81,7 @@ fn convert_to_px(
   match px_factors.get(unit) {
     Some(factor) => {
       let px = n * factor
-      let px_str = @path.format_number(px, precision)
+      let px_str = @num.format_number(px, precision)
       if px_str.length() < original_len {
         (px, "px")
       } else {
@@ -100,7 +100,7 @@ let color_attrs : Set[String] = Set([
 
 ///|
 /// Convert colors to their shortest equivalent form.
-pub let convert_colors : Plugin = {
+let convert_colors : Plugin = {
   name: "convertColors",
   description: "convert colors to the shortest form",
   run: (doc, ctx) => {
@@ -147,14 +147,6 @@ pub let convert_colors : Plugin = {
     }
     changed
   },
-}
-
-///|
-/// Shortest equivalent spelling of a color: `rgb()` and names become hex,
-/// `#rrggbb` collapses to `#rgb` when possible, and a color name wins when
-/// it is shorter than the hex form (`#ff0000` -> `red`).
-pub fn shorten_color(v : String) -> String {
-  convert_color(v, Context::new(), false)
 }
 
 ///|

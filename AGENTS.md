@@ -18,7 +18,7 @@ root installs every JS package.
 | goal | command |
 | --- | --- |
 | type check every package on the default backend | `moon check` |
-| run all tests (unit tests plus generated fixtures) | `moon test --target native` (also `js`; not `wasm-gc`: moonrun lacks the `Math` / `Number` imports of `svgo/path/host_wasm.mbt`, the wasm artifact is tested with `node --test` in `packages/svgo-mbt`) |
+| run all tests (unit tests plus generated fixtures) | `moon test --target native` (also `js`; not `wasm-gc`: moonrun lacks the `Math` / `Number` imports of `svgo/internal/num/host_wasm.mbt`, the wasm artifact is tested with `node --test` in `packages/svgo-mbt`) |
 | update snapshot expectations after an intended output change | `moon test --update` |
 | format and refresh the generated `.mbti` interface files | `moon fmt && moon info` |
 | everything CI checks, in one go | `scripts/verify.sh` (`--full` adds wasm build, svgo-js comparison, render diff) |
@@ -46,7 +46,9 @@ moon.work, package.json       workspace roots (MoonBit members / pnpm packages),
 svgo/                         the MoonBit module PerfectPan/svgo
   svgo.mbt, svgo_test.mbt     public API: optimize(svg, config?) -> Result, Config, list_plugins
   xml/                        Document/Node/Element, parse, serialize (SVG-oriented, keeps prolog)
-  path/                       path data: parse, optimize, stringify; number.mbt = fast number I/O; host_wasm.mbt / host_default.mbt = trig and slow number parsing per target
+  path/                       path data: Segment, PathError, parse, optimize, stringify, apply_matrix, has_geometry
+  internal/num/               number I/O, trig; host_wasm.mbt / host_default.mbt = trig and slow number parsing per target
+  internal/css/               CSS parser, minifier and selector matcher (used by inlineStyles)
   plugins/                    Plugin { name, description, run }, Context (+ params.mbt accessors), preset_default order
     cleanup.mbt               removal plugins (doctype, comments, editor data, ids, empty things)
     values.mbt                numeric values and colours
@@ -95,7 +97,7 @@ docs/ARCHITECTURE.md          design notes
 4. **Deterministic, idempotent output.** Optimizing the output again must
    produce the same bytes (`scripts/regress.sh` and the corpus check this).
 5. **No target-specific code outside `app/cli/io_native.mbt`, `svgo/wasm/` and
-   `svgo/path/host_*.mbt`.** The library compiles unchanged to wasm-gc, js and
+   `svgo/internal/num/host_*.mbt`.** The library compiles unchanged to wasm-gc, js and
    native. The `host_*` pair is the one exception: on wasm-gc the
    transcendentals and the slow path of number parsing are host imports
    (`Math`, `Number.parseFloat`), which keeps about 20 KB of core out of the

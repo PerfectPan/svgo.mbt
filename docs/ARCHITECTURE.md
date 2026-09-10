@@ -51,7 +51,7 @@ absolute and the relative spelling and emits the shorter one; `M` prefers
 absolute on ties because it usually starts a subpath far from the current
 point.
 
-`number.mbt` is why the optimizer is fast:
+`internal/num/number.mbt` is why the optimizer is fast:
 
 - `scan_number` folds up to 15 significant digits into an `Int64` and applies
   a single exact power-of-ten division. No substring, no general float parser.
@@ -106,7 +106,7 @@ that did something. `utf8_length` counts bytes without encoding.
 
 | form | package | notes |
 | --- | --- | --- |
-| wasm-gc module + JS loader | `svgo/wasm/`, `packages/svgo-mbt/` | JS String Builtins: MoonBit `String` *is* a JS string, so the boundary is two string arguments and one string back. Config and result cross as length-prefixed tokens rather than JSON, and trig plus the slow path of number parsing are host imports (`svgo/path/host_wasm.mbt`), so the module carries no JSON, strconv or fdlibm code: about 200 KB after the pinned Binaryen `wasm-opt -Oz --converge` step, down from 269 KB. |
+| wasm-gc module + JS loader | `svgo/wasm/`, `packages/svgo-mbt/` | JS String Builtins: MoonBit `String` *is* a JS string, so the boundary is two string arguments and one string back. Config and result cross as length-prefixed tokens rather than JSON, and trig plus the slow path of number parsing are host imports (`svgo/internal/num/host_wasm.mbt`), so the module carries no JSON, strconv or fdlibm code: about 200 KB after the pinned Binaryen `wasm-opt -Oz --converge` step, down from 269 KB. |
 | CLI | `app/cli/` | One MoonBit source, two IO backends: `extern "C"` file access on the native target, node's `fs` on the js target, which is what `packages/svgo-mbt/cli.mjs` ships. `--json` for tooling. |
 | MoonBit library | `svgo/` | `moon add PerfectPan/svgo`. The website in `app/website/` is the first consumer: a Rabbita app compiled to JS that calls `@svgo.optimize` directly, so the demo and the playground run the same code the tests run. |
 

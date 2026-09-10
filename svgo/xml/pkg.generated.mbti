@@ -6,11 +6,7 @@ import {
 }
 
 // Values
-pub fn decode_entities(String) -> String
-
 pub fn parse(String) -> Document raise ParseError
-
-pub let text_elements : Array[String]
 
 // Errors
 pub suberror ParseError {

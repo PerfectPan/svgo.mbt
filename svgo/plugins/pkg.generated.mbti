@@ -8,95 +8,11 @@ import {
 }
 
 // Values
-pub let cleanup_attrs : Plugin
-
-pub let cleanup_enable_background : Plugin
-
-pub let cleanup_ids : Plugin
-
-pub let cleanup_numeric_values : Plugin
-
-pub let collapse_groups : Plugin
-
-pub let container_elements : @set.Set[String]
-
-pub let convert_colors : Plugin
-
-pub let convert_ellipse_to_circle : Plugin
-
-pub let convert_path_data : Plugin
-
-pub let convert_shape_to_path : Plugin
-
-pub let convert_transform : Plugin
-
-pub let editor_namespaces : Array[String]
-
 pub fn find_plugin(String) -> Plugin?
-
-pub let inline_styles : Plugin
-
-pub let merge_paths : Plugin
-
-pub let merge_styles : Plugin
-
-pub let minify_styles : Plugin
-
-pub let move_elems_attrs_to_group : Plugin
-
-pub let move_group_attrs_to_elems : Plugin
 
 pub let optional_plugins : Array[Plugin]
 
 pub let preset_default : Array[Plugin]
-
-pub let reference_attrs : @set.Set[String]
-
-pub fn referenced_ids(@xml.Document) -> @set.Set[String]
-
-pub let remove_comments : Plugin
-
-pub let remove_deprecated_attrs : Plugin
-
-pub let remove_desc : Plugin
-
-pub let remove_dimensions : Plugin
-
-pub let remove_doctype : Plugin
-
-pub let remove_editors_ns_data : Plugin
-
-pub let remove_empty_attrs : Plugin
-
-pub let remove_empty_containers : Plugin
-
-pub let remove_empty_text : Plugin
-
-pub let remove_hidden_elems : Plugin
-
-pub let remove_metadata : Plugin
-
-pub let remove_non_inheritable_group_attrs : Plugin
-
-pub let remove_title : Plugin
-
-pub let remove_unknowns_and_defaults : Plugin
-
-pub let remove_unused_ns : Plugin
-
-pub let remove_useless_defs : Plugin
-
-pub let remove_useless_stroke_and_fill : Plugin
-
-pub let remove_xml_proc_inst : Plugin
-
-pub fn shorten_color(String) -> String
-
-pub let sort_attrs : Plugin
-
-pub let sort_defs_children : Plugin
-
-pub fn split_unit(String) -> (Double, String)?
 
 // Errors
 
@@ -107,12 +23,7 @@ pub struct Context {
   optimized_paths : @set.Set[String]
   path_hulls : Map[String, Array[Array[(Double, Double)]]]
 } derive(@debug.Debug)
-pub fn Context::has_param(Self, String) -> Bool
 pub fn Context::new(precision? : Int) -> Self
-pub fn Context::param_bool(Self, String, Bool) -> Bool
-pub fn Context::param_int(Self, String, Int) -> Int
-pub fn Context::param_string(Self, String, String) -> String
-pub fn Context::param_strings(Self, String) -> Array[String]
 pub fn Context::set_params(Self, Json) -> Unit
 
 pub(all) struct Plugin {

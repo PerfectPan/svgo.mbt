@@ -134,7 +134,7 @@ fn to_absolute(seg : Segment, cx : Double, cy : Double) -> Abs {
 
 ///|
 fn approx(a : Double, b : Double, precision : Int) -> Bool {
-  round_to(a, precision) == round_to(b, precision)
+  @num.round_to(a, precision) == @num.round_to(b, precision)
 }
 
 ///|
@@ -237,8 +237,8 @@ fn Emitter::emit(
       self.by = psy
       // undo the previous segment's contribution to the accumulated
       // rounded offset, since its delta is now folded into this one.
-      self.rsx = strong_round(self.rsx - self.prev_rdx, p)
-      self.rsy = strong_round(self.rsy - self.prev_rdy, p)
+      self.rsx = @num.strong_round(self.rsx - self.prev_rdx, p)
+      self.rsy = @num.strong_round(self.rsy - self.prev_rdy, p)
       dx = ex - psx
       dy = ey - psy
       base_x = psx
@@ -256,33 +256,33 @@ fn Emitter::emit(
   match cmd {
     'H' => {
       let rel = dx + (base_x - self.rsx)
-      rel_corrected.push(strong_round(rel, p))
+      rel_corrected.push(@num.strong_round(rel, p))
     }
     'V' => {
       let rel = dy + (base_y - self.rsy)
-      rel_corrected.push(strong_round(rel, p))
+      rel_corrected.push(@num.strong_round(rel, p))
     }
     'A' => {
       for i in 0..<5 {
-        rel_corrected.push(strong_round(abs_args[i], p))
+        rel_corrected.push(@num.strong_round(abs_args[i], p))
       }
       let relx = rel_args[5] + (base_x - self.rsx)
       let rely = rel_args[6] + (base_y - self.rsy)
-      rel_corrected.push(strong_round(relx, p))
-      rel_corrected.push(strong_round(rely, p))
+      rel_corrected.push(@num.strong_round(relx, p))
+      rel_corrected.push(@num.strong_round(rely, p))
     }
     'M' => {
       let relx = dx + (base_x - self.rsx)
       let rely = dy + (base_y - self.rsy)
-      rel_corrected.push(strong_round(relx, p))
-      rel_corrected.push(strong_round(rely, p))
+      rel_corrected.push(@num.strong_round(relx, p))
+      rel_corrected.push(@num.strong_round(rely, p))
     }
     _ =>
       for i, v in rel_args {
         let base = if i % 2 == 0 { base_x } else { base_y }
         let rs = if i % 2 == 0 { self.rsx } else { self.rsy }
         let rel = v + (base - rs)
-        rel_corrected.push(strong_round(rel, p))
+        rel_corrected.push(@num.strong_round(rel, p))
       }
   }
   // Absolute form: rounded relative + base, then round again. This matches
@@ -290,19 +290,19 @@ fn Emitter::emit(
   // roundData(adata).
   let abs_rounded : Array[Double] = []
   match cmd {
-    'H' => abs_rounded.push(strong_round(rel_corrected[0] + base_x, p))
-    'V' => abs_rounded.push(strong_round(rel_corrected[0] + base_y, p))
+    'H' => abs_rounded.push(@num.strong_round(rel_corrected[0] + base_x, p))
+    'V' => abs_rounded.push(@num.strong_round(rel_corrected[0] + base_y, p))
     'A' => {
       for i in 0..<5 {
         abs_rounded.push(rel_corrected[i])
       }
-      abs_rounded.push(strong_round(rel_corrected[5] + base_x, p))
-      abs_rounded.push(strong_round(rel_corrected[6] + base_y, p))
+      abs_rounded.push(@num.strong_round(rel_corrected[5] + base_x, p))
+      abs_rounded.push(@num.strong_round(rel_corrected[6] + base_y, p))
     }
     _ =>
       for i, v in rel_corrected {
         let base = if i % 2 == 0 { base_x } else { base_y }
-        abs_rounded.push(strong_round(v + base, p))
+        abs_rounded.push(@num.strong_round(v + base, p))
       }
   }
   let rel_seg : Segment = {
@@ -340,38 +340,38 @@ fn Emitter::emit(
     (self.options.utilize_absolute && abs_len < effective_rel_len)
   if use_abs {
     self.out.push(abs_seg)
-    self.bx = strong_round(ex, p)
-    self.by = strong_round(ey, p)
+    self.bx = @num.strong_round(ex, p)
+    self.by = @num.strong_round(ey, p)
   } else {
     self.out.push(rel_seg)
     // the consumer adds the rounded relative offsets to its current point
     match cmd {
-      'H' => self.bx = strong_round(self.bx + rel_corrected[0], p)
-      'V' => self.by = strong_round(self.by + rel_corrected[0], p)
+      'H' => self.bx = @num.strong_round(self.bx + rel_corrected[0], p)
+      'V' => self.by = @num.strong_round(self.by + rel_corrected[0], p)
       'A' => {
-        self.bx = strong_round(self.bx + rel_corrected[5], p)
-        self.by = strong_round(self.by + rel_corrected[6], p)
+        self.bx = @num.strong_round(self.bx + rel_corrected[5], p)
+        self.by = @num.strong_round(self.by + rel_corrected[6], p)
       }
       _ => {
         let n = rel_corrected.length()
-        self.bx = strong_round(self.bx + rel_corrected[n - 2], p)
-        self.by = strong_round(self.by + rel_corrected[n - 1], p)
+        self.bx = @num.strong_round(self.bx + rel_corrected[n - 2], p)
+        self.by = @num.strong_round(self.by + rel_corrected[n - 1], p)
       }
     }
   }
   // Update the accumulated rounded offset (svgo's relSubpoint): add the
   // rounded endpoint relative delta, then round the accumulated value.
   match cmd {
-    'H' => self.rsx = strong_round(self.rsx + rel_corrected[0], p)
-    'V' => self.rsy = strong_round(self.rsy + rel_corrected[0], p)
+    'H' => self.rsx = @num.strong_round(self.rsx + rel_corrected[0], p)
+    'V' => self.rsy = @num.strong_round(self.rsy + rel_corrected[0], p)
     'A' => {
-      self.rsx = strong_round(self.rsx + rel_corrected[5], p)
-      self.rsy = strong_round(self.rsy + rel_corrected[6], p)
+      self.rsx = @num.strong_round(self.rsx + rel_corrected[5], p)
+      self.rsy = @num.strong_round(self.rsy + rel_corrected[6], p)
     }
     _ => {
       let n = rel_corrected.length()
-      self.rsx = strong_round(self.rsx + rel_corrected[n - 2], p)
-      self.rsy = strong_round(self.rsy + rel_corrected[n - 1], p)
+      self.rsx = @num.strong_round(self.rsx + rel_corrected[n - 2], p)
+      self.rsy = @num.strong_round(self.rsy + rel_corrected[n - 1], p)
     }
   }
   // track the previous collapsible command and its geometric delta
@@ -596,7 +596,7 @@ fn find_arc_angle(
   } else {
     let cos = (x1 * x2 + y1 * y2) / denom
     // clamp to [-1, 1] to dodge acos NaNs from floating point drift
-    acos(if cos > 1.0 { 1.0 } else if cos < -1.0 { -1.0 } else { cos })
+    @num.acos(if cos > 1.0 { 1.0 } else if cos < -1.0 { -1.0 } else { cos })
   }
 }
 
@@ -614,7 +614,7 @@ fn make_arcs(segments : Array[Segment], options : Options) -> Array[Segment] {
     return segments
   }
   let p = options.precision
-  let error = epsilon(p)
+  let error = @num.epsilon(p)
   let threshold = options.make_arcs_threshold
   let tolerance_pct = options.make_arcs_tolerance
   // Convert every segment to relative coordinates so the arc math (which
@@ -780,7 +780,7 @@ fn make_arcs(segments : Array[Segment], options : Options) -> Array[Segment] {
       continue
     }
     let circle = circle.unwrap()
-    let r = strong_round(circle.r, p)
+    let r = @num.strong_round(circle.r, p)
     let sweep = if sdata[5] * sdata[0] - sdata[4] * sdata[1] > 0.0 {
       1.0
     } else {
@@ -848,7 +848,7 @@ fn make_arcs(segments : Array[Segment], options : Options) -> Array[Segment] {
       // control points are collinear with its start/end (within the rounding
       // tolerance): svgo would have turned it into a line, and lines can't
       // be merged into arcs.
-      let straight_tol = epsilon(p)
+      let straight_tol = @num.epsilon(p)
       let prev_straight = collinear(
           0.0,
           0.0,
@@ -1130,7 +1130,7 @@ pub fn optimize(
   // used to resolve S/T control points (which reflect the previous curve's
   // control point even if that curve was collapsed to a line)
   let mut prev_orig_kind : Char = ' '
-  let tolerance = epsilon(p)
+  let tolerance = @num.epsilon(p)
   for seg in segments {
     let a = to_absolute(seg, cx, cy)
     let mut kind : Char = ' '
@@ -1144,10 +1144,10 @@ pub fn optimize(
           em.out[em.out.length() - 1].cmd.to_ascii_lowercase() == 'm' {
           let last = em.out.pop().unwrap()
           if last.cmd == 'm' {
-            em.bx = strong_round(em.bx - last.args[0], p)
-            em.by = strong_round(em.by - last.args[1], p)
-            em.rsx = strong_round(em.rsx - last.args[0], p)
-            em.rsy = strong_round(em.rsy - last.args[1], p)
+            em.bx = @num.strong_round(em.bx - last.args[0], p)
+            em.by = @num.strong_round(em.by - last.args[1], p)
+            em.rsx = @num.strong_round(em.rsx - last.args[0], p)
+            em.rsy = @num.strong_round(em.rsy - last.args[1], p)
             // the previous M's endpoint was cx,cy; its relative delta was
             // last.args, so the base before it was cx - last.args[0].
             base_x = cx - last.args[0]
@@ -1171,8 +1171,8 @@ pub fn optimize(
         // coordinate, not the emitter's accumulated bx (which can drift by a
         // ULP when the moveto was emitted as relative). A `z` resets the
         // cursor here, so a following relative `m` is measured from it.
-        bsx = strong_round(sx, p)
-        bsy = strong_round(sy, p)
+        bsx = @num.strong_round(sx, p)
+        bsy = @num.strong_round(sy, p)
         kind = ' '
         ctrl = None
         prev_ctrl = None
@@ -1227,8 +1227,8 @@ pub fn optimize(
         continue
       }
       'L' | 'H' | 'V' => {
-        let ex = strong_round(a.ex, p)
-        let ey = strong_round(a.ey, p)
+        let ex = @num.strong_round(a.ex, p)
+        let ey = @num.strong_round(a.ey, p)
         // Relative x/y deltas (exact, from the original segment). An `H`/`V`
         // moves along one axis only, so the other delta is exactly zero. The
         // pair is needed because the rounded cursor can drift from the exact
@@ -1304,8 +1304,8 @@ pub fn optimize(
         if options.straight_curves &&
           collinear(cx, cy, a.ex, a.ey, c1x, c1y, tolerance) &&
           collinear(cx, cy, a.ex, a.ey, c2x, c2y, tolerance) {
-          let ex = strong_round(a.ex, p)
-          let ey = strong_round(a.ey, p)
+          let ex = @num.strong_round(a.ex, p)
+          let ey = @num.strong_round(a.ey, p)
           if options.remove_useless && ex == em.bx && ey == em.by {
             if options.linecap == "round" || options.linecap == "square" {
               em.emit_line(a, rel_endx, rel_endy, ex, ey, cx, cy)
@@ -1334,22 +1334,22 @@ pub fn optimize(
           //   x1 = 0.75*C1x - 0.25*P0x,  x2 = 0.75*C2x - 0.25*P3x
           //   Qx = x1 + x2 - P0x   (relative Q control point)
           // The curve is a quadratic iff |x1-x2| < 2*error and |y1-y2| < 2*error.
-          let rcx = strong_round(cx, p)
-          let rcy = strong_round(cy, p)
-          let rc1x = strong_round(c1x, p)
-          let rc1y = strong_round(c1y, p)
-          let rc2x = strong_round(c2x, p)
-          let rc2y = strong_round(c2y, p)
-          let rex = strong_round(a.ex, p)
-          let rey = strong_round(a.ey, p)
+          let rcx = @num.strong_round(cx, p)
+          let rcy = @num.strong_round(cy, p)
+          let rc1x = @num.strong_round(c1x, p)
+          let rc1y = @num.strong_round(c1y, p)
+          let rc2x = @num.strong_round(c2x, p)
+          let rc2y = @num.strong_round(c2y, p)
+          let rex = @num.strong_round(a.ex, p)
+          let rey = @num.strong_round(a.ey, p)
           let x1 = 0.75 * rc1x - 0.25 * rcx
           let y1 = 0.75 * rc1y - 0.25 * rcy
           let x2 = 0.75 * rc2x - 0.25 * rex
           let y2 = 0.75 * rc2y - 0.25 * rey
           if (x1 - x2).abs() < 2.0 * tolerance &&
             (y1 - y2).abs() < 2.0 * tolerance {
-            let qx = strong_round(x1 + x2 - rcx, p)
-            let qy = strong_round(y1 + y2 - rcy, p)
+            let qx = @num.strong_round(x1 + x2 - rcx, p)
+            let qy = @num.strong_round(y1 + y2 - rcy, p)
             em.emit(
               'Q',
               [cx + qx, cy + qy, a.ex, a.ey],
@@ -1474,8 +1474,8 @@ pub fn optimize(
           options.straight_curves &&
           collinear(cx, cy, a.ex, a.ey, qx, qy, tolerance)
         if degenerate_t || is_straight {
-          let ex = strong_round(a.ex, p)
-          let ey = strong_round(a.ey, p)
+          let ex = @num.strong_round(a.ex, p)
+          let ey = @num.strong_round(a.ey, p)
           if options.remove_useless && ex == em.bx && ey == em.by {
             if options.linecap == "round" || options.linecap == "square" {
               em.emit_line(a, rel_endx, rel_endy, ex, ey, cx, cy)
@@ -1548,7 +1548,7 @@ pub fn optimize(
           let sagitta = rx - (rx * rx - 0.25 * chord * chord).sqrt()
           let mut p_new = p
           while p_new >= 0 {
-            let r = round_to(rx, p_new)
+            let r = @num.round_to(rx, p_new)
             if r > 0.0 && chord <= 2.0 * r {
               let s_new = r - (r * r - 0.25 * chord * chord).sqrt()
               if (sagitta - s_new).abs() < tolerance {
@@ -1574,12 +1574,12 @@ pub fn optimize(
             let sagitta = rx - (rx * rx - 0.25 * chord * chord).sqrt()
             sagitta < tolerance
           })
-        if strong_round(rx, p) == 0.0 ||
-          strong_round(ry, p) == 0.0 ||
+        if @num.strong_round(rx, p) == 0.0 ||
+          @num.strong_round(ry, p) == 0.0 ||
           is_straight_arc {
           // the spec says a degenerate arc is a straight line
-          let ex = strong_round(a.ex, p)
-          let ey = strong_round(a.ey, p)
+          let ex = @num.strong_round(a.ex, p)
+          let ey = @num.strong_round(a.ey, p)
           if options.remove_useless && ex == em.bx && ey == em.by {
             if options.linecap == "round" || options.linecap == "square" {
               em.emit_line(a, rel_endx, rel_endy, ex, ey, cx, cy)
@@ -1588,8 +1588,8 @@ pub fn optimize(
             em.emit_line(a, rel_endx, rel_endy, ex, ey, cx, cy)
           }
         } else {
-          let ex = strong_round(a.ex, p)
-          let ey = strong_round(a.ey, p)
+          let ex = @num.strong_round(a.ex, p)
+          let ey = @num.strong_round(a.ey, p)
           if options.remove_useless && ex == em.bx && ey == em.by {
             if options.linecap == "round" || options.linecap == "square" {
               em.emit_line(a, rel_endx, rel_endy, ex, ey, cx, cy)
@@ -1635,235 +1635,6 @@ pub fn optimize(
     }
   }
   em.out
-}
-
-///|
-/// Apply a 6-element affine matrix [a, b, c, d, e, f] to path data, returning
-/// new segments. Absolute points are transformed as (a*x + c*y + e,
-/// b*x + d*y + f); relative deltas as (a*dx + c*dy, b*dx + d*dy). `H`/`V` are
-/// widened to `L` because a non-axis-aligned transform changes both
-/// coordinates. Arcs have their radii, rotation and sweep flag adjusted.
-pub fn apply_matrix(
-  segments : Array[Segment],
-  m : Array[Double],
-) -> Array[Segment] {
-  let a = m[0]
-  let b = m[1]
-  let c = m[2]
-  let d = m[3]
-  let e = m[4]
-  let f = m[5]
-  let out : Array[Segment] = []
-  // transformed current point and subpath start
-  let mut cx = 0.0
-  let mut cy = 0.0
-  let mut sx = 0.0
-  let mut sy = 0.0
-  // original (untransformed) current point, needed for H/V which reference
-  // the current coordinate in the pre-transform space
-  let mut ocx = 0.0
-  let mut ocy = 0.0
-  let mut osx = 0.0
-  let mut osy = 0.0
-  // the first moveto in a path is always absolute, even when written as 'm'
-  let mut first = true
-  fn abs_pt(x : Double, y : Double) -> (Double, Double) {
-    let nx = a * x + c * y + e
-    let ny = b * x + d * y + f
-    (nx, ny)
-  }
-  fn rel_pt(x : Double, y : Double) -> (Double, Double) {
-    let nx = a * x + c * y
-    let ny = b * x + d * y
-    (nx, ny)
-  }
-  for seg in segments {
-    let args = seg.args
-    let upper = seg.cmd.to_ascii_uppercase()
-    match upper {
-      'M' | 'L' | 'C' | 'S' | 'Q' | 'T' => {
-        // every argument is a coordinate pair; the first moveto is absolute
-        // per the SVG spec even when written as `m`
-        let rel = seg.cmd.is_ascii_lowercase() && !first
-        let n = args.length()
-        let out_args : Array[Double] = []
-        let mut i = 0
-        while i < n {
-          let (x, y) = if rel {
-            rel_pt(args[i], args[i + 1])
-          } else {
-            abs_pt(args[i], args[i + 1])
-          }
-          out_args.push(x)
-          out_args.push(y)
-          i += 2
-        }
-        if rel {
-          cx = cx + out_args[n - 2]
-          cy = cy + out_args[n - 1]
-          ocx = ocx + args[n - 2]
-          ocy = ocy + args[n - 1]
-        } else {
-          cx = out_args[n - 2]
-          cy = out_args[n - 1]
-          ocx = args[n - 2]
-          ocy = args[n - 1]
-        }
-        if upper == 'M' {
-          sx = cx
-          sy = cy
-          osx = ocx
-          osy = ocy
-        }
-        out.push({ cmd: if rel { seg.cmd } else { upper }, args: out_args, })
-      }
-      'H' if seg.cmd == 'H' => {
-        let (x, y) = abs_pt(args[0], ocy)
-        cx = x
-        cy = y
-        ocx = args[0]
-        out.push({ cmd: 'L', args: [x, y], })
-      }
-      'H' => {
-        let (dx, dy) = rel_pt(args[0], 0.0)
-        cx = cx + dx
-        cy = cy + dy
-        ocx = ocx + args[0]
-        out.push({ cmd: 'l', args: [dx, dy], })
-      }
-      'V' if seg.cmd == 'V' => {
-        let (x, y) = abs_pt(ocx, args[0])
-        cx = x
-        cy = y
-        ocy = args[0]
-        out.push({ cmd: 'L', args: [x, y], })
-      }
-      'V' => {
-        let (dx, dy) = rel_pt(0.0, args[0])
-        cx = cx + dx
-        cy = cy + dy
-        ocy = ocy + args[0]
-        out.push({ cmd: 'l', args: [dx, dy], })
-      }
-      'A' if seg.cmd == 'A' => {
-        let na = transform_arc(ocx, ocy, args, m, true)
-        cx = na[5]
-        cy = na[6]
-        ocx = args[5]
-        ocy = args[6]
-        out.push({ cmd: 'A', args: na, })
-      }
-      'A' => {
-        let na = transform_arc(0.0, 0.0, args, m, false)
-        cx = cx + na[5]
-        cy = cy + na[6]
-        ocx = ocx + args[5]
-        ocy = ocy + args[6]
-        out.push({ cmd: 'a', args: na, })
-      }
-      'Z' => {
-        cx = sx
-        cy = sy
-        ocx = osx
-        ocy = osy
-        out.push({ cmd: seg.cmd, args: [], })
-      }
-      _ => out.push(seg)
-    }
-    first = false
-  }
-  out
-}
-
-///|
-/// Transform an elliptical arc's parameters (rx, ry, x-axis-rotation,
-/// large-arc-flag, sweep-flag, x, y) by an affine matrix. The radii are
-/// scaled, the rotation is adjusted (and normalized to |rot| ≤ 80 by swapping
-/// rx/ry), and the sweep flag is flipped when the determinant is negative.
-/// The endpoint (x, y) is transformed by the full matrix when `absolute` is
-/// true, or by the linear part only when false. Mirrors svgo's `transformArc`.
-fn transform_arc(
-  cursor_x : Double,
-  cursor_y : Double,
-  arc : Array[Double],
-  m : Array[Double],
-  absolute : Bool,
-) -> Array[Double] {
-  let a = m[0]
-  let b = m[1]
-  let c = m[2]
-  let d = m[3]
-  let e = m[4]
-  let f = m[5]
-  let x = arc[5] - cursor_x
-  let y = arc[6] - cursor_y
-  let mut rx = arc[0]
-  let mut ry = arc[1]
-  let rot = arc[2] * @math.PI / 180.0
-  let cos = cos(rot)
-  let sin = sin(rot)
-  if rx > 0.0 && ry > 0.0 {
-    let mut h = (x * cos + y * sin) * (x * cos + y * sin) / (4.0 * rx * rx) +
-      (y * cos - x * sin) * (y * cos - x * sin) / (4.0 * ry * ry)
-    if h > 1.0 {
-      h = h.sqrt()
-      rx = rx * h
-      ry = ry * h
-    }
-  }
-  // ellipse matrix [rx*cos, rx*sin, -ry*sin, ry*cos, 0, 0]
-  let e0 = rx * cos
-  let e1 = rx * sin
-  let e2 = -ry * sin
-  let e3 = ry * cos
-  // multiply m * ellipse
-  let m0 = a * e0 + c * e1
-  let m1 = b * e0 + d * e1
-  let m2 = a * e2 + c * e3
-  let m3 = b * e2 + d * e3
-  let last_col = m2 * m2 + m3 * m3
-  let square_sum = m0 * m0 + m1 * m1 + last_col
-  let root = @math.hypot(m0 - m3, m1 + m2) * @math.hypot(m0 + m3, m1 - m2)
-  let (nrx0, nry0, nrot0) = if root == 0.0 {
-    let r = (square_sum / 2.0).sqrt()
-    (r, r, 0.0)
-  } else {
-    let major_sqr = (square_sum + root) / 2.0
-    let minor_sqr = (square_sum - root) / 2.0
-    let major = (major_sqr - last_col).abs() > 0.000001
-    let sub = (if major { major_sqr } else { minor_sqr }) - last_col
-    let rows_sum = m0 * m2 + m1 * m3
-    let term1 = m0 * sub + m2 * rows_sum
-    let term2 = m1 * sub + m3 * rows_sum
-    let nrx = major_sqr.sqrt()
-    let nry = minor_sqr.sqrt()
-    let value = if major { term1 } else { term2 }
-    let sign = if major { term2 < 0.0 } else { term1 > 0.0 }
-    let angle = (if sign { -1.0 } else { 1.0 }) *
-      acos(value / @math.hypot(term1, term2)) *
-      180.0 /
-      @math.PI
-    (nrx, nry, angle)
-  }
-  let mut nrx = nrx0
-  let mut nry = nry0
-  let mut nrot = nrot0
-  // reduce the rotation angle to [-80, 80] by swapping the radii and
-  // shifting the angle by 90°; an ellipse is invariant under this.
-  if nrot.abs() > 80.0 {
-    let tmp = nrx
-    nrx = nry
-    nry = tmp
-    nrot = nrot + (if nrot > 0.0 { -90.0 } else { 90.0 })
-  }
-  let mut sweep = arc[4]
-  if (a < 0.0) != (d < 0.0) {
-    sweep = 1.0 - sweep
-  }
-  // transform the endpoint
-  let nx = a * arc[5] + c * arc[6] + (if absolute { e } else { 0.0 })
-  let ny = b * arc[5] + d * arc[6] + (if absolute { f } else { 0.0 })
-  [nrx, nry, nrot, arc[3], sweep, nx, ny]
 }
 
 ///|

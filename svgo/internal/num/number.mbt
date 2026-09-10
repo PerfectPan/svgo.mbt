@@ -15,6 +15,14 @@ let pow10_i64 : Array[Int64] = [
 ]
 
 ///|
+/// Error raised by the number scanner when a token is not a valid number;
+/// callers (parse_number, path's parse_into) translate it into their own
+/// error type.
+pub suberror NumError {
+  NumError(String)
+} derive(Debug)
+
+///|
 /// `10^-precision` as svgo computes it (`+Math.pow(.1, precision).toFixed(precision)`),
 /// i.e. the correctly rounded value. A single division gives exactly that;
 /// `pow` does not for precision 4 and 5.
@@ -82,10 +90,10 @@ pub fn strong_round(v : Double, precision : Int) -> Double {
 /// it. Numbers with at most 15 significant digits are decoded exactly with
 /// integer arithmetic and one correctly rounded division; longer ones fall
 /// back to the general parser.
-fn scan_number(
+pub fn scan_number(
   cu : ArrayView[UInt16],
   i : Int,
-) -> (Double, Int) raise PathError {
+) -> (Double, Int) raise NumError {
   let n = cu.length()
   let start = i
   let mut j = i
@@ -131,7 +139,7 @@ fn scan_number(
       digits += 1
     }
   }
-  guard digits > 0 else { raise PathError("expected number at \{start}") }
+  guard digits > 0 else { raise NumError("expected number at \{start}") }
   if j < n && (cu[j] == 101 || cu[j] == 69) {
     let mut k = j + 1
     let mut eneg = false
@@ -176,13 +184,13 @@ fn slow_path(
   cu : ArrayView[UInt16],
   start : Int,
   end : Int,
-) -> Double raise PathError {
+) -> Double raise NumError {
   let text = String::from_iter(
     cu[start:end].iter().map(u => u.to_int().unsafe_to_char()),
   )
   match parse_double_slow(text) {
     Some(v) => v
-    None => raise PathError("bad number '\{text}'")
+    None => raise NumError("bad number '\{text}'")
   }
 }
 
@@ -190,7 +198,7 @@ fn slow_path(
 /// Decompose `v` rounded to `precision` places into sign, integer part and
 /// fraction digits (`frac` scaled by 10^frac_len, trailing zeros removed).
 /// Returns (neg, int_part, frac, frac_len); (false, 0, 0, 0) for 0, NaN, inf.
-fn decompose(v : Double, precision : Int) -> (Bool, Int64, Int64, Int) {
+pub fn decompose(v : Double, precision : Int) -> (Bool, Int64, Int64, Int) {
   if v.is_nan() || v.is_inf() {
     return (false, 0, 0, 0)
   }
@@ -260,7 +268,11 @@ fn write_digits(sb : StringBuilder, v : Int64) -> Unit {
 
 ///|
 /// Write the number and return its shape (see `number_shape`) in one pass.
-fn write_number_shaped(sb : StringBuilder, v : Double, precision : Int) -> Int {
+pub fn write_number_shaped(
+  sb : StringBuilder,
+  v : Double,
+  precision : Int,
+) -> Int {
   let (neg, int_part, frac, frac_len) = decompose(v, precision)
   if int_part == 0 && frac == 0 {
     sb.write_char('0')
@@ -340,7 +352,7 @@ fn write_number_shaped(sb : StringBuilder, v : Double, precision : Int) -> Int {
 /// output without building strings: bits 0..1 flags, bit 2.. length.
 /// flag 1: starts with '-', flag 2: starts with '.', (a '.' is present iff
 /// bit 2 is set or the number starts with '.').
-fn number_shape(v : Double, precision : Int) -> Int {
+pub fn number_shape(v : Double, precision : Int) -> Int {
   let (neg, int_part, frac, frac_len) = decompose(v, precision)
   if int_part == 0 && frac == 0 {
     return 1 << 3
@@ -380,38 +392,4 @@ fn number_shape(v : Double, precision : Int) -> Int {
     flags = flags | 4
   }
   (len << 3) | flags
-}
-
-///|
-/// Length of `stringify([seg])`: the command letter plus its arguments with
-/// the same separator rules as `stringify`.
-pub fn segment_len(seg : Segment, precision : Int) -> Int {
-  let mut len = 1
-  let is_arc = seg.cmd == 'a' || seg.cmd == 'A'
-  let mut prev_has_dot = false
-  let mut prev_was_flag = false
-  let mut first = true
-  for k, a in seg.args {
-    let is_flag = is_arc && (k == 3 || k == 4)
-    if is_flag {
-      if !first {
-        len += 1
-      }
-      len += 1
-      prev_has_dot = false
-      prev_was_flag = true
-    } else {
-      let shape = number_shape(a, precision)
-      let starts_neg = (shape & 1) != 0
-      let starts_dot = (shape & 2) != 0 && prev_has_dot && !prev_was_flag
-      if !first && !(starts_neg || starts_dot) {
-        len += 1
-      }
-      len += shape >> 3
-      prev_has_dot = (shape & 4) != 0
-      prev_was_flag = false
-    }
-    first = false
-  }
-  len
 }

@@ -1,7 +1,8 @@
 import {
   "PerfectPan/svgo/xml",
   "PerfectPan/svgo/path",
-  "PerfectPan/svgo/css",
+  "PerfectPan/svgo/internal/num",
+  "PerfectPan/svgo/internal/css",
   "moonbitlang/core/string",
   "moonbitlang/core/math",
 }

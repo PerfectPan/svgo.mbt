@@ -14,7 +14,7 @@ pub impl Show for ParseError with fn output(self, logger) {
 
 ///|
 /// Elements whose text content is significant and must be kept verbatim.
-pub let text_elements : Array[String] = [
+let text_elements : Array[String] = [
   "text", "tspan", "textPath", "tref", "style", "script", "title", "desc", "pre",
 ]
 
@@ -281,7 +281,7 @@ fn Parser::parse_element(self : Parser) -> Element raise ParseError {
 ///|
 /// Decode the predefined entities and numeric character references.
 /// Unknown entities are kept verbatim.
-pub fn decode_entities(s : String) -> String {
+fn decode_entities(s : String) -> String {
   if !s.contains("&") {
     return s
   }

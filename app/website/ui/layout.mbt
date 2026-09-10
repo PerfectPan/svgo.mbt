@@ -128,10 +128,18 @@ pub fn top_nav(
 }
 
 ///|
-/// Page header used by the API page: eyebrow, display title and a
-/// one-paragraph blurb, entering with the same stagger as the hero.
-pub fn page_head(eyebrow : String, title : Array[Html], blurb : String) -> Html {
-  header(class="wrap pb-8 pt-14", [
+/// Page header shared by the API and playground pages: eyebrow, display title
+/// and a one-paragraph blurb, entering with the same stagger as the hero. The
+/// top padding matches the hero so every page starts at the same height.
+/// `inline=true` drops the `.wrap` for callers that place it inside their own
+/// column.
+pub fn page_head(
+  eyebrow : String,
+  title : Array[Html],
+  blurb : String,
+  inline? : Bool = false,
+) -> Html {
+  header(class=if inline { "pb-8 pt-14" } else { "wrap pb-8 pt-14" }, [
     div(class="eyebrow rise", [span(class="dot", nothing), text(" " + eyebrow)]),
     h1(
       class="display rise mt-3 text-[clamp(34px,4.4vw,52px)] leading-[1.05]",
@@ -163,9 +171,9 @@ pub fn page_footer() -> Html {
             ),
           ],
           [
-            text("svgo.mbt · MIT · 插件行为和 "),
+            text("svgo.mbt · MIT · 插件行为与 "),
             a(class="text-ink-2", href="https://github.com/svg/svgo", "svgo"),
-            text(" 一致（MIT）· 这个站也是 MoonBit 写的，用的 "),
+            text(" 一致（MIT）· 本站同样以 MoonBit 编写，基于 "),
             a(
               class="text-ink-2",
               href="https://github.com/moonbit-community/rabbita",

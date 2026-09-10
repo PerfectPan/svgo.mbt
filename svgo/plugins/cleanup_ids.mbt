@@ -1,6 +1,6 @@
 ///|
 /// Remove unused ids and minify referenced ids, preserving dynamic documents.
-pub let cleanup_ids : Plugin = {
+let cleanup_ids : Plugin = {
   name: "cleanupIds",
   description: "remove unused ids and minify referenced ids",
   run: cleanup_ids_run,

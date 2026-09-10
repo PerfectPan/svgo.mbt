@@ -1,6 +1,6 @@
 import {
   "PerfectPan/svgo",
-  "PerfectPan/svgo/path",
+  "PerfectPan/svgo/internal/num",
 }
 
 pkgtype(kind: "foreign_library")

@@ -140,7 +140,7 @@ fn Reader::next(self : Reader) -> String raise WireError {
 
 ///|
 fn int_of(t : String) -> Int raise WireError {
-  match @path.parse_number(t) {
+  match @num.parse_number(t) {
     Some(v) => v.to_int()
     None => raise WireError("expected a number, got '\{t}'")
   }
@@ -179,7 +179,7 @@ fn Reader::read_value(self : Reader) -> Json raise WireError {
 
 ///|
 fn double_of(t : String) -> Double raise WireError {
-  match @path.parse_number(t) {
+  match @num.parse_number(t) {
     Some(v) => v
     None => raise WireError("expected a number, got '\{t}'")
   }

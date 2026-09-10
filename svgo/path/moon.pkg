@@ -1,11 +1,5 @@
 import {
+  "PerfectPan/svgo/internal/num",
   "moonbitlang/core/string",
   "moonbitlang/core/math",
 }
-
-options(
-  targets: {
-    "host_wasm.mbt": [ "wasm-gc" ],
-    "host_default.mbt": [ "not", "wasm-gc" ],
-  },
-)

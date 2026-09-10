@@ -22,13 +22,13 @@ test "parse expands implicit repetition and arc flags" {
 
 ///|
 test "number formatting" {
-  inspect(@path.format_number(0.5, 3), content=".5")
-  inspect(@path.format_number(-0.5, 3), content="-.5")
-  inspect(@path.format_number(10.0, 3), content="10")
-  inspect(@path.format_number(1.23456, 3), content="1.235")
-  inspect(@path.format_number(1.0004, 3), content="1")
-  inspect(@path.format_number(-0.0004, 3), content="0")
-  inspect(@path.format_number(100.10, 2), content="100.1")
+  inspect(@num.format_number(0.5, 3), content=".5")
+  inspect(@num.format_number(-0.5, 3), content="-.5")
+  inspect(@num.format_number(10.0, 3), content="10")
+  inspect(@num.format_number(1.23456, 3), content="1.235")
+  inspect(@num.format_number(1.0004, 3), content="1")
+  inspect(@num.format_number(-0.0004, 3), content="0")
+  inspect(@num.format_number(100.10, 2), content="100.1")
 }
 
 ///|
@@ -181,31 +181,31 @@ test "numbers beyond the exact fast path keep their sign" {
 ///|
 test "parse_number accepts exactly one number" {
   debug_inspect(
-    @path.parse_number("1e+21"),
+    @num.parse_number("1e+21"),
     content=(
       #|Some(1e+21)
     ),
   )
   debug_inspect(
-    @path.parse_number("-.5"),
+    @num.parse_number("-.5"),
     content=(
       #|Some(-0.5)
     ),
   )
   debug_inspect(
-    @path.parse_number(" 1"),
+    @num.parse_number(" 1"),
     content=(
       #|None
     ),
   )
   debug_inspect(
-    @path.parse_number("1px"),
+    @num.parse_number("1px"),
     content=(
       #|None
     ),
   )
   debug_inspect(
-    @path.parse_number(""),
+    @num.parse_number(""),
     content=(
       #|None
     ),
@@ -214,8 +214,8 @@ test "parse_number accepts exactly one number" {
 
 ///|
 test "epsilon is the correctly rounded power of ten" {
-  inspect(@path.epsilon(3), content="0.001")
-  inspect(@path.epsilon(4), content="0.0001")
-  inspect(@path.epsilon(5), content="0.00001")
-  inspect(@path.epsilon(0), content="1")
+  inspect(@num.epsilon(3), content="0.001")
+  inspect(@num.epsilon(4), content="0.0001")
+  inspect(@num.epsilon(5), content="0.00001")
+  inspect(@num.epsilon(0), content="1")
 }

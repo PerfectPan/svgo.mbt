@@ -91,7 +91,7 @@ fn remove_attrs(e : @xml.Element, pred : (String, String) -> Bool) -> Bool {
 
 ///|
 /// Split a numeric attribute value into number and unit ("12.5px" -> (12.5, "px")).
-pub fn split_unit(s : String) -> (Double, String)? {
+fn split_unit(s : String) -> (Double, String)? {
   let t = s.trim()
   let mut end = t.length()
   while end > 0 &&
@@ -104,13 +104,13 @@ pub fn split_unit(s : String) -> (Double, String)? {
   if end == 0 {
     return None
   }
-  guard @path.parse_number(t[:end].to_owned()) is Some(v) else { return None }
+  guard @num.parse_number(t[:end].to_owned()) is Some(v) else { return None }
   Some((v, t[end:].to_owned()))
 }
 
 ///|
 /// Elements that are containers for other content.
-pub let container_elements : Set[String] = Set([
+let container_elements : Set[String] = Set([
   "a", "defs", "foreignObject", "g", "marker", "mask", "missing-glyph", "pattern",
   "svg", "switch", "symbol", "text", "textPath", "tspan",
 ])
@@ -118,7 +118,7 @@ pub let container_elements : Set[String] = Set([
 ///|
 /// Attributes whose value may reference an element: `url(#id)` in paint
 /// servers and effects, `#id` in links, `id.event` in animation timing.
-pub let reference_attrs : Set[String] = Set([
+let reference_attrs : Set[String] = Set([
   "fill", "stroke", "filter", "clip-path", "mask", "marker", "marker-start", "marker-mid",
   "marker-end", "cursor", "color-profile", "begin", "end", "style",
 ])
@@ -126,7 +126,7 @@ pub let reference_attrs : Set[String] = Set([
 ///|
 /// Collect every id referenced anywhere in the document: `href="#id"`,
 /// `url(#id)` in attributes and `<style>` text, and `begin="id.click"`.
-pub fn referenced_ids(doc : @xml.Document) -> Set[String] {
+fn referenced_ids(doc : @xml.Document) -> Set[String] {
   let ids : Set[String] = Set([])
   doc.each_element((e, _) => {
     for k, v in e.attrs {

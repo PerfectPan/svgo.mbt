@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "PerfectPan/svgo/css"
+package "PerfectPan/svgo/internal/css"
 
 import {
   "PerfectPan/svgo/xml",

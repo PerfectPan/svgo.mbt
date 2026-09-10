@@ -93,7 +93,7 @@ fn ancestors_define(chain : Array[@xml.Element], attr : String) -> Bool {
 ///|
 /// Remove unknown elements and attributes, and attributes whose value equals
 /// the element's default (when no ancestor overrides it).
-pub let remove_unknowns_and_defaults : Plugin = {
+let remove_unknowns_and_defaults : Plugin = {
   name: "removeUnknownsAndDefaults",
   description: "remove unknown elements/attributes and default attribute values",
   run: (doc, ctx) => {
@@ -261,13 +261,13 @@ pub let remove_unknowns_and_defaults : Plugin = {
             match e.attrs.get(k) {
               Some(v) =>
                 match split_unit(v) {
-                  Some((n, _)) if @path.round_to(n, ctx.precision) == 0.0 => {
+                  Some((n, _)) if @num.round_to(n, ctx.precision) == 0.0 => {
                     // rx/ry default to each other on <rect>
                     if (k == "rx" || k == "ry") && e.name == "rect" {
                       let other = if k == "rx" { "ry" } else { "rx" }
                       match e.attrs.get(other) {
                         Some(o) if !(split_unit(o) is Some((on, _)) &&
-                          @path.round_to(on, ctx.precision) == 0.0) => continue
+                          @num.round_to(on, ctx.precision) == 0.0) => continue
                         _ => ()
                       }
                     }
@@ -312,7 +312,7 @@ fn remove_standalone_no(v : String) -> String {
 
 ///|
 /// Drop stroke-* attributes when there is no stroke and fill-* when fill is none.
-pub let remove_useless_stroke_and_fill : Plugin = {
+let remove_useless_stroke_and_fill : Plugin = {
   name: "removeUselessStrokeAndFill",
   description: "remove useless stroke and fill attributes",
   run: (doc, ctx) => {
@@ -523,7 +523,7 @@ fn has_filter(e : @xml.Element) -> Bool {
 ///|
 /// Unwrap groups that carry nothing, and move attributes of single-child
 /// groups onto the child.
-pub let collapse_groups : Plugin = {
+let collapse_groups : Plugin = {
   name: "collapseGroups",
   description: "collapse useless groups",
   run: (doc, _) => {
@@ -628,13 +628,13 @@ pub let collapse_groups : Plugin = {
 
 ///|
 /// Convert basic shapes into paths when the path is not longer.
-pub let convert_shape_to_path : Plugin = {
+let convert_shape_to_path : Plugin = {
   name: "convertShapeToPath",
   description: "convert rect, line, polyline and polygon to path",
   run: (doc, ctx) => {
     let mut changed = false
     let p = ctx.param_int("floatPrecision", ctx.precision)
-    let num = fn(v : Double) -> String { @path.format_number(v, p) }
+    let num = fn(v : Double) -> String { @num.format_number(v, p) }
     doc.each_element((e, _) => {
       let d : String? = match e.name {
         "rect" if !e.attrs.contains("rx") && !e.attrs.contains("ry") => {
@@ -853,7 +853,7 @@ fn attr_is_plain(e : @xml.Element, name : String) -> Bool {
 
 ///|
 /// `<ellipse>` with `rx == ry` (or one radius `auto`) is a `<circle>`.
-pub let convert_ellipse_to_circle : Plugin = {
+let convert_ellipse_to_circle : Plugin = {
   name: "convertEllipseToCircle",
   description: "convert ellipses with equal radii to circles",
   run: (doc, _) => {
@@ -884,7 +884,7 @@ pub let convert_ellipse_to_circle : Plugin = {
 
 ///|
 /// Optimize the `d` attribute of every path.
-pub let convert_path_data : Plugin = {
+let convert_path_data : Plugin = {
   name: "convertPathData",
   description: "optimize path data",
   run: (doc, ctx) => {
@@ -1262,7 +1262,7 @@ fn scale_numbers(s : String, scale : Double, precision : Int) -> String {
       let num_str = s[start:i].to_owned()
       match split_unit(num_str) {
         Some((v, _)) =>
-          sb.write_string(@path.format_number(v * scale, precision))
+          sb.write_string(@num.format_number(v * scale, precision))
         None => sb.write_string(num_str)
       }
     } else {
@@ -1329,7 +1329,7 @@ fn collect_style_props(
 ///|
 /// Merge adjacent paths with identical attributes when their bounding boxes
 /// do not overlap, so fill rules cannot interact.
-pub let merge_paths : Plugin = {
+let merge_paths : Plugin = {
   name: "mergePaths",
   description: "merge adjacent non-overlapping paths with the same attributes",
   run: (doc, ctx) => {
@@ -1606,7 +1606,7 @@ fn mergeable(
     return false
   }
   // paths must not intersect so fill rules cannot interact
-  !hulls_intersect(a_hulls, path_hulls(ctx, db), @path.epsilon(ctx.precision))
+  !hulls_intersect(a_hulls, path_hulls(ctx, db), @num.epsilon(ctx.precision))
 }
 
 ///|
@@ -1903,10 +1903,10 @@ fn arc_to_curves(
   let res : Array[Array[Double]] = []
 
   fn rotate_x(x : Double, y : Double, r : Double) -> Double {
-    x * @path.cos(r) - y * @path.sin(r)
+    x * @num.cos(r) - y * @num.sin(r)
   }
   fn rotate_y(x : Double, y : Double, r : Double) -> Double {
-    x * @path.sin(r) + y * @path.cos(r)
+    x * @num.sin(r) + y * @num.cos(r)
   }
 
   let mut x1 = x1
@@ -1945,8 +1945,8 @@ fn arc_to_curves(
     .sqrt()
   cx = k * rx * y / ry + (x1 + x2) / 2.0
   cy = k * -ry * x / rx + (y1 + y2) / 2.0
-  f1 = @path.asin((y1 - cy) / ry)
-  f2 = @path.asin((y2 - cy) / ry)
+  f1 = @num.asin((y1 - cy) / ry)
+  f2 = @num.asin((y2 - cy) / ry)
   f1 = if x1 < cx { pi - f1 } else { f1 }
   f2 = if x2 < cx { pi - f2 } else { f2 }
   if f1 < 0.0 {
@@ -1967,19 +1967,19 @@ fn arc_to_curves(
     let x2old = x2
     let y2old = y2
     f2 = f1 + _120 * (if sweep == 1.0 && f2 > f1 { 1.0 } else { -1.0 })
-    x2 = cx + rx * @path.cos(f2)
-    y2 = cy + ry * @path.sin(f2)
+    x2 = cx + rx * @num.cos(f2)
+    y2 = cy + ry * @num.sin(f2)
     let sub = arc_to_curves(x2, y2, rx, ry, angle, 0.0, sweep, x2old, y2old)
     for s in sub {
       res.push(s)
     }
   }
   df = f2 - f1
-  let c1 = @path.cos(f1)
-  let s1 = @path.sin(f1)
-  let c2 = @path.cos(f2)
-  let s2 = @path.sin(f2)
-  let t = @path.tan(df / 4.0)
+  let c1 = @num.cos(f1)
+  let s1 = @num.sin(f1)
+  let c2 = @num.cos(f2)
+  let s2 = @num.sin(f2)
+  let t = @num.tan(df / 4.0)
   let hx = 4.0 / 3.0 * rx * t
   let hy = 4.0 / 3.0 * ry * t
   let m = [
@@ -2261,7 +2261,7 @@ fn hull_bbox(hull : Array[Pt]) -> (Double, Double, Double, Double) {
 ///|
 /// Drop `width`/`height` when a viewBox exists; otherwise, if both are
 /// unitless numbers, derive `viewBox="0 0 w h"` from them and drop them.
-pub let remove_dimensions : Plugin = {
+let remove_dimensions : Plugin = {
   name: "removeDimensions",
   description: "remove width/height from the root when viewBox is present",
   run: (doc, _) => {
@@ -2297,7 +2297,7 @@ pub let remove_dimensions : Plugin = {
 
 ///|
 /// Drop `<title>` (optional: titles are accessible names, keep them for UI icons).
-pub let remove_title : Plugin = {
+let remove_title : Plugin = {
   name: "removeTitle",
   description: "remove <title>",
   run: (doc, _) => remove_elements(doc, (e, _) => e.name == "title"),
@@ -2317,7 +2317,7 @@ fn inherited_attr(chain : Array[@xml.Element], key : String) -> String? {
 /// Sort children of `<defs>` to improve compression: first by element name
 /// frequency (descending), then by name length (descending), then by name
 /// (descending). Non-element children keep their relative position.
-pub let sort_defs_children : Plugin = {
+let sort_defs_children : Plugin = {
   name: "sortDefsChildren",
   description: "sorts children of <defs> to improve compression",
   run: (doc, _) => {
@@ -2379,7 +2379,7 @@ pub let sort_defs_children : Plugin = {
 /// has no paint-server/url reference that would make the transform apply to
 /// the referenced resource as well. The group's transform is prepended to
 /// each child's existing transform.
-pub let move_group_attrs_to_elems : Plugin = {
+let move_group_attrs_to_elems : Plugin = {
   name: "moveGroupAttrsToElems",
   description: "moves some group attributes to the content elements",
   run: (doc, _) => {
@@ -2452,7 +2452,7 @@ pub let move_group_attrs_to_elems : Plugin = {
 /// attributes). `transform` is kept on children when the group has a
 /// `filter`, `clip-path` or `mask`, or when every child is a path (so
 /// `convertPathData` can fold the transform into the path data).
-pub let move_elems_attrs_to_group : Plugin = {
+let move_elems_attrs_to_group : Plugin = {
   name: "moveElemsAttrsToGroup",
   description: "Move common attributes of group children to the group",
   run: (doc, _) => {

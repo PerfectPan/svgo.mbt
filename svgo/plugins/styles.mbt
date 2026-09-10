@@ -3,7 +3,7 @@
 
 ///|
 /// Merge multiple `<style>` elements into one.
-pub let merge_styles : Plugin = {
+let merge_styles : Plugin = {
   name: "mergeStyles",
   description: "merge multiple style elements into one",
   run: (doc, _) => {
@@ -102,7 +102,7 @@ pub let merge_styles : Plugin = {
 
 ///|
 /// Inline styles from `<style>` elements into matching elements' `style` attributes.
-pub let inline_styles : Plugin = {
+let inline_styles : Plugin = {
   name: "inlineStyles",
   description: "inline styles from style elements into style attributes",
   run: (doc, ctx) => run_inline_styles(doc, ctx),
@@ -110,7 +110,7 @@ pub let inline_styles : Plugin = {
 
 ///|
 /// Minify styles in `<style>` elements and `style` attributes.
-pub let minify_styles : Plugin = {
+let minify_styles : Plugin = {
   name: "minifyStyles",
   description: "minify styles in style elements and style attributes",
   run: (doc, ctx) => run_minify_styles(doc, ctx),

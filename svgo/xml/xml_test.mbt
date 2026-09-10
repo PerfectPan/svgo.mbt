@@ -43,10 +43,20 @@ test "roundtrip a typical editor export" {
 
 ///|
 test "entities" {
-  inspect(
-    @xml.decode_entities("a &lt; b &amp;&amp; c &#65;&#x42; &unknown; &"),
-    content="a < b && c AB &unknown; &",
+  let doc = @xml.parse(
+    "<svg><text>a &lt; b &amp;&amp; c &#65;&#x42; &unknown; &amp;</text></svg>",
   )
+  let root = doc.root().unwrap()
+  let text_el = root.children[0]
+  let text = match text_el {
+    @xml.Node::Element(e) =>
+      match e.children[0] {
+        @xml.Node::Text(t) => t
+        _ => ""
+      }
+    _ => ""
+  }
+  inspect(text, content="a < b && c AB &unknown; &")
   let doc = @xml.parse("<svg><text>x &lt; y</text></svg>")
   inspect(doc.to_string(), content="<svg><text>x &lt; y</text></svg>")
 }

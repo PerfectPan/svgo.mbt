@@ -2,7 +2,7 @@
   "generated": "2026-09-09",
   "node": "v24.18.0",
   "svgoVersion": "4.1.0",
-  "wasmBytes": 200430,
+  "wasmBytes": 200607,
   "plugins": [
     {
       "name": "removeDoctype",

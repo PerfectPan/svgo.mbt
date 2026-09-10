@@ -20,9 +20,7 @@ impl @rabbita.Enumerate for Route with fn tag(self) {
 
 ///|
 /// Package short names that have an API page, in display order.
-pub let api_package_names : Array[String] = [
-  "svgo", "xml", "path", "plugins", "wasm",
-]
+pub let api_package_names : Array[String] = ["svgo", "xml", "path", "plugins"]
 
 ///|
 /// `/api`, `/api/xml`, `/api/xml/Element` → (package, member). Unknown

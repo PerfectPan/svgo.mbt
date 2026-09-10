@@ -122,7 +122,7 @@ pub fn list_plugins() -> Array[(String, String, Bool)] {
 
 ///|
 /// Number of bytes of the UTF-8 encoding of `s`, without encoding it.
-pub fn utf8_length(s : String) -> Int {
+fn utf8_length(s : String) -> Int {
   let mut n = 0
   for c in s.code_units() {
     let u = c.to_int()

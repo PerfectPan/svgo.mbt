@@ -6,21 +6,9 @@ import {
 }
 
 // Values
-pub fn acos(Double) -> Double
-
 pub fn apply_matrix(Array[Segment], Array[Double]) -> Array[Segment]
 
-pub fn asin(Double) -> Double
-
-pub fn atan(Double) -> Double
-
-pub fn cos(Double) -> Double
-
-pub fn epsilon(Int) -> Double
-
-pub fn format_number(Double, Int) -> String
-
-pub fn is_drawing_command(Char) -> Bool
+pub fn has_geometry(String) -> Bool
 
 pub fn optimize(Array[Segment], options? : Options) -> Array[Segment]
 
@@ -28,25 +16,7 @@ pub fn optimize_string(String, options? : Options) -> String raise PathError
 
 pub fn parse(String) -> Array[Segment] raise PathError
 
-pub fn parse_number(String) -> Double?
-
-pub fn parse_prefix(String, until_drawing? : Bool) -> Array[Segment]
-
-pub fn round_to(Double, Int) -> Double
-
-pub fn segment_len(Segment, Int) -> Int
-
-pub fn sin(Double) -> Double
-
 pub fn stringify(Array[Segment], precision? : Int) -> String
-
-pub fn strong_round(Double, Int) -> Double
-
-pub fn tan(Double) -> Double
-
-pub fn write_number(StringBuilder, Double, Int) -> Unit
-
-pub fn write_path(StringBuilder, Array[Segment], Int) -> Unit
 
 // Errors
 pub suberror PathError {

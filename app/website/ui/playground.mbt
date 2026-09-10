@@ -238,7 +238,7 @@ fn sidebar(m : PgModel, emit : Emit[PgMsg]) -> Html {
         checked=m.enabled.contains(name),
         on_change=emit.map(_ => Toggle(name)),
       ),
-      span([code(name), small(desc)]),
+      span([code(name), small(plugin_description(name, desc, lang.val))]),
     ])
   })
   aside(class="rise card min-h-0 overflow-auto", style=["--d: 80ms"], [

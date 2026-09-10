@@ -81,8 +81,9 @@ and the eyebrow.
 
 Tokens in `style.css` `@theme`, dark palette under `[data-theme="dark"]`. Use tokens only:
 `ink` primary text, `ink-2` secondary, `muted` hints and footnotes, `line` / `line-2` borders,
-`surface` / `surface-2` cards and inputs, `bg` / `bg-2` page bands, `accent` (emerald) for the
-current item, links on hover and "changed" markers, `mint` for wins in tables, `warn` for
+`surface` / `surface-2` cards and inputs, `bg` / `bg-2` page bands, `ink-hover` and `line-3` for
+button hover states (buttons stay in their own colour on hover; accent is a state colour, not a
+hover colour), `accent` (emerald) for the current item, links on hover and "changed" markers, `mint` for wins in tables, `warn` for
 losses, `grad` (accent → teal) for the hero highlight and the primary bar. Code cards are
 always dark (`code`, `code-fg`).
 

@@ -46,7 +46,7 @@ parsed, with the failing names on stderr.
 In a browser the module is fetched relative to the loader; pass your own URL
 to `init(url)` before the first `optimize` call if you host it elsewhere.
 
-Requires WebAssembly GC and JS String Builtins (V8 13.6): Node 24+, Chrome 130+,
+Requires WebAssembly GC and JS String Builtins: Node 24+, Bun 1.4+, Chrome 130+,
 Firefox 134+, Safari 18.4+.
 
 Same-process timings against svgo 4.1 (ms per call, both multipass): a Sketch

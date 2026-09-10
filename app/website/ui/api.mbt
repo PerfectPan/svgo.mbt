@@ -45,7 +45,7 @@ fn api_member(pkg : ApiPackage, it : ApiItem) -> Html {
   let methods = it.methods.map(m => {
     div([
       h4(id=anchor(pkg, it.name + "::" + m.name), m.name),
-      pre(m.signature),
+      pre(highlight_mbt(m.signature)),
       doc_html(m.doc),
     ])
   })
@@ -68,7 +68,7 @@ fn api_member(pkg : ApiPackage, it : ApiItem) -> Html {
         )
       },
     ]),
-    pre(it.signature),
+    pre(highlight_mbt(it.signature)),
     doc_html(it.doc),
     if methods.is_empty() && impls.is_empty() {
       nothing
@@ -127,14 +127,11 @@ pub fn api_page(chrome : Chrome) -> Val[Html] {
     div(class="pt-[60px]", [
       top_nav(Api, "API", p, chrome.emit),
       page_head(
-        t("API reference · from moon doc", "API 文档 · 来自 moon doc"),
-        tm([text("Plain structs, "), span(class="grad", "no globals.")], [
-          text("都是普通结构体，"),
-          span(class="grad", "没有全局变量。"),
-        ]),
+        "PerfectPan/svgo",
+        [text(t("API reference", "API 文档"))],
         t(
-          "The public API of PerfectPan/svgo and its packages, pulled from the doc comments in the source. Same text you see on mooncakes.io, and every item links to the file that defines it.",
-          "PerfectPan/svgo 及其子包的公开接口，都是从源码里的文档注释提出来的，和 mooncakes.io 上看到的是同一份。每一项都能点进定义它的源文件。",
+          "The public API of PerfectPan/svgo and its packages, pulled from the doc comments in the source. Same text you see on mooncakes.io.",
+          "PerfectPan/svgo 及其子包的公开接口，从源码里的文档注释提取，和 mooncakes.io 上看到的是同一份。",
         ),
       ),
       div(

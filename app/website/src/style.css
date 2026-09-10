@@ -158,6 +158,8 @@
   .hl-val { @apply text-hl-val; }
   .hl-cmt, .hl-pro { @apply italic text-hl-cmt; }
   .hl-p { @apply text-hl-p; }
+  .hl-kw { @apply text-hl-tag; }
+  .hl-type { @apply text-hl-attr; }
   .preview { @apply flex h-[150px] flex-none items-center justify-center overflow-hidden border-t border-line bg-checker bg-[length:14px_14px] p-2.5; }
   .preview svg { @apply block h-full w-auto max-h-full max-w-full; }
   .stats { @apply flex flex-wrap items-center gap-[22px] border-t border-line px-4 py-3.5 tabular-nums; }
@@ -217,6 +219,13 @@
   .use pre { @apply mt-auto bg-code px-[18px] py-4 text-[12.5px] leading-relaxed text-code-fg; }
   .use pre .c { @apply text-code-dim; }
   .use pre .k { @apply text-code-k; }
+  /* hl-* tokens inside the dark code card: use the dark-theme palette so
+     strings/types stay legible on the always-dark .use pre background. */
+  .use pre .hl-kw { color: #34d399; }
+  .use pre .hl-type { color: #fbbf24; }
+  .use pre .hl-val { color: #93c5fd; }
+  .use pre .hl-cmt { color: #6b7280; }
+  .use pre .hl-p { color: #8a92a3; }
 
   /* before/after gallery */
   .shot { @apply overflow-hidden rounded-card border border-line bg-surface; }

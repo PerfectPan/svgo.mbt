@@ -392,44 +392,23 @@ fn pg_view(m : PgModel, p : Prefs, chrome : Chrome, emit : Emit[PgMsg]) -> Html 
   div(class="pt-[60px]", [
     top_nav(Playground, t("playground", "在线体验"), p, chrome.emit),
     div(
-      class="pg mx-auto grid w-[min(1480px,calc(100%-32px))] grid-rows-[auto_minmax(0,1fr)] gap-4 pb-4 pt-6 min-[961px]:h-[calc(100dvh-60px)]",
+      class="wrap grid grid-rows-[auto_minmax(0,1fr)] gap-4 pb-4 pt-6 min-[961px]:h-[calc(100dvh-60px)]",
       [
-        div(
-          class="flex flex-wrap items-end justify-between gap-x-10 gap-y-2 px-1",
-          [
-            div([
-              div(class="eyebrow rise", [
-                span(class="dot", nothing),
-                text(
-                  " " +
-                  t(
-                    "Playground · runs in your browser", "在线体验 · 就在你浏览器里跑",
-                  ),
-                ),
-              ]),
-              h1(
-                class="display rise mt-1.5 text-[clamp(28px,3.2vw,38px)] leading-[1.08]",
-                style=["--d: 60ms"],
-                tm(
-                  [text("Try it on "), span(class="grad", "your own files.")],
-                  [
-                    text("用"),
-                    span(class="grad", "你自己的文件"),
-                    text("试试。"),
-                  ],
-                ),
-              ),
-            ]),
-            @html.p(
-              class="rise max-w-[56ch] text-[14px] leading-relaxed text-ink-2",
-              style=["--d: 120ms"],
-              t(
-                "Paste an SVG, open a file, or pick a sample — the output updates as you type. Nothing leaves this tab: the optimizer is MoonBit compiled to JavaScript. Share links put the input and options in the URL.",
-                "粘一段 SVG、打开一个文件，或者选个示例，输入一变输出就跟着变。所有东西都不出这个标签页：优化器是用 MoonBit 写、编译成 JavaScript 的。分享链接会把输入和选项都放进 URL 里。",
-              ),
+        div(class="px-1", [
+          h1(
+            class="display rise text-[clamp(28px,3.2vw,38px)] leading-[1.08]",
+            style=["--d: 60ms"],
+            t("Playground", "在线体验"),
+          ),
+          @html.p(
+            class="rise mt-3 max-w-[62ch] text-[14px] leading-relaxed text-ink-2",
+            style=["--d: 120ms"],
+            t(
+              "Paste an SVG, open a file, or pick a sample — the output updates as you type. Nothing leaves this tab: the optimizer is MoonBit compiled to JavaScript. Share links put the input and options in the URL.",
+              "粘一段 SVG、打开一个文件，或者选个示例，输入一变输出就跟着变。所有东西都不出这个标签页：优化器是用 MoonBit 写、编译成 JavaScript 的。分享链接会把输入和选项都放进 URL 里。",
             ),
-          ],
-        ),
+          ),
+        ]),
         div(
           class="grid min-h-0 gap-4 min-[961px]:grid-cols-[280px_minmax(0,1fr)]",
           [

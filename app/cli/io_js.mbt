@@ -116,3 +116,16 @@ fn svgo_list_dir(path : String) -> String {
 fn svgo_mkdir_p(path : String) -> Int {
   node_mkdir_p(path)
 }
+
+///|
+/// Command-line arguments without the runtime and script paths: on the js
+/// backend `@env.args()` is `process.argv`, whose first two entries are the
+/// runtime (node, bun, deno) and the script.
+fn svgo_args() -> Array[String] {
+  let raw = @env.args()
+  if raw.length() >= 2 {
+    raw[2:].to_owned()
+  } else {
+    []
+  }
+}

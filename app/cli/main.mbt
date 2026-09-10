@@ -54,12 +54,9 @@ struct CliConfig {
 
 ///|
 fn main {
-  // On the js backend `@env.args()` is `process.argv` = [node, script, ...args];
-  // on native it is [program, ...args]. Detect the js backend by the first arg
-  // being the node executable and skip both leading elements there.
-  let raw = @env.args()
-  let skip = if raw.length() > 0 && raw[0].contains("node") { 2 } else { 1 }
-  let args = raw[skip:].to_owned()
+  // svgo_args is per target (io_js.mbt / io_native.mbt): process.argv carries
+  // the runtime and the script on js, argv carries only the program on native.
+  let args = svgo_args()
   if args.contains("-h") || args.contains("--help") {
     println(USAGE)
     return

@@ -100,3 +100,14 @@ fn svgo_list_dir(path : String) -> String {
 fn svgo_mkdir_p(path : String) -> Int {
   c_svgo_mkdir_p(cstr(path))
 }
+
+///|
+/// Command-line arguments without the program path.
+fn svgo_args() -> Array[String] {
+  let raw = @env.args()
+  if raw.length() >= 1 {
+    raw[1:].to_owned()
+  } else {
+    []
+  }
+}

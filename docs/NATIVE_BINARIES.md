@@ -65,14 +65,14 @@ Asset naming:
 ```
 svgo-mbt-X.Y.Z-linux-x86_64.tar.gz
 svgo-mbt-X.Y.Z-linux-arm64.tar.gz
-svgo-mbt-X.Y.Z-macos-x86_64.tar.gz
 svgo-mbt-X.Y.Z-macos-arm64.tar.gz
-svgo-mbt-X.Y.Z-windows-x86_64.zip
 ```
 
-Each archive contains a single `svgo-mbt` executable (or `svgo-mbt.exe` on
-Windows). The binary is named `svgo-mbt` to avoid colliding with the original
-`svgo` CLI; the npm bin entry uses the same name.
+Each archive contains a single `svgo-mbt` executable. macOS x86_64 and Windows
+are not built (no runner in the matrix); build from source with
+`moon build --target native --release app/cli` there. The binary is named
+`svgo-mbt` to avoid colliding with the original `svgo` CLI; the npm bin entry
+uses the same name.
 
 ### Installer script
 

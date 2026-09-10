@@ -33,6 +33,19 @@ jobs:
           packages/compare/compare.sh
           node packages/compare/render-diff.mjs
           node packages/compare/wasm-speed.mjs
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Wasm fixture suite and CLI under Bun and Deno
+        run: |
+          scripts/build-cli.sh
+          bun test packages/svgo-mbt/fixtures.test.mjs
+          bun packages/svgo-mbt/cli.mjs svgo/testdata/sketch-icon.svg --stats > /dev/null
+          deno test -A packages/svgo-mbt/fixtures.test.mjs
+          deno run -A packages/svgo-mbt/cli.mjs svgo/testdata/sketch-icon.svg --stats > /dev/null
       - name: Website builds (Rabbita app, js backend)
         run: |
           moon install moonbit-community/warren

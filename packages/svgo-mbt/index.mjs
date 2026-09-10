@@ -1,5 +1,5 @@
-// Loader for the wasm-gc build of svgo.mbt. Works in Node >= 24 (V8 13.6, JS String
-// Builtins with imported string constants; Node 22 and 23 cannot load it) and in
+// Loader for the wasm-gc build of svgo.mbt. Works in Node >= 24, Bun >= 1.4 and Deno 2
+// (engines with JS String Builtins and imported string constants; Node 22/23 and Bun 1.2 cannot load it) and in
 // browsers with the JS String Builtins proposal (Chrome 130+, Firefox 134+,
 // Safari 18.4+).
 let instancePromise;

@@ -1,6 +1,64 @@
 ///|
+/// Element id of a member: `<pkg>-<Item>`, also the tail of its route
+/// `#/api/<pkg>/<Item>`.
 fn anchor(pkg : ApiPackage, name : String) -> String {
-  pkg.short[1:].to_owned() + "-" + name
+  short_name(pkg) + "-" + name
+}
+
+///|
+/// `@xml` → `xml`.
+fn short_name(pkg : ApiPackage) -> String {
+  pkg.short[1:].to_owned()
+}
+
+///|
+fn find_package(name : String) -> ApiPackage {
+  match api_packages.iter().find_first(p => short_name(p) == name) {
+    Some(p) => p
+    None => api_packages[0]
+  }
+}
+
+///|
+/// One sentence per package for the page head.
+fn package_blurb(name : String) -> String {
+  match name {
+    "xml" =>
+      t(
+        "Parse and serialize SVG documents. Plugins operate on this tree.", "解析与序列化 SVG 文档。插件在这棵树上工作。",
+      )
+    "path" =>
+      t(
+        "Path data: parse, optimize and print d attributes.", "路径数据：解析、优化并输出 d 属性。",
+      )
+    "wasm" =>
+      t(
+        "Exports of the wasm module: the length-prefixed token protocol behind @rivus/svgo.",
+        "wasm 模块的导出：@rivus/svgo 背后基于长度前缀 token 的调用协议。",
+      )
+    "plugins" =>
+      t(
+        "The 36 plugins, the preset order and the execution context.", "36 个插件、预设顺序与执行上下文。",
+      )
+    _ =>
+      t(
+        "Optimize an SVG document: Config, optimize, Result and the plugin list.",
+        "优化 SVG 文档：Config、optimize、Result 与插件列表。",
+      )
+  }
+}
+
+///|
+/// Member kinds in display order with their group titles.
+let kind_groups : Array[(String, (String, String))] = [
+  ("type", ("Types", "类型")),
+  ("fn", ("Functions", "函数")),
+  ("error", ("Errors", "错误")),
+]
+
+///|
+fn items_of_kind(pkg : ApiPackage, kind : String) -> Array[ApiItem] {
+  pkg.items.filter(it => it.kind == kind)
 }
 
 ///|
@@ -79,19 +137,50 @@ fn api_member(pkg : ApiPackage, it : ApiItem) -> Html {
 }
 
 ///|
-fn side_nav() -> Html {
-  let entries : Array[Html] = []
+/// Left column: every package, the current one expanded into its members
+/// grouped by kind. Member links carry `data-target` for the scrollspy.
+fn side_nav(current : ApiPackage) -> Html {
+  let blocks : Array[Html] = []
   for pkg in api_packages {
-    entries.push(h4(a(href="#/api#\{anchor(pkg, "pkg")}", pkg.short)))
-    for it in pkg.items {
-      entries.push(a(href="#/api#\{anchor(pkg, it.name)}", it.name))
+    let name = short_name(pkg)
+    let is_current = name == short_name(current)
+    blocks.push(
+      a(
+        class=if is_current { "api-pkg api-pkg-current" } else { "api-pkg" },
+        href="#/api/\{name}",
+        [
+          span(class="dot", nothing),
+          code(pkg.short),
+          span(class="count", pkg.items.length().to_string()),
+        ],
+      ),
+    )
+    if is_current {
+      for group in kind_groups {
+        let (kind, (en, zh)) = group
+        let items = items_of_kind(pkg, kind)
+        if items.is_empty() {
+          continue
+        }
+        blocks.push(h4(t(en, zh)))
+        for it in items {
+          blocks.push(
+            a(
+              href="#/api/\{name}/\{it.name}",
+              attrs=Attrs::build().data_set("target", anchor(pkg, it.name)),
+              it.name,
+            ),
+          )
+        }
+      }
     }
   }
   aside(
-    class="api-side text-[13px] min-[901px]:sticky min-[901px]:top-20 min-[901px]:max-h-[calc(100vh-100px)] min-[901px]:self-start min-[901px]:overflow-auto",
+    class="api-side text-[13px] min-[961px]:sticky min-[961px]:top-20 min-[961px]:max-h-[calc(100vh-100px)] min-[961px]:self-start min-[961px]:overflow-auto",
     [
+      ..blocks,
       p(
-        class="mb-1.5 text-xs text-muted",
+        class="mt-6 text-xs text-muted",
         tm(
           [
             text("Also on "),
@@ -103,37 +192,54 @@ fn side_nav() -> Html {
           ],
         ),
       ),
-      ..entries,
     ],
   )
 }
 
 ///|
-/// The API reference page.
-pub fn api_page(chrome : Chrome) -> Val[Html] {
+/// The API reference for one package.
+pub fn api_page(chrome : Chrome, name : String) -> Val[Html] {
   chrome.prefs.view(p => {
+    let pkg = find_package(name)
     let sections : Array[Html] = []
-    for pkg in api_packages {
-      sections.push(h2(id=anchor(pkg, "pkg"), class="display", pkg.path))
-      for it in pkg.items {
+    for group in kind_groups {
+      let (kind, (en, zh)) = group
+      let items = items_of_kind(pkg, kind)
+      if items.is_empty() {
+        continue
+      }
+      sections.push(h2(class="display", t(en, zh)))
+      for it in items {
         sections.push(api_member(pkg, it))
       }
     }
     div(class="pt-[60px]", [
-      top_nav(Api, "API", p, chrome.emit),
+      top_nav(Api(short_name(pkg)), "API", p, chrome.emit),
       page_head(
-        "PerfectPan/svgo",
-        [text(t("API reference", "API 文档"))],
-        t(
-          "Types, functions and options of PerfectPan/svgo and its packages: xml parsing, path data, plugins and the optimizer itself.",
-          "PerfectPan/svgo 及其子包的类型、函数与配置项：XML 解析、路径数据、插件，以及优化器本身。",
-        ),
+        t("API reference", "API 文档"),
+        [text(pkg.path)],
+        package_blurb(short_name(pkg)),
       ),
       div(
-        class="wrap grid gap-10 pb-20 pt-2 min-[901px]:grid-cols-[240px_1fr]",
-        [side_nav(), main_(class="api-main min-w-0", sections)],
+        class="wrap grid gap-10 pb-20 pt-2 min-[961px]:grid-cols-[240px_minmax(0,1fr)]",
+        [side_nav(pkg), main_(class="api-main min-w-0", sections)],
       ),
       page_footer(),
     ])
   })
+}
+
+///|
+test "api routes parse" {
+  assert_eq(parse_api_path("/api"), ("svgo", None))
+  assert_eq(parse_api_path("/api/xml"), ("xml", None))
+  assert_eq(parse_api_path("/api/path/Options"), ("path", Some("Options")))
+  assert_eq(parse_api_path("/api/nope/X"), ("svgo", Some("X")))
+}
+
+///|
+test "every package name has a page" {
+  for pkg in api_packages {
+    assert_true(api_package_names.contains(short_name(pkg)), msg=pkg.short)
+  }
 }

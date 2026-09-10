@@ -104,7 +104,7 @@ pub fn top_nav(
           t("Playground", "在线体验"),
           route == Playground,
         ),
-        nav_link("#/api", "API", route == Api),
+        nav_link("#/api", "API", route is Api(_)),
         a(
           href=REPO_URL,
           class="nav-link inline-flex items-center gap-1.5 max-sm:hidden",

@@ -1,10 +1,12 @@
 ///|
 /// Hash routes, so the site works from any static host (GitHub Pages
-/// included) without a rewrite rule: `#/`, `#/playground`, `#/api`.
+/// included) without a rewrite rule: `#/`, `#/playground`, `#/api/<pkg>`
+/// (one page per package: svgo, xml, path, plugins) and
+/// `#/api/<pkg>/<Item>` for a member anchor.
 pub(all) enum Route {
   Landing
   Playground
-  Api
+  Api(String)
 } derive(Eq)
 
 ///|
@@ -12,8 +14,31 @@ impl @rabbita.Enumerate for Route with fn tag(self) {
   match self {
     Landing => "landing"
     Playground => "playground"
-    Api => "api"
+    Api(pkg) => "api-" + pkg
   }
+}
+
+///|
+/// Package short names that have an API page, in display order.
+pub let api_package_names : Array[String] = [
+  "svgo", "xml", "path", "plugins", "wasm",
+]
+
+///|
+/// `/api`, `/api/xml`, `/api/xml/Element` → (package, member). Unknown
+/// packages fall back to `svgo`.
+pub fn parse_api_path(fragment : String) -> (String, String?) {
+  let rest = fragment["/api".length():]
+  let parts = rest
+    .split("/")
+    .map(s => s.to_owned())
+    .filter(s => !s.is_empty())
+    .to_array()
+  let pkg = match parts.get(0) {
+    Some(p) if api_package_names.contains(p) => p
+    _ => "svgo"
+  }
+  (pkg, parts.get(1))
 }
 
 ///|
@@ -58,7 +83,7 @@ fn route_of(url : @url.Url) -> Route {
       if f.has_prefix("/playground") {
         Playground
       } else if f.has_prefix("/api") {
-        Api
+        Api(parse_api_path(f).0)
       } else {
         Landing
       }
@@ -97,11 +122,26 @@ pub fn app() -> Val[Html] {
         UrlRequest(External(url)) => (m, @nav.load(url))
         UrlChanged(url) => {
           let route = route_of(url)
-          // same page, only the query changed (share links): keep the scroll
-          if route == m.route {
-            (m, none)
-          } else {
-            ({ ..m, route, }, @nav.scroll_to_top())
+          // an API member anchor scrolls to the member once it is rendered;
+          // otherwise a route change starts at the top and a query-only
+          // change (share links) keeps the scroll position
+          let target = match (route, url.fragment) {
+            (Api(pkg), Some(f)) =>
+              parse_api_path(f).1.map(item => "\{pkg}-\{item}")
+            _ => None
+          }
+          match target {
+            Some(id) =>
+              (
+                { ..m, route, },
+                @rabbita.effect(fn() noraise { scroll_to_id(id) }),
+              )
+            None =>
+              if route == m.route {
+                (m, none)
+              } else {
+                ({ ..m, route, }, @nav.scroll_to_top())
+              }
           }
         }
         Pref(SetLang(l)) => {
@@ -134,7 +174,7 @@ pub fn app() -> Val[Html] {
     match r {
       Landing => landing_page(chrome)
       Playground => playground_page(chrome)
-      Api => api_page(chrome)
+      Api(pkg) => api_page(chrome, pkg)
     }
   })
 }

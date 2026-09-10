@@ -333,7 +333,7 @@ fn plugins_section() -> Html {
         "plugin plugin-optional reveal stagger"
       },
       style=["--i: \{idx}"],
-      [code(name), p(desc)],
+      [code(name), p(plugin_description(name, desc, lang.val))],
     )
   })
   let count = @svgo.list_plugins().filter(it => it.2).length()

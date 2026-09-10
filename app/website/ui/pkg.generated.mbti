@@ -61,6 +61,8 @@ pub fn page_head(String, Array[@html.Html], String) -> @html.Html
 
 pub fn playground_page(Chrome) -> @rabbita.Val[@html.Html]
 
+pub fn plugin_description(String, String, Lang) -> String
+
 pub fn run_optimize(String, plugins? : Array[String], precision? : Int, multipass? : Bool, pretty? : Bool) -> Outcome
 
 pub let samples : Array[Sample]

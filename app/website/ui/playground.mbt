@@ -230,6 +230,7 @@ fn with_notice(
 ///|
 fn sidebar(m : PgModel, emit : Emit[PgMsg]) -> Html {
   let all = @svgo.list_plugins()
+  let applied = m.outcome.applied
   let plugin_rows = all.map(it => {
     let (name, desc, _) = it
     label(class="pl", [
@@ -238,69 +239,97 @@ fn sidebar(m : PgModel, emit : Emit[PgMsg]) -> Html {
         checked=m.enabled.contains(name),
         on_change=emit.map(_ => Toggle(name)),
       ),
-      span([code(name), small(plugin_description(name, desc, lang.val))]),
+      span([
+        code(name),
+        if applied.contains(name) {
+          span(
+            class="applied",
+            title=t("changed the output", "本次修改了输出"),
+            nothing,
+          )
+        } else {
+          nothing
+        },
+        small(plugin_description(name, desc, lang.val)),
+      ]),
     ])
   })
-  aside(class="rise card min-h-0 overflow-auto", style=["--d: 80ms"], [
-    div(class="side-head", [text(t("Options", "选项"))]),
-    label(class="opt", [
-      span([
-        text(t("precision", "精度")),
-        small(t("decimal places kept", "保留的小数位数")),
+  aside(
+    class="rise card flex min-h-0 flex-col overflow-hidden p-5",
+    style=["--d: 80ms"],
+    [
+      div(class="side-head", [text(t("Options", "选项"))]),
+      label(class="opt", [
+        span([
+          text(t("precision", "精度")),
+          small(t("decimal places kept", "保留的小数位数")),
+        ]),
+        input(
+          input_type=Number,
+          class="num",
+          value=m.precision.to_string(),
+          min=0,
+          max=8,
+          on_input=emit.map(v => SetPrecision(v)),
+        ),
       ]),
-      input(
-        input_type=Number,
-        class="num",
-        value=m.precision.to_string(),
-        min=0,
-        max=8,
-        on_input=emit.map(v => SetPrecision(v)),
-      ),
-    ]),
-    label(class="opt", [
-      span([
-        text("multipass"),
-        small(
-          t(
-            "repeat until the output is stable", "重复运行直至输出不再变化",
+      label(class="opt", [
+        span([
+          text("multipass"),
+          small(
+            t(
+              "repeat until the output is stable", "重复运行直至输出不再变化",
+            ),
           ),
+        ]),
+        input(
+          input_type=Checkbox,
+          class="switch",
+          checked=m.multipass,
+          on_change=emit.map(_ => ToggleMultipass),
         ),
       ]),
-      input(
-        input_type=Checkbox,
-        class="switch",
-        checked=m.multipass,
-        on_change=emit.map(_ => ToggleMultipass),
-      ),
-    ]),
-    label(class="opt", [
-      span([
-        text(t("pretty print", "格式化输出")),
-        small(t("indented output", "带缩进")),
-      ]),
-      input(
-        input_type=Checkbox,
-        class="switch",
-        checked=m.pretty,
-        on_change=emit.map(_ => TogglePretty),
-      ),
-    ]),
-    div(class="side-head mt-6", [
-      span(class="flex items-center gap-2", [
-        text(t("Plugins", "插件")),
-        span(
-          class="tag normal-case tracking-normal",
-          "\{m.enabled.length()}/\{all.length()}",
+      label(class="opt", [
+        span([
+          text(t("pretty print", "格式化输出")),
+          small(t("indented output", "带缩进")),
+        ]),
+        input(
+          input_type=Checkbox,
+          class="switch",
+          checked=m.pretty,
+          on_change=emit.map(_ => TogglePretty),
         ),
       ]),
-      button(
-        class="chip -my-1 normal-case tracking-normal",
-        on_click=emit(Reset),
-        t("reset", "重置"),
+      div(class="side-head mt-6", [
+        span(class="flex items-center gap-2", [
+          text(t("Plugins", "插件")),
+          span(class="tag", "\{m.enabled.length()}/\{all.length()}"),
+          if applied.is_empty() {
+            nothing
+          } else {
+            span(
+              class="flex items-center gap-1.5 text-[12px] font-normal text-muted",
+              [
+                span(class="applied ml-0", nothing),
+                text(
+                  t(
+                    "\{applied.length()} changed the output",
+                    "\{applied.length()} 个生效",
+                  ),
+                ),
+              ],
+            )
+          },
+        ]),
+        button(class="chip -my-1", on_click=emit(Reset), t("reset", "重置")),
+      ]),
+      div(
+        class="divide-y divide-line flex-1 min-h-0 overflow-auto",
+        plugin_rows,
       ),
-    ]),
-    div(class="divide-y divide-line", plugin_rows),
-  ])
+    ],
+  )
 }
 
 ///|
@@ -365,95 +394,71 @@ fn toolbar(m : PgModel, emit : Emit[PgMsg]) -> Html {
 }
 
 ///|
-fn applied_row(o : Outcome) -> Html {
-  div(
-    class="flex flex-wrap items-center gap-1.5 border-t border-line bg-surface px-4 py-3 text-[12.5px]",
-    [
-      span(
-        class="mr-1.5 text-[11px] font-bold uppercase tracking-[0.1em] text-muted",
-        t("changed by", "生效插件"),
-      ),
-      if o.applied.is_empty() {
-        span(class="text-muted", t("nothing yet", "暂无"))
-      } else {
-        span(
-          class="flex flex-wrap gap-1.5",
-          o.applied.map(n => span(class="tag", n)),
-        )
-      },
-    ],
-  )
-}
-
-///|
 fn pg_view(m : PgModel, p : Prefs, chrome : Chrome, emit : Emit[PgMsg]) -> Html {
   let passes = t(
     "\{m.outcome.passes} pass\{if m.outcome.passes == 1 { "" } else { "es" }}",
     "\{m.outcome.passes} 轮",
   )
+  // The title block scrolls away; the workbench below it is exactly one
+  // viewport tall (minus the fixed nav), so one scroll of the header's height
+  // leaves the editors filling the screen. Below 961px everything flows.
   div(class="pt-[60px]", [
     top_nav(Playground, t("playground", "在线体验"), p, chrome.emit),
+    page_head(
+      "svgo.mbt",
+      [text(t("Playground", "在线体验"))],
+      t(
+        "Paste an SVG, open a file or pick a sample; the output updates as you type. Everything runs locally in the browser and nothing is uploaded. Share links carry the input and options in the URL.",
+        "粘贴一段 SVG、打开文件或选一个示例，输出随输入实时更新。全部在浏览器本地完成，不上传任何内容。分享链接将输入和选项编码在 URL 中。",
+      ),
+    ),
     div(
-      class="wrap grid grid-rows-[auto_minmax(0,1fr)] pb-4 min-[961px]:h-[calc(100dvh-60px)]",
+      class="wrap grid gap-4 pt-2 min-[961px]:h-[calc(100vh-60px)] min-[961px]:min-h-[640px] min-[961px]:grid-cols-[280px_minmax(0,1fr)] min-[961px]:pb-4",
       [
-        page_head(
-          "svgo.mbt",
-          [text(t("Playground", "在线体验"))],
-          t(
-            "Paste an SVG, open a file or pick a sample; the output updates as you type. Everything runs locally in the browser and nothing is uploaded. Share links carry the input and options in the URL.",
-            "粘贴一段 SVG、打开文件或选一个示例，输出随输入实时更新。全部在浏览器本地完成，不上传任何内容。分享链接将输入和选项编码在 URL 中。",
-          ),
-          inline=true,
-        ),
-        div(
-          class="grid min-h-[440px] gap-4 pt-2 min-[961px]:grid-cols-[280px_minmax(0,1fr)]",
+        sidebar(m, emit),
+        main_(
+          class="rise grid min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden rounded-card border border-line bg-surface shadow-card",
+          style=["--d: 160ms"],
           [
-            sidebar(m, emit),
-            main_(
-              class="rise grid min-h-0 grid-rows-[auto_minmax(0,1fr)_auto_auto] overflow-hidden rounded-card border border-line bg-surface shadow-card",
-              style=["--d: 160ms"],
-              [
-                toolbar(m, emit),
-                div(class="grid min-h-0 grid-cols-2 max-[800px]:grid-cols-1", [
-                  div(class="pane", [
-                    span(class="pane-label", t("input", "输入")),
-                    code_editor(
-                      m.source,
-                      emit.map(s => Edit(s)),
-                      placeholder=t(
-                        "Paste an SVG or pick a sample", "粘贴 SVG 或选择示例",
-                      ),
-                      label=t("SVG input", "SVG 输入"),
-                    ),
-                    svg_preview(m.source),
-                  ]),
-                  div(
-                    class="pane border-l border-line max-[800px]:border-l-0 max-[800px]:border-t",
-                    [
-                      span(
-                        class="pane-label",
-                        t("svgo.mbt output", "svgo.mbt 输出"),
-                      ),
-                      code_view(
-                        if m.outcome.error != "" {
-                          m.outcome.error
-                        } else {
-                          m.outcome.data
-                        },
-                        label=t("optimized SVG", "优化后的 SVG"),
-                      ),
-                      svg_preview(m.outcome.data),
-                    ],
+            toolbar(m, emit),
+            div(class="grid min-h-0 grid-cols-2 max-[800px]:grid-cols-1", [
+              div(class="pane", [
+                span(class="pane-label", t("input", "输入")),
+                code_editor(
+                  m.source,
+                  emit.map(s => Edit(s)),
+                  placeholder=t(
+                    "Paste an SVG or pick a sample", "粘贴 SVG 或选择示例",
                   ),
-                ]),
-                stats_bar(m.outcome, passes),
-                applied_row(m.outcome),
-              ],
-            ),
+                  label=t("SVG input", "SVG 输入"),
+                ),
+                svg_preview(m.source),
+              ]),
+              div(
+                class="pane border-l border-line max-[800px]:border-l-0 max-[800px]:border-t",
+                [
+                  span(
+                    class="pane-label",
+                    t("svgo.mbt output", "svgo.mbt 输出"),
+                  ),
+                  code_view(
+                    if m.outcome.error != "" {
+                      m.outcome.error
+                    } else {
+                      m.outcome.data
+                    },
+                    label=t("optimized SVG", "优化后的 SVG"),
+                  ),
+                  svg_preview(m.outcome.data),
+                ],
+              ),
+            ]),
+            stats_bar(m.outcome, passes),
           ],
         ),
       ],
     ),
+    page_footer(),
   ])
 }
 

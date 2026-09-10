@@ -3,7 +3,8 @@
 An SVG optimizer in MoonBit, compatible in spirit with svgo's preset-default.
 Everything below is what an agent needs to work here without re-deriving it.
 Human-facing docs: `README.mbt.md` (usage), `docs/ARCHITECTURE.md` (design),
-`CONTRIBUTING.md` (how to add a plugin or fixture).
+`CONTRIBUTING.md` (how to add a plugin or fixture), `docs/DESIGN.md` (website
+guidelines: voice, layout, type scale, tokens, interaction; every site change follows it).
 
 ## Repository shape
 

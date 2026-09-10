@@ -146,10 +146,10 @@
 
   /* demo / playground editor panes */
   .pane { @apply flex min-h-0 min-w-0 flex-col; }
-  .pane-label { @apply flex h-8 flex-none items-center border-b border-line bg-surface px-3.5 text-[11px] font-bold uppercase tracking-[0.1em] text-muted; }
+  .pane-label { @apply flex h-9 flex-none items-center border-b border-line bg-surface px-3.5 text-[12.5px] font-semibold text-ink-2; }
   .editor { @apply relative min-h-[260px] min-w-0 flex-1 overflow-auto min-[961px]:min-h-0; }
   .editor-in { @apply relative min-h-full w-max min-w-full; }
-  .editor-hl, .editor-ta { @apply m-0 block whitespace-pre border-0 px-3.5 py-3 font-mono text-[12.5px] leading-[1.55]; }
+  .editor-hl, .editor-ta { @apply m-0 block whitespace-pre border-0 px-3.5 py-3 font-mono text-[13px] leading-[1.55]; }
   .editor-hl { @apply min-h-full text-ink-2; }
   .editor-out { @apply min-w-full w-max select-text; }
   .editor-ta { @apply absolute inset-0 size-full resize-none overflow-hidden bg-transparent text-transparent caret-ink outline-none; -webkit-text-fill-color: transparent; }
@@ -161,7 +161,7 @@
   .hl-p { @apply text-hl-p; }
   .hl-kw { @apply text-hl-tag; }
   .hl-type { @apply text-hl-attr; }
-  .preview { @apply flex h-[150px] flex-none items-center justify-center overflow-hidden border-t border-line bg-checker bg-[length:14px_14px] p-2.5; }
+  .preview { @apply flex h-[120px] flex-none items-center justify-center overflow-hidden border-t border-line bg-checker bg-[length:14px_14px] p-2.5; }
   .preview svg { @apply block h-full w-auto max-h-full max-w-full; }
   .stats { @apply flex flex-wrap items-center gap-[22px] border-t border-line px-4 py-3.5 tabular-nums; }
   .stat b { @apply font-display text-lg font-bold tracking-[-0.01em]; }
@@ -172,15 +172,16 @@
   .drop { @apply outline-2 outline-dashed outline-accent -outline-offset-8; }
 
   /* playground sidebar */
-  .side-head { @apply mb-1 flex items-center justify-between text-[11px] font-bold uppercase tracking-[0.1em] text-muted; }
-  .opt { @apply flex cursor-pointer items-center justify-between gap-3 py-2 text-[13px] text-ink-2; }
-  .opt small { @apply block text-[11.5px] text-muted; }
-  .num { @apply w-[64px] rounded-lg border border-line-2 bg-surface px-2 py-1 text-right tabular-nums text-ink outline-none transition-colors focus:border-accent; }
+  .side-head { @apply mb-1 flex items-center justify-between text-[13px] font-semibold text-ink; }
+  .opt { @apply flex h-10 cursor-pointer items-center justify-between gap-3 text-[14px] font-medium leading-[1.3] text-ink; }
+  .opt small { @apply block text-[12px] font-normal text-muted; }
+  .num { @apply h-[30px] w-[64px] rounded-lg border border-line-2 bg-surface px-2 text-right tabular-nums text-ink outline-none transition-colors focus:border-accent; }
   .switch { @apply relative h-[22px] w-[38px] flex-none cursor-pointer appearance-none rounded-full bg-line-2 transition-colors before:absolute before:left-[3px] before:top-[3px] before:size-4 before:rounded-full before:bg-white before:shadow-[0_1px_2px_rgb(0_0_0/0.25)] before:transition-transform checked:bg-accent checked:before:translate-x-4; }
   .pl { @apply flex cursor-pointer items-start gap-2.5 py-2 text-[12.5px] leading-[1.35]; }
   .pl input { @apply mt-[3px] accent-accent; }
-  .pl code { @apply text-[12px] font-semibold text-ink; }
-  .pl small { @apply block text-[11.5px] text-muted; }
+  .pl code { @apply text-[12.5px] font-semibold text-ink; }
+  .pl small { @apply block text-[12px] text-muted; }
+  .pl .applied { @apply ml-1.5 inline-block size-1.5 -translate-y-px rounded-full bg-accent; }
 
   /* benchmark rows */
   .row { @apply grid grid-cols-[200px_1fr_64px] items-center gap-3 text-[13px] max-sm:grid-cols-1; }
@@ -242,10 +243,17 @@
   .pill { @apply inline-flex items-center gap-1.5 rounded-full bg-mint-soft px-[9px] py-[3px] text-xs font-bold text-mint; }
 
   /* API reference */
-  .api-side a { @apply block truncate py-[3px] text-ink-2 hover:text-accent; }
-  .api-side h4 { @apply mb-1.5 mt-[18px] text-[11px] font-bold uppercase tracking-[0.1em] text-muted; }
-  .api-main h2 { @apply mb-2 mt-12 border-t border-line pt-6 text-[28px] first:mt-0 first:border-t-0 first:pt-0; }
-  .member { @apply my-[26px]; }
+  .api-side a { @apply block truncate border-l-2 border-transparent py-[3px] pl-3 text-ink-2 hover:text-accent; }
+  .api-side a[aria-current="true"] { @apply border-accent font-semibold text-accent; }
+  .api-side h4 { @apply mb-1 mt-3.5 pl-3 text-[12px] font-semibold text-muted; }
+  .api-side .api-pkg { @apply mt-1.5 flex h-8 items-center gap-2 border-0 pl-0 text-[13px] text-ink-2; }
+  .api-side .api-pkg code { @apply text-[13px]; }
+  .api-side .api-pkg .dot { @apply size-2 rounded-full bg-line-2; }
+  .api-side .api-pkg .count { @apply ml-auto text-[11.5px] tabular-nums text-muted; }
+  .api-side .api-pkg-current { @apply font-semibold text-ink; }
+  .api-side .api-pkg-current .dot { @apply bg-grad; }
+  .api-main h2 { @apply mb-2 mt-12 border-t border-line pt-6 text-[22px] first:mt-0 first:border-t-0 first:pt-0; }
+  .member { @apply my-[26px] scroll-mt-[76px]; }
   .member h3 { @apply flex items-baseline gap-2.5 text-[15px] font-bold; }
   .member .kind { @apply text-[11px] font-bold uppercase tracking-[0.08em] text-accent; }
   .member .src { @apply ml-auto text-xs font-normal text-muted; }

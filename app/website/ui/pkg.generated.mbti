@@ -17,9 +17,11 @@ pub const REPO_URL : String = "https://github.com/PerfectPan/svgo.mbt"
 
 pub const SVGO_URL : String = "https://github.com/svg/svgo"
 
+pub let api_package_names : Array[String]
+
 pub let api_packages : Array[ApiPackage]
 
-pub fn api_page(Chrome) -> @rabbita.Val[@html.Html]
+pub fn api_page(Chrome, String) -> @rabbita.Val[@html.Html]
 
 pub fn app() -> @rabbita.Val[@html.Html]
 
@@ -63,6 +65,8 @@ pub fn page_footer() -> @html.Html
 
 pub fn page_head(String, Array[@html.Html], String, inline? : Bool) -> @html.Html
 
+pub fn parse_api_path(String) -> (String, String?)
+
 pub fn playground_page(Chrome) -> @rabbita.Val[@html.Html]
 
 pub fn plugin_description(String, String, Lang) -> String
@@ -72,6 +76,8 @@ pub fn run_optimize(String, plugins? : Array[String], precision? : Int, multipas
 pub let samples : Array[Sample]
 
 pub fn start_motion() -> Unit
+
+pub fn start_scrollspy() -> Unit
 
 pub fn start_video_lazyload() -> Unit
 
@@ -169,7 +175,7 @@ pub(all) struct Prefs {
 pub(all) enum Route {
   Landing
   Playground
-  Api
+  Api(String)
 } derive(Eq)
 
 pub(all) struct Sample {

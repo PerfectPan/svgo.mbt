@@ -166,6 +166,65 @@ pub fn start_video_lazyload() -> Unit {
 }
 
 ///|
+/// Scroll the element with `id` to the top of the viewport (its
+/// `scroll-margin-top` keeps it clear of the fixed nav). The element may not
+/// exist yet when a route has just changed, so this retries for up to a second.
+extern "js" fn scroll_to_id(id : String) -> Unit =
+  #|(id) => {
+  #|  let tries = 60;
+  #|  const attempt = () => {
+  #|    const el = document.getElementById(id);
+  #|    if (el) { el.scrollIntoView({ block: "start" }); return; }
+  #|    if (--tries > 0) requestAnimationFrame(attempt);
+  #|  };
+  #|  attempt();
+  #|}
+
+///|
+/// Keep the API sidebar in step with the page: the sidebar link whose
+/// `data-target` names the member nearest the top of the viewport gets
+/// `aria-current="true"`. Runs on scroll (one pass per frame) and whenever
+/// the API view is (re)rendered.
+extern "js" fn install_scrollspy() -> Unit =
+  #|() => {
+  #|  let queued = false;
+  #|  const update = () => {
+  #|    queued = false;
+  #|    const members = document.querySelectorAll(".api-main .member[id]");
+  #|    if (!members.length) return;
+  #|    let current = members[0];
+  #|    for (const m of members) {
+  #|      if (m.getBoundingClientRect().top <= 110) current = m; else break;
+  #|    }
+  #|    const side = document.querySelector(".api-side");
+  #|    document.querySelectorAll(".api-side a[data-target]").forEach((a) => {
+  #|      if (a.dataset.target === current.id) {
+  #|        a.setAttribute("aria-current", "true");
+  #|        if (side) {
+  #|          const sr = side.getBoundingClientRect();
+  #|          const ar = a.getBoundingClientRect();
+  #|          if (ar.top < sr.top || ar.bottom > sr.bottom) {
+  #|            a.scrollIntoView({ block: "nearest" });
+  #|          }
+  #|        }
+  #|      } else {
+  #|        a.removeAttribute("aria-current");
+  #|      }
+  #|    });
+  #|  };
+  #|  const schedule = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
+  #|  addEventListener("scroll", schedule, { passive: true });
+  #|  addEventListener("resize", schedule);
+  #|  new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true });
+  #|  schedule();
+  #|}
+
+///|
+pub fn start_scrollspy() -> Unit {
+  install_scrollspy()
+}
+
+///|
 extern "js" fn load_pref(key : String) -> String =
   #|(key) => { try { return localStorage.getItem(key) || ""; } catch (e) { return ""; } }
 

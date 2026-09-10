@@ -69,6 +69,8 @@ pub let samples : Array[Sample]
 
 pub fn start_motion() -> Unit
 
+pub fn start_video_lazyload() -> Unit
+
 pub fn stats_bar(Outcome, String) -> @html.Html
 
 pub fn svg_preview(String, class? : String) -> @html.Html

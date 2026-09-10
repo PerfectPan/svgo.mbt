@@ -127,6 +127,45 @@ pub fn start_motion() -> Unit {
 }
 
 ///|
+/// Lazy-load `<video preload="none">` elements: start loading (and autoplay
+/// when muted) once they enter the viewport, or after the first paint for
+/// above-the-fold videos. Keeps the 960 KB hero mp4 off the critical path.
+extern "js" fn install_video_lazyload() -> Unit =
+  #|() => {
+  #|  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  #|  const start = (v) => {
+  #|    if (v.dataset.lazy) return;
+  #|    v.dataset.lazy = "1";
+  #|    v.preload = "auto";
+  #|    if (v.autoplay && !reduce) v.play().catch(() => {});
+  #|  };
+  #|  const scan = (root) => {
+  #|    if (root.nodeType !== 1) return;
+  #|    const videos = root.tagName === "VIDEO" ? [root] : root.querySelectorAll("video[preload='none']");
+  #|    videos.forEach((v) => {
+  #|      if (v.dataset.lazy) return;
+  #|      if ("IntersectionObserver" in window) {
+  #|        const io = new IntersectionObserver((es) => {
+  #|          es.forEach((e) => { if (e.isIntersecting) { io.disconnect(); start(e.target); } });
+  #|        }, { rootMargin: "200px" });
+  #|        io.observe(v);
+  #|      } else {
+  #|        start(v);
+  #|      }
+  #|    });
+  #|  };
+  #|  // above-the-fold: load on the next frame after first paint
+  #|  requestAnimationFrame(() => requestAnimationFrame(() => scan(document)));
+  #|  new MutationObserver((ms) => ms.forEach((m) => m.addedNodes.forEach(scan)))
+  #|    .observe(document.body, { childList: true, subtree: true });
+  #|}
+
+///|
+pub fn start_video_lazyload() -> Unit {
+  install_video_lazyload()
+}
+
+///|
 extern "js" fn load_pref(key : String) -> String =
   #|(key) => { try { return localStorage.getItem(key) || ""; } catch (e) { return ""; } }
 

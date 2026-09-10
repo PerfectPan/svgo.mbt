@@ -104,6 +104,7 @@ fn hero(dark : Bool) -> Html {
                 autoplay=true,
                 muted=true,
                 loop_=true,
+                preload="none",
                 poster~,
                 src=video_src,
                 nothing,

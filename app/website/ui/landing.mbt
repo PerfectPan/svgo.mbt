@@ -79,13 +79,13 @@ fn hero(dark : Bool) -> Html {
                 [
                   a(class="font-medium text-ink", href=SVGO_URL, "svgo"),
                   text(
-                    "'s 34 preset optimizations, rewritten in MoonBit and compiled to a single \{wasm_bytes / 1000} KB wasm file. Runs in the browser, in Node.js and on the command line. Every output is render-checked pixel by pixel: smaller files, identical rendering.",
+                    "'s 34 preset-default plugins, rewritten in MoonBit and compiled to a single \{wasm_bytes / 1000} KB wasm module. Runs in the browser, in Node.js and on the command line. Every output is render-checked pixel by pixel: smaller files, identical rendering.",
                   ),
                 ],
                 [
                   a(class="font-medium text-ink", href=SVGO_URL, "svgo"),
                   text(
-                    " 预设的 34 个优化插件，用 MoonBit 完整重写，编译为一个 \{wasm_bytes / 1000} KB 的 wasm 文件，可在浏览器、Node.js 和命令行中使用。每次输出都经过逐像素渲染比对：文件更小，渲染结果不变。",
+                    " preset-default 的 34 个插件，用 MoonBit 重写，编译为单个 \{wasm_bytes / 1000} KB wasm 模块，可在浏览器、Node.js 与命令行中运行。每次输出均经逐像素渲染比对：文件更小，渲染结果不变。",
                   ),
                 ],
               ),
@@ -305,7 +305,7 @@ fn numbers_section() -> Html {
               ],
               [
                 text(
-                  "svgo \{svgo_js_version} 与 svgo.mbt 在同一 Node 进程中处理相同文件，开启 multipass 并预热；样本为编辑器导出文件和经典大图。",
+                  "svgo \{svgo_js_version} 与 svgo.mbt 运行于同一 Node 进程，开启 multipass 并预热；样本为编辑器导出文件与经典大型 SVG。",
                 ),
                 code("packages/compare/collect.mjs"),
                 text("，\{generated_on}。"),
@@ -342,7 +342,7 @@ fn numbers_section() -> Html {
               ],
               [
                 text(
-                  "svgo-js 更小的那几个文件，差在 style 属性里数字的前导零，以及 svgo 会把三次曲线改写成二次曲线（",
+                  "svgo-js 更小的那几个文件，差在 style 属性中数字的前导零，以及 svgo 会把三次曲线改写成二次曲线（",
                 ),
                 code("q"),
                 text("）。两项均尚未实现。"),

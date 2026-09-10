@@ -186,23 +186,13 @@ fn numbers_section() -> Html {
   let rows = bench_rows.copy()
   rows.sort_by((x, y) => x.original - y.original)
   let median = median_speedup()
-  // log scale so 0.05 ms and 50 ms both stay visible
-  let mut lo = 1.0e9
-  let mut hi = 0.0
-  for r in rows {
-    for v in [r.mbt_ms, r.js_ms] {
-      if v < lo {
-        lo = v
-      }
-      if v > hi {
-        hi = v
-      }
-    }
-  }
-  let lo = lo / 1.5
-  let hi = hi * 1.15
-  let width = fn(ms : Double) -> String {
-    let w = @math.ln(ms / lo) / @math.ln(hi / lo) * 78.0
+  // Each row is scaled to its own svgo time (the full bar), so the svgo.mbt
+  // bar's length is the real ratio. Absolute values span three orders of
+  // magnitude and are given as labels; a shared axis (log or linear) would
+  // either hide the small files or misstate the ratios.
+  let full = 78.0
+  let width = fn(ms : Double, base : Double) -> String {
+    let w = if base > 0.0 { ms / base * full } else { 0.0 }
     "width: \{to_fixed(w, 2)}%"
   }
   let bar_rows = rows.mapi((idx, r) => {
@@ -214,13 +204,13 @@ fn numbers_section() -> Html {
       div(class="bars", [
         div(
           class="bar bar-a",
-          style=[width(r.mbt_ms)],
+          style=[width(r.mbt_ms, r.js_ms)],
           attrs=Attrs::build().data_set("label", "\{fmt_ms(r.mbt_ms)} ms"),
           nothing,
         ),
         div(
           class="bar bar-b",
-          style=[width(r.js_ms)],
+          style=[width(r.js_ms, r.js_ms)],
           attrs=Attrs::build().data_set("label", "\{fmt_ms(r.js_ms)} ms"),
           nothing,
         ),
@@ -291,7 +281,7 @@ fn numbers_section() -> Html {
           div(
             class="sub",
             t(
-              "milliseconds, lower is better · log scale", "毫秒，越低越好 · 对数刻度",
+              "milliseconds per call · each row scaled to svgo's time", "每次调用的毫秒数 · 每行以 svgo 的耗时为满格",
             ),
           ),
           div(class="grid gap-3", bar_rows),

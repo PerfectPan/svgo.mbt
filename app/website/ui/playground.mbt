@@ -7,6 +7,14 @@ priv struct PgModel {
   pretty : Bool
   outcome : Outcome
   notice : String
+  notice_at : NoticeAt
+} derive(Eq)
+
+///|
+/// Where the 1.5 s notice shows: next to the action that produced it.
+priv enum NoticeAt {
+  Toolbar
+  Output
 } derive(Eq)
 
 ///|
@@ -23,7 +31,7 @@ priv enum PgMsg {
   Copy
   Download
   Share
-  Notice(String)
+  Notice(String, NoticeAt)
 }
 
 ///|
@@ -116,6 +124,7 @@ fn from_url() -> PgModel? {
       pretty,
       outcome: Outcome::empty(),
       notice: "",
+      notice_at: Toolbar,
     }),
   )
 }
@@ -189,7 +198,8 @@ fn pg_update(
         m,
         with_notice(
           emit,
-          t("Output copied", "输出已复制"),
+          t("Copied", "已复制"),
+          Output,
           @rabbita.effect(fn() noraise { copy_text(m.outcome.data) }),
         ),
       )
@@ -207,6 +217,7 @@ fn pg_update(
         with_notice(
           emit,
           t("Link copied", "链接已复制"),
+          Toolbar,
           @rabbita.effect(fn() noraise {
             replace_url(url)
             copy_text(url)
@@ -214,7 +225,7 @@ fn pg_update(
         ),
       )
     }
-    Notice(s) => ({ ..m, notice: s, }, none)
+    Notice(s, at) => ({ ..m, notice: s, notice_at: at, }, none)
   }
 }
 
@@ -222,9 +233,14 @@ fn pg_update(
 fn with_notice(
   emit : Emit[PgMsg],
   s : String,
+  at : NoticeAt,
   cmd : @rabbita.Cmd,
 ) -> @rabbita.Cmd {
-  @rabbita.batch([cmd, emit(Notice(s)), @rabbita.delay(emit(Notice("")), 1500)])
+  @rabbita.batch([
+    cmd,
+    emit(Notice(s, at)),
+    @rabbita.delay(emit(Notice("", at)), 1500),
+  ])
 }
 
 ///|
@@ -369,16 +385,13 @@ fn toolbar(m : PgModel, emit : Emit[PgMsg]) -> Html {
         ]),
       ]),
       div(class="ml-auto flex items-center gap-2", [
-        span(class="text-[12.5px] font-semibold text-mint", m.notice),
-        button(
-          class="btn btn-sm",
-          on_click=emit(Copy),
-          t("Copy output", "复制输出"),
-        ),
-        button(
-          class="btn btn-sm",
-          on_click=emit(Download),
-          t("Download", "下载"),
+        span(
+          class="text-[12.5px] font-semibold text-mint",
+          if m.notice_at == Toolbar {
+            m.notice
+          } else {
+            ""
+          },
         ),
         button(
           class="btn btn-primary btn-sm",
@@ -437,10 +450,31 @@ fn pg_view(m : PgModel, p : Prefs, chrome : Chrome, emit : Emit[PgMsg]) -> Html 
               div(
                 class="pane border-l border-line max-[800px]:border-l-0 max-[800px]:border-t",
                 [
-                  span(
-                    class="pane-label",
-                    t("svgo.mbt output", "svgo.mbt 输出"),
-                  ),
+                  // copy and download act on this pane, so they live in its
+                  // label bar; the toolbar keeps the inputs and the share link
+                  div(class="pane-label", [
+                    text(t("svgo.mbt output", "svgo.mbt 输出")),
+                    div(class="ml-auto flex items-center gap-1", [
+                      span(
+                        class="mr-1 font-semibold text-mint",
+                        if m.notice_at == Output {
+                          m.notice
+                        } else {
+                          ""
+                        },
+                      ),
+                      button(
+                        class="pane-act",
+                        on_click=emit(Copy),
+                        t("Copy", "复制"),
+                      ),
+                      button(
+                        class="pane-act",
+                        on_click=emit(Download),
+                        t("Download", "下载"),
+                      ),
+                    ]),
+                  ]),
                   code_view(
                     if m.outcome.error != "" {
                       m.outcome.error
@@ -481,6 +515,7 @@ pub fn playground_page(chrome : Chrome) -> Val[Html] {
         pretty: false,
         outcome: Outcome::empty(),
         notice: "",
+        notice_at: Toolbar,
       })
     }
   }

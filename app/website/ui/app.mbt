@@ -107,8 +107,16 @@ pub fn app() -> Val[Html] {
   lang.val = prefs0.lang
   set_theme(prefs0.dark)
   set_document_lang(prefs0.lang.code())
+  // The first paint already shows the linked page: the runtime reports the
+  // initial URL a frame later, which would flash the landing page (and start
+  // its media) on every deep link.
+  let route0 = try @url.parse(location_href()) catch {
+    _ => Landing
+  } noraise {
+    url => route_of(url)
+  }
   let (model, emit) = @rabbita.create_state(
-    { route: Landing, prefs: prefs0, },
+    { route: route0, prefs: prefs0, },
     subscriptions=(_, emit) => {
       @sub.batch([
         @sub.on_url_changed(url => emit(UrlChanged(url))),

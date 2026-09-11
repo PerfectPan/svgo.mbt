@@ -58,7 +58,7 @@ pub fn plugins_wire() -> String {
 /// Library version, matching moon.mod.
 #export_name("version")
 pub fn version() -> String {
-  "0.2.0"
+  "0.2.1"
 }
 
 ///|

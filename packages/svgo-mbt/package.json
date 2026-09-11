@@ -1,6 +1,6 @@
 {
   "name": "@rivus/svgo",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "SVG optimizer written in MoonBit: a wasm-gc library and the svgo-mbt command line tool",
   "repository": {
     "type": "git",

@@ -1,5 +1,11 @@
 # @rivus/svgo
 
+## 0.2.1
+
+### Patch Changes
+
+- [#26](https://github.com/PerfectPan/svgo.mbt/pull/26) [`84ebf7d`](https://github.com/PerfectPan/svgo.mbt/commit/84ebf7daecc5a61d4f5fd75fb627c2455ca12fd9) Thanks [@PerfectPan](https://github.com/PerfectPan)! - README: the plugin parameter examples (`{ name, params }` entries and top-level `params`) now follow the API usage block instead of trailing the licence line.
+
 ## 0.2.0
 
 ### Minor Changes

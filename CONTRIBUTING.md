@@ -118,14 +118,21 @@ The repository ships a pre-commit hook that runs `moon check`:
 
 1. A PR that changes what users get runs `pnpm changeset` and commits the file
    it writes under `.changeset/` (bump level + one line for the changelog).
-2. To release, open a PR from `pnpm version-packages`: changesets bumps
-   `packages/svgo-mbt/package.json` and writes `CHANGELOG.md`, then
-   `scripts/sync-version.mjs` copies the version into `svgo/moon.mod`, the app
-   modules' dependency, the CLI's `--version` and the wasm's `version()`.
-   `scripts/verify.sh` fails if those ever disagree.
-3. Merging that PR runs `release.yml`: build, tests, `changeset publish` (npm,
-   OIDC trusted publishing, so no token lives in the repo) and the tag
-   `@rivus/svgo@X.Y.Z`.
+2. When that PR lands, `release.yml` opens (or updates) the release PR on the
+   branch `changeset-release/main` by running `pnpm version-packages`:
+   changesets bumps `packages/svgo-mbt/package.json` and writes
+   `CHANGELOG.md`, then `scripts/sync-version.mjs` copies the version into
+   `svgo/moon.mod`, the app modules' dependency, the CLI's `--version` and the
+   wasm's `version()`. `scripts/verify.sh` fails if those ever disagree.
+   Further changesets merged later are folded into the same PR.
+3. To release, run CI on the release PR and merge it. The PR is opened with
+   the workflow token, and GitHub does not start workflows for events that
+   token causes, so CI has to be started by a person: close and reopen the PR
+   (`gh pr close <n> && gh pr reopen <n>`) or push an empty commit to its
+   branch. `gh workflow run ci.yml` does not count: a dispatched run is not
+   attached to the PR and does not satisfy the required checks. Merging runs
+   `release.yml` again: build, tests, `changeset publish` (npm, OIDC trusted
+   publishing, so no token lives in the repo) and the tag `@rivus/svgo@X.Y.Z`.
 4. The tag runs `binaries.yml`: native CLI tarballs for linux-x86_64,
    linux-arm64 and macos-arm64 on a GitHub release, and `moon publish` of
    `PerfectPan/svgo` to mooncakes using the `MOONCAKES_TOKEN` secret.

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>svgo.mbt</title>
+<meta name="robots" content="noindex">
+<style>
+  /* Standalone page: GitHub Pages serves it at any depth, so ./style.css cannot be
+     linked. Colours are copies of --color-bg / --color-ink / --color-accent in
+     src/style.css (light and dark); keep them in step when the tokens change. */
+  body {
+    margin: 0;
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: #0b0d12;
+    background: #ffffff;
+    padding: 56px 24px;
+    line-height: 1.55;
+  }
+  .wrap { max-width: 1140px; margin: 0 auto; }
+  p { margin: 0.5em 0; }
+  a { color: #059669; }
+  @media (prefers-color-scheme: dark) {
+    body { color: #eef0f5; background: #0b0d12; }
+    a { color: #10b981; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p>This page does not exist. Redirecting to svgo.mbt.</p>
+  <p>该页面不存在，正在返回 svgo.mbt 首页。</p>
+  <p><a href="https://perfectpan.github.io/svgo.mbt/">https://perfectpan.github.io/svgo.mbt/</a></p>
+</div>
+<noscript><meta http-equiv="refresh" content="0; url=https://perfectpan.github.io/svgo.mbt/"></noscript>
+<script>
+  (function () {
+    var path = location.pathname;
+    var root = path.indexOf("/svgo.mbt/") === 0 ? "/svgo.mbt/" : "/";
+    var rest = path.slice(root.length).replace(/^\/+/, "");
+    var first = rest.split("/")[0];
+    if (first === "playground" || first === "api") {
+      location.replace(root + "#/" + rest);
+    } else {
+      location.replace(root);
+    }
+  })();
+</script>
+</body>
+</html>

@@ -68,7 +68,7 @@ fn hero(dark : Bool) -> Html {
                 [
                   text("更小的 SVG，"),
                   br(),
-                  span(class="grad", "快 \{times} 倍。"),
+                  span(class="grad", "约快 \{times} 倍。"),
                 ],
               ),
             ),

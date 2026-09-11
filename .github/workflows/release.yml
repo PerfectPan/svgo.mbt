@@ -1,14 +1,25 @@
 name: release
 
-# Publishes @rivus/svgo to npm when a release pull request lands on main.
+# Opens the release pull request and publishes @rivus/svgo to npm.
 #
-# Flow: pull requests add changesets (`pnpm changeset`); a release PR runs
-# `pnpm version-packages`, which bumps packages/svgo-mbt/package.json and
-# CHANGELOG.md and copies the version into the MoonBit modules. Once that PR is
-# merged, this workflow builds, tests and runs `changeset publish`, which
-# publishes only if the version is not on npm yet and tags the commit
-# `@rivus/svgo@X.Y.Z`. That tag triggers binaries.yml (native CLI builds, the
-# GitHub release and the mooncakes publish).
+# Flow: pull requests add changesets (`pnpm changeset`). On every push to main
+# the `version` job looks at `.changeset/`:
+#   - changesets pending: changesets/action runs `pnpm version-packages` (bumps
+#     packages/svgo-mbt/package.json and CHANGELOG.md, copies the version into
+#     the MoonBit modules) and opens or updates the release PR on the branch
+#     `changeset-release/main`. Nothing is published.
+#   - none pending: the `npm` job builds, tests and runs `changeset publish`,
+#     which publishes only if the version is not on npm yet and tags the commit
+#     `@rivus/svgo@X.Y.Z`. That tag triggers binaries.yml (native CLI builds,
+#     the GitHub release and the mooncakes publish).
+#
+# The release PR is opened with GITHUB_TOKEN, and GitHub does not start
+# workflows for events that token causes, so CI does not run on it by itself.
+# main requires the two `verify` checks, so before merging, close and reopen
+# the PR (or push an empty commit to its branch) as a person:
+# `gh pr close <n> && gh pr reopen <n>`. That is a normal pull_request event and
+# ci.yml runs. Do not `gh workflow run ci.yml` on the branch instead: a
+# workflow_dispatch run is not attached to the PR and does not satisfy the rule.
 #
 # npm authentication is OIDC trusted publishing (no token in the repo): the
 # package's Trusted Publisher on npmjs.com must point at this repository and
@@ -26,6 +37,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
   id-token: write
   actions: write
 
@@ -34,7 +46,54 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Open or update the release PR when changesets are pending. Skipped on
+  # workflow_dispatch: rehearsals only exercise the publish job.
+  version:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    outputs:
+      has_changesets: ${{ steps.changesets.outputs.has-changesets }}
+      pr_number: ${{ steps.changesets.outputs.pr-number }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # `pnpm version-packages` ends with `moon info`, so the toolchain is needed
+      - name: Install MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+          "$HOME/.moon/bin/moon" update
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Open or update the release PR
+        id: changesets
+        uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
+        with:
+          version-script: pnpm version-packages
+          commit-message: "Release: version bump and changelog"
+          pr-title: "Release: version bump and changelog"
+          create-github-releases: false
+        env:
+          # changelog-github reads PR titles and authors through the API
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Summary
+        run: |
+          if [ "${{ steps.changesets.outputs.has-changesets }}" = "true" ]; then
+            echo "release PR #${{ steps.changesets.outputs.pr-number }} is up to date; close and reopen it to run CI, then merge" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "no changesets pending" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  # Build, test and publish. Runs when nothing is pending (a release PR has
+  # just been merged, or a push changed nothing user-visible) and on dispatch.
   npm:
+    needs: version
+    if: ${{ !cancelled() && (github.event_name == 'workflow_dispatch' || (needs.version.result == 'success' && needs.version.outputs.has_changesets == 'false')) }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

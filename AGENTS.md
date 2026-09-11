@@ -37,7 +37,7 @@ root installs every JS package.
 | regenerate the site's data files | `node app/website/gen.mjs` (after collect.mjs or moon doc changed) |
 | re-render the hero animation | `pnpm -C app/website motion:render` |
 | record a user-visible change for the changelog | `pnpm changeset` in the PR (writes `.changeset/*.md`) |
-| release (npm via OIDC, then native binaries + GitHub release + mooncakes) | release PR: `pnpm version-packages` (changesets bump + `scripts/sync-version.mjs` copies the version into the MoonBit modules), merge it; `release.yml` publishes to npm and tags `@rivus/svgo@X.Y.Z`, `binaries.yml` does the rest (needs the `MOONCAKES_TOKEN` secret). Rehearse with `gh workflow run release.yml -f dry_run=true`. See CONTRIBUTING.md "Releasing". |
+| release (npm via OIDC, then native binaries + GitHub release + mooncakes) | `release.yml` opens the release PR (branch `changeset-release/main`, from `pnpm version-packages`: changesets bump + `scripts/sync-version.mjs`) whenever changesets are pending on main. To release: `gh pr close <n> && gh pr reopen <n>` so CI runs on it (a bot-opened PR gets no CI by itself), then merge; `release.yml` publishes to npm and tags `@rivus/svgo@X.Y.Z`, `binaries.yml` does the rest (needs the `MOONCAKES_TOKEN` secret). Rehearse with `gh workflow run release.yml -f dry_run=true`. See CONTRIBUTING.md "Releasing". |
 
 ## Layout
 

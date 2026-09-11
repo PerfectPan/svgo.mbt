@@ -105,7 +105,11 @@ rows, 6 between a name and its badge or dot, 10 between a checkbox and its label
 - **Tags** (`.tag`): 11.5 px mono badges for counts and plugin names.
 - **Editors**: highlighted `<pre>` under a transparent `<textarea>` with identical metrics;
   13 px mono; a 36 px label bar above (12.5 px / 600 `ink-2`); a 120 px checkerboard preview
-  below.
+  below. Actions that apply to one pane (copy, download) sit at the right end of that pane's
+  label bar as text actions (`.pane-act`, 12.5 px / 500 `ink-2`, hover `ink` on `surface-2`).
+- **Playground toolbar**: one row at the workbench's width (844 px inside `.wrap`): sample
+  chips and the file picker on the left, the share button and its notice on the right. It
+  must not wrap at desktop widths; anything else belongs to a pane's label bar.
 - **Stats bar**: bytes in, bytes out, saving pill, size bar, ms, passes; numbers in display
   18 / 700, units 13 muted.
 - **Playground sidebar**: options (precision, multipass, pretty) fixed at the top, then the

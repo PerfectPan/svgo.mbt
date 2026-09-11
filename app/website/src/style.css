@@ -153,6 +153,7 @@
   /* demo / playground editor panes */
   .pane { @apply flex min-h-0 min-w-0 flex-col; }
   .pane-label { @apply flex h-9 flex-none items-center border-b border-line bg-surface px-3.5 text-[12.5px] font-semibold text-ink-2; }
+  .pane-act { @apply cursor-pointer rounded-md px-2 py-1 text-[12.5px] font-medium text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink; }
   .editor { @apply relative min-h-[260px] min-w-0 flex-1 overflow-auto min-[961px]:min-h-0; }
   .editor-in { @apply relative min-h-full w-max min-w-full; }
   .editor-hl, .editor-ta { @apply m-0 block whitespace-pre border-0 px-3.5 py-3 font-mono text-[13px] leading-[1.55]; }

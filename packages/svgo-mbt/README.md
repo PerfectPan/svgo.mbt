@@ -27,6 +27,20 @@ r.applied;       // plugins that changed something
 await plugins(); // [{ name, description, enabled }]
 ```
 
+Plugin entries may also be objects, for example:
+
+```js
+await optimize(svg, {
+  plugins: [{ name: "cleanupIds", params: { preserve: ["logo"], minify: false } }],
+});
+```
+
+Top-level `params: { cleanupIds: { preserve: ["logo"] } }` works with either
+the default preset or an explicit plugin list. An entry's `params` object takes
+precedence over the top-level object for that plugin. Missing parameters use
+plugin defaults. `removeComments.preservePatterns` supports literal substrings
+and `^`-prefixed literal prefixes, not full regular expressions.
+
 ## Command line
 
 The bin is the same optimizer compiled for node, so it needs no toolchain:
@@ -56,17 +70,3 @@ Ghostscript Tiger 7.8 vs 38. Playground and details:
 <https://perfectpan.github.io/svgo.mbt/>.
 
 MIT.
-
-Plugin entries may also be objects, for example:
-
-```js
-await optimize(svg, {
-  plugins: [{ name: "cleanupIds", params: { preserve: ["logo"], minify: false } }],
-});
-```
-
-Top-level `params: { cleanupIds: { preserve: ["logo"] } }` works with either
-the default preset or an explicit plugin list. An entry's `params` object takes
-precedence over the top-level object for that plugin. Missing parameters use
-plugin defaults. `removeComments.preservePatterns` supports literal substrings
-and `^`-prefixed literal prefixes, not full regular expressions.

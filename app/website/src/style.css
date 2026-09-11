@@ -114,6 +114,8 @@
 /* Repeated pieces, rendered from the MoonBit views in ../ui. */
 @layer components {
   .wrap { @apply mx-auto w-[min(1140px,calc(100%-48px))]; }
+  .noscript { @apply pt-14 text-[15px] text-ink; }
+  .noscript p { @apply mt-2; }
   .display { @apply font-display font-bold tracking-[-0.03em]; }
   .grad { @apply bg-grad bg-clip-text text-transparent; }
   .eyebrow { @apply inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.1em] text-accent; }

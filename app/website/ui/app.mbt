@@ -106,6 +106,7 @@ pub fn app() -> Val[Html] {
   let prefs0 = initial_prefs()
   lang.val = prefs0.lang
   set_theme(prefs0.dark)
+  set_document_lang(prefs0.lang.code())
   let (model, emit) = @rabbita.create_state(
     { route: Landing, prefs: prefs0, },
     subscriptions=(_, emit) => {
@@ -146,7 +147,10 @@ pub fn app() -> Val[Html] {
           lang.val = l
           (
             { ..m, prefs: { ..m.prefs, lang: l, }, },
-            @rabbita.effect(fn() noraise { save_pref("svgo-lang", l.code()) }),
+            @rabbita.effect(fn() noraise {
+              set_document_lang(l.code())
+              save_pref("svgo-lang", l.code())
+            }),
           )
         }
         Pref(ToggleDark) => {

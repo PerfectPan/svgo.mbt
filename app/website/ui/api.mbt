@@ -22,6 +22,7 @@ fn find_package(name : String) -> ApiPackage {
 ///|
 /// One sentence per package for the page head.
 fn package_blurb(name : String) -> String {
+  let count = @svgo.list_plugins().length()
   match name {
     "xml" =>
       t(
@@ -38,7 +39,8 @@ fn package_blurb(name : String) -> String {
       )
     "plugins" =>
       t(
-        "The 36 plugins, the preset order and the execution context.", "36 个插件、预设顺序与执行上下文。",
+        "The \{count} plugins, the preset order and the execution context.",
+        "\{count} 个插件、预设顺序与执行上下文。",
       )
     _ =>
       t(

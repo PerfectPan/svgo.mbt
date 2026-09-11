@@ -241,3 +241,9 @@ extern "js" fn browser_lang() -> String =
 /// shell applies the stored value before the first paint.
 extern "js" fn set_theme(dark : Bool) -> Unit =
   #|(dark) => { document.documentElement.dataset.theme = dark ? "dark" : "light"; }
+
+///|
+/// `lang` on <html> follows the UI language (screen readers, hyphenation,
+/// font selection); the shell applies the stored value before the first paint.
+extern "js" fn set_document_lang(code : String) -> Unit =
+  #|(code) => { document.documentElement.lang = code; }

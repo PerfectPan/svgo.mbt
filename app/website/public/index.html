@@ -4,13 +4,28 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>svgo.mbt · SVG optimizer in MoonBit, shipped as WebAssembly</title>
-<meta name="description" content="All 34 of svgo's default plugins, rewritten in MoonBit as a wasm file of about 200 KB. 1.7× to 4.4× faster than svgo-js in the same process, zero pixel difference on the test corpus. Runs in the browser, Node 24+, or as a native CLI.">
+<meta name="description" content="svgo.mbt: svgo in MoonBit. 2.9× faster, 200 KB wasm, zero dependencies. All 34 preset-default plugins with identical behavior. Runs in the browser, Node, Bun, Deno, or natively.">
+<link rel="canonical" href="https://perfectpan.github.io/svgo.mbt/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="svgo.mbt">
+<meta property="og:title" content="svgo.mbt · SVG optimizer in MoonBit, shipped as WebAssembly">
+<meta property="og:description" content="2.9× faster than svgo in a 200 KB wasm module with zero dependencies. Runs in the browser, Node 24+, Bun, Deno, or as a native CLI.">
+<meta property="og:url" content="https://perfectpan.github.io/svgo.mbt/">
+<meta property="og:image" content="https://perfectpan.github.io/svgo.mbt/hero-poster.jpg">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="720">
+<meta property="og:image:alt" content="An SVG icon's source with the removed lines struck through, the plugin pipeline beside it, and the result: 836 B to 300 B, 0 px changed.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="svgo.mbt · SVG optimizer in MoonBit, shipped as WebAssembly">
+<meta name="twitter:description" content="2.9× faster than svgo in a 200 KB wasm module with zero dependencies. Runs in the browser, Node 24+, Bun, Deno, or as a native CLI.">
+<meta name="twitter:image" content="https://perfectpan.github.io/svgo.mbt/hero-poster.jpg">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="./style.css">
-<script>try { if (localStorage.getItem("svgo-theme") === "dark") document.documentElement.dataset.theme = "dark"; } catch (e) {}</script>
+<script>(function () { try { var h = document.documentElement; if (localStorage.getItem("svgo-theme") === "dark") h.dataset.theme = "dark"; var l = localStorage.getItem("svgo-lang"); if (l !== "en" && l !== "zh") l = (navigator.language || "en").toLowerCase().indexOf("zh") === 0 ? "zh" : "en"; h.lang = l; } catch (e) {} })();</script>
 <script src="./index.js" type="module"></script>
 </head>
 <body>
+<noscript><div class="wrap noscript"><p>svgo.mbt requires JavaScript. The optimizer runs locally in the browser; nothing is uploaded.</p><p>svgo.mbt 需要 JavaScript 才能运行。优化在浏览器本地完成，文件不会上传。</p></div></noscript>
 <div id="app"></div>
 </body>
 </html>

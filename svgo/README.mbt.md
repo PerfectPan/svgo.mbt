@@ -2,7 +2,7 @@
 
 **An SVG optimizer written in MoonBit, shipped as WebAssembly.**
 All 34 plugins in [svgo](https://github.com/svg/svgo)'s preset-default, in its
-order and with its semantics, and none of the Node.js dependency tree: a 200 KB
+order and with its semantics, and none of the Node.js dependency tree: a 188 KB
 `wasm-gc` module that runs in the browser, Node, Bun and Deno, a CLI that installs
 with `npx`, and a MoonBit library.
 

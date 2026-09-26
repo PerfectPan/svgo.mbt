@@ -99,6 +99,13 @@ The repository ships a pre-commit hook that runs `moon check`:
   scripts/regress.sh /tmp/ref          # every line must say "same"
   ```
 
+- Measure every change on native, js (`scripts/bench.sh js`, what the site
+  runs) and the wasm artifact (`node packages/compare/wasm-speed.mjs` after
+  `scripts/build-wasm.sh`), and check the wasm size. The targets can
+  disagree: Int64 arithmetic is emulated on js, strings are JS strings on
+  wasm, and core's generic code costs bytes per instantiation.
+  `svgo/benchmark/README.md` lists attempts that won on one target and lost
+  on another.
 - Rules of thumb that paid off here: tables instead of `@math.pow`, integer
   digit folding instead of substring + `parse_double`, measure lengths
   arithmetically instead of formatting candidates, `Set` instead of

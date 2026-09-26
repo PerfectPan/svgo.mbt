@@ -195,44 +195,6 @@ fn slow_path(
 }
 
 ///|
-/// Decompose `v` rounded to `precision` places into sign, integer part and
-/// fraction digits (`frac` scaled by 10^frac_len, trailing zeros removed).
-/// Returns (neg, int_part, frac, frac_len); (false, 0, 0, 0) for 0, NaN, inf.
-pub fn decompose(v : Double, precision : Int) -> (Bool, Int64, Int64, Int) {
-  if v.is_nan() || v.is_inf() {
-    return (false, 0, 0, 0)
-  }
-  let p = if precision < 0 {
-    0
-  } else if precision > 15 {
-    15
-  } else {
-    precision
-  }
-  let av = v.abs()
-  if av >= 9.0e15 {
-    // beyond exact Int64 scaling; integers only at this magnitude
-    return (v < 0.0, av.to_int64(), 0, 0)
-  }
-  let scaled = @math.round(av * pow10[p]).to_int64()
-  if scaled == 0 {
-    return (false, 0, 0, 0)
-  }
-  let m = pow10_i64[p]
-  let int_part = scaled / m
-  let mut frac = scaled % m
-  let mut frac_len = p
-  while frac_len > 0 && frac % 10 == 0 {
-    frac = frac / 10
-    frac_len -= 1
-  }
-  if frac == 0 {
-    frac_len = 0
-  }
-  (v < 0.0, int_part, frac, frac_len)
-}
-
-///|
 fn digits_of(v : Int64) -> Int {
   let mut n = 1
   let mut v = v
@@ -244,26 +206,121 @@ fn digits_of(v : Int64) -> Int {
 }
 
 ///|
+fn write_digits(sb : StringBuilder, v : Int64) -> Unit {
+  if v >= 10 {
+    write_digits(sb, v / 10)
+  }
+  sb.write_char(((v % 10).to_int() + 48).unsafe_to_char())
+}
+
+///|
+/// Format `v` rounded to `precision` places the way path data spells it: no
+/// trailing zeros, no leading zero before the point, scientific notation when
+/// that is shorter (`1e-7` rather than `.0000001`). Appends to `sb` when one
+/// is given and returns the shape either way (see `number_shape`). Callers
+/// measure far more candidates than they write, and everything stays in
+/// locals: a helper returning the decomposed parts as a tuple allocated on
+/// every call.
+fn format_into(sb : StringBuilder?, v : Double, precision : Int) -> Int {
+  let p = if precision < 0 {
+    0
+  } else if precision > 15 {
+    15
+  } else {
+    precision
+  }
+  let neg = v < 0.0
+  let av = v.abs()
+  let mut int_part : Int64 = 0
+  let mut frac : Int64 = 0 // fraction digits, trailing zeros removed
+  let mut frac_len = 0
+  if v.is_nan() || v.is_inf() {
+    ()
+  } else if av >= 9.0e15 {
+    // beyond exact Int64 scaling; integers only at this magnitude
+    int_part = av.to_int64()
+  } else {
+    let scaled = @math.round(av * pow10[p]).to_int64()
+    let m = pow10_i64[p]
+    int_part = scaled / m
+    frac = scaled % m
+    if frac != 0 {
+      frac_len = p
+      while frac % 10 == 0 {
+        frac = frac / 10
+        frac_len -= 1
+      }
+    }
+  }
+  if int_part == 0 && frac == 0 {
+    if sb is Some(sb) {
+      sb.write_char('0')
+    }
+    return 1 << 3
+  }
+  let sign_len = if neg { 1 } else { 0 }
+  if int_part == 0 {
+    let mant_digits = digits_of(frac)
+    let exponent = mant_digits - frac_len - 1 // negative: the value is below 1
+    let exp_digits = digits_of(exponent.abs().to_int64())
+    let mant_len = if mant_digits == 1 { 1 } else { mant_digits + 1 }
+    let sci_len = mant_len + 2 + exp_digits
+    if sci_len < 1 + frac_len {
+      if sb is Some(sb) {
+        if neg {
+          sb.write_char('-')
+        }
+        // first digit, then a point and the rest if there is more than one
+        let pow = pow10_i64[mant_digits - 1]
+        sb.write_char(((frac / pow).to_int() + 48).unsafe_to_char())
+        if mant_digits > 1 {
+          sb.write_char('.')
+          write_digits(sb, frac % pow)
+        }
+        sb.write_string(if exponent < 0 { "e-" } else { "e+" })
+        write_digits(sb, exponent.abs().to_int64())
+      }
+      return ((sign_len + sci_len) << 3) |
+        sign_len |
+        (if mant_digits > 1 { 4 } else { 0 })
+    }
+  }
+  let int_len = if int_part != 0 { digits_of(int_part) } else { 0 }
+  if sb is Some(sb) {
+    if neg {
+      sb.write_char('-')
+    }
+    if int_part != 0 {
+      write_digits(sb, int_part)
+    }
+    if frac != 0 {
+      sb.write_char('.')
+      for _ in digits_of(frac)..<frac_len {
+        sb.write_char('0')
+      }
+      write_digits(sb, frac)
+    }
+  }
+  let frac_part_len = if frac != 0 { 1 + frac_len } else { 0 }
+  ((sign_len + int_len + frac_part_len) << 3) |
+  sign_len |
+  (if int_part == 0 && !neg { 2 } else { 0 }) |
+  (if frac != 0 { 4 } else { 0 })
+}
+
+///|
 /// Shortest decimal representation of a number for path data:
 /// no trailing zeros, no leading zero before the decimal point.
 pub fn format_number(v : Double, precision : Int) -> String {
   let sb = StringBuilder()
-  write_number(sb, v, precision)
+  ignore(format_into(Some(sb), v, precision))
   sb.to_string()
 }
 
 ///|
 /// Append `format_number(v, precision)` to `sb` without intermediate strings.
 pub fn write_number(sb : StringBuilder, v : Double, precision : Int) -> Unit {
-  ignore(write_number_shaped(sb, v, precision))
-}
-
-///|
-fn write_digits(sb : StringBuilder, v : Int64) -> Unit {
-  if v >= 10 {
-    write_digits(sb, v / 10)
-  }
-  sb.write_char(((v % 10).to_int() + 48).unsafe_to_char())
+  ignore(format_into(Some(sb), v, precision))
 }
 
 ///|
@@ -273,123 +330,13 @@ pub fn write_number_shaped(
   v : Double,
   precision : Int,
 ) -> Int {
-  let (neg, int_part, frac, frac_len) = decompose(v, precision)
-  if int_part == 0 && frac == 0 {
-    sb.write_char('0')
-    return 1 << 3
-  }
-  // For small numbers (int_part == 0) check whether scientific notation is
-  // shorter than the decimal form, e.g. 1e-7 vs .0000001.
-  if int_part == 0 && frac > 0 {
-    let mant_digits = digits_of(frac)
-    let exponent = mant_digits - frac_len - 1 // negative for values < 1
-    let mant_len = if mant_digits == 1 { mant_digits } else { mant_digits + 1 }
-    let sci_len = mant_len + 1 + 1 + digits_of(exponent.abs().to_int64())
-    let dec_len = 1 + frac_len
-    if sci_len < dec_len {
-      let mut len = 0
-      let mut flags = 0
-      if neg {
-        sb.write_char('-')
-        len += 1
-        flags = flags | 1
-      }
-      // mantissa: first digit, then a dot and the rest if more than one digit
-      let mut pow : Int64 = 1
-      for _ in 1..<mant_digits {
-        pow = pow * 10
-      }
-      let first = frac / pow
-      sb.write_char((first.to_int() + 48).unsafe_to_char())
-      len += 1
-      if mant_digits > 1 {
-        sb.write_char('.')
-        len += 1
-        flags = flags | 4
-        write_digits(sb, frac % pow)
-        len += mant_digits - 1
-      }
-      sb.write_char('e')
-      len += 1
-      if exponent < 0 {
-        sb.write_char('-')
-      } else {
-        sb.write_char('+')
-      }
-      len += 1
-      write_digits(sb, exponent.abs().to_int64())
-      len += digits_of(exponent.abs().to_int64())
-      return (len << 3) | flags
-    }
-  }
-  let mut len = 0
-  let mut flags = 0
-  if neg {
-    sb.write_char('-')
-    len += 1
-    flags = flags | 1
-  }
-  if int_part != 0 {
-    write_digits(sb, int_part)
-    len += digits_of(int_part)
-  } else if !neg {
-    flags = flags | 2
-  }
-  if frac != 0 {
-    sb.write_char('.')
-    for _ in digits_of(frac)..<frac_len {
-      sb.write_char('0')
-    }
-    write_digits(sb, frac)
-    len += 1 + frac_len
-    flags = flags | 4
-  }
-  (len << 3) | flags
+  format_into(Some(sb), v, precision)
 }
 
 ///|
-/// Shape of a formatted number packed into an Int, so callers can measure
-/// output without building strings: bits 0..1 flags, bit 2.. length.
-/// flag 1: starts with '-', flag 2: starts with '.', (a '.' is present iff
-/// bit 2 is set or the number starts with '.').
+/// Shape of `format_number(v, precision)` packed into an Int, so callers can
+/// measure output without building strings: bits 3.. hold the length; flag 1:
+/// starts with '-'; flag 2: starts with '.'; flag 4: contains a '.'.
 pub fn number_shape(v : Double, precision : Int) -> Int {
-  let (neg, int_part, frac, frac_len) = decompose(v, precision)
-  if int_part == 0 && frac == 0 {
-    return 1 << 3
-  }
-  if int_part == 0 && frac > 0 {
-    let mant_digits = digits_of(frac)
-    let exponent = mant_digits - frac_len - 1
-    let mant_len = if mant_digits == 1 { mant_digits } else { mant_digits + 1 }
-    let sci_len = mant_len + 1 + 1 + digits_of(exponent.abs().to_int64())
-    let dec_len = 1 + frac_len
-    if sci_len < dec_len {
-      let mut len = sci_len
-      let mut flags = 0
-      if neg {
-        len += 1
-        flags = flags | 1
-      }
-      if mant_digits > 1 {
-        flags = flags | 4
-      }
-      return (len << 3) | flags
-    }
-  }
-  let mut len = 0
-  let mut flags = 0
-  if neg {
-    len += 1
-    flags = flags | 1
-  }
-  if int_part != 0 {
-    len += digits_of(int_part)
-  } else if !neg {
-    flags = flags | 2
-  }
-  if frac != 0 {
-    len += 1 + frac_len
-    flags = flags | 4
-  }
-  (len << 3) | flags
+  format_into(None, v, precision)
 }

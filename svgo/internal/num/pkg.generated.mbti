@@ -14,8 +14,6 @@ pub fn atan(Double) -> Double
 
 pub fn cos(Double) -> Double
 
-pub fn decompose(Double, Int) -> (Bool, Int64, Int64, Int)
-
 pub fn epsilon(Int) -> Double
 
 pub fn format_number(Double, Int) -> String

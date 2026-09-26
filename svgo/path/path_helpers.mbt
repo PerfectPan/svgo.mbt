@@ -146,12 +146,9 @@ fn write_path(
       if prev_shape != 0 {
         // a separator is needed unless the number starts with '-', or starts
         // with '.' after a number that already has a '.'
-        let (neg, int_part, frac, _) = @num.decompose(a, precision)
-        let nonzero = int_part != 0 || frac != 0
-        let starts_neg = nonzero && neg
-        let starts_dot = nonzero &&
-          !neg &&
-          int_part == 0 &&
+        let shape = @num.number_shape(a, precision)
+        let starts_neg = (shape & 1) != 0
+        let starts_dot = (shape & 2) != 0 &&
           (prev_shape & 4) != 0 &&
           !prev_was_flag
         if !(starts_neg || starts_dot) {

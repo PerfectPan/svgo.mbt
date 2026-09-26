@@ -1124,11 +1124,25 @@ let convert_path_data : Plugin = {
               .any(c => marker_classes.contains(c.trim().to_owned()))
             None => false
           })
-        // The memo of already-optimal path data is only valid in the default
-        // context: with a stroke the result also depends on linecap/linejoin,
-        // and the same `d` may appear on differently styled elements.
-        let memo_ok = !has_marker_mid && !has_stroke
-        if memo_ok && ctx.optimized_paths.contains(path_d) {
+        // marker-start/end on a path that originally had drawing commands
+        // but optimizes down to only M/m needs an explicit `z` so the
+        // marker renders consistently across clients.
+        let has_marker_se = e.attrs.contains("marker-start") ||
+          e.attrs.contains("marker-end")
+        // Besides `d`, the result depends only on these element inputs (the
+        // optimizer distinguishes butt/round/square caps and round joins),
+        // so data found optimal is remembered together with them.
+        let style = (if has_marker_mid { 1 } else { 0 }) |
+          (if has_marker_se { 2 } else { 0 }) |
+          (if has_stroke { 4 } else { 0 }) |
+          (match linecap {
+            "butt" => 8
+            "round" => 16
+            "square" => 24
+            _ => 0
+          }) |
+          (if linejoin == "round" { 32 } else { 0 })
+        if ctx.optimized_paths.get(path_d) == Some(style) {
           return
         }
         let opts = if has_marker_mid {
@@ -1143,11 +1157,6 @@ let convert_path_data : Plugin = {
         }
         try {
           let segs = @path.parse(path_d)
-          // marker-start/end on a path that originally had drawing commands
-          // but optimizes down to only M/m needs an explicit `z` so the
-          // marker renders consistently across clients.
-          let has_marker_se = e.attrs.contains("marker-start") ||
-            e.attrs.contains("marker-end")
           let includes_vertices = segs.any(s => s.cmd != 'M' && s.cmd != 'm')
           let optimized = @path.optimize(segs, options=opts)
           let all_moveto = optimized.all(s => s.cmd == 'M' || s.cmd == 'm')
@@ -1158,8 +1167,8 @@ let convert_path_data : Plugin = {
           if out != path_d {
             e.attrs["d"] = out
             changed(true)
-          } else if memo_ok {
-            ctx.optimized_paths.add(path_d)
+          } else {
+            ctx.optimized_paths[path_d] = style
           }
         } catch {
           _ => ()
@@ -1367,34 +1376,42 @@ let merge_paths : Plugin = {
           changed = true
         }
       }
+      // Fold `b` into the run ending at `a` if the two may merge. The
+      // attribute test is cheap and usually fails, so hulls are only built
+      // for neighbours that pass it.
+      let try_merge = fn(a : @xml.Element, b : @xml.Element) -> Bool {
+        guard same_merge_attrs(
+            a, b, marker_classes, url_classes, clip_mask_classes,
+          ) &&
+          a.attrs.get("d") is Some(da) &&
+          b.attrs.get("d") is Some(db) else {
+          return false
+        }
+        let a_hulls = if acc_active { acc_hulls } else { path_hulls(ctx, da) }
+        let b_hulls = path_hulls(ctx, db)
+        // paths must not intersect so fill rules cannot interact
+        if hulls_intersect(a_hulls, b_hulls, @num.epsilon(ctx.precision)) {
+          return false
+        }
+        if !acc_active {
+          acc_segs = @path.parse(da) catch { _ => [] }
+          acc_hulls = a_hulls.copy()
+          acc_active = true
+        }
+        append_segments(acc_segs, @path.parse(db) catch { _ => [] })
+        acc_hulls.append(b_hulls)
+        true
+      }
       let mut i = 0
       while i + 1 < parent.children.length() {
         match (parent.children[i], parent.children[i + 1]) {
-          (Element(a), Element(b)) if a.name == "path" && b.name == "path" => {
-            let da = a.attrs.get("d").unwrap_or("")
-            let a_hulls = if acc_active {
-              acc_hulls
-            } else {
-              path_hulls(ctx, da)
-            }
-            if mergeable(
-                a, b, a_hulls, marker_classes, url_classes, clip_mask_classes, ctx,
-              ) {
-              let db = b.attrs.get("d").unwrap_or("")
-              let sb = @path.parse(db) catch { _ => [] }
-              if !acc_active {
-                acc_segs = @path.parse(da) catch { _ => [] }
-                acc_hulls = a_hulls.copy()
-                acc_active = true
-              }
-              append_segments(acc_segs, sb)
-              acc_hulls.append(path_hulls(ctx, db))
+          (Element(a), Element(b)) if a.name == "path" && b.name == "path" =>
+            if try_merge(a, b) {
               ignore(parent.children.remove(i + 1))
             } else {
               flush(a)
               i += 1
             }
-          }
           (Element(a), _) => {
             flush(a)
             i += 1
@@ -1575,14 +1592,15 @@ fn is_moveto(cmd : Char) -> Bool {
 }
 
 ///|
-fn mergeable(
+/// Attribute side of the mergePaths test: identical attributes apart from
+/// `d`, no `id`, and nothing (markers, clip-path, mask, url() paints) that
+/// makes concatenating the path data observable.
+fn same_merge_attrs(
   a : @xml.Element,
   b : @xml.Element,
-  a_hulls : Array[Array[Pt]],
   marker_classes : Set[String],
   url_classes : Set[String],
   clip_mask_classes : Set[String],
-  ctx : Context,
 ) -> Bool {
   guard a.attrs.length() == b.attrs.length() &&
     !a.attrs.contains("id") &&
@@ -1597,16 +1615,8 @@ fn mergeable(
       return false
     }
   }
-  // markers, clip-path, mask and url() paints make a merge unsafe
-  if has_merge_restriction(a, marker_classes, url_classes, clip_mask_classes) ||
-    has_merge_restriction(b, marker_classes, url_classes, clip_mask_classes) {
-    return false
-  }
-  guard a.attrs.contains("d") && b.attrs.get("d") is Some(db) else {
-    return false
-  }
-  // paths must not intersect so fill rules cannot interact
-  !hulls_intersect(a_hulls, path_hulls(ctx, db), @num.epsilon(ctx.precision))
+  !has_merge_restriction(a, marker_classes, url_classes, clip_mask_classes) &&
+  !has_merge_restriction(b, marker_classes, url_classes, clip_mask_classes)
 }
 
 ///|

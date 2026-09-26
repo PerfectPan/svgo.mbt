@@ -4,7 +4,6 @@ package "PerfectPan/svgo/plugins"
 import {
   "PerfectPan/svgo/xml",
   "moonbitlang/core/debug",
-  "moonbitlang/core/set",
 }
 
 // Values
@@ -20,7 +19,7 @@ pub let preset_default : Array[Plugin]
 pub struct Context {
   precision : Int
   mut params : Json
-  optimized_paths : @set.Set[String]
+  optimized_paths : Map[String, Int]
   path_hulls : Map[String, Array[Array[(Double, Double)]]]
 } derive(@debug.Debug)
 pub fn Context::new(precision? : Int) -> Self

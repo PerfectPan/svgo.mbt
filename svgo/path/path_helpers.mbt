@@ -63,7 +63,7 @@ fn parse_into(
       }
     }
     let count = arg_count(cmd)
-    let args : Array[Double] = []
+    let args : Array[Double] = Array::new(capacity=count)
     for k in 0..<count {
       i = skip(i)
       let is_flag = cmd.to_ascii_lowercase() == 'a' && (k == 3 || k == 4)
@@ -115,7 +115,6 @@ fn write_path(
   // shape of the last number written in the current command, 0 right after
   // a command letter
   let mut prev_shape = 0
-  let mut prev_was_flag = false
   for i, seg in segments {
     let cmd = if i == 0 { first_cmd } else { seg.cmd }
     // implicit repetition saves the command letter; `M x y L` pairs use it too
@@ -127,7 +126,6 @@ fn write_path(
     if !implicit {
       sb.write_char(cmd)
       prev_shape = 0
-      prev_was_flag = false
     }
     let is_arc = cmd == 'a' || cmd == 'A'
     for k, a in seg.args {
@@ -140,23 +138,9 @@ fn write_path(
         }
         sb.write_char(if a != 0.0 { '1' } else { '0' })
         prev_shape = 1 << 3
-        prev_was_flag = true
         continue
       }
-      if prev_shape != 0 {
-        // a separator is needed unless the number starts with '-', or starts
-        // with '.' after a number that already has a '.'
-        let shape = @num.number_shape(a, precision)
-        let starts_neg = (shape & 1) != 0
-        let starts_dot = (shape & 2) != 0 &&
-          (prev_shape & 4) != 0 &&
-          !prev_was_flag
-        if !(starts_neg || starts_dot) {
-          sb.write_char(' ')
-        }
-      }
-      prev_shape = @num.write_number_shaped(sb, a, precision)
-      prev_was_flag = false
+      prev_shape = @num.write_path_number(sb, a, precision, prev_shape)
     }
     prev_cmd = cmd
   }
@@ -168,30 +152,19 @@ fn write_path(
 fn segment_len(seg : Segment, precision : Int) -> Int {
   let mut len = 1
   let is_arc = seg.cmd == 'a' || seg.cmd == 'A'
-  let mut prev_has_dot = false
-  let mut prev_was_flag = false
-  let mut first = true
+  let mut prev = 0
   for k, a in seg.args {
-    let is_flag = is_arc && (k == 3 || k == 4)
-    if is_flag {
-      if !first {
-        len += 1
-      }
-      len += 1
-      prev_has_dot = false
-      prev_was_flag = true
+    // an arc flag is one digit and always separated, like in `write_path`
+    let shape = if is_arc && (k == 3 || k == 4) {
+      1 << 3
     } else {
-      let shape = @num.number_shape(a, precision)
-      let starts_neg = (shape & 1) != 0
-      let starts_dot = (shape & 2) != 0 && prev_has_dot && !prev_was_flag
-      if !first && !(starts_neg || starts_dot) {
-        len += 1
-      }
-      len += shape >> 3
-      prev_has_dot = (shape & 4) != 0
-      prev_was_flag = false
+      @num.number_shape(a, precision)
     }
-    first = false
+    if @num.needs_separator(prev, shape) {
+      len += 1
+    }
+    len += shape >> 3
+    prev = shape
   }
   len
 }

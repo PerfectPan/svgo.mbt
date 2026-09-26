@@ -217,11 +217,17 @@ fn write_digits(sb : StringBuilder, v : Int64) -> Unit {
 /// Format `v` rounded to `precision` places the way path data spells it: no
 /// trailing zeros, no leading zero before the point, scientific notation when
 /// that is shorter (`1e-7` rather than `.0000001`). Appends to `sb` when one
-/// is given and returns the shape either way (see `number_shape`). Callers
-/// measure far more candidates than they write, and everything stays in
-/// locals: a helper returning the decomposed parts as a tuple allocated on
-/// every call.
-fn format_into(sb : StringBuilder?, v : Double, precision : Int) -> Int {
+/// is given, preceded by a space if it follows a number of shape `prev` (0:
+/// nothing to separate from) and would otherwise run into it; returns the
+/// shape of `v` either way (see `number_shape`). Callers measure far more
+/// candidates than they write, and everything stays in locals: a helper
+/// returning the decomposed parts as a tuple allocated on every call.
+fn format_into(
+  sb : StringBuilder?,
+  v : Double,
+  precision : Int,
+  prev? : Int = 0,
+) -> Int {
   let p = if precision < 0 {
     0
   } else if precision > 15 {
@@ -252,8 +258,16 @@ fn format_into(sb : StringBuilder?, v : Double, precision : Int) -> Int {
       }
     }
   }
+  fn separate(sb : StringBuilder, starts_neg : Bool, starts_dot : Bool) {
+    let lead = (if starts_neg { 1 } else { 0 }) |
+      (if starts_dot { 2 } else { 0 })
+    if needs_separator(prev, lead) {
+      sb.write_char(' ')
+    }
+  }
   if int_part == 0 && frac == 0 {
     if sb is Some(sb) {
+      separate(sb, false, false)
       sb.write_char('0')
     }
     return 1 << 3
@@ -267,6 +281,7 @@ fn format_into(sb : StringBuilder?, v : Double, precision : Int) -> Int {
     let sci_len = mant_len + 2 + exp_digits
     if sci_len < 1 + frac_len {
       if sb is Some(sb) {
+        separate(sb, neg, false)
         if neg {
           sb.write_char('-')
         }
@@ -287,6 +302,7 @@ fn format_into(sb : StringBuilder?, v : Double, precision : Int) -> Int {
   }
   let int_len = if int_part != 0 { digits_of(int_part) } else { 0 }
   if sb is Some(sb) {
+    separate(sb, neg, int_part == 0)
     if neg {
       sb.write_char('-')
     }
@@ -324,13 +340,26 @@ pub fn write_number(sb : StringBuilder, v : Double, precision : Int) -> Unit {
 }
 
 ///|
-/// Write the number and return its shape (see `number_shape`) in one pass.
-pub fn write_number_shaped(
+/// Append `v` as the next number of a path data argument list, after one of
+/// shape `prev` (0 right after a command letter): a separating space is
+/// written only where the two would otherwise run together. Returns the
+/// shape of `v` (see `number_shape`).
+pub fn write_path_number(
   sb : StringBuilder,
   v : Double,
   precision : Int,
+  prev : Int,
 ) -> Int {
-  format_into(Some(sb), v, precision)
+  format_into(Some(sb), v, precision, prev~)
+}
+
+///|
+/// Whether path data needs a space between a number of shape `prev` (0:
+/// none, e.g. right after a command letter) and one of shape `next`. None is
+/// needed before a '-', or before a '.' when the previous number already has
+/// one; only the flag bits of `next` are read.
+pub fn needs_separator(prev : Int, next : Int) -> Bool {
+  prev != 0 && (next & 1) == 0 && ((next & 2) == 0 || (prev & 4) == 0)
 }
 
 ///|

@@ -5,8 +5,9 @@
 let instancePromise;
 
 const hostImports = () => ({
-  // Transcendentals and the slow path of number parsing come from the host,
-  // which keeps their MoonBit implementations out of the wasm.
+  // Transcendentals, the slow path of number parsing and shortest number
+  // formatting come from the host, which keeps their MoonBit implementations
+  // out of the wasm.
   Math: {
     sin: Math.sin,
     cos: Math.cos,
@@ -15,7 +16,7 @@ const hostImports = () => ({
     acos: Math.acos,
     atan: Math.atan,
   },
-  Number: { parseFloat: Number.parseFloat },
+  Number: { parseFloat: Number.parseFloat, toString: String },
   // `println` and friends are never called by the optimizer, but the module
   // declares the imports; provide inert implementations.
   spectest: {

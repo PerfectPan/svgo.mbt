@@ -32,6 +32,13 @@ pub fn atan(x : Double) -> Double {
 }
 
 ///|
+/// Shortest decimal spelling that reads back as `x`, as JavaScript's
+/// `String(x)` writes it (exponent form below 1e-6 and from 1e21).
+pub fn number_to_string(x : Double) -> String {
+  x.to_string()
+}
+
+///|
 /// Correctly rounded conversion for numbers `scan_number` cannot decode
 /// exactly on its own; None when `s` is not a number.
 fn parse_double_slow(s : String) -> Double? {

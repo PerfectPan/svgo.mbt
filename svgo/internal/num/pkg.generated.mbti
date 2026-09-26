@@ -22,6 +22,8 @@ pub fn needs_separator(Int, Int) -> Bool
 
 pub fn number_shape(Double, Int) -> Int
 
+pub fn number_to_string(Double) -> String
+
 pub fn parse_number(String) -> Double?
 
 pub fn round_to(Double, Int) -> Double

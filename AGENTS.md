@@ -99,10 +99,10 @@ docs/ARCHITECTURE.md          design notes
 5. **No target-specific code outside `app/cli/io_native.mbt`, `svgo/wasm/` and
    `svgo/internal/num/host_*.mbt`.** The library compiles unchanged to wasm-gc, js and
    native. The `host_*` pair is the one exception: on wasm-gc the
-   transcendentals and the slow path of number parsing are host imports
-   (`Math`, `Number.parseFloat`), which keeps about 20 KB of core out of the
-   artifact; the other targets call core. Keep it to pure functions with
-   identical results.
+   transcendentals, the slow path of number parsing and shortest number
+   formatting are host imports (`Math`, `Number.parseFloat`, `String`), which
+   keeps about 25 KB of core out of the artifact; the other targets call core.
+   Keep it to pure functions with identical results.
 
 ## Conventions
 

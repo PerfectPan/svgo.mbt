@@ -153,7 +153,7 @@ fn transforms_multiply(ts : Array[Tf]) -> Tf {
 ///|
 /// Number of digits after the decimal point.
 fn float_digits(v : Double) -> Int {
-  let s = v.to_string()
+  let s = @num.number_to_string(v)
   match s.find(".") {
     Some(i) => s.length() - i - 1
     None => 0
@@ -163,7 +163,7 @@ fn float_digits(v : Double) -> Int {
 ///|
 /// Total number of digits in a number (ignoring sign and decimal point).
 fn total_digits(v : Double) -> Int {
-  let s = v.to_string()
+  let s = @num.number_to_string(v)
   let mut n = 0
   for c in s {
     if c >= '0' && c <= '9' {

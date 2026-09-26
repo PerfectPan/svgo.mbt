@@ -7,6 +7,8 @@ pub fn Context::set_params(self : Context, params : Json) -> Unit {
 ///|
 fn Context::param(self : Context, name : String) -> Json? {
   match self.params {
+    // the common case, and plugins read parameters per element
+    Object(obj) if obj.is_empty() => None
     Object(obj) => obj.get(name)
     _ => None
   }

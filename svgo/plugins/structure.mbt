@@ -102,6 +102,13 @@ let remove_unknowns_and_defaults : Plugin = {
     // collect CSS text to detect attribute selectors that would make a
     // default-valued attribute meaningful
     let css = style_text(doc)
+    let unknown_content = ctx.param_bool("unknownContent", true)
+    let unknown_attrs = ctx.param_bool("unknownAttrs", true)
+    let default_attrs = ctx.param_bool("defaultAttrs", true)
+    let useless_overrides = ctx.param_bool("uselessOverrides", true)
+    let keep_data_attrs = ctx.param_bool("keepDataAttrs", true)
+    let keep_aria_attrs = ctx.param_bool("keepAriaAttrs", true)
+    let keep_role_attr = ctx.param_bool("keepRoleAttr", false)
     // remove standalone="no" from the XML declaration
     for node in doc.children {
       match node {
@@ -144,7 +151,7 @@ let remove_unknowns_and_defaults : Plugin = {
         Some(allowed) if allowed.length() > 0 => !allowed.contains(e.name)
         _ => is_unknown
       }
-      if ctx.param_bool("unknownContent", true) && not_allowed {
+      if unknown_content && not_allowed {
         match parent {
           Some(p) => {
             let idx = p.children.search_by(c => {
@@ -169,21 +176,21 @@ let remove_unknowns_and_defaults : Plugin = {
       for kv in e.attrs.to_array() {
         let (k, v) = kv
         // always keep data-*, aria-*, xmlns and xmlns:*
-        if (ctx.param_bool("keepDataAttrs", true) && k.has_prefix("data-")) ||
-          (ctx.param_bool("keepAriaAttrs", true) && k.has_prefix("aria-")) ||
-          (ctx.param_bool("keepRoleAttr", false) && k == "role") ||
+        if (keep_data_attrs && k.has_prefix("data-")) ||
+          (keep_aria_attrs && k.has_prefix("aria-")) ||
+          (keep_role_attr && k == "role") ||
           k == "xmlns" ||
           k.has_prefix("xmlns:") {
           continue
         }
         // role is removed by default (keepRoleAttr = false)
-        if k == "role" && !ctx.param_bool("keepRoleAttr", false) {
+        if k == "role" && !keep_role_attr {
           e.attrs.remove(k)
           changed = true
           continue
         }
         // version and baseProfile on <svg> are noise
-        if ctx.param_bool("unknownAttrs", true) &&
+        if unknown_attrs &&
           e.name == "svg" &&
           (k == "version" || k == "baseProfile") {
           e.attrs.remove(k)
@@ -194,8 +201,7 @@ let remove_unknowns_and_defaults : Plugin = {
         // are always kept (they belong to other namespaces)
         let is_namespaced = k.contains(":")
         let is_xml_xlink = k.has_prefix("xml:") || k.has_prefix("xlink:")
-        if ctx.param_bool("unknownAttrs", true) &&
-          (!is_namespaced || is_xml_xlink) {
+        if unknown_attrs && (!is_namespaced || is_xml_xlink) {
           match allowed {
             Some(set) if !set.contains(k) => {
               e.attrs.remove(k)
@@ -220,7 +226,7 @@ let remove_unknowns_and_defaults : Plugin = {
               None => false
             }
         }
-        if ctx.param_bool("defaultAttrs", true) && is_default && !has_id {
+        if default_attrs && is_default && !has_id {
           let ancestor_sets = inheritable.contains(k) &&
             ancestors_define(chain, k)
           let css_selects = css.contains("[" + k + "]")
@@ -232,7 +238,7 @@ let remove_unknowns_and_defaults : Plugin = {
         }
         // useless override: an inheritable attr whose value equals the
         // inherited value from the nearest ancestor that sets it
-        if ctx.param_bool("uselessOverrides", true) &&
+        if useless_overrides &&
           !has_id &&
           inheritable.contains(k) &&
           !tables.presentation_non_inheritable.contains(k) {
@@ -256,7 +262,7 @@ let remove_unknowns_and_defaults : Plugin = {
       }
       // zero-valued geometry attributes default to 0
       match zero_defaults.get(e.name) {
-        Some(list) if ctx.param_bool("defaultAttrs", true) =>
+        Some(list) if default_attrs =>
           for k in list {
             match e.attrs.get(k) {
               Some(v) =>
@@ -311,6 +317,12 @@ fn remove_standalone_no(v : String) -> String {
 }
 
 ///|
+/// Elements removeUselessStrokeAndFill inspects.
+let stroke_and_fill_elements : Set[String] = Set([
+  "path", "rect", "circle", "ellipse", "line", "polyline", "polygon", "g", "text",
+])
+
+///|
 /// Drop stroke-* attributes when there is no stroke and fill-* when fill is none.
 let remove_useless_stroke_and_fill : Plugin = {
   name: "removeUselessStrokeAndFill",
@@ -334,10 +346,7 @@ let remove_useless_stroke_and_fill : Plugin = {
     // elements with ids may be referenced by <use> under different inherited values
     let ids = referenced_ids(doc)
     fn walk(e : @xml.Element, chain : Array[@xml.Element]) {
-      let shape = [
-        "path", "rect", "circle", "ellipse", "line", "polyline", "polygon", "g",
-        "text",
-      ].contains(e.name)
+      let shape = stroke_and_fill_elements.contains(e.name)
       // ...and so may anything below a referenced element or inside <defs>:
       // a <use> can put a stroke on it that is not visible here
       let referenced = (e.attrs.get("id") is Some(id) && ids.contains(id)) ||
@@ -909,6 +918,10 @@ let convert_path_data : Plugin = {
       }
       _ => (true, 2.5, 0.5)
     }
+    // applyTransforms: bake an element's transform into its path data when
+    // it is safe to do so (see the walk below)
+    let apply_transforms = ctx.param_bool("applyTransforms", true)
+    let apply_stroked = ctx.param_bool("applyTransformsStroked", true)
     let options = {
       ..@path.Options::default(),
       precision,
@@ -998,12 +1011,9 @@ let convert_path_data : Plugin = {
       }
       let has_stroke = css_strokes || (stroke != "none" && sw != "0")
       if e.name == "path" && e.attrs.get("d") is Some(d) {
-        // applyTransforms: bake the element's transform into the path data
-        // when it is safe to do so. We are stricter than svgo: any `id` on
-        // the path makes us bail, because a `<use>` may add its own transform
-        // on top.
-        let apply_transforms = ctx.param_bool("applyTransforms", true)
-        let apply_stroked = ctx.param_bool("applyTransformsStroked", true)
+        // We are stricter than svgo about applyTransforms: any `id` on the
+        // path makes us bail, because a `<use>` may add its own transform on
+        // top.
         let mut path_d = d
         if apply_transforms {
           match e.attrs.get("transform") {

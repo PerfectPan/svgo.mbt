@@ -1,24 +1,20 @@
 ///|
 /// Pipe-separated records, comma-separated lists, key=value defaults.
-/// Shared groups are parsed once; element rules are expanded on demand.
+/// Shared groups are parsed once; element rules (and the attribute group
+/// defaults they use) are kept as raw records and expanded on demand.
 priv struct SvgTables {
   attr_groups : Map[String, Array[String]]
-  group_defaults : Map[String, Map[String, String]]
+  group_defaults : Map[String, String]
   content_groups : Map[String, Array[String]]
-  elements : Map[String, Array[StringView]]
+  elements : Map[String, String]
   expanded : Map[String, SvgElementTables]
   known_elements : Set[String]
   presentation_non_inheritable : Set[String]
   inheritable : Set[String]
   path_elems : Set[String]
   references_props : Set[String]
-  deprecated_groups : Map[String, DeprecatedAttrs]
-}
-
-///|
-priv struct DeprecatedAttrs {
-  safe : Set[String]
-  unsafe_attrs : Set[String]
+  /// group name -> `safe|unsafe` attribute lists
+  deprecated_groups : Map[String, String]
 }
 
 ///|
@@ -61,31 +57,14 @@ fn table_groups(raw : String) -> Map[String, Array[String]] {
 }
 
 ///|
-fn deprecated_groups(raw : String) -> Map[String, DeprecatedAttrs] {
-  let groups : Map[String, DeprecatedAttrs] = Map([])
-  for row in raw.split("\n") {
-    let fields = row.split("|").to_array()
-    if fields.length() < 3 {
-      continue
-    }
-    let name = fields[0].to_owned()
-    groups[name] = {
-      safe: Set::from_array(table_list(fields[1])),
-      unsafe_attrs: Set::from_array(table_list(fields[2])),
-    }
-  }
-  groups
-}
-
-///|
 fn svg_tables() -> SvgTables {
   if svg_tables_cache.val is Some(tables) {
     return tables
   }
-  let group_defaults : Map[String, Map[String, String]] = Map([])
+  let group_defaults : Map[String, String] = Map([])
   for row in svg_attr_defaults_data.split("\n") {
     if row.to_owned().split_once("|") is Some((name, values)) {
-      group_defaults[name.to_owned()] = table_pairs(values)
+      group_defaults[name.to_owned()] = values.to_owned()
     }
   }
   let tables : SvgTables = {
@@ -101,13 +80,19 @@ fn svg_tables() -> SvgTables {
     inheritable: Set::from_array(table_list(svg_inheritable_data[:])),
     path_elems: Set::from_array(table_list(svg_path_elems_data[:])),
     references_props: Set::from_array(table_list(svg_references_props_data[:])),
-    deprecated_groups: deprecated_groups(svg_deprecated_groups_data),
+    deprecated_groups: Map([]),
+  }
+  for row in svg_deprecated_groups_data.split("\n") {
+    if row.to_owned().split_once("|") is Some((name, lists)) {
+      tables.deprecated_groups[name.to_owned()] = lists.to_owned()
+    }
   }
   for row in svg_elements_data.split("\n") {
-    let fields = row.split("|").to_array()
-    let name = fields[0].to_owned()
-    tables.elements[name] = fields
-    tables.known_elements.add(name)
+    if row.to_owned().split_once("|") is Some((name, _)) {
+      let name = name.to_owned()
+      tables.elements[name] = row.to_owned()
+      tables.known_elements.add(name)
+    }
   }
   svg_tables_cache.val = Some(tables)
   tables
@@ -118,7 +103,8 @@ fn SvgTables::element(self : SvgTables, name : String) -> SvgElementTables? {
   if self.expanded.get(name) is Some(element) {
     return Some(element)
   }
-  guard self.elements.get(name) is Some(fields) else { return None }
+  guard self.elements.get(name) is Some(row) else { return None }
+  let fields = row.split("|").to_array()
   let attrs = Set::from_array(table_list(fields[2]))
   let defaults = table_pairs(fields[3])
   // Preserve the previous generator's precedence: own defaults first,
@@ -130,7 +116,7 @@ fn SvgTables::element(self : SvgTables, name : String) -> SvgElementTables? {
       }
     }
     if self.group_defaults.get(group) is Some(values) {
-      for key, value in values {
+      for key, value in table_pairs(values) {
         defaults[key] = value
       }
     }
@@ -155,11 +141,12 @@ fn SvgTables::element(self : SvgTables, name : String) -> SvgElementTables? {
   }
   // merge group-level deprecated attributes into the element's sets
   for group in table_list(fields[1]) {
-    if self.deprecated_groups.get(group) is Some(dep) {
-      for name in dep.safe {
+    if self.deprecated_groups.get(group) is Some(lists) &&
+      lists.split_once("|") is Some((safe, unsafe_attrs)) {
+      for name in table_list(safe) {
         deprecated_safe.add(name)
       }
-      for name in dep.unsafe_attrs {
+      for name in table_list(unsafe_attrs) {
         deprecated_unsafe.add(name)
       }
     }

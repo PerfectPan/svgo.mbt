@@ -377,9 +377,10 @@ fn run_inline_styles(doc : @xml.Document, ctx : Context) -> Bool {
         None => ""
       }
       let existing_decls = @css.parse_declarations(existing_style)
-      let decl_map : Map[String, (@css.Declaration, Int)] = Map([])
+      // name -> index of its last declaration
+      let decl_map : Map[String, Int] = Map([])
       for i = 0; i < existing_decls.length(); i = i + 1 {
-        decl_map[existing_decls[i].name] = (existing_decls[i], i)
+        decl_map[existing_decls[i].name] = i
       }
 
       let new_decls : Array[@css.Declaration] = []
@@ -411,8 +412,8 @@ fn run_inline_styles(doc : @xml.Document, ctx : Context) -> Bool {
 
         match decl_map.get(prop) {
           None => new_decls.push(rule_decl)
-          Some((existing, _)) =>
-            if !existing.important && rule_decl.important {
+          Some(i) =>
+            if !existing_decls[i].important && rule_decl.important {
               new_decls.push(rule_decl)
             }
         }

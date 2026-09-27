@@ -75,8 +75,8 @@ jobs:
         uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
         with:
           version-script: pnpm version-packages
-          commit-message: "Release: version bump and changelog"
-          pr-title: "Release: version bump and changelog"
+          commit-message: "chore(release): version packages"
+          pr-title: "chore(release): version packages"
           create-github-releases: false
         env:
           # changelog-github reads PR titles and authors through the API

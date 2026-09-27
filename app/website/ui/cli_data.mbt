@@ -32,17 +32,17 @@ pub let cli_flags : Array[CliFlag] = [
   },
   {
     flag: "--stats",
-    description: "print size statistics (to stderr when output is stdout)",
+    description: "also print the size report when the SVG goes to stdout",
   },
   {
     flag: "--json",
-    description: "print a JSON object {data, originalSize, size, passes, applied}",
+    description: "print a JSON object {data, originalSize, size, passes, applied} per input instead of the report",
   },
   {
     flag: "--bench <n>",
-    description: "optimize the input n times in-process and report timing",
+    description: "optimize each input n times in-process and report timing",
   },
-  { flag: "-q, --quiet", description: "suppress the stats line", },
+  { flag: "-q, --quiet", description: "do not print the size report", },
   { flag: "--version", description: "print the version and exit", },
   { flag: "--list", description: "list available plugins", },
   { flag: "-h, --help", description: "show this help", },

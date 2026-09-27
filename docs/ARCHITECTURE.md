@@ -74,6 +74,13 @@ default because plugins unlock each other: `collapseGroups` exposes
 attributes that `removeUnknownsAndDefaults` can then drop, `convertShapeToPath`
 produces paths that `mergePaths` can join.
 
+Because a plugin is a value, callers add their own through `Config::custom`
+without a registry: `optimize` resolves each name in `Config::plugins` against
+`custom` first, then the built-ins, and appends the custom plugins no name
+refers to. They share the pipeline, so parameters, multipass and `applied`
+work unchanged. The wasm build has no equivalent, since a JavaScript function
+cannot run inside the module.
+
 SVG vocabulary tables retain svgo's shared groups in compact strings generated
 by `scripts/gen-svg-tables.mjs`. The handwritten `svg_tables_parse.mbt` parses
 groups on first use and expands each element's rules only when queried; both
@@ -107,7 +114,7 @@ that did something. `utf8_length` counts bytes without encoding.
 | form | package | notes |
 | --- | --- | --- |
 | wasm-gc module + JS loader | `svgo/wasm/`, `packages/svgo-mbt/` | JS String Builtins: MoonBit `String` *is* a JS string, so the boundary is two string arguments and one string back. Config and result cross as length-prefixed tokens rather than JSON, and trig, the slow path of number parsing and shortest number formatting are host imports (`svgo/internal/num/host_wasm.mbt`), so the module carries no JSON, strconv, ryu or fdlibm code: about 188 KB after the pinned Binaryen `wasm-opt -Oz --converge` step, down from 269 KB. Each `Map[String, V]` with a new value type adds about 1 KB of generic code, so rarely used tables stay as text or a `match`. |
-| CLI | `app/cli/` | One MoonBit source, two IO backends: `extern "C"` file access on the native target, node's `fs` on the js target, which is what `packages/svgo-mbt/cli.mjs` ships. `--json` for tooling. |
+| CLI | `app/cli/` | One MoonBit source, two IO backends: `extern "C"` file access on the native target, node's `fs` on the js target, which is what `packages/svgo-mbt/cli.mjs` ships. The size report goes to stderr and is styled only when that stream is a terminal, so stdout carries nothing but the SVG. `--json` for tooling. |
 | MoonBit library | `svgo/` | `moon add PerfectPan/svgo`. The website in `app/website/` is the first consumer: a Rabbita app compiled to JS that calls `@svgo.optimize` directly, so the demo and the playground run the same code the tests run. |
 
 ## Verification layers

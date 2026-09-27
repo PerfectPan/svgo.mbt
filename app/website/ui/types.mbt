@@ -97,7 +97,7 @@ pub fn run_optimize(
 ) -> Outcome {
   let base = @svgo.Config::default()
   let config : @svgo.Config = {
-    params: Map([]),
+    ..base,
     plugins: plugins.unwrap_or(base.plugins),
     precision,
     multipass,

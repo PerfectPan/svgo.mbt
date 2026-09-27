@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <string.h>
+#include <time.h>
 #include <errno.h>
 #include "moonbit.h"
 
@@ -52,8 +53,14 @@ moonbit_bytes_t svgo_read_stdin(void) {
   return out;
 }
 
-int32_t svgo_stdin_is_tty(void) {
-  return isatty(0) ? 1 : 0;
+int32_t svgo_is_tty(int32_t fd) {
+  return isatty(fd) ? 1 : 0;
+}
+
+double svgo_clock_ms(void) {
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  return (double)ts.tv_sec * 1000.0 + (double)ts.tv_nsec / 1e6;
 }
 
 void svgo_exit(int32_t code) {

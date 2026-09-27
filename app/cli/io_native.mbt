@@ -10,7 +10,10 @@ extern "C" fn c_svgo_write_file(path : Bytes, data : Bytes) -> Int = "svgo_write
 extern "C" fn c_svgo_read_stdin() -> Bytes = "svgo_read_stdin"
 
 ///|
-extern "C" fn c_svgo_stdin_is_tty() -> Int = "svgo_stdin_is_tty"
+extern "C" fn c_svgo_is_tty(fd : Int) -> Int = "svgo_is_tty"
+
+///|
+extern "C" fn c_svgo_clock_ms() -> Double = "svgo_clock_ms"
 
 ///|
 extern "C" fn c_svgo_exit(code : Int) -> Unit = "svgo_exit"
@@ -58,9 +61,15 @@ fn svgo_read_stdin() -> Bytes {
 }
 
 ///|
-/// Returns true if standard input is connected to a terminal.
-fn svgo_stdin_is_tty() -> Bool {
-  c_svgo_stdin_is_tty() != 0
+/// Returns true if file descriptor `fd` (0 stdin, 1 stdout, 2 stderr) is a terminal.
+fn svgo_is_tty(fd : Int) -> Bool {
+  c_svgo_is_tty(fd) != 0
+}
+
+///|
+/// Milliseconds on a monotonic clock, with sub-millisecond resolution.
+fn svgo_clock_ms() -> Double {
+  c_svgo_clock_ms()
 }
 
 ///|
@@ -89,7 +98,7 @@ fn svgo_is_dir(path : String) -> Bool {
 
 ///|
 /// List the entries of a directory, one per line. Returns an empty string on
-/// failure. Entries are sorted by name.
+/// failure, in no particular order.
 fn svgo_list_dir(path : String) -> String {
   @utf8.decode_lossy(c_svgo_list_dir(cstr(path))[:])
 }

@@ -2,16 +2,22 @@
 const VERSION = "0.2.1"
 
 ///|
+/// The installed command name, for the npm bin and the native binary alike.
+const PROG = "svgo-mbt"
+
+///|
+/// Help after the title line. `app/website/gen.mjs` reads the flag table
+/// between `options:` and `exit status:` for the site.
 const USAGE =
-  #|svgo.mbt - SVG optimizer written in MoonBit
+  #|usage:
+  #|  svgo-mbt [options] [input.svg ...]
+  #|  svgo-mbt in.svg -o out.svg
+  #|  svgo-mbt icons -r -o dist
+  #|  cat in.svg | svgo-mbt > out.svg
   #|
-  #|usage: svgo [options] [input.svg ...]
-  #|       svgo -o out.svg in.svg
-  #|       cat in.svg | svgo > out.svg
-  #|       svgo --list
-  #|
-  #|With no input file (or input "-"), svgo reads from stdin when stdin is not
-  #|a terminal. With no -o, the result is written to stdout.
+  #|  With no input, or input "-", svgo-mbt reads stdin when it is not a terminal.
+  #|  With -o, the files are written and a size report goes to stderr. Without it,
+  #|  the optimized SVG goes to stdout and nothing else does.
   #|
   #|options:
   #|  -o, --output <file>     write the result to a file (default: stdout);
@@ -24,15 +30,19 @@ const USAGE =
   #|  --enable <plugin>       add an optional plugin such as removeDimensions (repeatable)
   #|  --plugins <a,b,c>       run exactly these plugins, in this order
   #|  --param <plugin>.<key>=<value>  set a plugin parameter (repeatable)
-  #|  --stats                 print size statistics (to stderr when output is stdout)
+  #|  --stats                 also print the size report when the SVG goes to stdout
   #|  --json                  print a JSON object {data, originalSize, size, passes, applied}
-  #|  --bench <n>             optimize the input n times in-process and report timing
-  #|  -q, --quiet             suppress the stats line
+  #|                          per input instead of the report
+  #|  --bench <n>             optimize each input n times in-process and report timing
+  #|  -q, --quiet             do not print the size report
   #|  --version               print the version and exit
   #|  --list                  list available plugins
   #|  -h, --help              show this help
   #|
-  #|exit codes: 0 success, 1 usage error, 2 an input failed to parse or optimize.
+  #|exit status:
+  #|  0  success
+  #|  1  usage error
+  #|  2  an input could not be read, parsed, optimized or written (names on stderr)
 
 ///|
 struct CliConfig {
@@ -58,7 +68,7 @@ fn main {
   // the runtime and the script on js, argv carries only the program on native.
   let args = svgo_args()
   if args.contains("-h") || args.contains("--help") {
-    println(USAGE)
+    println(help(Term::detect(1)))
     return
   }
   if args.contains("--version") {
@@ -66,17 +76,13 @@ fn main {
     return
   }
   if args.contains("--list") {
-    for p in @svgo.list_plugins() {
-      let (name, desc, on) = p
-      println("\{if on { "*" } else { " " }} \{name.pad_end(28, ' ')} \{desc}")
-    }
-    println("\n* = enabled by default")
+    println(plugin_list(Term::detect(1), @svgo.list_plugins()))
     return
   }
   let cfg = match parse_args(args) {
     Ok(c) => c
     Err(msg) => {
-      svgo_eprintln("svgo: \{msg}")
+      svgo_eprintln("\{PROG}: \{msg}")
       svgo_exit(1)
       return
     }
@@ -91,115 +97,220 @@ fn main {
       list
     }
   }
+  let config : @svgo.Config = {
+    ..@svgo.Config::default(),
+    plugins,
+    params: cfg.params,
+    precision: cfg.precision,
+    multipass: cfg.multipass,
+    pretty: cfg.pretty,
+  }
   let inputs = collect_inputs(cfg.inputs, cfg.recursive)
   if inputs.length() == 0 {
-    svgo_eprintln("svgo: no input files")
+    svgo_eprintln("\{PROG}: no input files")
     svgo_exit(1)
     return
   }
-  let failures : Array[String] = []
-  for input in inputs {
-    let (source, label) = match input {
-      "-" => {
-        let bytes = svgo_read_stdin()
-        (@utf8.decode_lossy(bytes[:]), "<stdin>")
-      }
-      path => {
-        let bytes = svgo_read_file(path)
-        if bytes.length() == 0 {
-          svgo_eprintln("svgo: cannot read \{path}")
-          failures.push(path)
-          continue
-        }
-        (@utf8.decode_lossy(bytes[:]), path)
-      }
-    }
-    if cfg.bench > 0 {
-      let config : @svgo.Config = {
-        plugins,
-        params: cfg.params,
-        precision: cfg.precision,
-        multipass: cfg.multipass,
-        pretty: cfg.pretty,
-      }
-      ignore(
-        @svgo.optimize(source, config~) catch {
-          _ => {
-            failures.push(label)
-            continue
-          }
-        },
-      )
-      let start = @env.now()
-      for _ in 0..<cfg.bench {
-        ignore(
-          @svgo.optimize(source, config~) catch {
-            _ => {
-              failures.push(label)
-              break
-            }
-          },
-        )
-      }
-      let elapsed_ms = (@env.now() - start).to_double()
-      let per = (elapsed_ms / cfg.bench.to_double() * 1000.0).round() / 1000.0
-      println("\{label}: \{cfg.bench} runs in \{elapsed_ms} ms, \{per} ms/run")
-      continue
-    }
-    let result = @svgo.optimize(source, config={
-      plugins,
-      params: cfg.params,
-      precision: cfg.precision,
-      multipass: cfg.multipass,
-      pretty: cfg.pretty,
-    }) catch {
-      e => {
-        svgo_eprintln("svgo: \{label}: \{e}")
-        failures.push(label)
-        continue
-      }
-    }
-    let out_path = output_path_for(
-      label,
-      cfg.output,
-      inputs.length() > 1 || cfg.recursive,
-    )
-    match out_path {
-      Some(out) => {
-        if inputs.length() > 1 || cfg.recursive {
-          // ensure the output directory exists
-          let idx = last_index_of(out, '/')
-          if idx > 0 {
-            let dir = out[:idx].to_owned()
-            ignore(svgo_mkdir_p(dir))
-          }
-        }
-        if svgo_write_file(out, @utf8.encode(result.data)) != 0 {
-          svgo_eprintln("svgo: cannot write \{out}")
-          failures.push(label)
-          continue
-        }
-        if cfg.json {
-          println(to_json(result, data=false))
-        } else if cfg.stats && !cfg.quiet {
-          report(label, result)
-        }
-      }
-      None =>
-        if cfg.json {
-          println(to_json(result, data=true))
-        } else {
-          println(result.data)
-          if cfg.stats && !cfg.quiet {
-            report_stderr(label, result)
-          }
-        }
-    }
+  let labels = inputs.map(i => if i == "-" { "<stdin>" } else { i })
+  let ok = if cfg.bench > 0 {
+    bench(inputs, labels, config, cfg.bench)
+  } else {
+    optimize_all(inputs, labels, config, cfg)
   }
-  if failures.length() > 0 {
-    svgo_eprintln("svgo: failed: \{failures.join(", ")}")
+  if !ok {
     svgo_exit(2)
   }
+}
+
+///|
+/// Optimize every input, write or print it, and report on stderr. Returns
+/// false when any input failed.
+fn optimize_all(
+  inputs : Array[String],
+  labels : Array[String],
+  config : @svgo.Config,
+  cfg : CliConfig,
+) -> Bool {
+  let multi = inputs.length() > 1 || cfg.recursive
+  // stdout may carry the SVG, so without -o the report is opt-in
+  let show = !cfg.json && !cfg.quiet && (cfg.output is Some(_) || cfg.stats)
+  let report = Report::new(Term::detect(2), labels)
+  let start = svgo_clock_ms()
+  let mut failed = 0
+  let mut original = 0
+  let mut size = 0
+  for i, input in inputs {
+    let label = labels[i]
+    let out = output_path_for(label, cfg.output, multi)
+    match optimize_one(input, out, config, cfg.json) {
+      Ok(r) => {
+        original += r.original_size
+        size += r.size
+        if show {
+          svgo_eprintln(report.row(label, r))
+          if inputs.length() == 1 && !r.applied.is_empty() {
+            svgo_eprintln(report.plugins(r.applied))
+          }
+        }
+      }
+      Err(msg) => {
+        failed += 1
+        svgo_eprintln(report.error(label, msg))
+        if show && inputs.length() > 1 {
+          svgo_eprintln(report.failed_row(label))
+        }
+      }
+    }
+  }
+  if show && inputs.length() > 1 {
+    svgo_eprintln(
+      report.totals(
+        files=inputs.length(),
+        failed~,
+        original~,
+        size~,
+        elapsed_ms=svgo_clock_ms() - start,
+      ),
+    )
+  }
+  failed == 0
+}
+
+///|
+/// Read, optimize and write one input; `out` is `None` for stdout. The error
+/// is the message for the diagnostic line.
+fn optimize_one(
+  input : String,
+  out : String?,
+  config : @svgo.Config,
+  json : Bool,
+) -> Result[@svgo.Result, String] {
+  let source = match read_input(input) {
+    Some(s) => s
+    None => return Err("cannot read the file")
+  }
+  let result = @svgo.optimize(source, config~) catch {
+    e => return Err(e.to_string())
+  }
+  match out {
+    Some(path) => {
+      let idx = last_index_of(path, '/')
+      if idx > 0 {
+        ignore(svgo_mkdir_p(path[:idx].to_owned()))
+      }
+      if svgo_write_file(path, @utf8.encode(result.data)) != 0 {
+        return Err("cannot write \{path}")
+      }
+      if json {
+        println(to_json(result, data=false))
+      }
+    }
+    None => println(if json { to_json(result, data=true) } else { result.data })
+  }
+  Ok(result)
+}
+
+///|
+/// The input's text; `None` when a file cannot be read.
+fn read_input(input : String) -> String? {
+  if input == "-" {
+    return Some(@utf8.decode_lossy(svgo_read_stdin()[:]))
+  }
+  let bytes = svgo_read_file(input)
+  if bytes.length() == 0 {
+    None
+  } else {
+    Some(@utf8.decode_lossy(bytes[:]))
+  }
+}
+
+///|
+/// Optimize each input `runs` times after one warm-up run and print a timing
+/// row per input on stdout. Returns false when any input failed.
+fn bench(
+  inputs : Array[String],
+  labels : Array[String],
+  config : @svgo.Config,
+  runs : Int,
+) -> Bool {
+  let report = Report::new(Term::detect(1), labels)
+  let errors = Report::new(Term::detect(2), labels)
+  let mut ok = true
+  for i, input in inputs {
+    let label = labels[i]
+    let timed = match read_input(input) {
+      None => Err("cannot read the file")
+      Some(source) =>
+        try {
+          ignore(@svgo.optimize(source, config~))
+          let start = svgo_clock_ms()
+          for _ in 0..<runs {
+            ignore(@svgo.optimize(source, config~))
+          }
+          Ok((svgo_clock_ms() - start, source))
+        } catch {
+          e => Err(e.to_string())
+        }
+    }
+    match timed {
+      Ok((total_ms, source)) =>
+        println(
+          report.bench(
+            label,
+            runs~,
+            total_ms~,
+            input_size=@utf8.encode(source).length(),
+          ),
+        )
+      Err(msg) => {
+        ok = false
+        svgo_eprintln(errors.error(label, msg))
+      }
+    }
+  }
+  ok
+}
+
+///|
+/// Title line with the version, then `USAGE` with its headings in bold.
+fn help(term : Term) -> String {
+  let lines = ["\{PROG} \{VERSION}, an SVG optimizer written in MoonBit", ""]
+  for line in USAGE.split("\n") {
+    let line = line.to_owned()
+    lines.push(
+      if line.has_suffix(":") && !line.has_prefix(" ") {
+        term.bold(line)
+      } else {
+        line
+      },
+    )
+  }
+  lines.join("\n")
+}
+
+///|
+/// The plugins in two groups, preset-default in execution order, then the
+/// optional ones.
+fn plugin_list(term : Term, plugins : Array[(String, String, Bool)]) -> String {
+  let mut width = 0
+  for p in plugins {
+    width = width.max(p.0.length())
+  }
+  let lines : Array[String] = []
+  for group in [(true, "preset-default"), (false, "optional")] {
+    let (on, title) = group
+    if !lines.is_empty() {
+      lines.push("")
+    }
+    lines.push(term.bold(title))
+    for p in plugins {
+      let (name, description, enabled) = p
+      if enabled == on {
+        lines.push("  \{name.pad_end(width, ' ')}  \{description}")
+      }
+    }
+  }
+  lines.join("\n")
 }
 
 ///|
@@ -304,7 +415,7 @@ fn parse_args(args : Array[String]) -> Result[CliConfig, String] {
 /// for stdin. When no inputs are given and stdin is not a TTY, stdin is used.
 fn collect_inputs(raw : Array[String], recursive : Bool) -> Array[String] {
   if raw.length() == 0 {
-    if svgo_stdin_is_tty() {
+    if svgo_is_tty(0) {
       return []
     }
     return ["-"]
@@ -318,7 +429,7 @@ fn collect_inputs(raw : Array[String], recursive : Bool) -> Array[String] {
         expand_dir(input, out)
       } else {
         svgo_eprintln(
-          "svgo: \{input} is a directory (use -r to process recursively)",
+          "\{PROG}: \{input} is a directory (use -r to process recursively)",
         )
       }
     } else {
@@ -335,10 +446,14 @@ fn expand_dir(dir : String, out : Array[String]) -> Unit {
   if entries.is_empty() {
     return
   }
-  for name in entries.split("\n") {
-    if name.is_empty() {
-      continue
-    }
+  // readdir order differs between file systems; sort so reports are stable
+  let names = entries
+    .split("\n")
+    .filter(n => !n.is_empty())
+    .map(n => n.to_owned())
+    .to_array()
+  names.sort_by((a, b) => a.lexical_compare(b))
+  for name in names {
     let path = "\{dir}/\{name}"
     if svgo_is_dir(path) {
       expand_dir(path, out)
@@ -378,23 +493,6 @@ fn output_path_for(input : String, output : String?, multi : Bool) -> String? {
         Some(out)
       }
   }
-}
-
-///|
-fn report(path : String, r : @svgo.Result) -> Unit {
-  let pct = (r.saved_percent() * 10.0).round() / 10.0
-  println(
-    "\{path}: \{r.original_size} -> \{r.size} bytes (-\{pct}%), \{r.passes} pass(es), plugins: \{r.applied.join(", ")}",
-  )
-}
-
-///|
-/// Like `report` but on stderr, used when the optimized SVG goes to stdout.
-fn report_stderr(path : String, r : @svgo.Result) -> Unit {
-  let pct = (r.saved_percent() * 10.0).round() / 10.0
-  svgo_eprintln(
-    "\{path}: \{r.original_size} -> \{r.size} bytes (-\{pct}%), \{r.passes} pass(es), plugins: \{r.applied.join(", ")}",
-  )
 }
 
 ///|

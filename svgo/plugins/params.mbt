@@ -16,13 +16,17 @@ fn Context::param(self : Context, name : String) -> Json? {
 
 ///|
 /// Whether a parameter was supplied, including explicit false or empty arrays.
-fn Context::has_param(self : Context, name : String) -> Bool {
+pub fn Context::has_param(self : Context, name : String) -> Bool {
   self.param(name) is Some(_)
 }
 
 ///|
 /// Read a boolean, falling back for absent or incorrectly typed values.
-fn Context::param_bool(self : Context, name : String, default : Bool) -> Bool {
+pub fn Context::param_bool(
+  self : Context,
+  name : String,
+  default : Bool,
+) -> Bool {
   match self.param(name) {
     Some(True) => true
     Some(False) => false
@@ -32,7 +36,7 @@ fn Context::param_bool(self : Context, name : String, default : Bool) -> Bool {
 
 ///|
 /// Read an integer parameter, falling back for absent or incorrectly typed values.
-fn Context::param_int(self : Context, name : String, default : Int) -> Int {
+pub fn Context::param_int(self : Context, name : String, default : Int) -> Int {
   match self.param(name) {
     Some(Number(n, ..)) => n.to_int()
     _ => default
@@ -41,7 +45,7 @@ fn Context::param_int(self : Context, name : String, default : Int) -> Int {
 
 ///|
 /// Read a string parameter, falling back for absent or incorrectly typed values.
-fn Context::param_string(
+pub fn Context::param_string(
   self : Context,
   name : String,
   default : String,
@@ -54,7 +58,7 @@ fn Context::param_string(
 
 ///|
 /// Read a string or an array of strings; ignore non-string entries.
-fn Context::param_strings(self : Context, name : String) -> Array[String] {
+pub fn Context::param_strings(self : Context, name : String) -> Array[String] {
   match self.param(name) {
     Some(String(s)) => [s]
     Some(Array(items)) =>

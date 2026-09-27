@@ -515,7 +515,10 @@ fn cli_section() -> Html {
               text("# read from stdin, write to stdout\n"),
               text("cat in.svg | svgo-mbt > out.svg\n\n"),
               text("# optimize every SVG under a directory into another\n"),
-              text("svgo-mbt -r ./icons -o ./icons-opt"),
+              text("svgo-mbt -r ./icons -o ./icons-opt\n"),
+              c(
+                "  ./icons/close.svg     836 B →    276 B   −67%\n  ./icons/logo.svg     1.1 KB →    528 B   −54%\n  2 files              2.0 KB →    804 B   −59%  2.6 ms",
+              ),
             ]),
           ]),
         ]),

@@ -16,8 +16,13 @@ fn svgo_read_stdin() -> Bytes {
 }
 
 ///|
-fn svgo_stdin_is_tty() -> Bool {
+fn svgo_is_tty(_fd : Int) -> Bool {
   true
+}
+
+///|
+fn svgo_clock_ms() -> Double {
+  0.0
 }
 
 ///|

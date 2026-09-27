@@ -2,6 +2,7 @@
 package "PerfectPan/svgo"
 
 import {
+  "PerfectPan/svgo/plugins",
   "moonbitlang/core/debug",
 }
 
@@ -19,6 +20,7 @@ pub impl Show for UnknownPlugin
 // Types and methods
 pub(all) struct Config {
   plugins : Array[String]
+  custom : Array[@plugins.Plugin]
   params : Map[String, Json]
   precision : Int
   multipass : Bool

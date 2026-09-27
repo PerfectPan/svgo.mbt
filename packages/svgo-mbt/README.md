@@ -41,21 +41,35 @@ precedence over the top-level object for that plugin. Missing parameters use
 plugin defaults. `removeComments.preservePatterns` supports literal substrings
 and `^`-prefixed literal prefixes, not full regular expressions.
 
+Only the built-in plugins run. JavaScript functions cannot run inside the wasm
+module, so do project-specific rewrites on the SVG string before or after
+`optimize`; the MoonBit library accepts custom plugins through `Config::custom`.
+
 ## Command line
 
 The bin is the same optimizer compiled for node, so it needs no toolchain:
 
 ```bash
-npx @rivus/svgo in.svg -o out.svg
+npx @rivus/svgo in.svg -o out.svg        # size report on stderr
 cat in.svg | npx @rivus/svgo > out.svg   # stdin, or pass "-" as the input
 npx @rivus/svgo icons -r -o dist         # a directory, recursively
-npx @rivus/svgo in.svg --stats           # size statistics on stderr
+npx @rivus/svgo in.svg --stats           # SVG on stdout, size report on stderr
 npx @rivus/svgo in.svg --json            # {data, originalSize, size, passes, applied}
 npx @rivus/svgo --list                   # available plugins
 ```
 
+Writing files prints one row per file on stderr, with a totals line for
+several; `-q` silences it:
+
+```text
+$ npx @rivus/svgo icons/close.svg icons/logo.svg -o dist
+  icons/close.svg     836 B →    276 B   −67%
+  icons/logo.svg     1.1 KB →    528 B   −54%
+  2 files            2.0 KB →    804 B   −59%  1.9 ms
+```
+
 Exit codes: 0 on success, 1 for a usage error, 2 when a file could not be
-parsed, with the failing names on stderr.
+read, parsed, optimized or written, with the failing names on stderr.
 
 In a browser the module is fetched relative to the loader; pass your own URL
 to `init(url)` before the first `optimize` call if you host it elsewhere.

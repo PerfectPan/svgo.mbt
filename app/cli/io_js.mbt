@@ -23,8 +23,12 @@ extern "js" fn node_read_stdin() -> Bytes =
   #|}
 
 ///|
-extern "js" fn node_stdin_is_tty() -> Bool =
-  #|() => !!process.stdin.isTTY
+extern "js" fn node_is_tty(fd : Int) -> Bool =
+  #|(fd) => require("tty").isatty(fd)
+
+///|
+extern "js" fn node_clock_ms() -> Double =
+  #|() => performance.now()
 
 ///|
 extern "js" fn node_exit(code : Int) -> Unit =
@@ -45,7 +49,7 @@ extern "js" fn node_is_dir(path : String) -> Bool =
 extern "js" fn node_list_dir(path : String) -> String =
   #|(path) => {
   #|  const fs = require("fs");
-  #|  try { return fs.readdirSync(path).sort().join("\n"); } catch (e) { return ""; }
+  #|  try { return fs.readdirSync(path).join("\n"); } catch (e) { return ""; }
   #|}
 
 ///|
@@ -74,9 +78,15 @@ fn svgo_read_stdin() -> Bytes {
 }
 
 ///|
-/// Returns true if standard input is connected to a terminal.
-fn svgo_stdin_is_tty() -> Bool {
-  node_stdin_is_tty()
+/// Returns true if file descriptor `fd` (0 stdin, 1 stdout, 2 stderr) is a terminal.
+fn svgo_is_tty(fd : Int) -> Bool {
+  node_is_tty(fd)
+}
+
+///|
+/// Milliseconds on a monotonic clock, with sub-millisecond resolution.
+fn svgo_clock_ms() -> Double {
+  node_clock_ms()
 }
 
 ///|
@@ -105,7 +115,7 @@ fn svgo_is_dir(path : String) -> Bool {
 
 ///|
 /// List the entries of a directory, one per line. Returns an empty string on
-/// failure. Entries are sorted by name.
+/// failure, in no particular order.
 fn svgo_list_dir(path : String) -> String {
   node_list_dir(path)
 }

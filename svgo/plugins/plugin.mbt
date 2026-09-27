@@ -28,11 +28,26 @@ pub fn Context::new(precision? : Int = 3) -> Context {
 
 ///|
 /// A plugin transforms the document in place and reports whether it changed
-/// anything, which drives multipass optimization.
+/// anything, which drives multipass optimization. Built-in plugins and the
+/// ones a caller passes in `Config::custom` follow the same rules:
+///
+/// - only remove or rewrite what a renderer cannot observe at
+///   `Context::precision`;
+/// - return `true` exactly when the document changed, otherwise every run
+///   takes the maximum of 10 passes;
+/// - run on any document, in any position of the pipeline, without raising;
+/// - read parameters with `Context::param_bool`, `param_int`, `param_string`
+///   and `param_strings`, which see the object `Config::params` holds under
+///   the plugin's `name`.
 pub(all) struct Plugin {
   name : String
   description : String
   run : (@xml.Document, Context) -> Bool
+}
+
+///|
+pub impl Debug for Plugin with fn to_repr(self) {
+  Repr(self.name)
 }
 
 ///|

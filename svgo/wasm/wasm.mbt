@@ -93,7 +93,7 @@ fn read_config(text : String) -> @svgo.Config raise WireError {
     let name = r.next()
     params[name] = r.read_value()
   }
-  { plugins, params, precision, multipass, pretty, }
+  { ..base, plugins, params, precision, multipass, pretty, }
 }
 
 ///|

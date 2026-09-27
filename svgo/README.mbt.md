@@ -62,13 +62,14 @@ test "optimize" {
 }
 ```
 
-`Config` provides plugin selection, `params : Map[String, Json]`, precision, multipass, and pretty printing; see the [API reference](https://perfectpan.github.io/svgo.mbt/#/api) for all fields.
+`Config` provides plugin selection, your own plugins (`custom`, see [Custom plugins](#custom-plugins)), `params : Map[String, Json]`, precision, multipass, and pretty printing; see the [API reference](https://perfectpan.github.io/svgo.mbt/#/api) for all fields.
 
 ## Command line
 
 ```bash
-svgo-mbt input.svg                            # optimized SVG on stdout
-svgo-mbt input.svg -o out.svg --stats         # write a file, print size statistics
+svgo-mbt input.svg                            # optimized SVG on stdout, nothing else
+svgo-mbt input.svg -o out.svg                 # write a file, size report on stderr
+svgo-mbt input.svg --stats > out.svg          # the report also when the SVG goes to stdout
 svgo-mbt input.svg -p 2 --pretty              # 2 decimal places, indented output
 svgo-mbt input.svg --json                     # {data, originalSize, size, passes, applied}
 svgo-mbt input.svg --plugins convertPathData,sortAttrs
@@ -77,7 +78,20 @@ svgo-mbt input.svg --disable convertShapeToPath --enable moveGroupAttrsToElems
 svgo-mbt --list                               # available plugins
 ```
 
-Exit codes: 0 on success, 1 for a usage error, 2 when a file could not be parsed (the names go to stderr, so a shell loop can act on them).
+Writing files prints a size report on stderr, one row per file as it finishes and a totals line for several (`-q` silences it, `--json` replaces it):
+
+```text
+$ svgo-mbt icons -r -o dist
+  icons/figma-export.svg         570 B →    442 B   −22%
+  icons/illustrator-logo.svg    1.1 KB →    528 B   −54%
+  icons/inkscape-drawing.svg    2.1 KB →    641 B   −69%
+  icons/sketch-icon.svg          836 B →    276 B   −67%
+  4 files                       4.6 KB →   1.9 KB   −59%  6.5 ms
+```
+
+For a single file a second line lists the plugins that changed it. A file that fails gets one line, `svgo-mbt: icons/bad.svg: unclosed element <g> at offset 8`, a `failed` row in the table and a count in the totals. On a terminal the percentages are green or red; `NO_COLOR` turns colour off, `FORCE_COLOR` turns it on for pipes, and stdout is never styled.
+
+Exit codes: 0 on success, 1 for a usage error, 2 when a file could not be read, parsed, optimized or written (the names go to stderr, so a shell loop can act on them).
 
 `--param <plugin>.<key>=<value>` is repeatable. Values `true`/`false` become booleans, integers become numbers, comma-separated values become string arrays, and other values remain strings.
 
@@ -123,6 +137,37 @@ Parameters use svgo's names and JSON shapes. Each plugin receives only its own o
 | sortAttrs | `xmlnsOrder: "front"`; `order: ["id", "width", "height", "x", "x1", "x2", "y", "y1", "y2", "cx", "cy", "r", "fill", "stroke", "marker", "d", "points"]` |
 
 `preserve` and `preservePrefixes` accept one string or an array of strings. `currentColor` accepts a boolean or an exact color string and does not replace colors inside masks. `preservePatterns` supports literal substring matches and `^`-prefixed literal prefix matches, **not full regular expressions**.
+
+### Custom plugins
+
+The MoonBit library runs your own plugins next to the built-in ones. A plugin is a `@plugins.Plugin` value; pass it in `Config::custom`. It runs after the named plugins, or at its position when `plugins` names it (a custom plugin with a built-in's name replaces that built-in). Parameters come from `Config::params` under the plugin's name, and `applied` and multipass treat it like any other plugin.
+
+```mbt check
+///|
+test "custom plugin" {
+  let tag_owner : @plugins.Plugin = {
+    name: "tagOwner",
+    description: "set data-owner on the root element",
+    run: (doc, ctx) => {
+      guard doc.root() is Some(root) else { return false }
+      let owner = ctx.param_string("owner", "design")
+      if root.get("data-owner") == Some(owner) {
+        return false // unchanged: returning true here would force 10 passes
+      }
+      root.set("data-owner", owner)
+      true
+    },
+  }
+  let r = @svgo.optimize("<svg><!-- c --></svg>", config={
+    ..@svgo.Config::default(),
+    custom: [tag_owner],
+    params: { "tagOwner": { "owner": "icons" } },
+  })
+  inspect(r.data, content="<svg data-owner=\"icons\"/>")
+}
+```
+
+A plugin follows the rules the built-in ones do: it removes or rewrites only what a renderer cannot observe, returns `true` exactly when it changed the document, and runs on any document in any position without raising. The npm package and the CLI run only the built-in plugins, because JavaScript functions cannot run inside the wasm module; process the SVG string before or after `optimize` instead.
 
 ## Performance
 

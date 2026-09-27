@@ -3,8 +3,13 @@
 /// numeric precision, multipass and pretty printing. Start from
 /// `Config::default()` and override fields with record update syntax.
 pub(all) struct Config {
-  /// names of plugins to run, in order; defaults to the preset
+  /// names of plugins to run, in order; defaults to the preset. A name
+  /// resolves to a plugin in `custom` first, then to a built-in one
   plugins : Array[String]
+  /// plugins written by the caller. Those that `plugins` names run at that
+  /// position (a custom plugin can replace a built-in of the same name); the
+  /// others run after the named ones, in this order
+  custom : Array[@plugins.Plugin]
   /// per-plugin JSON parameter objects, keyed by plugin name
   params : Map[String, Json]
   /// decimal places kept for numbers
@@ -21,6 +26,7 @@ pub(all) struct Config {
 pub fn Config::default() -> Config {
   {
     plugins: @plugins.preset_default.map(p => p.name),
+    custom: [],
     params: Map([]),
     precision: 3,
     multipass: true,
@@ -54,7 +60,8 @@ pub fn Result::saved_percent(self : Result) -> Double {
 }
 
 ///|
-/// Raised by `optimize` when `Config::plugins` names a plugin that does not exist.
+/// Raised by `optimize` when `Config::plugins` names a plugin that is neither
+/// built in nor in `Config::custom`.
 pub suberror UnknownPlugin {
   UnknownPlugin(String)
 } derive(Debug)
@@ -74,10 +81,21 @@ pub fn optimize(
 ) -> Result raise {
   let doc = @xml.parse(svg)
   let plugins : Array[@plugins.Plugin] = []
+  let named : Set[String] = Set([])
   for name in config.plugins {
-    match @plugins.find_plugin(name) {
-      Some(p) => plugins.push(p)
-      None => raise UnknownPlugin(name)
+    match config.custom.search_by(p => p.name == name) {
+      Some(i) => plugins.push(config.custom[i])
+      None =>
+        match @plugins.find_plugin(name) {
+          Some(p) => plugins.push(p)
+          None => raise UnknownPlugin(name)
+        }
+    }
+    named.add(name)
+  }
+  for p in config.custom {
+    if !named.contains(p.name) {
+      plugins.push(p)
     }
   }
   let ctx = @plugins.Context::new(precision=config.precision)

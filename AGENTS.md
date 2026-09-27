@@ -44,7 +44,7 @@ root installs every JS package.
 ```
 moon.work, package.json       workspace roots (MoonBit members / pnpm packages), .npmrc pins registry.npmjs.org
 svgo/                         the MoonBit module PerfectPan/svgo
-  svgo.mbt, svgo_test.mbt     public API: optimize(svg, config?) -> Result, Config, list_plugins
+  svgo.mbt, svgo_test.mbt     public API: optimize(svg, config?) -> Result, Config (custom plugins via Config::custom), list_plugins
   xml/                        Document/Node/Element, parse, serialize (SVG-oriented, keeps prolog)
   path/                       path data: Segment, PathError, parse, optimize, stringify, apply_matrix, has_geometry
   internal/num/               number I/O, trig; host_wasm.mbt / host_default.mbt = trig and slow number parsing per target
@@ -72,9 +72,10 @@ app/website/                  the website, itself a MoonBit module (PerfectPan/s
   motion/                     Remotion composition for the hero video (pnpm -C app/website motion:render)
   build.mjs / dev.mjs         tailwind + gen + warren build / warren dev with live reload
 app/cli/                      the CLI, itself a MoonBit module (PerfectPan/svgo-cli)
-  main.mbt                    argument parsing and the optimize/print loop
+  main.mbt                    argument parsing, help, --list and the optimize/print loop
+  report.mbt                  the stderr size report: terminal detection (TTY, NO_COLOR, locale, COLUMNS), units, columns
   params.mbt                  --param plugin.key=value parser
-  io_native.mbt / io.c        C file I/O for the native backend
+  io_native.mbt / io.c        C file I/O, isatty and a monotonic clock for the native backend (io_js.mbt: the node equivalents)
   io_stub.mbt                 stubs so the package type-checks on wasm
 scripts/                      build-wasm, verify, bench, regress, gen-fixtures
 docs/ARCHITECTURE.md          design notes

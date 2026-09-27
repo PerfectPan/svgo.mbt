@@ -8,6 +8,10 @@ package "PerfectPan/svgo-cli"
 // Types and methods
 type CliConfig
 
+type Report
+
+type Term
+
 // Type aliases
 
 // Traits

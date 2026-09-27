@@ -158,3 +158,67 @@ test "custom config" {
     _ => fail("expected error")
   }
 }
+
+///|
+/// Sets `data-owner` on the root element; `params.owner` names the owner.
+let tag_owner : @plugins.Plugin = {
+  name: "tagOwner",
+  description: "set data-owner on the root element",
+  run: (doc, ctx) => {
+    guard doc.root() is Some(root) else { return false }
+    let owner = ctx.param_string("owner", "me")
+    if root.get("data-owner") == Some(owner) {
+      return false
+    }
+    root.set("data-owner", owner)
+    true
+  },
+}
+
+///|
+test "custom plugins run after the named ones unless named" {
+  let svg = "<svg xmlns=\"http://www.w3.org/2000/svg\"><!-- c --><path d=\"M0 0L5 5\"/></svg>"
+  let r = @svgo.optimize(svg, config={
+    ..@svgo.Config::default(),
+    plugins: ["removeComments"],
+    custom: [tag_owner],
+    params: { "tagOwner": { "owner": "docs" } },
+  })
+  inspect(
+    r.data,
+    content=(
+      #|<svg xmlns="http://www.w3.org/2000/svg" data-owner="docs"><path d="M0 0L5 5"/></svg>
+    ),
+  )
+  assert_eq(r.applied, ["removeComments", "tagOwner"])
+  // the second pass changes nothing, so multipass stops there
+  inspect(r.passes, content="2")
+  // named in `plugins`, it runs at that position; sortAttrs then sees it
+  let r = @svgo.optimize(svg, config={
+    ..@svgo.Config::default(),
+    plugins: ["tagOwner", "sortAttrs"],
+    custom: [tag_owner],
+  })
+  inspect(
+    r.data,
+    content=(
+      #|<svg xmlns="http://www.w3.org/2000/svg" data-owner="me"><!-- c --><path d="M0 0L5 5"/></svg>
+    ),
+  )
+}
+
+///|
+test "a custom plugin replaces the built-in plugin of the same name" {
+  let keep : @plugins.Plugin = {
+    name: "removeComments",
+    description: "keep comments",
+    run: (_, _) => false,
+  }
+  let r = @svgo.optimize("<svg><!-- c --></svg>", config={
+    ..@svgo.Config::default(),
+    plugins: ["removeComments"],
+    custom: [keep],
+  })
+  inspect(r.data, content="<svg><!-- c --></svg>")
+  assert_eq(r.applied, [])
+}

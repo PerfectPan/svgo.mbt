@@ -117,7 +117,7 @@ console.log(`app/website/gen.mjs: data (${data.rows.length} rows), samples (${SA
 // ---------- cli_data.mbt ----------
 // Parse the option lines out of the CLI's USAGE constant so the site's flag
 // table always matches the binary. The USAGE string uses MoonBit's `#|` line
-// prefix; we strip that, find the block between "options:" and "exit codes:",
+// prefix; we strip that, find the block between "options:" and "exit status:",
 // and turn each option line into { flag, description }. Continuation lines
 // (indented past the flag column) are joined onto the previous description.
 const cliMain = readFileSync(join(ROOT, "app/cli/main.mbt"), "utf8");
@@ -139,7 +139,7 @@ for (const line of cliMain.split("\n")) {
   }
 }
 const usage = usageLines.join("\n");
-const optMatch = usage.match(/options:\n([\s\S]*?)\nexit codes:/);
+const optMatch = usage.match(/options:\n([\s\S]*?)\nexit status:/);
 const cliFlags = [];
 if (optMatch) {
   const block = optMatch[1];

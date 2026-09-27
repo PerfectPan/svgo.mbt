@@ -35,6 +35,12 @@ test "number formatting" {
 test "stringify is compact" {
   let segs = @path.parse("M 10 10 L 20 20 L 30 -5 L 0.5 0.5 a 1 1 0 0 1 2 2")
   inspect(@path.stringify(segs), content="M10 10 20 20 30-5 .5.5a1 1 0 0 1 2 2")
+  // scientific notation starts with a digit, so it needs the separator even
+  // after a fractional number
+  inspect(
+    @path.stringify(@path.parse("M10.5 .00001"), precision=5),
+    content="M10.5 1e-5",
+  )
 }
 
 ///|

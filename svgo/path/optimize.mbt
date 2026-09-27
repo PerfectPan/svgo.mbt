@@ -113,8 +113,8 @@ fn to_absolute(seg : Segment, cx : Double, cy : Double) -> Abs {
       }
     }
     _ => {
-      let out : Array[Double] = []
-      let rel_out : Array[Double] = []
+      let out : Array[Double] = Array::new(capacity=a.length())
+      let rel_out : Array[Double] = Array::new(capacity=a.length())
       for i, v in a {
         let abs_v = if i % 2 == 0 { rx(v) } else { ry(v) }
         let rel_v = if rel { v } else if i % 2 == 0 { v - cx } else { v - cy }
@@ -252,7 +252,7 @@ fn Emitter::emit(
   // round(abs_args[i]): svgo recomputes absolute coords from the rounded
   // relative value plus the unrounded base, which can differ from rounding
   // the absolute coordinate directly by a ULP at strong_round boundaries.
-  let rel_corrected : Array[Double] = []
+  let rel_corrected : Array[Double] = Array::new(capacity=rel_args.length())
   match cmd {
     'H' => {
       let rel = dx + (base_x - self.rsx)
@@ -288,7 +288,7 @@ fn Emitter::emit(
   // Absolute form: rounded relative + base, then round again. This matches
   // svgo's convertToMixed which does adata[i] = data[i] + item.base[i] then
   // roundData(adata).
-  let abs_rounded : Array[Double] = []
+  let abs_rounded : Array[Double] = Array::new(capacity=rel_args.length())
   match cmd {
     'H' => abs_rounded.push(@num.strong_round(rel_corrected[0] + base_x, p))
     'V' => abs_rounded.push(@num.strong_round(rel_corrected[0] + base_y, p))
@@ -316,22 +316,16 @@ fn Emitter::emit(
   let first = self.out.length() == 0
   // When the previous emitted command is the same lowercase command, the
   // relative form can drop its command letter (implicit repetition). If the
-  // first relative argument also needs no leading separator (negative, or a
-  // bare fraction after a fractional number), that saves exactly one byte, so
-  // the effective relative length is rel_len - 1. On a tie we keep relative.
+  // first relative argument also needs no separator after the previous
+  // number, that saves exactly one byte, so the effective relative length is
+  // rel_len - 1. On a tie we keep relative.
   let mut effective_rel_len = rel_len
   if !first {
     let prev = self.out[self.out.length() - 1]
     if prev.cmd == rel_seg.cmd {
-      let first_rel = rel_corrected[0]
-      let prev_last = prev.args[prev.args.length() - 1]
-      let no_space = first_rel < 0.0 ||
-        (
-          first_rel > 0.0 &&
-          first_rel < 1.0 &&
-          prev_last - @math.floor(prev_last) != 0.0
-        )
-      if no_space {
+      let prev_last = @num.number_shape(prev.args[prev.args.length() - 1], p)
+      let first_rel = @num.number_shape(rel_corrected[0], p)
+      if !@num.needs_separator(prev_last, first_rel) {
         effective_rel_len = rel_len - 1
       }
     }

@@ -14,13 +14,15 @@ pub fn atan(Double) -> Double
 
 pub fn cos(Double) -> Double
 
-pub fn decompose(Double, Int) -> (Bool, Int64, Int64, Int)
-
 pub fn epsilon(Int) -> Double
 
 pub fn format_number(Double, Int) -> String
 
+pub fn needs_separator(Int, Int) -> Bool
+
 pub fn number_shape(Double, Int) -> Int
+
+pub fn number_to_string(Double) -> String
 
 pub fn parse_number(String) -> Double?
 
@@ -36,7 +38,7 @@ pub fn tan(Double) -> Double
 
 pub fn write_number(StringBuilder, Double, Int) -> Unit
 
-pub fn write_number_shaped(StringBuilder, Double, Int) -> Int
+pub fn write_path_number(StringBuilder, Double, Int, Int) -> Int
 
 // Errors
 pub suberror NumError {

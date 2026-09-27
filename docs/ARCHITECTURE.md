@@ -106,7 +106,7 @@ that did something. `utf8_length` counts bytes without encoding.
 
 | form | package | notes |
 | --- | --- | --- |
-| wasm-gc module + JS loader | `svgo/wasm/`, `packages/svgo-mbt/` | JS String Builtins: MoonBit `String` *is* a JS string, so the boundary is two string arguments and one string back. Config and result cross as length-prefixed tokens rather than JSON, and trig plus the slow path of number parsing are host imports (`svgo/internal/num/host_wasm.mbt`), so the module carries no JSON, strconv or fdlibm code: about 200 KB after the pinned Binaryen `wasm-opt -Oz --converge` step, down from 269 KB. |
+| wasm-gc module + JS loader | `svgo/wasm/`, `packages/svgo-mbt/` | JS String Builtins: MoonBit `String` *is* a JS string, so the boundary is two string arguments and one string back. Config and result cross as length-prefixed tokens rather than JSON, and trig, the slow path of number parsing and shortest number formatting are host imports (`svgo/internal/num/host_wasm.mbt`), so the module carries no JSON, strconv, ryu or fdlibm code: about 188 KB after the pinned Binaryen `wasm-opt -Oz --converge` step, down from 269 KB. Each `Map[String, V]` with a new value type adds about 1 KB of generic code, so rarely used tables stay as text or a `match`. |
 | CLI | `app/cli/` | One MoonBit source, two IO backends: `extern "C"` file access on the native target, node's `fs` on the js target, which is what `packages/svgo-mbt/cli.mjs` ships. `--json` for tooling. |
 | MoonBit library | `svgo/` | `moon add PerfectPan/svgo`. The website in `app/website/` is the first consumer: a Rabbita app compiled to JS that calls `@svgo.optimize` directly, so the demo and the playground run the same code the tests run. |
 

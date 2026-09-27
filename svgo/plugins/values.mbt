@@ -59,13 +59,16 @@ let cleanup_numeric_values : Plugin = {
 }
 
 ///|
-/// Absolute length units and their factor relative to pixels.
-let px_factors : Map[String, Double] = {
-  "in": 96.0,
-  "pt": 4.0 / 3.0,
-  "pc": 16.0,
-  "cm": 96.0 / 2.54,
-  "mm": 96.0 / 25.4,
+/// Factor of an absolute length unit relative to pixels.
+fn px_factor(unit : String) -> Double? {
+  match unit {
+    "in" => Some(96.0)
+    "pt" => Some(4.0 / 3.0)
+    "pc" => Some(16.0)
+    "cm" => Some(96.0 / 2.54)
+    "mm" => Some(96.0 / 25.4)
+    _ => None
+  }
 }
 
 ///|
@@ -78,7 +81,7 @@ fn convert_to_px(
   original_len : Int,
   precision : Int,
 ) -> (Double, String) {
-  match px_factors.get(unit) {
+  match px_factor(unit) {
     Some(factor) => {
       let px = n * factor
       let px_str = @num.format_number(px, precision)

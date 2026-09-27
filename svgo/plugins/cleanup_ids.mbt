@@ -30,7 +30,10 @@ fn cleanup_ids_run(doc : @xml.Document, ctx : Context) -> Bool {
   if dynamic {
     return false
   }
-  let nodes : Map[String, @xml.Element] = Map([])
+  // elements carrying each id (the first one; later duplicates lose theirs),
+  // in document order
+  let ids : Set[String] = Set([])
+  let nodes : Array[@xml.Element] = []
   let references : Set[String] = Set([])
   let attributes : Array[(@xml.Element, String, String, Array[IdReference])] = []
   let mut changed = false
@@ -44,11 +47,12 @@ fn cleanup_ids_run(doc : @xml.Document, ctx : Context) -> Bool {
     for entry in e.attrs.to_array() {
       let (name, value) = entry
       if name == "id" {
-        if nodes.contains(value) {
+        if ids.contains(value) {
           e.attrs.remove(name)
           changed = true
         } else {
-          nodes[value] = e
+          ids.add(value)
+          nodes.push(e)
         }
       } else if name == "begin" || name == "end" || value.contains_code_unit(35) {
         // 35 is '#': apart from SMIL timing (`begin="r2.click"`) every
@@ -75,18 +79,18 @@ fn cleanup_ids_run(doc : @xml.Document, ctx : Context) -> Bool {
   let renamed : Map[String, String] = Map([])
   let reserved : Set[String] = Set([])
   for id in references {
-    if !nodes.contains(id) {
+    if !ids.contains(id) {
       reserved.add(id)
     }
   }
-  for id, _ in nodes {
+  for id in ids {
     if keep(id) || (!remove && !references.contains(id)) {
       reserved.add(id)
     }
   }
   let mut next = 0
   for id in references {
-    if nodes.contains(id) && minify && !keep(id) {
+    if ids.contains(id) && minify && !keep(id) {
       let mut short = short_id(next)
       next += 1
       while reserved.contains(short) || keep(short) {
@@ -98,7 +102,8 @@ fn cleanup_ids_run(doc : @xml.Document, ctx : Context) -> Bool {
   }
   // Apply all replacements against the original values, so swapped ids and
   // multiple references in one attribute cannot cascade into one another.
-  for id, node in nodes {
+  for node in nodes {
+    let id = node.attrs.get("id").unwrap_or("")
     if renamed.get(id) is Some(short) {
       if short != id {
         node.attrs["id"] = short

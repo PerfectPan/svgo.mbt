@@ -26,8 +26,8 @@ if ! git diff --quiet -- '*.mbti'; then
   git --no-pager diff --stat -- '*.mbti' >&2
   exit 1
 fi
-# Not wasm-gc: svgo/path/host_wasm.mbt imports Math and Number.parseFloat from
-# the embedder, which moonrun does not provide. The wasm artifact is tested
+# Not wasm-gc: svgo/internal/num/host_wasm.mbt imports Math, Number.parseFloat
+# and String from the embedder, which moonrun does not provide. The wasm artifact is tested
 # through node in --full (packages/svgo-mbt, including the fixture suite).
 for target in js native; do
   step "moon test --target $target"

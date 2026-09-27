@@ -6,8 +6,9 @@ pub struct Context {
   precision : Int
   /// current plugin parameter object; set by the pipeline before each run
   mut params : Json
-  /// path data the optimizer has already left unchanged in this run
-  optimized_paths : Set[String]
+  /// path data convertPathData has already left unchanged in this run,
+  /// with the element style it was optimized for
+  optimized_paths : Map[String, Int]
   /// convex hulls of each subpath, per path data string, for mergePaths'
   /// intersection test (paths are compared against both neighbours on
   /// every pass, so this saves most of the parsing and hull building)
@@ -20,7 +21,7 @@ pub fn Context::new(precision? : Int = 3) -> Context {
   {
     precision,
     params: Json::object(Map([])),
-    optimized_paths: Set([]),
+    optimized_paths: Map([]),
     path_hulls: Map([]),
   }
 }

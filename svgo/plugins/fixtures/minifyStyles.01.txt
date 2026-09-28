@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <style>.a{stroke-width:1.50px;opacity:0.50;margin:0.0em}</style>
+  <path style="fill:#ff6b4a;stroke:#2a1f1a;stroke-width:6.000000;fill-opacity:1;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none" d="M0 0h10"/>
+  <ellipse class="a" style="fill:#fff7ec;opacity:0.450000" rx="1" ry="1"/>
+  <path style="stroke-dashoffset:-0.50;stroke-width:+1.50em;stroke-dasharray:1.0 2.50/0.0px;font-size:1.0E3px" d="M0 0h10"/>
+  <text style="font:12.0px/1.50 sans-serif;font-family:&quot;Font 1.0&quot;;letter-spacing:0.0px;flex:0.0px">a</text>
+  <rect style="fill:url(#g1.0);transform:translate(1.50px,0.0px) rotate(0.0deg);width:calc(0.0px + 1.50px)" width="1" height="1"/>
+  <rect style="--x:0.50;stroke-width:var(--x,0.50);opacity:0.0;x:0%" width="1" height="1"/>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg">
+  <style>.a{stroke-width:1.5px;opacity:.5;margin:0}</style>
+  <path style="fill:#ff6b4a;stroke:#2a1f1a;stroke-width:6;fill-opacity:1;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none" d="M0 0h10"/>
+  <ellipse class="a" style="fill:#fff7ec;opacity:.45" rx="1" ry="1"/>
+  <path style="stroke-dashoffset:-.5;stroke-width:1.5em;stroke-dasharray:1 2.5/0;font-size:1.0E3px" d="M0 0h10"/>
+  <text style="font:12px/1.5 sans-serif;font-family:&quot;Font 1.0&quot;;letter-spacing:0;flex:0px">a</text>
+  <rect style="fill:url(#g1.0);transform:translate(1.5px,0) rotate(0deg);width:calc(0px + 1.5px)" width="1" height="1"/>
+  <rect style="--x:0.50;stroke-width:var(--x,0.50);opacity:0;x:0%" width="1" height="1"/>
+</svg>

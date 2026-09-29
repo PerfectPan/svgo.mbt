@@ -6,6 +6,7 @@ import {
   "moonbit-community/rabbita/nav",
   "moonbit-community/rabbita/url",
   "moonbit-community/rabbita/js",
+  "moonbit-community/rui",
   "PerfectPan/svgo",
   "moonbitlang/core/math",
   "moonbitlang/core/string",

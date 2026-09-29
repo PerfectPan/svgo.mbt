@@ -3,7 +3,34 @@
 The rules the site at https://perfectpan.github.io/svgo.mbt/ is built to. They apply to
 every page and every string; a change that needs an exception should change the rule here
 first. Source: `app/website/ui/*.mbt` (views), `app/website/src/style.css` (tokens and
-component classes, Tailwind v4).
+component classes, Tailwind v4), `app/website/samples/` (the SVGs the site optimizes).
+
+## Idea
+
+Warm, confident and immediately understood. A visitor gets the point from the first screen in
+a few seconds: your SVGs get smaller and faster, and they look the same. Each landing screen
+makes one point with one big line and one visual; everything else is one click away.
+
+- One idea per screen: smaller (the hero), faster, same pixels, install. Detail (benchmark
+  tables, the plugin list, CLI flags) sits in collapsed disclosures, not on the page.
+- Show the product working instead of describing it: the hero is Nib, the mascot, standing
+  still while its own file size counts down; the "same pixels" screen shows real logos with
+  their before/after sizes. Every number comes from `data.json` or from optimizing the sample
+  at runtime; one figure has one value on every page.
+- Evidence stays honest: the speed bars and the headline use the same metric, svgo's numbers
+  are measured with the same plugin set, and the few files where svgo is smaller are listed.
+- No generic AI look: no gradient text, glow blobs, eyebrow chips, card grids of everything,
+  emoji, fake window chrome.
+
+## Samples
+
+`app/website/samples/` holds the SVGs the landing page and the playground optimize: Nib (drawn
+for the project; its copy carries editor-style metadata so there is something to remove) and
+three model logos (DeepSeek, Qwen, Mistral). `SOURCES.md` there records where each came from
+and its licence; logos are trademarks of their owners and the page says so under them. Every
+sample must render with 0 differing pixels (`node packages/compare/render-diff.mjs
+app/website/samples`); a file that does not is not a sample. The benchmark corpus
+(`svgo/testdata/`, `packages/compare/corpus/`) is separate and only feeds the numbers.
 
 ## Voice
 
@@ -28,103 +55,130 @@ component classes, Tailwind v4).
 
 ## Layout
 
-- One column: `.wrap` = `min(1140px, 100% − 48px)`, centered. Everything aligns to it,
-  including the fixed nav's contents.
-- Fixed nav, 60 px. Every page starts with `page_head`: eyebrow, display title, one-sentence
-  blurb, padding 56 above and 32 below. The landing hero uses the same 56 so the eyebrow sits
-  at the same height on every route.
-- Landing sections: a display title and the content, no subtitles. Provenance and caveats go
-  in a 12.5 px muted footnote under the content.
-- Section rhythm on the landing page: 80 px vertical padding, alternating `bg` / `bg-2` with
-  hairline borders.
-- Cards: `--radius-card` 18 px, 1 px `line` border, `surface` background, 24 px padding
-  (20 px for narrow sidebars). Small tiles (plugins) 10 px radius.
-- Breakpoints: 961 px separates the desktop two-column layouts (playground workbench, API
-  sidebar) from the single-column flow; 800 px stacks the editor panes; 640 px (`max-sm`)
-  stacks KPI cards.
-- Tool pages (playground) do not lock the whole page to the viewport. The title block scrolls
-  away; the workbench below it is exactly `100vh − 60px` tall (min 640 px) so one scroll of
-  the header's height leaves it filling the screen; the shared footer follows.
-- Sticky sidebars (API) sit 80 px from the top with `max-height: 100vh − 100px` and scroll
-  internally; the highlighted item is kept inside the visible area.
+- One column: `.wrap` centred with side gutters of at least 24 px (16 px below 640 px).
+- Nav: brand (coral dot + `svgo.mbt` in the display face), Playground, API, GitHub, language and
+  theme, and the "Open the playground" pill on the right; nothing may overflow at 390 px.
+- The hero fills the first screen: `min-h-[calc(100svh-var(--nav-h))]` (the nav's own height) with its
+  content vertically centred, headline left and the Nib counter right. No screen is a centred
+  text block: the hero and every later landing screen (speed, pixel-identical output) put a
+  title and its one line of text on the left of a 12-column grid inside `.wrap` (columns 1–5)
+  and the visual on the right (columns 6–12); the install block spans the full width with a
+  left-aligned title instead. Below 961 px everything stacks to one column, still left-aligned.
+- Landing screens are generous: about 96 px of vertical space around each, separated by a
+  subtle tone step (`paper-2`) or a hairline, never by a strong colour band. The speed screen's
+  full-width tinted band spans the viewport via a box-shadow/clip-path trick while its content
+  stays inside `.wrap`.
+- The footer is one quiet row: project, version, licence, measurement environment (landing),
+  links, and the svgo credit.
+- Tool pages (playground) start with the tool: a thin toolbar (samples, open, share) and the
+  workbench; on narrow screens the result comes first and the options follow.
+- Breakpoints: `--breakpoint-lg` 961 px (two-column layouts, the API sidebar), `--breakpoint-md`
+  800 px (reserved; nothing branches on it yet), `--breakpoint-sm` 640 px (compact nav, the stats
+  bar's single row). Defined once in `style.css` `@theme`; use `sm:`/`md:`/`lg:`/`max-sm:`/
+  `max-lg:`, never `min-[…px]:`/`max-[…px]:`.
 
 ## Type
 
-Fonts: Inter (text), Space Grotesk (`.display`: titles, big numbers), JetBrains Mono (code).
-All self-hosted with `font-display: swap`.
+- Fraunces (`.display`, 500/600): headlines, screen titles, big numbers.
+- Space Grotesk (400/500): prose and UI.
+- JetBrains Mono: code, file names and byte captions.
+- Chinese falls back to the system faces ("PingFang SC", "Noto Sans CJK SC"; headings "Songti SC",
+  "Noto Serif CJK SC"); a coloured phrase in a Chinese headline never breaks inside itself.
 
-| px | use |
-| --- | --- |
-| 11.5 | counts, `.tag` badges, bar labels |
-| 12 | hints under options, plugin descriptions, API group labels |
-| 12.5 | monospace: editor pane labels, plugin names, API signatures, footnotes |
-| 13 | UI labels: sidebar section titles, API sidebar items, chips, small buttons |
-| 14 | option labels, API doc prose |
-| 15 | card titles, API member names, body text |
-| 16 | `page_head` blurb |
-| 17 | hero paragraph |
-| 18 | numbers in the playground stats bar |
-| 22 | API group headings (`.display`) |
-| 30–42 | landing section titles (`clamp`) |
-| 34–52 | page titles (`clamp`) |
-| 42–68 | hero title (`clamp`) |
+Every size is a `--text-*` token in `style.css` `@theme`; no `text-[…]` or `font-size:`/`font:`
+literal anywhere else. Line height 1.05–1.15 for display, 1.6 for prose; `--leading-cjk` (1.7) is
+the Chinese prose line height next to Tailwind's own `leading-snug`/`leading-relaxed` steps. A unit
+next to a big number is its own span at a readable size (never below 11 px, `--text-2xs`).
 
-Line height 1.55 for prose and code, 1.4 for hints, 1.02–1.1 for display sizes. Weights:
-400 text, 500 labels, 600 UI emphasis, 700 titles and numbers. Display titles carry
-`letter-spacing: -0.03em`.
-
-Labels are never all-caps with letter spacing when they can be Chinese; use 13 px / 600 in
-normal case instead. The only uppercase labels are Latin kind tags (`TYPE`, `FN`, `ERROR`)
-and the eyebrow.
-
-## Color
-
-Tokens in `style.css` `@theme`, dark palette under `[data-theme="dark"]`. Use tokens only:
-`ink` primary text, `ink-2` secondary, `muted` hints and footnotes, `line` / `line-2` borders,
-`surface` / `surface-2` cards and inputs, `bg` / `bg-2` page bands, `ink-hover` and `line-3` for
-button hover states (buttons stay in their own colour on hover; accent is a state colour, not a
-hover colour), `accent` (emerald) for the current item, links on hover and "changed" markers, `mint` for wins in tables, `warn` for
-losses, `grad` (accent → teal) for the hero highlight and the primary bar. Code cards are
-always dark (`code`, `code-fg`).
-
-Never hard-code a color in a view; add a token if one is missing.
+| token | size | line height | role |
+| --- | --- | --- | --- |
+| `--text-2xs` | 11 px | 16 px | the smallest labels (plugin row numbers, group headings) |
+| `--text-xs` | 12 px | 16 px | captions, small UI labels |
+| `--text-code` | 13 px | 20 px | code, byte captions, figure captions, table cells |
+| `--text-sm` | 14 px | 20 px | secondary text, nav links, buttons |
+| `--text-base` | 16 px | 1.6 | body prose |
+| `--text-lg` | 18 px | 28 px | emphasised prose, screen lead-ins (`.screen-line`) |
+| `--text-xl` | 20 px | 28 px | small headings (disclosure summaries) |
+| `--text-2xl` | 24 px | 32 px | group headings (API `h2`) |
+| `--text-page` | clamp(28, 3.6vw, 40) px | 1.15 | the API page's own compact `h1` |
+| `--text-section` | clamp(32, 4.4vw, 52) px | 1.15 | landing screen titles |
+| `--text-hero` / `--text-hero-zh` | clamp(44, 6vw, 84) / clamp(34, 5.2vw, 68) px | 1.08 / 1.15 | the hero `h1`, Latin / Chinese |
+| `--text-number` | clamp(40, 5.6vw, 68) px | 1 | the hero byte counter, the benchmark's big numbers |
+| `--text-number-unit` | clamp(18, 2vw, 26) px | — | the unit beside a `--text-number` figure |
 
 ## Spacing
 
-4 px grid: 4, 8, 12, 16, 24, 32, 40, 56, 80. Within a card: 24 between blocks, 8 between
-rows, 6 between a name and its badge or dot, 10 between a checkbox and its label.
+Tailwind's `--spacing` scale (4 px steps, including the fractional classes: `gap-5.5` = 22 px).
+No `p-[…px]`/`gap-[…px]`/`w-[…px]` etc. in the views; in `style.css` use the `--spacing(n)`
+function instead of a literal `px` value (`padding: --spacing(4);`, not `padding: 16px;`).
+Text measures (a paragraph's `max-width` in `ch`) are named `--container-*` tokens instead:
+
+| token | value | role |
+| --- | --- | --- |
+| `--container-tight` | 14ch | the hero `h1` |
+| `--container-narrow` | 36ch | a short error message |
+| `--container-copy` | 48ch | the hero's lead paragraph |
+| `--container-lead` | 50ch | a screen's lead-in line (`.screen-line`) |
+| `--container-read` | 62ch | a page's intro paragraph (API, reference pages) |
+| `--container-doc` | 72ch | a member's doc prose (API reference) |
+
+A handful of fixed layout dimensions have no home in either scale and are their own tokens
+instead of a literal: `--nav-h` (56 px, the fixed nav's height, used in `calc()`), `--pg-sidebar-w`
+/ `--api-side-w` / `--api-main-w` (the playground and API two-column grid tracks), and
+`--api-side-clearance` (the API sidebar's sticky-scroll cap). `--border-w-bold` (1.5 px) is the
+bolder stroke on buttons, pills and the hero's anchor markers, next to Tailwind's own default
+(1 px) and `border-2` (2 px) steps.
+
+## Color
+
+Tokens in `style.css` `@theme`, dark palette under `[data-theme="dark"]`; use tokens only.
+Light: `paper` cream page, `paper-2` a slightly deeper cream for a screen that needs separation,
+`card` the white tile behind logos,
+`ink` warm near-black text, `ink-2` secondary, `muted` captions, `line` hairlines, `mark` coral:
+the primary CTA, the saved amount and the svgo.mbt bar, `mark-soft` its tint. Teal appears only
+inside Nib. Dark theme is warm (brown-black paper, cream ink), not blue-black; coral stays. Nib
+(hero, nav logo, illustrations, favicon) keeps its own colours in both themes: no dark variant;
+on the dark paper it gets a thin cream sticker rim (a filter) so the ink outline and antenna show.
+The playground's dark preview checker is a mid-dark grey for the same reason.
+Every SVG the site ships, inline or in `public/`, is svgo.mbt output (run it through the CLI first).
+Checkerboards behind SVG previews stay light enough that dark samples remain visible; the
+playground has a Light/Dark checker toggle. A few colours are fixed regardless of theme, also
+tokens rather than a bare hex: `--color-white` (selection text, the logo comparison tiles),
+`--color-mark-ink` (the warm-dark text on the coral fill) and `--color-race-dim` (the losing
+speed-race bar in dark mode, the light theme's own `ink-2` hex).
 
 ## Components and interaction
 
-- **Buttons**: `.btn` pill, 13–14 px / 600; `.btn-primary` ink on bg (inverts in dark);
-  `.btn-sm` inside toolbars. Hover lifts 1 px and tints to accent.
-- **Chips** (`.chip`): pill toggles for samples and small actions; the selected one is ink on
-  bg (`aria-selected`).
-- **Install pills** (`.install`): monospace command with a copy button; copying shows a
-  1.5 s notice, no modal.
-- **Tags** (`.tag`): 11.5 px mono badges for counts and plugin names.
-- **Editors**: highlighted `<pre>` under a transparent `<textarea>` with identical metrics;
-  13 px mono; a 36 px label bar above (12.5 px / 600 `ink-2`); a 120 px checkerboard preview
-  below. Actions that apply to one pane (copy, download) sit at the right end of that pane's
-  label bar as text actions (`.pane-act`, 12.5 px / 500 `ink-2`, hover `ink` on `surface-2`).
-- **Playground toolbar**: one row at the workbench's width (844 px inside `.wrap`): sample
-  chips and the file picker on the left, the share button and its notice on the right. It
-  must not wrap at desktop widths; anything else belongs to a pane's label bar.
-- **Stats bar**: bytes in, bytes out, saving pill, size bar, ms, passes; numbers in display
-  18 / 700, units 13 muted.
-- **Playground sidebar**: options (precision, multipass, pretty) fixed at the top, then the
-  plugin list as the only scrolling region. A plugin that changed the output in the last run
-  shows a 6 px accent dot after its name; the section title shows "N changed the output".
-  Toggling a plugin recomputes immediately; the dots follow.
-- **API navigation**: one page per package (`#/api/svgo|xml|path|plugins`); the sidebar lists
-  all packages with the current one expanded into Types / Functions / Errors, other packages
-  show name and count. Member links are `#/api/<pkg>/<Item>`: the URL changes, the page
-  scrolls to the member with a 76 px offset, and the item is highlighted (accent text, 2 px
-  accent bar on the left). Scrolling the page moves the highlight (one pass per frame) and
-  keeps the highlighted item inside the sidebar's visible area.
-- **Motion**: entrance `rise` (0.8 s, staggered by `--d`), scroll `reveal` via
-  IntersectionObserver, number count-ups, hero blobs drifting. All of it is off under
-  `prefers-reduced-motion`. Nothing functional depends on motion.
+- **Radius**: one scale everywhere, nothing else.
+
+  | class | value | role |
+  | --- | --- | --- |
+  | `rounded-full` | a pill | buttons, the install line, segmented switches, tabs-as-pills |
+  | `rounded-2xl` | 16 px | cards, panels, code blocks, rounded preview frames |
+  | `rounded-lg` | 8 px | small controls (inputs, select, copy chips), inline code, one-line signatures |
+- **Buttons**: pills. Primary: coral fill, paper text, the one soft shadow on the page; secondary:
+  hairline outline. Text actions (copy, download) are plain underlined-on-hover text.
+- **Nav**: Nib (the `nib-logo` illustration, redrawn for 28 px) and "svgo.mbt" on the left;
+  links, language and theme together on the right, no separate CTA. The current page's link is
+  underlined; on hover the same line grows from the left at a constant speed (240 ms, linear).
+- **Install line**: mono command in a hairline pill with a "copy" action.
+- **Toast**: every copy or share action confirms with one success toast, `@rui.sonner` (RUI, the
+  Rabbita component library in shadcn's style) mounted once in `app.mbt`: the install line's hairline
+  pill with ink text and a coral check, one line sized to its text, no close button, top centre under the nav, 2 s. Raise it with `toast_success(title)`; never swap a button's
+  label or show an inline "copied" instead.
+- **Hero counter**: counts down once (about 1.2 s) from the original to the optimized size of
+  `nib.svg`; the bar under it shrinks to the kept fraction. Under `prefers-reduced-motion` the
+  end state is shown at once. Nothing else moves.
+- **Speed race**: two lanes, name and median time above each bar, bar length proportional to
+  time (svgo full width); labels never sit on a bar.
+- **Logo cards**: a white rounded tile per sample, the caption `name · before → after B −N%`
+  under it; three in a row on desktop, one column on phones.
+- **Disclosures**: "Benchmarks" (size table, per-file speed chart, their footnotes) and
+  "36 plugins" (the pipeline list), collapsed by default.
+- **Playground**: sample tabs as pills (current one filled), editors with soft wrap, previews on
+  the checkerboard, the stats bar (in, out, saved in coral, ms, passes).
+- **API**: package switcher and TOC on the left, one reading column, MoonBit keywords as kickers
+  (`struct`, `fn`, `suberror`), hairline code blocks with a copy action on multi-line ones.
 - **Theme and language**: toggles in the nav, persisted in localStorage, applied before first
   paint (`data-theme` on `<html>`). Language is remembered; the default follows
   `navigator.language`.
@@ -132,15 +186,15 @@ rows, 6 between a name and its badge or dot, 10 between a checkbox and its label
 ## Performance rules
 
 - No external stylesheet or script requests: fonts self-hosted, no CDN.
-- Hero videos `preload="none"`, started when visible; only the current theme's video loads.
+- No video; raster images only for the social card (`og.jpg`), which no page loads.
+- Fonts: three families, latin subsets, at most two weights each.
 - The JS bundle is the MoonBit js build, minified by warren; no second minifier.
 
 ## Checking a change
 
 `moon check` (zero warnings), `moon fmt --check`, `moon info`,
 `moon test --target js -p PerfectPan/svgo-website/ui` (copy tables have tests: every plugin
-and every CLI flag needs a Chinese string), `pnpm app`, then screenshots of the touched routes
-in both languages and both themes at 1440 px, plus 800 px for layout changes. Background
-Chrome tabs do not advance CSS animations or smooth scrolling: inject
-`*{animation:none!important;transition:none!important} html{scroll-behavior:auto!important} .motion .reveal{opacity:1!important;translate:none!important}`
-before measuring or shooting.
+and every CLI flag needs a Chinese string), `pnpm app`, then
+`node app/website/shots.mjs <dir> [routes]`: full-page screenshots of the built site at
+1440 and 390 px, light and dark, English and Chinese, with motion frozen at its end state.
+Look at every screenshot of a touched route before calling a change done.

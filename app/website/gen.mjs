@@ -19,9 +19,16 @@ const dbl = (n) => { const s = num(n); return s.includes(".") ? s : s + ".0"; };
 
 // ---------- data.mbt ----------
 const data = JSON.parse(readFileSync(join(ROOT, "app/website/data.json"), "utf8"));
+const pkg = JSON.parse(readFileSync(join(ROOT, "packages/svgo-mbt/package.json"), "utf8"));
 writeFileSync(join(UI, "data.mbt"), `${HEADER}
 ///|
 pub let generated_on : String = ${str(data.generated)}
+
+///|
+let node_version : String = ${str(data.node)}
+
+///|
+let project_version : String = ${str(pkg.version)}
 
 ///|
 pub let svgo_js_version : String = ${str(data.svgoVersion)}
@@ -33,7 +40,7 @@ pub let wasm_bytes : Int = ${data.wasmBytes}
 /// One corpus file: bytes before, after svgo.mbt and after svgo-js, plus
 /// same-process milliseconds per call for both.
 pub let bench_rows : Array[BenchRow] = [
-${data.rows.map((r) => `  { file: ${str(r.file)}, original: ${r.original}, mbt: ${r.mbt}, js: ${r.js}, mbt_ms: ${dbl(r.mbtMs)}, js_ms: ${dbl(r.jsMs)} },`).join("\n")}
+${data.rows.map((r) => `  { file: ${str(r.file)}, original: ${r.original}, mbt: ${r.mbt}, js: ${r.js}, js_default: ${r.jsDefault}, mbt_ms: ${dbl(r.mbtMs)}, js_ms: ${dbl(r.jsMs)} },`).join("\n")}
 ]
 `);
 
@@ -54,6 +61,11 @@ writeFileSync(join(UI, "samples.mbt"), `${HEADER}
 pub let samples : Array[Sample] = [
 ${SAMPLES.map(([name, f]) => `  { name: ${str(name)}, file: ${str(f.split("/").pop())}, svg: ${str(readFileSync(join(ROOT, f), "utf8"))} },`).join("\n")}
 ]
+
+///|
+/// public/nib.svg, the optimized mascot: the favicon, the README image and
+/// the nav logo are this one file.
+let nib_svg : String = ${str(readFileSync(join(ROOT, "app/website/public/nib.svg"), "utf8").trim())}
 `);
 
 // ---------- api_data.mbt ----------

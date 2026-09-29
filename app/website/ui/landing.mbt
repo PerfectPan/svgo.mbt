@@ -1,603 +1,908 @@
 ///|
-fn copy_pill(cmd : String) -> Html {
-  span(class="install", [
-    code(cmd),
-    button(
-      title=t("copy", "复制"),
-      on_click=@rabbita.effect(fn() noraise { copy_text(cmd) }),
-      attrs=Attrs::build().inner_html(
-        (
-          #|<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="8" height="8" rx="1.5"/><path d="M3 11V3.5A.5.5 0 0 1 3.5 3H11"/></svg>
-        ),
+priv struct LandingState {
+  tab : Int
+  /// index into `package_managers` for the npm tab's install command
+  pm : Int
+} derive(Eq)
+
+///|
+priv enum LandingMsg {
+  SelectTab(Int)
+  SelectPm(Int)
+  Copy(String)
+}
+
+///|
+fn copy_pill(cmd : String, emit : Emit[LandingMsg]) -> Html {
+  div(
+    class="install flex items-center justify-between gap-3 rounded-full border border-line-2 bg-card px-4.5 py-3",
+    [
+      code(t(cmd, cmd)),
+      button(
+        class="min-w-12 font-mono text-xs underline underline-offset-[--spacing(0.75)]",
+        attrs=Attrs::build().aria_label(t("Copy \{cmd}", "复制 \{cmd}")),
+        on_click=emit(Copy(cmd)),
+        t("copy", "复制"),
       ),
-      nothing,
-    ),
-  ])
-}
-
-///|
-/// Median same-process speedup over svgo-js, from the generated data.
-fn median_speedup() -> Double {
-  let ratios = bench_rows.map(r => r.js_ms / r.mbt_ms)
-  ratios.sort()
-  ratios[ratios.length() / 2]
-}
-
-///|
-fn hero(dark : Bool) -> Html {
-  let times = to_fixed(median_speedup(), 0)
-  let video_src = if dark { "hero-dark.mp4" } else { "hero.mp4" }
-  let poster = if dark { "hero-dark-poster.jpg" } else { "hero-poster.jpg" }
-  header(class="relative isolate overflow-hidden pb-16 pt-14", [
-    div(
-      class="pointer-events-none absolute inset-0 -z-10 overflow-hidden",
-      attrs=Attrs::build().aria_hidden("true"),
-      [
-        span(
-          class="blob -left-[8%] -top-[30%] size-[640px] bg-accent/20",
-          nothing,
-        ),
-        span(
-          class="blob -right-[6%] -top-[10%] size-[560px] bg-teal/20 [animation-delay:-7s]",
-          nothing,
-        ),
-        span(
-          class="blob -bottom-[25%] left-[42%] size-[480px] bg-amber-300/25 [animation-delay:-14s]",
-          nothing,
-        ),
-      ],
-    ),
-    div(class="wrap", [
-      div(
-        class="grid items-center gap-12 max-[960px]:grid-cols-1 max-[960px]:gap-7 min-[961px]:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]",
-        [
-          div([
-            div(class="eyebrow rise", [
-              span(class="dot", nothing),
-              text(" svgo · MoonBit · WebAssembly · \{wasm_bytes / 1000} KB"),
-            ]),
-            h1(
-              class="display rise mt-3.5 text-[clamp(42px,5.6vw,68px)] leading-[1.02]",
-              style=["--d: 80ms"],
-              tm(
-                [
-                  text("Smaller SVGs,"),
-                  br(),
-                  span(class="grad", "\{times}× faster."),
-                ],
-                [
-                  text("更小的 SVG，"),
-                  br(),
-                  span(class="grad", "约快 \{times} 倍。"),
-                ],
-              ),
-            ),
-            p(
-              class="rise mt-[22px] max-w-[54ch] text-[17px] leading-relaxed text-ink-2",
-              style=["--d: 160ms"],
-              tm(
-                [
-                  text("svgo.mbt is "),
-                  a(class="font-medium text-ink", href=SVGO_URL, "svgo"),
-                  text(
-                    " in MoonBit: the same 34 preset-default plugins with the same behaviour, compiled to a single \{wasm_bytes / 1000} KB wasm module that runs in the browser, in Node.js and on the command line. Every output is render-checked pixel by pixel: smaller files, identical rendering.",
-                  ),
-                ],
-                [
-                  text("svgo.mbt 是 "),
-                  a(class="font-medium text-ink", href=SVGO_URL, "svgo"),
-                  text(
-                    " 的 MoonBit 实现：同样的 34 个 preset-default 插件、同样的行为，编译为单个 \{wasm_bytes / 1000} KB wasm 模块，可在浏览器、Node.js 与命令行中运行。每次输出均经逐像素渲染比对：文件更小，渲染结果不变。",
-                  ),
-                ],
-              ),
-            ),
-            div(
-              class="rise mt-7 flex flex-wrap items-center gap-3",
-              style=["--d: 240ms"],
-              [
-                a(
-                  class="btn btn-primary",
-                  href="#/playground",
-                  t("Open the playground", "打开在线体验"),
-                ),
-                a(class="btn", href=REPO_URL, [github_icon(), text("GitHub")]),
-              ],
-            ),
-            div(
-              class="rise mt-4 flex flex-wrap items-center gap-3",
-              style=["--d: 300ms"],
-              [
-                copy_pill("npm i @rivus/svgo"),
-                copy_pill("moon add PerfectPan/svgo"),
-              ],
-            ),
-            p(
-              class="rise mt-5 text-[13px] text-ink-2",
-              style=["--d: 360ms"],
-              tm(
-                [
-                  text("Built on "),
-                  a(class="font-medium text-ink", href=SVGO_URL, "svgo"),
-                  text(
-                    " by Kir Belevich and contributors (MIT). Plugin behaviour follows svgo; every known difference is listed in the README.",
-                  ),
-                ],
-                [
-                  text("基于 "),
-                  a(class="font-medium text-ink", href=SVGO_URL, "svgo"),
-                  text(
-                    "（Kir Belevich 及贡献者，MIT）。插件行为与 svgo 保持一致，已知差异逐条记录在 README 中。",
-                  ),
-                ],
-              ),
-            ),
-          ]),
-          div(
-            class="rise relative aspect-video overflow-hidden rounded-[22px] border border-line bg-surface shadow-card",
-            style=["--d: 200ms"],
-            attrs=Attrs::build().aria_hidden("true"),
-            [
-              video(
-                class="block size-full object-cover motion-reduce:hidden",
-                autoplay=true,
-                muted=true,
-                loop_=true,
-                preload="none",
-                poster~,
-                src=video_src,
-                nothing,
-              ),
-              img(
-                class="hidden size-full object-cover motion-reduce:block",
-                src=poster,
-                alt="",
-              ),
-              span(
-                class="absolute bottom-3 left-3.5 rounded-full border border-line bg-bg/80 px-2.5 py-1 text-[11.5px] text-muted backdrop-blur-sm",
-                t(
-                  "one optimize() call, step by step · rendered with Remotion",
-                  "一次 optimize() 调用的全过程 · 由 Remotion 渲染",
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    ]),
-  ])
-}
-
-///|
-fn section_head(title : String) -> Html {
-  h2(
-    class="display reveal mb-9 text-[clamp(30px,3.4vw,42px)] leading-[1.08]",
-    title,
+    ],
   )
 }
 
 ///|
-fn nice_name(file : String) -> String {
-  file.replace_all(old=".svg", new="").replace_all(old="_", new=" ")
+/// A code block in the install tabs with a "copy" in its corner, the same
+/// mono underlined action as the install line above it (`copy_pill`), set
+/// on the same right edge. `render` turns the source into the block's
+/// content (a highlighter, or plain text for commands); copy takes the
+/// source as written.
+fn code_card(
+  source : String,
+  render : (String) -> Array[Html],
+  emit : Emit[LandingMsg],
+) -> Html {
+  div(class="code-card", [
+    pre(render(source)),
+    button(
+      class="code-card-copy",
+      attrs=Attrs::build().aria_label(t("Copy code", "复制代码")),
+      on_click=emit(Copy(source)),
+      t("copy", "复制"),
+    ),
+  ])
 }
 
 ///|
-fn numbers_section() -> Html {
-  let rows = bench_rows.copy()
-  rows.sort_by((x, y) => x.original - y.original)
-  let median = median_speedup()
-  // Each row is scaled to its own svgo time (the full bar), so the svgo.mbt
-  // bar's length is the real ratio. Absolute values span three orders of
-  // magnitude and are given as labels; a shared axis (log or linear) would
-  // either hide the small files or misstate the ratios.
-  let full = 78.0
-  let width = fn(ms : Double, base : Double) -> String {
-    let w = if base > 0.0 { ms / base * full } else { 0.0 }
-    "width: \{to_fixed(w, 2)}%"
+/// The middle value of a non-empty array (the mean of the two middle values
+/// when its length is even).
+fn median(values : Array[Double]) -> Double {
+  let sorted = values.copy()
+  sorted.sort()
+  let middle = sorted.length() / 2
+  if sorted.length() % 2 == 0 {
+    (sorted[middle - 1] + sorted[middle]) / 2.0
+  } else {
+    sorted[middle]
   }
-  let bar_rows = rows.mapi((idx, r) => {
-    div(class="row", style=["--i: \{idx}"], [
-      div(class="name", title=r.file, [
-        text(nice_name(r.file)),
-        small(fmt_kb(r.original)),
+}
+
+///|
+/// The median of one timing across every benchmarked file.
+fn median_bench_ms(pick : (BenchRow) -> Double) -> Double {
+  median(bench_rows.map(pick))
+}
+
+///|
+fn median_speedup() -> Double {
+  let ratios = bench_rows.map(r => r.js_ms / r.mbt_ms)
+  median(ratios)
+}
+
+///|
+/// Package managers offered in the npm tab: name and install command.
+let package_managers : Array[(String, String)] = [
+  ("npm", "npm i @rivus/svgo"),
+  ("pnpm", "pnpm add @rivus/svgo"),
+  ("yarn", "yarn add @rivus/svgo"),
+  ("bun", "bun add @rivus/svgo"),
+]
+
+///|
+/// A collapsed-by-default landing section: `<details>` with a styled
+/// summary, closed until the reader opens it.
+fn landing_details(summary : String, children : Array[Html]) -> Html {
+  node("details", Attrs::build().class("landing-details reveal"), [
+    node("summary", Attrs::build().class("landing-details-summary"), summary),
+    div(class="landing-details-body", children),
+  ])
+}
+
+///|
+/// A number and its unit, styled as the site's shared "hero evidence"
+/// figure: the number is set at the ancestor's font size, the unit rides at
+/// 0.45em beside it. `id` is set on the number span alone, so a caller can
+/// animate just the digits in place (see the hero byte counter).
+fn display_measure(value : String, unit : String, id? : String = "") -> Html {
+  let number = if id == "" {
+    span(class="display-number", value)
+  } else {
+    span(id~, class="display-number", value)
+  }
+  span(class="display-measure", [number, span(class="display-unit", unit)])
+}
+
+///|
+fn file_label(file : String) -> String {
+  match file {
+    "Ghostscript_Tiger.svg" => t("Tiger", "老虎")
+    "SVG_logo.svg" => t("SVG logo", "SVG 标志")
+    "Python_logo_and_wordmark.svg" => t("Python logo", "Python 标志")
+    "World_map_-_low_resolution.svg" => t("World map", "世界地图")
+    "sketch-icon.svg" => t("Sketch icon", "Sketch 图标")
+    "figma-export.svg" => t("Figma export", "Figma 导出")
+    "illustrator-logo.svg" => t("Illustrator", "Illustrator")
+    "inkscape-drawing.svg" => t("Inkscape", "Inkscape")
+    "React-icon.svg" => t("React icon", "React 图标")
+    "Tux.svg" => "Tux"
+    _ => file
+  }
+}
+
+///|
+/// A logo rendered as an `<img>` from a data URI, so its own fill colours
+/// stay intact regardless of stray ids in the optimized markup.
+fn sample_preview(svg : String, class : String) -> Html {
+  let source = svg
+    .replace_all(old="%", new="%25")
+    .replace_all(old="#", new="%23")
+    .replace_all(old="<", new="%3C")
+    .replace_all(old=">", new="%3E")
+    .replace_all(old="\"", new="%22")
+    .replace_all(old="\n", new="%0A")
+    .replace_all(old="\r", new="%0D")
+  div(class~, [@html.img(src="data:image/svg+xml," + source, alt="")])
+}
+
+///|
+/// The hero: Nib, optimized live, with a counter that runs from the
+/// original byte size down to the optimized one and a bar that shrinks to
+/// match. `start_count` no-ops under `prefers-reduced-motion`, so the
+/// server-rendered end state (the optimized size) is what a reduced-motion
+/// reader sees throughout.
+fn hero(emit : Emit[LandingMsg]) -> Html {
+  let mascot = samples[0]
+  let output = run_optimize(mascot.svg)
+  let kept = output.size.to_double() * 100.0 / output.original_size.to_double()
+  div(
+    class="wrap grid min-h-[calc(100svh-var(--nav-h))] grid-cols-1 content-center gap-12 py-16 max-sm:gap-6 max-sm:py-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center lg:gap-12",
+    [
+      div(class="hero-copy", [
+        h1(class="display hero-title max-w-tight", [
+          span(
+            class="hero-line hero-line-1",
+            t("Smaller SVGs,", "更小的 SVG，"),
+          ),
+          span(
+            class="hero-line hero-line-2 accent",
+            t(
+              "\{to_fixed(median_speedup(), 1)}× faster",
+              "快 \{to_fixed(median_speedup(), 1)} 倍",
+            ),
+          ),
+        ]),
+        p(
+          class="lead hero-sub mb-8 max-w-copy text-lg text-ink-2 text-pretty",
+          t(
+            "svgo's preset-default, written in MoonBit, with the same rendering to the pixel. An npm package, a native CLI and a MoonBit library.",
+            "svgo 的 preset-default，用 MoonBit 编写，渲染结果逐像素一致。提供 npm 包、原生 CLI 与 MoonBit 库。",
+          ),
+        ),
+        div(class="cta-row flex flex-wrap items-center gap-5", [
+          a(
+            class="btn btn-coral",
+            href="#/playground",
+            t("Open the playground →", "打开在线体验 →"),
+          ),
+          copy_pill("npm i @rivus/svgo", emit),
+        ]),
       ]),
-      div(class="bars", [
+      div(class="hero-visual flex flex-col items-center gap-5.5 max-sm:gap-3", [
+        // nib.svg's own drawn figure fills only about two-thirds of its
+        // square viewBox (antenna to feet, arm to arm), so the frame is
+        // sized well past the 240/300px the figure should read as, to land
+        // the *visible character* at that size rather than its box.
         div(
-          class="bar bar-a",
-          style=[width(r.mbt_ms, r.js_ms)],
-          attrs=Attrs::build().data_set("label", "\{fmt_ms(r.mbt_ms)} ms"),
-          nothing,
+          class="nib-frame relative w-full max-w-80 max-sm:max-w-62 lg:max-w-90",
+          [
+            div(
+              attrs=Attrs::build().inner_html(output.data).aria_hidden("true"),
+              nothing,
+            ),
+          ],
         ),
-        div(
-          class="bar bar-b",
-          style=[width(r.js_ms, r.js_ms)],
-          attrs=Attrs::build().data_set("label", "\{fmt_ms(r.js_ms)} ms"),
-          nothing,
-        ),
+        div(class="byte-panel flex flex-col items-center gap-3.5 text-center", [
+          node("strong", Attrs::build().class("hero-counter block"), [
+            display_measure(fmt_int(output.size), "B", id="hero-byte-count"),
+          ]),
+          div(
+            class="bar-track relative h-1.5 w-60 lg:w-64 overflow-hidden rounded-full bg-line",
+            [
+              div(
+                class="bar-fill",
+                style=[
+                  "--kept: \{to_fixed(kept, 1)}%",
+                  "--kept-frac: \{to_fixed(kept / 100.0, 4)}",
+                ],
+                nothing,
+              ),
+            ],
+          ),
+          p(
+            class="byte-caption",
+            t(
+              "\{mascot.file} · −\{fmt_pct(output.saved_percent(), digits=0)}% · 0 px difference",
+              "\{mascot.file} · −\{fmt_pct(output.saved_percent(), digits=0)}% · 0 px 差异",
+            ),
+          ),
+        ]),
       ]),
-      div(class="ratio", "\{to_fixed(r.js_ms / r.mbt_ms, 1)}×"),
-    ])
-  })
-  let size_rows = rows.map(r => {
-    let cls = if r.mbt < r.js {
-      "win"
-    } else if r.mbt > r.js {
-      "lose"
-    } else {
-      ""
-    }
-    tr([
-      td(nice_name(r.file)),
-      td(fmt_int(r.original)),
-      td(class=cls, fmt_int(r.mbt)),
-      td(fmt_int(r.js)),
-    ])
-  })
-  section(id="numbers", class="py-20", [
-    div(class="wrap", [
-      section_head(
-        t(
-          "Compared with svgo: the same sizes, a third of the time.", "对比 svgo：输出体积相当，耗时三分之一。",
-        ),
+    ],
+  )
+}
+
+///|
+/// One lane of the speed race: name above the bar, its length and animation
+/// duration both driven by `share` (svgo.mbt's time as a fraction of
+/// svgo's — 1.0 for svgo itself). Both lanes start together on reveal and
+/// run at the same real-world speed (linear, `anim_ms` long), so the race
+/// itself, not just the final bar length, shows the ratio. `arrival` is the
+/// measured time this lane's bar is standing for (e.g. "1.2 ms"), shown
+/// beside the bar's end once it arrives — `anim_ms` is the race's staged
+/// wall-clock duration, not the value being illustrated, so the two are
+/// threaded through separately. The svgo.mbt lane also carries a small
+/// runner riding just ahead of its bar's tip to the same target (see
+/// `.race-runner` in style.css), hopping once on arrival.
+fn race_lane(
+  name : String,
+  share : Double,
+  anim_ms : Double,
+  arrival : String,
+  mbt~ : Bool,
+) -> Html {
+  let width = to_fixed(share * 100.0, 2)
+  div(class="race-lane", [
+    span(class="race-label", name),
+    div(class="race-track", [
+      div(
+        class=if mbt { "race-fill race-fill-mbt" } else { "race-fill" },
+        style=["width: \{width}%", "--race-dur: \{to_fixed(anim_ms, 0)}ms"],
+        nothing,
       ),
-      div(class="mb-5 grid grid-cols-3 gap-4 max-sm:grid-cols-1", [
-        div(class="kpi reveal", [
-          b(
-            attrs=Attrs::build().data_set("count", to_fixed(median, 1)),
-            "\{to_fixed(median, 1)}×",
-          ),
-          span(
-            t(
-              "median speedup over svgo, same process", "相对 svgo 的中位加速比，同一进程",
-            ),
-          ),
-        ]),
-        div(class="kpi reveal", style=["--d: 90ms"], [
-          b(
-            attrs=Attrs::build().data_set(
-              "count",
-              (wasm_bytes / 1000).to_string(),
-            ),
-            "\{wasm_bytes / 1000} KB",
-          ),
-          span(
-            t(
-              "wasm-gc module, no dependencies, loads in milliseconds", "wasm-gc 模块，零依赖，毫秒级加载",
-            ),
-          ),
-        ]),
-        div(class="kpi reveal", style=["--d: 180ms"], [
-          b("0 px"),
-          span(
-            t(
-              "rendering difference across all samples (resvg + pixelmatch)", "全部样图的渲染差异（resvg + pixelmatch）",
-            ),
-          ),
-        ]),
-      ]),
-      div(class="grid gap-5 min-[901px]:grid-cols-[1.3fr_1fr]", [
-        div(class="card reveal", [
-          h3(t("Time per call", "单次调用耗时")),
-          div(
-            class="sub",
-            t(
-              "milliseconds per call · each row scaled to svgo's time", "每次调用的毫秒数 · 每行以 svgo 的耗时为满格",
-            ),
-          ),
-          div(class="grid gap-3", bar_rows),
-          div(class="legend", [
-            span([i(class="bg-grad", nothing), text("svgo.mbt (wasm-gc)")]),
-            span([i(class="bg-bar-b", nothing), text("svgo \{svgo_js_version}")]),
-          ]),
-          p(
-            class="mt-3.5 text-[12.5px] text-muted",
-            tm(
-              [
-                text(
-                  "svgo \{svgo_js_version} and svgo.mbt in the same Node process, multipass on, warmed up; editor exports and classic large SVGs. ",
-                ),
-                code("packages/compare/collect.mjs"),
-                text(", \{generated_on}."),
-              ],
-              [
-                text(
-                  "svgo \{svgo_js_version} 与 svgo.mbt 运行于同一 Node 进程，开启 multipass 并预热；样本为编辑器导出文件与经典大型 SVG。",
-                ),
-                code("packages/compare/collect.mjs"),
-                text("，\{generated_on}。"),
-              ],
-            ),
-          ),
-        ]),
-        div(class="card reveal", style=["--d: 120ms"], [
-          h3(t("Output size", "输出大小")),
-          div(
-            class="sub",
-            t("bytes after optimization", "优化后的字节数"),
-          ),
-          table(class="sizes", [
-            thead([
-              tr([
-                th(t("file", "文件")),
-                th(t("original", "原始")),
-                th("svgo.mbt"),
-                th("svgo"),
-              ]),
-            ]),
-            tbody(size_rows),
-          ]),
-          p(
-            class="mt-3.5 text-[12.5px] text-muted",
-            tm(
-              [
-                text(
-                  "Where svgo is smaller, the difference is a leading zero inside a style attribute and cubic curves that svgo also rewrites as quadratics (",
-                ),
-                code("q"),
-                text("). Neither is implemented yet."),
-              ],
-              [
-                text(
-                  "svgo 更小的那几个文件，差在 style 属性中数字的前导零，以及 svgo 会把三次曲线改写成二次曲线（",
-                ),
-                code("q"),
-                text("）。两项均尚未实现。"),
-              ],
-            ),
-          ),
-        ]),
-      ]),
+      span(
+        class=if mbt { "race-arrival race-arrival-mbt" } else { "race-arrival" },
+        style=["left: \{width}%", "--race-dur: \{to_fixed(anim_ms, 0)}ms"],
+        arrival,
+      ),
+      if mbt {
+        div(
+          class="race-runner",
+          style=[
+            "--race-target: \{width}%",
+            "--race-dur: \{to_fixed(anim_ms, 0)}ms",
+          ],
+          [illustration("nib-dash")],
+        )
+      } else {
+        nothing
+      },
     ]),
   ])
 }
 
 ///|
-fn plugins_section() -> Html {
-  let cards = @svgo.list_plugins().mapi((idx, item) => {
-    let (name, desc, enabled) = item
+/// "Time per file": two bars for the same metric as the hero's ratio (median
+/// time per file, warmed up, same process): svgo at full width, svgo.mbt at
+/// its share of that width, both driven from the same ratio the headline
+/// states so the picture and the number never disagree. It is a real race:
+/// both bars start together and run at the same real-world speed (svgo
+/// takes 1200 ms, svgo.mbt 1200 ms / ratio), so the faster bar visibly
+/// finishes first.
+fn faster_screen() -> Html {
+  let median_js = median_bench_ms(r => r.js_ms)
+  let median_mbt = median_bench_ms(r => r.mbt_ms)
+  let ratio = median_speedup()
+  div(class="wrap screen screen-band py-14 lg:py-24", id="faster", [
     div(
-      class=if enabled {
-        "plugin reveal stagger"
-      } else {
-        "plugin plugin-optional reveal stagger"
-      },
-      style=["--i: \{idx}"],
-      [code(name), p(plugin_description(name, desc, lang.val))],
+      class="reveal grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-center lg:gap-10",
+      [
+        div(class="reveal-text lg:col-span-5", [
+          h2(
+            class="display screen-heading mb-8 text-balance text-section lg:mb-0",
+            t("Time per file", "单个文件的耗时"),
+          ),
+          p(
+            class="screen-line mt-8 max-w-lead text-ink-2",
+            t(
+              "Same Node.js process, \{bench_rows.length()} files, multipass. From a cold start the native CLI takes about 10 ms, the svgo CLI about 160 ms.",
+              "同一 Node.js 进程，\{bench_rows.length()} 个文件，启用 multipass。从冷启动开始，原生 CLI 约需 10 ms，svgo CLI 约需 160 ms。",
+            ),
+          ),
+        ]),
+        div(class="reveal-graphics lg:col-span-7", [
+          div(class="race", [
+            race_lane("svgo", 1.0, 1200.0, "\{fmt_ms(median_js)} ms", mbt=false),
+            race_lane(
+              "svgo.mbt",
+              1.0 / ratio,
+              1200.0 / ratio,
+              "\{fmt_ms(median_mbt)} ms",
+              mbt=true,
+            ),
+          ]),
+          p(
+            class="race-note",
+            t(
+              "\{to_fixed(ratio, 1)}× is the median of per-file speedups over \{bench_rows.length()} files.",
+              "\{to_fixed(ratio, 1)} 倍是 \{bench_rows.length()} 个文件中逐文件加速比的中位数。",
+            ),
+          ),
+        ]),
+      ],
+    ),
+  ])
+}
+
+///|
+/// "Pixel-identical output": the three logos, optimized live, each a real render
+/// sample (see app/website/samples/SOURCES.md); the trademark note keeps the
+/// claim honest about what the samples are for.
+fn same_pixels_screen() -> Html {
+  let cards = [1, 2, 3].map(idx => {
+    let s = samples[idx]
+    let o = run_optimize(s.svg)
+    // Mistral's logo is a squarish mark; DeepSeek's and Qwen's are wide
+    // wordmarks. object-fit:contain alone leaves the mark visually much
+    // larger in the same tile, so each kind gets its own share of the
+    // tile's width (see .logo-wordmark/.logo-mark in style.css).
+    let kind = if idx == 3 { "logo-mark" } else { "logo-wordmark" }
+    node("figure", Attrs::build().class("logo-card"), [
+      sample_preview(o.data, "logo-panel \{kind}"),
+      node("figcaption", Attrs::build(), [
+        span(class="logo-name", s.name),
+        span(class="logo-metrics", [
+          text("\{fmt_int(o.original_size)} → \{fmt_int(o.size)} B "),
+          span(class="removed", "−\{fmt_pct(o.saved_percent(), digits=0)}%"),
+        ]),
+      ]),
+    ])
+  })
+  div(class="wrap screen screen-same py-14 lg:py-24", id="same-pixels", [
+    div(
+      class="reveal grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-center lg:gap-10",
+      [
+        div(class="reveal-text lg:col-span-5", [
+          h2(
+            class="display screen-heading mb-8 text-balance text-section lg:mb-0",
+            t("Pixel-identical output", "像素级一致的输出"),
+          ),
+          p(
+            class="screen-line mt-8 max-w-lead text-ink-2",
+            t(
+              "Rendered before and after with resvg and compared pixel by pixel: 0 px difference.",
+              "使用 resvg 渲染前后效果并逐像素比较：0 px 差异。",
+            ),
+          ),
+          p(
+            class="footnote",
+            t(
+              "Logos are trademarks of their owners, shown as optimization samples.",
+              "标志为其各自所有者的商标，仅作为优化示例展示。",
+            ),
+          ),
+        ]),
+        // A third grid item, not nested in the text column: on phones
+        // (grid-cols-1) it stacks after the tiles in source order, so the
+        // call to action reads after the proof; on desktop the explicit
+        // placement below puts it back under the text column, with the
+        // tiles spanning both rows beside it.
+        div(
+          class="reveal-graphics lg:col-span-7 lg:col-start-6 lg:row-span-2",
+          [div(class="logos-row", cards)],
+        ),
+        div(class="install-row mt-6 lg:col-span-5 lg:mt-11", [
+          a(
+            class="cta-secondary",
+            href="#/playground",
+            t("Open the playground →", "打开在线体验 →"),
+          ),
+        ]),
+      ],
+    ),
+  ])
+}
+
+///|
+fn speed_axis_limit(maximum : Double) -> Double {
+  maximum.ceil()
+}
+
+///|
+fn speed_row(row : BenchRow, axis_limit : Double) -> Html {
+  let ratio = row.js_ms / row.mbt_ms
+  div(class="speed-row", [
+    div(
+      class="speed-name",
+      attrs=Attrs::build().title(row.file),
+      file_label(row.file),
+    ),
+    div(class="speed-track", [
+      div(
+        class="speed-bar",
+        style=["width: \{to_fixed(ratio / axis_limit * 100.0, 3)}%"],
+        [span("\{to_fixed(ratio, 1)}×")],
+      ),
+    ]),
+    span(class="speed-time", fmt_ms(row.js_ms)),
+    span(class="speed-time", fmt_ms(row.mbt_ms)),
+    small(
+      class="speed-times-mobile",
+      "\{file_label(row.file)} · svgo \{fmt_ms(row.js_ms)} ms · svgo.mbt \{fmt_ms(row.mbt_ms)} ms",
+    ),
+  ])
+}
+
+///|
+/// The collapsed "Benchmarks" detail: the full output-size table and the
+/// per-file speed chart that used to be their own landing sections, now
+/// reference material a reader opens on purpose.
+fn benchmarks_details() -> Html {
+  let sorted = bench_rows.copy()
+  sorted.sort_by((a, b) => a.original.compare(b.original))
+  let rows = sorted.map(r => {
+    tr([
+      td(attrs=Attrs::build().title(r.file), [
+        text(file_label(r.file)),
+        small(
+          class="mobile-original",
+          t(
+            "\{fmt_int(r.original)} B original",
+            "原始 \{fmt_int(r.original)} B",
+          ),
+        ),
+      ]),
+      td(fmt_int(r.original)),
+      td(class=if r.mbt <= r.js { "win" } else { "" }, fmt_int(r.mbt)),
+      td(class=if r.js < r.mbt { "win" } else { "" }, fmt_int(r.js)),
+      td(
+        if r.mbt == r.js {
+          "0 B"
+        } else if r.mbt < r.js {
+          "−\{fmt_int(r.js - r.mbt)} B"
+        } else {
+          "+\{fmt_int(r.mbt - r.js)} B"
+        },
+      ),
+    ])
+  })
+  let defaults = sorted
+    .filter(r => r.js_default != r.js)
+    .map(r => {
+      t(
+        "With svgo's own default, the \{file_label(r.file)} is \{fmt_int(r.js_default)} B.",
+        "使用 svgo 自身的默认配置时，\{file_label(r.file)}的输出为 \{fmt_int(r.js_default)} B。",
+      )
+    })
+    .join(" ")
+  let differences = sorted
+    .filter(r => r.mbt > r.js)
+    .map(r => "\{file_label(r.file)} +\{fmt_int(r.mbt - r.js)} B")
+    .join(t(", ", "、"))
+  let mut maximum = 0.0
+  for row in sorted {
+    let ratio = row.js_ms / row.mbt_ms
+    if ratio > maximum {
+      maximum = ratio
+    }
+  }
+  let axis_limit = speed_axis_limit(maximum)
+  let ticks : Array[Html] = []
+  for i = 0; i.to_double() < axis_limit; i = i + 1 {
+    ticks.push(
+      span(
+        style=["left: \{to_fixed(i.to_double() / axis_limit * 100.0, 3)}%"],
+        if i == 0 {
+          "0"
+        } else {
+          "\{i}×"
+        },
+      ),
+    )
+  }
+  ticks.push(span(style=["left: 100%"], "\{axis_limit.to_int()}×"))
+  let speed_rows = sorted.map(row => speed_row(row, axis_limit))
+  landing_details(t("Benchmarks", "基准测试"), [
+    div(class="speed-summary", [
+      node("strong", Attrs::build(), [display_measure("0", "px")]),
+      span(
+        t(
+          "render difference across \{bench_rows.length()} tested samples",
+          "\{bench_rows.length()} 个测试样例的渲染差异",
+        ),
+      ),
+    ]),
+    p(
+      class="method-note",
+      t(
+        "Rendered with resvg and compared pixel by pixel with pixelmatch.", "使用 resvg 渲染，并通过 pixelmatch 逐像素比较。",
+      ),
+    ),
+    div(class="size-table", [
+      h3(t("Output size · B", "输出大小 · B")),
+      table(class="sizes", [
+        thead([
+          tr([
+            th(t("Sample", "样例")),
+            th(t("Original", "原始")),
+            th(t("svgo.mbt", "svgo.mbt")),
+            th(t("svgo", "svgo")),
+            th(
+              attrs=Attrs::build().title("svgo.mbt − svgo"),
+              t("Δ vs svgo", "与 svgo 相差"),
+            ),
+          ]),
+        ]),
+        tbody(rows),
+      ]),
+      p(
+        class="method-note table-note",
+        t(
+          "svgo runs with moveGroupAttrsToElems off, the plugin set svgo.mbt runs by default. \{defaults} svgo.mbt is larger on: \{differences}.",
+          "svgo 关闭 moveGroupAttrsToElems，与 svgo.mbt 默认运行的插件集一致。\{defaults}以下文件的 svgo.mbt 输出更大：\{differences}。",
+        ),
+      ),
+    ]),
+    div(class="speed-summary", [
+      node("strong", Attrs::build(), [
+        display_measure(to_fixed(median_speedup(), 1), "×"),
+      ]),
+      span(
+        t(
+          "median speedup over svgo, \{bench_rows.length()} samples",
+          "\{bench_rows.length()} 个样例，相对 svgo 的中位加速比",
+        ),
+      ),
+    ]),
+    p(
+      class="method-note",
+      t(
+        "Same Node.js process, warmed up, multipass enabled. packages/compare/collect.mjs · \{generated_on} · Node.js \{node_version} · svgo \{svgo_js_version}.",
+        "同一 Node.js 进程，预热后测量，启用 multipass。packages/compare/collect.mjs · \{generated_on} · Node.js \{node_version} · svgo \{svgo_js_version}。",
+      ),
+    ),
+    p(
+      class="method-note mb-4",
+      t(
+        "Speedup · sorted by original file size · timings in ms", "加速比 · 按原始文件大小排序 · 耗时单位 ms",
+      ),
+    ),
+    div(
+      class="speed-chart",
+      style=["--speed-reference: \{to_fixed(100.0 / axis_limit, 3)}%"],
+      [
+        div(class="speed-axis", [
+          span(t("File", "文件")),
+          div(class="speed-ticks", ticks),
+          span("svgo"),
+          span("svgo.mbt"),
+        ]),
+        ..speed_rows,
+      ],
+    ),
+    div(class="cli-speed", [
+      h3(t("CLI cold start", "CLI 冷启动")),
+      p(
+        class="mt-3 text-ink-2",
+        t(
+          "About 10 ms for the native binary and 160 ms for the svgo CLI on a small icon, including process startup.",
+          "包含进程启动时间，处理小图标时，原生二进制约需 10 ms，svgo CLI 约需 160 ms。",
+        ),
+      ),
+      div(class="cli-bars", [
+        div(class="cli-bar-row", [
+          span("svgo.mbt native"),
+          div(class="bars", [
+            div(class="bar", style=["width: 6.25%"], [span("10 ms")]),
+          ]),
+        ]),
+        div(class="cli-bar-row", [
+          span("svgo CLI"),
+          div(class="bars", [
+            div(class="bar bar-b", style=["width: 100%"], [span("160 ms")]),
+          ]),
+        ]),
+      ]),
+      p(
+        class="footnote",
+        t(
+          "scripts/cli-bench.sh · approximate end-to-end times; separate from the warmed-up measurements above.",
+          "scripts/cli-bench.sh · 端到端近似耗时，与上方预热后的测量分开比较。",
+        ),
+      ),
+    ]),
+  ])
+}
+
+///|
+/// What `svgo-mbt <file> -o out.svg` prints for one file: the size row in
+/// the CLI's units (1000-based, one decimal from 1 KB), then the plugins that
+/// changed it, wrapped at 76 columns like an 80-column terminal. The CLI's
+/// two-space left margin is dropped: the code block has its own padding.
+fn cli_report(file : String, r : Outcome) -> String {
+  let size = (bytes : Int) => {
+    if bytes < 1000 {
+      "\{bytes} B"
+    } else {
+      "\{to_fixed(bytes.to_double() / 1000.0, 1)} KB"
+    }
+  }
+  let row = "\{file}  \{size(r.original_size)} → \{size(r.size)}  −\{fmt_pct(r.saved_percent(), digits=0)}%"
+  let lines = [row]
+  let mut line = ""
+  for name in r.applied {
+    if line != "" && 2 + line.length() + 1 + name.length() > 76 {
+      lines.push(line)
+      line = ""
+    }
+    line = if line == "" { name } else { line + " " + name }
+  }
+  if line != "" {
+    lines.push(line)
+  }
+  lines.join("\n")
+}
+
+///|
+fn install_screen(state : LandingState, emit : Emit[LandingMsg]) -> Html {
+  let tabs = [
+    t("JavaScript", "JavaScript"),
+    t("CLI", "CLI"),
+    t("MoonBit", "MoonBit"),
+  ].mapi((idx, label) => {
+    button(
+      class="border-b-2 border-transparent px-3.5 py-2.5 font-mono text-sm text-ink-2 aria-pressed:border-mark aria-pressed:text-ink sm:px-5",
+      attrs=Attrs::build().aria_pressed(
+        if state.tab == idx {
+          "true"
+        } else {
+          "false"
+        },
+      ),
+      on_click=emit(SelectTab(idx)),
+      label,
     )
   })
-  let count = @svgo.list_plugins().length()
-  section(id="plugins", class="border-y border-line bg-bg-2 py-20", [
-    div(class="wrap", [
-      section_head(
-        t(
-          "\{count} plugins, svgo's names and order.",
-          "\{count} 个插件，与 svgo 同名同序。",
-        ),
-      ),
-      div(
-        class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-2.5",
-        cards,
-      ),
-      p(
-        class="mt-5 text-[12.5px] text-muted",
-        t(
-          "All 34 plugins of svgo's preset-default are implemented; moveGroupAttrsToElems is off by default. removeDimensions and removeTitle are optional.",
-          "svgo preset-default 的 34 个插件全部实现，其中 moveGroupAttrsToElems 默认关闭；removeDimensions、removeTitle 为可选插件。",
-        ),
-      ),
-    ]),
-  ])
-}
-
-///|
-fn snippet(
-  idx : Int,
-  title : String,
-  sub : String,
-  lines : Array[Html],
-) -> Html {
-  div(class="use reveal", style=["--d: \{idx * 110}ms"], [
-    h3(title),
-    div(class="sub", sub),
-    pre(lines),
-  ])
-}
-
-///|
-fn k(s : String) -> Html {
-  span(class="k", s)
-}
-
-///|
-fn c(s : String) -> Html {
-  span(class="c", s)
-}
-
-///|
-fn use_section() -> Html {
-  section(id="use", class="py-20", [
-    div(class="wrap", [
-      section_head(
-        t("Three ways in, one codebase.", "三种用法，一套代码。"),
-      ),
-      div(class="grid gap-4 min-[901px]:grid-cols-3", [
-        snippet(
-          0,
-          "JavaScript · npm",
+  let content = match state.tab {
+    1 => {
+      let sample = run_optimize(samples[0].svg)
+      let report = cli_report(samples[0].file, sample)
+      div(class="use", [
+        p(
           t(
-            "Node 24+, Bun 1.4+, Deno 2, Chrome 130+, Firefox 134+, Safari 18.4+ (JS String Builtins).",
-            "Node 24+、Bun 1.4+、Deno 2、Chrome 130+、Firefox 134+、Safari 18.4+（JS String Builtins）。",
-          ),
-          [
-            k("import"),
-            text(" { optimize } "),
-            k("from"),
-            text(" \"@rivus/svgo\";\n\n"),
-            k("const"),
-            text(" r = "),
-            k("await"),
-            text(" optimize(svg, {\n  precision: 3,\n});\nr.data          "),
-            c("// optimized SVG"),
-            text("\nr.originalSize  "),
-            c("// 836"),
-            text("\nr.size          "),
-            c("// 276"),
-            text("\nr.applied       "),
-            c("// [\"convertPathData\", ...]"),
-          ],
-        ),
-        snippet(
-          1,
-          t("Command line · native", "命令行 · 原生"),
-          t(
-            "A single binary. A complete run on a small icon takes about 10 ms; the svgo CLI takes about 160 ms, most of it Node start-up.",
-            "单个二进制文件。处理一个小图标的完整耗时约 10 毫秒，svgo CLI 约 160 毫秒，其中大部分为 Node 启动时间。",
-          ),
-          [
-            text(
-              "svgo-mbt icon.svg --stats\nsvgo-mbt icon.svg -o out.svg -p 2 --pretty\nsvgo-mbt icon.svg --json ",
-            ),
-            c("| jq .size"),
-            text(
-              "\nsvgo-mbt icon.svg \\\n  --plugins convertPathData,sortAttrs\nsvgo-mbt --list",
-            ),
-          ],
-        ),
-        snippet(
-          2,
-          t("MoonBit · library", "MoonBit · 库"),
-          t(
-            "Plain structs, no global state. The xml, path and plugins packages can each be used on their own.",
-            "普通结构体，无全局状态。xml、path、plugins 三个包均可单独使用。",
-          ),
-          highlight_mbt(
-            t(
-              "let r = @svgo.optimize(svg, config={\n  ..@svgo.Config::default(),\n  precision: 2,\n})\nr.saved_percent()  // 67.0\n\n// or just the path optimizer\n@path.optimize_string(\"M 0,0 L 10,10\")\n// \"M0 0l10 10\"",
-              "let r = @svgo.optimize(svg, config={\n  ..@svgo.Config::default(),\n  precision: 2,\n})\nr.saved_percent()  // 67.0\n\n// 或者只用路径优化器\n@path.optimize_string(\"M 0,0 L 10,10\")\n// \"M0 0l10 10\"",
-            ),
+            "npx runs the Node.js CLI. Native binaries are available on GitHub Releases.",
+            "npx 运行 Node.js CLI。原生二进制可从 GitHub Releases 下载。",
           ),
         ),
-      ]),
-    ]),
-  ])
-}
-
-///|
-fn cli_section() -> Html {
-  let flag_rows = cli_flags.map(f => {
-    tr([
-      td([code(f.flag)]),
-      td(flag_description(f.flag, f.description, lang.val)),
-    ])
-  })
-  section(id="cli", class="border-y border-line bg-bg-2 py-20", [
-    div(class="wrap", [
-      section_head(
-        t(
-          "The command line, in one binary.", "命令行，一个二进制文件。",
+        a(
+          class="mt-3 inline-block underline",
+          href=REPO_URL + "/releases",
+          t("Download a native binary", "下载原生二进制"),
         ),
-      ),
-      div(class="grid items-start gap-5 min-[901px]:grid-cols-[1fr_1fr]", [
-        div(class="card reveal", [
-          h3(t("Install and run", "安装并运行")),
-          div(
-            class="sub",
-            t(
-              "npx runs the Node build of the CLI; the native binary starts faster.",
-              "npx 运行 CLI 的 Node 版；原生二进制启动更快。",
-            ),
+        code_card(
+          "npx @rivus/svgo in.svg -o out.svg\n\nsvgo-mbt nib.svg -o out.svg\nsvgo-mbt icon.svg -o out.svg -p 2 --pretty\ncat in.svg | svgo-mbt > out.svg\nsvgo-mbt -r ./icons -o ./icons-opt",
+          s => [text(s)],
+          emit,
+        ),
+        p(class="mt-6 text-sm", t("Sample report", "示例报告")),
+        pre(class="whitespace-pre-wrap break-words", t(report, report)),
+        node("details", Attrs::build().class("flags"), [
+          node(
+            "summary",
+            Attrs::build(),
+            t("All CLI flags", "全部 CLI 参数"),
           ),
-          div(class="flex flex-wrap items-center gap-3", [
-            copy_pill("npx @rivus/svgo in.svg -o out.svg"),
+          table(class="sizes cli-flags", [
+            thead([
+              tr([th(t("Flag", "参数")), th(t("Description", "说明"))]),
+            ]),
+            tbody(
+              cli_flags.map(f => {
+                tr([
+                  td([code(t(f.flag, f.flag))]),
+                  td(flag_description(f.flag, f.description, lang.val)),
+                ])
+              }),
+            ),
           ]),
-          div(class="mt-4 use", [
-            pre([
-              text("# read from stdin, write to stdout\n"),
-              text("cat in.svg | svgo-mbt > out.svg\n\n"),
-              text("# optimize every SVG under a directory into another\n"),
-              text("svgo-mbt -r ./icons -o ./icons-opt\n"),
-              c(
-                "  ./icons/close.svg     836 B →    276 B   −67%\n  ./icons/logo.svg     1.1 KB →    528 B   −54%\n  2 files              2.0 KB →    804 B   −59%  2.6 ms",
+        ]),
+      ])
+    }
+    2 =>
+      div(class="use", [
+        copy_pill("moon add PerfectPan/svgo", emit),
+        code_card(
+          t(
+            "let r = @svgo.optimize(svg, config={\n  ..@svgo.Config::default(),\n  precision: 2,\n})\nr.data\nr.saved_percent()\n\n// Optimize path data independently\n@path.optimize_string(\"M 0,0 L 10,10\")",
+            "let r = @svgo.optimize(svg, config={\n  ..@svgo.Config::default(),\n  precision: 2,\n})\nr.data\nr.saved_percent()\n\n// 单独优化路径数据\n@path.optimize_string(\"M 0,0 L 10,10\")",
+          ),
+          highlight_mbt,
+          emit,
+        ),
+      ])
+    _ =>
+      div(class="use", [
+        div(
+          class="pm-switch",
+          attrs=Attrs::build().aria_label(t("Package manager", "包管理器")),
+          package_managers.mapi((idx, pm) => {
+            button(
+              attrs=Attrs::build().aria_pressed(
+                if state.pm == idx {
+                  "true"
+                } else {
+                  "false"
+                },
               ),
-            ]),
+              on_click=emit(SelectPm(idx)),
+              pm.0,
+            )
+          }),
+        ),
+        copy_pill(package_managers[state.pm].1, emit),
+        code_card(
+          t(
+            "import { optimize } from \"@rivus/svgo\";\n\nconst result = await optimize(svg, {\n  precision: 3,\n});\n\nresult.data;          // optimized SVG\nresult.originalSize;  // input bytes\nresult.size;          // output bytes\nresult.applied;       // applied plugins",
+            "import { optimize } from \"@rivus/svgo\";\n\nconst result = await optimize(svg, {\n  precision: 3,\n});\n\nresult.data;          // 优化后的 SVG\nresult.originalSize;  // 输入字节数\nresult.size;          // 输出字节数\nresult.applied;       // 已应用的插件",
+          ),
+          highlight_js,
+          emit,
+        ),
+      ])
+  }
+  let wasm_kb = to_fixed(wasm_bytes.to_double() / 1000.0, 0)
+  section(
+    id="install",
+    class="wrap screen screen-install screen-band py-14 lg:py-24",
+    [
+      div(
+        class="reveal grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start lg:gap-10",
+        [
+          div(class="lg:col-span-5", [
+            h2(
+              class="display screen-heading mb-8 text-balance text-section lg:mb-0",
+              t("Install", "安装"),
+            ),
+            p(
+              class="screen-line mt-8 max-w-lead text-ink-2",
+              t(
+                "One \{wasm_kb} KB wasm file, no dependencies.",
+                "一个 \{wasm_kb} KB 的 wasm 文件，无依赖。",
+              ),
+            ),
+            p(
+              class="footnote",
+              t(
+                "Node.js 24+, Bun 1.4+, Deno 2, Chrome 130+, Firefox 134+, Safari 18.4+ (JS String Builtins).",
+                "Node.js 24+、Bun 1.4+、Deno 2、Chrome 130+、Firefox 134+、Safari 18.4+（JS String Builtins）。",
+              ),
+            ),
           ]),
-        ]),
-        div(class="card reveal", style=["--d: 90ms"], [
-          h3(t("Flags", "参数")),
-          div(
-            class="sub",
+          div(class="lg:col-span-7", [
+            div(
+              class="install-tabs mb-6 flex gap-2 border-b border-line-2",
+              attrs=Attrs::build().aria_label(
+                t("Installation method", "安装方式"),
+              ),
+              tabs,
+            ),
+            content,
+          ]),
+        ],
+      ),
+    ],
+  )
+}
+
+///|
+fn plugins_details() -> Html {
+  let all = @svgo.list_plugins()
+  let defaults = all.filter(item => item.2)
+  let plugin = fn(number : String, item : (String, String, Bool)) -> Html {
+    let (name, desc, _) = item
+    let description = plugin_description(name, desc, lang.val)
+    div(class=if number == "" { "plugin plugin-opt-in" } else { "plugin" }, [
+      span(class="sheet-no", number),
+      code(attrs=Attrs::build().title(name), name),
+      span(
+        class="plugin-description",
+        attrs=Attrs::build().title(description),
+        description,
+      ),
+    ])
+  }
+  let plugins = defaults.mapi((idx, item) => {
+    plugin(if idx < 9 { "0\{idx + 1}" } else { "\{idx + 1}" }, item)
+  })
+  let optional = ["moveGroupAttrsToElems", "removeDimensions", "removeTitle"].map(name => {
+      let item = all.filter(item => item.0 == name)[0]
+      plugin("", item)
+    },
+  )
+  landing_details(t("\{all.length()} plugins", "\{all.length()} 个插件"), [
+    p(
+      class="section-intro pipeline-intro",
+      t(
+        "\{defaults.length()} run by default, in svgo's preset-default order. \{all.length() - defaults.length()} are opt-in: moveGroupAttrsToElems (on by default in svgo), removeDimensions, removeTitle.",
+        "默认运行 \{defaults.length()} 个，顺序与 svgo preset-default 一致。\{all.length() - defaults.length()} 个可选：moveGroupAttrsToElems（svgo 默认开启）、removeDimensions、removeTitle。",
+      ),
+    ),
+    div(class="pipeline-group", [
+      div(class="pipeline", plugins[:8].to_owned()),
+      input(
+        attrs=Attrs::build().type_("checkbox"),
+        id="pipeline-expanded",
+        class="pipeline-toggle",
+      ),
+      label(
+        class="pipeline-disclosure",
+        attrs=Attrs::build().for_("pipeline-expanded"),
+        [
+          span(
+            class="pipeline-chevron",
+            attrs=Attrs::build().aria_hidden("true"),
+            "+",
+          ),
+          text(
             t(
-              "repeatable means you can pass it more than once.", "标注“可重复”的参数可以传多次。",
+              "Show all \{all.length()} plugins",
+              "显示全部 \{all.length()} 个插件",
             ),
           ),
-          div(class="overflow-x-auto", [
-            table(class="sizes cli-flags", [
-              thead([
-                tr([th(t("flag", "参数")), th(t("what it does", "作用"))]),
-              ]),
-              tbody(flag_rows),
-            ]),
-          ]),
-        ]),
+        ],
+      ),
+      div(class="pipeline-rest", [
+        div(class="pipeline", plugins[8:].to_owned()),
+        h3(class="opt-in-heading", t("Opt-in", "可选")),
+        div(class="pipeline", optional),
       ]),
     ]),
   ])
 }
 
 ///|
-fn gallery_section() -> Html {
-  let shots = samples.mapi((idx, s) => {
-    let o = run_optimize(s.svg)
-    div(class="shot reveal stagger", style=["--i: \{idx}"], [
-      div(class="pair", [
-        div(attrs=Attrs::build().inner_html(s.svg), nothing),
-        div(attrs=Attrs::build().inner_html(o.data), nothing),
-      ]),
-      div(class="meta", [
-        span(class="flex items-baseline gap-2", [
-          b(class="font-semibold text-ink", s.name),
-          small(class="text-muted", fmt_kb(o.original_size)),
-        ]),
-        span([
-          text("→ "),
-          b(fmt_kb(o.size)),
-          text(" · "),
-          span(class="pill", "−\{fmt_pct(o.saved_percent(), digits=0)}%"),
-        ]),
-      ]),
-    ])
-  })
-  section(id="verified", class="border-y border-line bg-bg-2 py-20", [
-    div(class="wrap", [
-      section_head(t("Verified pixel by pixel.", "逐像素验证。")),
-      div(
-        class="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4",
-        shots,
-      ),
-      p(
-        class="mt-5 text-[12.5px] text-muted",
-        t(
-          "Left: the original. Right: optimized live in your browser. Every sample is rendered before and after with resvg and compared pixel by pixel; the wasm build runs the same fixture suite under Node, Bun and Deno.",
-          "左侧为原图，右侧为浏览器中实时优化的结果。每张样图在优化前后各用 resvg 渲染一次，逐像素比对；wasm 构建在 Node、Bun、Deno 中运行同一套测试用例。",
-        ),
-      ),
-    ]),
-  ])
-}
-
-///|
-/// The landing page. Re-rendered when the preferences change.
+/// Landing page with local installation selection and copy feedback.
 pub fn landing_page(chrome : Chrome) -> Val[Html] {
-  chrome.prefs.view(p => {
-    div(class="pt-[60px]", [
+  let initial : LandingState = { tab: 0, pm: 0, }
+  let mascot_output = run_optimize(samples[0].svg)
+  let (state, emit) = @rabbita.create_state_with_init(
+    init=fn(_) {
+      (
+        initial,
+        @rabbita.effect(fn() noraise {
+          start_count(
+            "hero-byte-count",
+            mascot_output.original_size,
+            mascot_output.size,
+          )
+        }),
+      )
+    },
+    update=(m, msg, _) => {
+      match msg {
+        SelectTab(tab) => ({ ..m, tab, }, none)
+        SelectPm(pm) => ({ ..m, pm, }, none)
+        Copy(cmd) =>
+          (
+            m,
+            @rabbita.batch([
+              @rabbita.effect(fn() noraise { copy_text(cmd) }),
+              toast_success(t("Copied", "已复制")),
+            ]),
+          )
+      }
+    },
+  )
+  state.view2(chrome.prefs, (m, p) => {
+    div(class="pt-14", [
       top_nav(Landing, "", p, chrome.emit),
-      hero(p.dark),
-      numbers_section(),
-      plugins_section(),
-      use_section(),
-      cli_section(),
-      gallery_section(),
-      page_footer(),
+      node("main", Attrs::build(), [
+        hero(emit),
+        faster_screen(),
+        same_pixels_screen(),
+        install_screen(m, emit),
+        div(class="wrap details-section", [
+          benchmarks_details(),
+          plugins_details(),
+        ]),
+      ]),
+      page_footer(route=Landing),
     ])
   })
 }

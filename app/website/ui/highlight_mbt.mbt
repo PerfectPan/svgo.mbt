@@ -59,8 +59,24 @@ fn is_upper(c : Int) -> Bool {
 }
 
 ///|
+/// Keywords for the JavaScript snippets on the landing page. The lexer is the
+/// MoonBit one: comments, strings, numbers and punctuation read the same.
+let js_keywords : Set[String] = Set::from_array([
+  "import", "from", "export", "const", "let", "await", "async", "function", "return",
+  "new", "true", "false",
+])
+
+///|
 /// `(class, text)` pairs; concatenating the texts gives `src` back.
 pub fn tokenize_mbt(src : String) -> Array[(String, String)] {
+  tokenize_code(src, mbt_keywords)
+}
+
+///|
+fn tokenize_code(
+  src : String,
+  keywords : Set[String],
+) -> Array[(String, String)] {
   let out : Array[(String, String)] = []
   let cu = src.code_units()
   let n = src.length()
@@ -211,7 +227,7 @@ pub fn tokenize_mbt(src : String) -> Array[(String, String)] {
         j += 1
       }
       let word = src.unsafe_substring(start=i, end=j)
-      if mbt_keywords.contains(word) {
+      if keywords.contains(word) {
         flush(i, Keyword)
       } else if is_upper(c) {
         flush(i, Type)
@@ -235,7 +251,18 @@ pub fn tokenize_mbt(src : String) -> Array[(String, String)] {
 /// Tokenise `src` into Html spans. The text content of the result is
 /// exactly `src`.
 pub fn highlight_mbt(src : String) -> Array[Html] {
-  tokenize_mbt(src).map(tok => {
+  spans(tokenize_mbt(src))
+}
+
+///|
+/// Like `highlight_mbt`, with JavaScript keywords.
+pub fn highlight_js(src : String) -> Array[Html] {
+  spans(tokenize_code(src, js_keywords))
+}
+
+///|
+fn spans(tokens : Array[(String, String)]) -> Array[Html] {
+  tokens.map(tok => {
     let (cls, s) = tok
     if cls.is_empty() {
       text(s)

@@ -35,6 +35,8 @@
     body { color: #f7ede3; background: #1c1613; }
     p { color: #d8c8bc; }
     a { color: #ff8a6b; }
+    /* the same sticker rim as the site's dark theme: Nib keeps its ink */
+    .nib svg { filter: drop-shadow(2px 0 0 #f7ede3) drop-shadow(-2px 0 0 #f7ede3) drop-shadow(0 2px 0 #f7ede3) drop-shadow(0 -2px 0 #f7ede3); }
   }
 </style>
 <script>(function () { try { var l = localStorage.getItem("svgo-lang"); if (l !== "en" && l !== "zh") l = (navigator.language || "en").toLowerCase().indexOf("zh") === 0 ? "zh" : "en"; document.documentElement.lang = l; } catch (e) {} })();</script>

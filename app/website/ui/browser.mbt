@@ -14,6 +14,7 @@ extern "js" fn download_text(name : String, text : String) -> Unit =
   #|}
 
 ///|
+/// Copies `text`; the confirmation is the caller's toast (`toast_success`).
 extern "js" fn copy_text(text : String) -> Unit =
   #|(text) => { navigator.clipboard && navigator.clipboard.writeText(text); }
 
@@ -29,6 +30,120 @@ extern "js" fn read_first_file(
   #|  const f = el && el.files && el.files[0];
   #|  if (!f) { cb(""); return; }
   #|  f.text().then(cb, () => cb(""));
+  #|}
+
+///|
+/// Wires the playground's drag-and-drop: dropping a file anywhere over
+/// `#<container_id>` reads its text and hands it to `on_file`, showing
+/// `#<overlay_id>` (hidden by default) while a file is dragged over and
+/// hiding it again on drop or drag-leave. Delegated on `document` — so it
+/// keeps working across playground re-renders without re-attaching to a
+/// specific node — and idempotent across route changes: calling it again
+/// (the playground page is re-created per route visit, see app.mbt) just
+/// rebinds `on_file` to the current page's callback instead of stacking a
+/// second set of listeners.
+extern "js" fn install_dropzone(
+  container_id : String,
+  overlay_id : String,
+  on_file : (String) -> Unit,
+) -> Unit =
+  #|(containerId, overlayId, onFile) => {
+  #|  window.__pgDropzoneOnFile = onFile;
+  #|  if (window.__pgDropzoneInstalled) return;
+  #|  window.__pgDropzoneInstalled = true;
+  #|  let depth = 0;
+  #|  const inZone = (e) => e.target && e.target.closest && e.target.closest("#" + containerId);
+  #|  const hasFiles = (e) => e.dataTransfer && Array.prototype.indexOf.call(e.dataTransfer.types || [], "Files") !== -1;
+  #|  const setOverlay = (hidden) => { const o = document.getElementById(overlayId); if (o) o.hidden = hidden; };
+  #|  document.addEventListener("dragenter", (e) => {
+  #|    if (!inZone(e) || !hasFiles(e)) return;
+  #|    e.preventDefault();
+  #|    depth++;
+  #|    setOverlay(false);
+  #|  });
+  #|  document.addEventListener("dragover", (e) => { if (inZone(e) && hasFiles(e)) e.preventDefault(); });
+  #|  document.addEventListener("dragleave", (e) => {
+  #|    if (!inZone(e) || !hasFiles(e)) return;
+  #|    depth = Math.max(0, depth - 1);
+  #|    if (depth === 0) setOverlay(true);
+  #|  });
+  #|  document.addEventListener("drop", (e) => {
+  #|    if (!inZone(e) || !hasFiles(e)) return;
+  #|    e.preventDefault();
+  #|    depth = 0;
+  #|    setOverlay(true);
+  #|    const f = e.dataTransfer.files && e.dataTransfer.files[0];
+  #|    if (f) f.text().then((t) => window.__pgDropzoneOnFile(t), () => {});
+  #|  });
+  #|}
+
+///|
+/// Carries `dropzone_sub`'s arguments through `@sub.custom_sub`'s `Error`
+/// payload (see the built-in subscriptions in rabbita's `sub` package for
+/// the same pattern with keydown/resize/etc.) so the drop callback below
+/// gets a live `&Scheduler` to dispatch through — calling `msg(text)` on its
+/// own only builds a `Cmd` description; nothing runs it unless a scheduler
+/// is asked to (`scheduler.add`), which is exactly what a subscription's
+/// loader is handed.
+priv suberror DropzoneSub {
+  Install(String, String, @cmd.Emit[String])
+}
+
+///|
+fn dropzone_sub_loader(
+  payload : Error,
+  scheduler : &@cmd.Scheduler,
+) -> @sub.RunningSub? {
+  match payload {
+    DropzoneSub::Install(container_id, overlay_id, msg) => {
+      install_dropzone(container_id, overlay_id, text => {
+        scheduler.add(msg(text))
+      })
+      Some({ unload: _ => (), update_tagger: _ => (), })
+    }
+    _ => None
+  }
+}
+
+///|
+/// Subscription wrapper for `install_dropzone`: dropping a file over
+/// `#<container_id>` dispatches `msg` with its text content. Install once
+/// from a page's `subscriptions` callback (see `playground_page`) rather
+/// than calling `install_dropzone` directly — a bare `emit(msg)` builds a
+/// `Cmd` but never runs it outside the update loop, so the drop handler
+/// would silently do nothing.
+pub fn dropzone_sub(
+  container_id : String,
+  overlay_id : String,
+  msg : @cmd.Emit[String],
+) -> @sub.Sub {
+  @sub.custom_sub(
+    "playground-dropzone",
+    Local,
+    DropzoneSub::Install(container_id, overlay_id, msg),
+    dropzone_sub_loader,
+  )
+}
+
+///|
+/// Tweens the text of a byte-count element from `from` to `to` over 250 ms
+/// (the playground's stats bar, on an option change — typing or loading a
+/// new file snaps instead, see pg_update). `from` and `to` come from the
+/// model, not the DOM: the vdom has usually already patched the element to
+/// `to` by the time this runs, so reading its current text back out would
+/// find no change to animate.
+extern "js" fn tween_int(id : String, from : Int, to : Int) -> Unit =
+  #|(id, from, to) => {
+  #|  const el = document.getElementById(id);
+  #|  if (!el || from === to || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  #|  const t0 = performance.now(), dur = 250;
+  #|  const tick = (now) => {
+  #|    const k = Math.min(1, (now - t0) / dur);
+  #|    const v = Math.round(from + (to - from) * k);
+  #|    el.textContent = (k >= 1 ? to : v).toLocaleString("en-US");
+  #|    if (k < 1) requestAnimationFrame(tick);
+  #|  };
+  #|  requestAnimationFrame(tick);
   #|}
 
 ///|
@@ -82,13 +197,15 @@ pub fn fmt_pct(p : Double, digits? : Int = 1) -> String {
 ///|
 /// Decorative motion: scroll-triggered reveals (`.reveal` gets `.in` when it
 /// enters the viewport) and number count-ups (`data-count`). Installed once;
-/// a MutationObserver picks up nodes the app renders later. Adds `motion` to
-/// <html> so the stylesheet only hides `.reveal` elements while this runs,
-/// and does nothing when the visitor prefers reduced motion.
+/// a MutationObserver picks up nodes the app renders later. The inline
+/// bootstrap script in `public/index.html` sets `motion` on `<html>`
+/// synchronously (before first paint, alongside the theme/lang bootstrap) so
+/// `.reveal` and the hero keyframes are already hidden in the first frame;
+/// this only wires the IntersectionObserver on top of that class and does
+/// nothing when the visitor prefers reduced motion (no `motion` class).
 extern "js" fn install_motion() -> Unit =
   #|() => {
-  #|  if (!("IntersectionObserver" in window) || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  #|  document.documentElement.classList.add("motion");
+  #|  if (!("IntersectionObserver" in window) || !document.documentElement.classList.contains("motion")) return;
   #|  const count = (el) => {
   #|    const raw = el.dataset.count, target = parseFloat(raw), final = el.textContent;
   #|    if (!target || el.dataset.counted) return;
@@ -109,7 +226,7 @@ extern "js" fn install_motion() -> Unit =
   #|      if (e.target.dataset.count) count(e.target);
   #|      e.target.querySelectorAll("[data-count]").forEach(count);
   #|    }
-  #|  }, { rootMargin: "0px 0px -8% 0px", threshold: 0.1 });
+  #|  }, { rootMargin: "0px 0px -25% 0px", threshold: 0.2 });
   #|  const scan = (root) => {
   #|    if (root.nodeType !== 1) return;
   #|    if (root.classList.contains("reveal") && !root.classList.contains("in")) io.observe(root);
@@ -127,42 +244,47 @@ pub fn start_motion() -> Unit {
 }
 
 ///|
-/// Lazy-load `<video preload="none">` elements: start loading (and autoplay
-/// when muted) once they enter the viewport, or after the first paint for
-/// above-the-fold videos. Keeps the 960 KB hero mp4 off the critical path.
-extern "js" fn install_video_lazyload() -> Unit =
-  #|() => {
-  #|  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  #|  const start = (v) => {
-  #|    if (v.dataset.lazy) return;
-  #|    v.dataset.lazy = "1";
-  #|    v.preload = "auto";
-  #|    if (v.autoplay && !reduce) v.play().catch(() => {});
+/// Counts an element's text from `from` down (or up) to `to`, once, in
+/// place — the hero byte counter. The element is server-rendered showing
+/// `to` (its reduced-motion end state), so as soon as this finds it it
+/// switches the text to `from` immediately — Nib and the counter are still
+/// fading/scaling in at that point (see `.hero-visual` in style.css), so
+/// this never flashes the final value before counting down to it. The
+/// visible count itself starts 450 ms after the id mounts and runs 720 ms
+/// on an easeOutCubic curve; once the value is within 0.5% of `to` it snaps
+/// there instead of riding the easing curve's flat tail out, so the count
+/// lands crisply. Does nothing under `prefers-reduced-motion` (the element
+/// keeps showing `to` throughout). Retries `requestAnimationFrame` until the
+/// id mounts, the same pattern as `scroll_to_id`.
+extern "js" fn animate_count(id : String, from : Int, to : Int) -> Unit =
+  #|(id, from, to) => {
+  #|  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  #|  let tries = 60;
+  #|  const run = (el) => {
+  #|    const span = Math.abs(to - from) || 1;
+  #|    const t0 = performance.now(), dur = 720;
+  #|    const tick = (now) => {
+  #|      const k = Math.min(1, (now - t0) / dur);
+  #|      const eased = 1 - Math.pow(1 - k, 3);
+  #|      const v = from + (to - from) * eased;
+  #|      const done = k >= 1 || Math.abs(to - v) / span <= 0.005;
+  #|      el.textContent = (done ? to : Math.round(v)).toLocaleString("en-US");
+  #|      if (!done) requestAnimationFrame(tick);
+  #|    };
+  #|    requestAnimationFrame(tick);
   #|  };
-  #|  const scan = (root) => {
-  #|    if (root.nodeType !== 1) return;
-  #|    const videos = root.tagName === "VIDEO" ? [root] : root.querySelectorAll("video[preload='none']");
-  #|    videos.forEach((v) => {
-  #|      if (v.dataset.lazy) return;
-  #|      if ("IntersectionObserver" in window) {
-  #|        const io = new IntersectionObserver((es) => {
-  #|          es.forEach((e) => { if (e.isIntersecting) { io.disconnect(); start(e.target); } });
-  #|        }, { rootMargin: "200px" });
-  #|        io.observe(v);
-  #|      } else {
-  #|        start(v);
-  #|      }
-  #|    });
+  #|  const start = () => {
+  #|    const el = document.getElementById(id);
+  #|    if (!el) { if (--tries > 0) requestAnimationFrame(start); return; }
+  #|    el.textContent = from.toLocaleString("en-US");
+  #|    setTimeout(() => run(el), 450);
   #|  };
-  #|  // above-the-fold: load on the next frame after first paint
-  #|  requestAnimationFrame(() => requestAnimationFrame(() => scan(document)));
-  #|  new MutationObserver((ms) => ms.forEach((m) => m.addedNodes.forEach(scan)))
-  #|    .observe(document.body, { childList: true, subtree: true });
+  #|  start();
   #|}
 
 ///|
-pub fn start_video_lazyload() -> Unit {
-  install_video_lazyload()
+pub fn start_count(id : String, from : Int, to : Int) -> Unit {
+  animate_count(id, from, to)
 }
 
 ///|
@@ -176,6 +298,29 @@ extern "js" fn scroll_to_id(id : String) -> Unit =
   #|    const el = document.getElementById(id);
   #|    if (el) { el.scrollIntoView({ block: "start" }); return; }
   #|    if (--tries > 0) requestAnimationFrame(attempt);
+  #|  };
+  #|  attempt();
+  #|}
+
+///|
+/// Flashes the `.api-anchor-flash` background (600ms, see style.css) on the
+/// element an API TOC link or deep link points at, so landing mid-page reads
+/// as "here" rather than a silent jump. A no-op under reduced motion (the
+/// element still scrolls into view via `scroll_to_id`, just without the
+/// flash). Retries like `scroll_to_id` since the target may not be mounted
+/// yet on a route change; removes and re-adds the class so revisiting the
+/// same anchor replays the animation instead of no-op'ing (the class would
+/// otherwise already be present with its animation finished).
+extern "js" fn highlight_id(id : String) -> Unit =
+  #|(id) => {
+  #|  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  #|  let tries = 60;
+  #|  const attempt = () => {
+  #|    const el = document.getElementById(id);
+  #|    if (!el) { if (--tries > 0) requestAnimationFrame(attempt); return; }
+  #|    el.classList.remove("api-anchor-flash");
+  #|    void el.offsetWidth;
+  #|    el.classList.add("api-anchor-flash");
   #|  };
   #|  attempt();
   #|}

@@ -5,6 +5,7 @@ import {
   "moonbit-community/rabbita",
   "moonbit-community/rabbita/cmd",
   "moonbit-community/rabbita/html",
+  "moonbit-community/rabbita/sub",
   "moonbitlang/core/ref",
 }
 
@@ -33,6 +34,8 @@ pub fn code_editor(String, @cmd.Emit[String], placeholder~ : String, label~ : St
 
 pub fn code_view(String, label~ : String) -> @html.Html
 
+pub fn dropzone_sub(String, String, @cmd.Emit[String]) -> @sub.Sub
+
 pub fn flag_description(String, String, Lang) -> String
 
 pub fn fmt_int(Int) -> String
@@ -47,6 +50,8 @@ pub let generated_on : String
 
 pub fn highlight(String) -> Array[@html.Html]
 
+pub fn highlight_js(String) -> Array[@html.Html]
+
 pub let highlight_limit : Int
 
 pub fn highlight_mbt(String) -> Array[@html.Html]
@@ -55,13 +60,11 @@ pub fn landing_page(Chrome) -> @rabbita.Val[@html.Html]
 
 pub let lang : @ref.Ref[Lang]
 
-pub fn logo(size? : String) -> @html.Html
-
 pub fn lz_compress(String) -> String
 
 pub fn lz_decompress(String) -> String?
 
-pub fn page_footer() -> @html.Html
+pub fn page_footer(route? : Route) -> @html.Html
 
 pub fn page_head(String, Array[@html.Html], String, inline? : Bool) -> @html.Html
 
@@ -75,11 +78,11 @@ pub fn run_optimize(String, plugins? : Array[String], precision? : Int, multipas
 
 pub let samples : Array[Sample]
 
+pub fn start_count(String, Int, Int) -> Unit
+
 pub fn start_motion() -> Unit
 
 pub fn start_scrollspy() -> Unit
-
-pub fn start_video_lazyload() -> Unit
 
 pub fn stats_bar(Outcome, String) -> @html.Html
 
@@ -129,6 +132,7 @@ pub(all) struct BenchRow {
   original : Int
   mbt : Int
   js : Int
+  js_default : Int
   mbt_ms : Double
   js_ms : Double
 } derive(Eq)

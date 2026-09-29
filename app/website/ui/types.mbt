@@ -5,6 +5,7 @@ pub(all) struct BenchRow {
   original : Int
   mbt : Int
   js : Int
+  js_default : Int
   mbt_ms : Double
   js_ms : Double
 } derive(Eq)

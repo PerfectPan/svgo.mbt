@@ -2,30 +2,19 @@
   "name": "@svgo-mbt/app",
   "private": true,
   "type": "module",
-  "description": "svgo.mbt website: MoonBit (Rabbita) app with Tailwind CSS v4 and a Remotion hero animation",
+  "description": "svgo.mbt website: MoonBit (Rabbita) app with Tailwind CSS v4",
   "scripts": {
     "dev": "node dev.mjs",
     "build": "node build.mjs",
     "gen": "node gen.mjs",
-    "css": "tailwindcss -i src/style.css -o public/style.css --minify",
-    "motion:studio": "remotion studio motion/src/index.ts",
-    "motion:render": "pnpm -s motion:render:light && pnpm -s motion:render:dark",
-    "motion:render:light": "remotion render motion/src/index.ts Hero public/hero.mp4 --codec h264 --crf 22 --props='{\"theme\":\"light\"}' && remotion still motion/src/index.ts Hero public/hero-poster.jpg --frame 150 --image-format jpeg --jpeg-quality 85 --props='{\"theme\":\"light\"}'",
-    "motion:render:dark": "remotion render motion/src/index.ts Hero public/hero-dark.mp4 --codec h264 --crf 22 --props='{\"theme\":\"dark\"}' && remotion still motion/src/index.ts Hero public/hero-dark-poster.jpg --frame 150 --image-format jpeg --jpeg-quality 85 --props='{\"theme\":\"dark\"}'"
+    "css": "tailwindcss -i src/style.css -o public/style.css --minify"
   },
   "dependencies": {
     "@rivus/svgo": "workspace:*"
   },
   "devDependencies": {
-    "@remotion/cli": "^4.0.0",
-    "@remotion/tailwind-v4": "^4.0.0",
     "@tailwindcss/cli": "^4.1.0",
-    "@types/react": "^19.0.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "remotion": "^4.0.0",
     "tailwindcss": "^4.1.0",
-    "terser": "^5.51.2",
-    "typescript": "^5.6.0"
+    "terser": "^5.51.2"
   }
 }

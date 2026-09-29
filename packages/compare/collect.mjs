@@ -14,6 +14,14 @@ const files = [
   ...readdirSync(join(ROOT, "svgo/testdata")).filter((f) => f.endsWith(".svg")).map((f) => join(ROOT, "svgo/testdata", f)),
   ...readdirSync(join(ROOT, "packages/compare/corpus")).filter((f) => f.endsWith(".svg") && !f.includes("x12")).map((f) => join(ROOT, "packages/compare/corpus", f)),
 ];
+// svgo runs with the plugin set svgo.mbt runs by default: preset-default
+// without moveGroupAttrsToElems, which svgo.mbt keeps opt-in (see
+// optional_plugins in svgo/plugins/preset.mbt). `jsDefault` records svgo's
+// own default for the footnote.
+const JS_CONFIG = {
+  multipass: true,
+  plugins: [{ name: "preset-default", params: { overrides: { moveGroupAttrsToElems: false } } }],
+};
 const bytes = (s) => Buffer.byteLength(s, "utf8");
 const time = async (fn, n) => {
   await fn();
@@ -27,14 +35,16 @@ for (const f of files) {
   const size = statSync(f).size;
   const runs = size > 40000 ? 20 : size > 3000 ? 100 : 300;
   const mbt = await mbtOptimize(src);
-  const js = jsOptimize(src, { multipass: true }).data;
+  const js = jsOptimize(src, JS_CONFIG).data;
+  const jsDefault = jsOptimize(src, { multipass: true }).data;
   const mbtMs = await time(() => mbtOptimize(src), runs);
-  const jsMs = await time(() => Promise.resolve(jsOptimize(src, { multipass: true })), runs);
+  const jsMs = await time(() => Promise.resolve(jsOptimize(src, JS_CONFIG)), runs);
   const row = {
     file: f.split("/").pop(),
     original: bytes(src),
     mbt: mbt.size,
     js: bytes(js),
+    jsDefault: bytes(jsDefault),
     mbtMs: +mbtMs.toFixed(3),
     jsMs: +jsMs.toFixed(3),
     passes: mbt.passes,

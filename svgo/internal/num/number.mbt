@@ -23,6 +23,9 @@ pub suberror NumError {
 } derive(Debug)
 
 ///|
+pub extend NumError with Debug::{to_repr}
+
+///|
 /// `10^-precision` as svgo computes it (`+Math.pow(.1, precision).toFixed(precision)`),
 /// i.e. the correctly rounded value. A single division gives exactly that;
 /// `pow` does not for precision 4 and 5.

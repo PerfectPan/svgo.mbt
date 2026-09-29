@@ -8,6 +8,15 @@ pub(all) struct Specificity {
 } derive(Eq, Compare, Debug)
 
 ///|
+pub extend Specificity with Eq::{not_equal, equal}
+
+///|
+pub extend Specificity with Compare::{op_lt, op_le, op_ge, op_gt}
+
+///|
+pub extend Specificity with Debug::{to_repr}
+
+///|
 pub impl Show for Specificity with fn output(self, logger) {
   logger.write_string("Specificity(")
   logger.write_string(self.a.to_string())
@@ -19,6 +28,9 @@ pub impl Show for Specificity with fn output(self, logger) {
   logger.write_string(self.d.to_string())
   logger.write_string(")")
 }
+
+///|
+pub extend Specificity with Show::{to_string, output}
 
 ///|
 pub fn Specificity::new(a : Int, b : Int, c : Int, d : Int) -> Specificity {
@@ -57,6 +69,12 @@ pub(all) struct Declaration {
 } derive(Eq, Debug)
 
 ///|
+pub extend Declaration with Eq::{not_equal, equal}
+
+///|
+pub extend Declaration with Debug::{to_repr}
+
+///|
 pub(all) enum Combinator {
   Descendant // space
   Child // >
@@ -64,6 +82,12 @@ pub(all) enum Combinator {
   SubsequentSibling // ~
   Deep // /deep/
 } derive(Eq, Debug)
+
+///|
+pub extend Combinator with Eq::{not_equal, equal}
+
+///|
+pub extend Combinator with Debug::{to_repr}
 
 ///|
 pub(all) enum AttrMatcher {
@@ -77,6 +101,12 @@ pub(all) enum AttrMatcher {
 } derive(Eq, Debug)
 
 ///|
+pub extend AttrMatcher with Eq::{not_equal, equal}
+
+///|
+pub extend AttrMatcher with Debug::{to_repr}
+
+///|
 pub(all) enum SimpleSelector {
   Universal
   Type(String)
@@ -88,9 +118,21 @@ pub(all) enum SimpleSelector {
 } derive(Eq, Debug)
 
 ///|
+pub extend SimpleSelector with Eq::{not_equal, equal}
+
+///|
+pub extend SimpleSelector with Debug::{to_repr}
+
+///|
 pub(all) struct CompoundSelector {
   simples : Array[SimpleSelector]
 } derive(Eq, Debug)
+
+///|
+pub extend CompoundSelector with Eq::{not_equal, equal}
+
+///|
+pub extend CompoundSelector with Debug::{to_repr}
 
 ///|
 pub(all) struct ComplexSelector {
@@ -100,10 +142,19 @@ pub(all) struct ComplexSelector {
 } derive(Eq, Debug)
 
 ///|
+pub extend ComplexSelector with Eq::{not_equal, equal}
+
+///|
+pub extend ComplexSelector with Debug::{to_repr}
+
+///|
 pub(all) struct Rule {
   selectors : Array[ComplexSelector]
   declarations : Array[Declaration]
 } derive(Debug)
+
+///|
+pub extend Rule with Debug::{to_repr}
 
 ///|
 pub(all) enum StyleSheetItem {
@@ -114,6 +165,12 @@ pub(all) enum StyleSheetItem {
 } derive(Debug)
 
 ///|
+pub extend StyleSheetItem with Debug::{to_repr}
+
+///|
 pub(all) struct StyleSheet {
   items : Array[StyleSheetItem]
 } derive(Debug)
+
+///|
+pub extend StyleSheet with Debug::{to_repr}

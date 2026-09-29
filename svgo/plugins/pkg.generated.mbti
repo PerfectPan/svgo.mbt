@@ -29,12 +29,14 @@ pub fn Context::param_int(Self, String, Int) -> Int
 pub fn Context::param_string(Self, String, String) -> String
 pub fn Context::param_strings(Self, String) -> Array[String]
 pub fn Context::set_params(Self, Json) -> Unit
+pub fn Context::to_repr(Self) -> @debug.Repr
 
 pub(all) struct Plugin {
   name : String
   description : String
   run : (@xml.Document, Context) -> Bool
 }
+pub fn Plugin::to_repr(Self) -> @debug.Repr
 pub impl @debug.Debug for Plugin
 
 // Type aliases

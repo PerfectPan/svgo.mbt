@@ -63,7 +63,7 @@ fn parse_into(
       }
     }
     let count = arg_count(cmd)
-    let args : Array[Double] = Array::new(capacity=count)
+    let args : Array[Double] = Array(capacity=count)
     for k in 0..<count {
       i = skip(i)
       let is_flag = cmd.to_ascii_lowercase() == 'a' && (k == 3 || k == 4)

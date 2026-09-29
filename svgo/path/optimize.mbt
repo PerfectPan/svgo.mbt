@@ -34,6 +34,9 @@ pub(all) struct Options {
 } derive(Debug)
 
 ///|
+pub extend Options with Debug::{to_repr}
+
+///|
 /// Precision 3 with every rewrite enabled.
 pub fn Options::default() -> Options {
   {
@@ -113,8 +116,8 @@ fn to_absolute(seg : Segment, cx : Double, cy : Double) -> Abs {
       }
     }
     _ => {
-      let out : Array[Double] = Array::new(capacity=a.length())
-      let rel_out : Array[Double] = Array::new(capacity=a.length())
+      let out : Array[Double] = Array(capacity=a.length())
+      let rel_out : Array[Double] = Array(capacity=a.length())
       for i, v in a {
         let abs_v = if i % 2 == 0 { rx(v) } else { ry(v) }
         let rel_v = if rel { v } else if i % 2 == 0 { v - cx } else { v - cy }
@@ -252,7 +255,7 @@ fn Emitter::emit(
   // round(abs_args[i]): svgo recomputes absolute coords from the rounded
   // relative value plus the unrounded base, which can differ from rounding
   // the absolute coordinate directly by a ULP at strong_round boundaries.
-  let rel_corrected : Array[Double] = Array::new(capacity=rel_args.length())
+  let rel_corrected : Array[Double] = Array(capacity=rel_args.length())
   match cmd {
     'H' => {
       let rel = dx + (base_x - self.rsx)
@@ -288,7 +291,7 @@ fn Emitter::emit(
   // Absolute form: rounded relative + base, then round again. This matches
   // svgo's convertToMixed which does adata[i] = data[i] + item.base[i] then
   // roundData(adata).
-  let abs_rounded : Array[Double] = Array::new(capacity=rel_args.length())
+  let abs_rounded : Array[Double] = Array(capacity=rel_args.length())
   match cmd {
     'H' => abs_rounded.push(@num.strong_round(rel_corrected[0] + base_x, p))
     'V' => abs_rounded.push(@num.strong_round(rel_corrected[0] + base_y, p))

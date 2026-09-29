@@ -12,6 +12,9 @@ pub fn parse(String) -> Document raise ParseError
 pub suberror ParseError {
   ParseError(String, Int)
 } derive(@debug.Debug)
+pub fn ParseError::output(Self, &Logger) -> Unit
+pub fn ParseError::to_repr(Self) -> @debug.Repr
+pub fn ParseError::to_string(Self) -> String
 pub impl Show for ParseError
 
 // Types and methods
@@ -21,6 +24,7 @@ pub(all) struct Document {
 pub fn Document::each_element(Self, (Element, Element?) -> Unit) -> Unit
 pub fn Document::each_element_post(Self, (Element, Element?) -> Unit) -> Unit
 pub fn Document::root(Self) -> Element?
+pub fn Document::to_repr(Self) -> @debug.Repr
 pub fn Document::to_string(Self, options? : SerializeOptions) -> String
 
 pub(all) struct Element {
@@ -34,6 +38,7 @@ pub fn Element::has(Self, String) -> Bool
 pub fn Element::new(String, attrs? : Map[String, String], children? : Array[Node]) -> Self
 pub fn Element::remove(Self, String) -> Unit
 pub fn Element::set(Self, String, String) -> Unit
+pub fn Element::to_repr(Self) -> @debug.Repr
 pub fn Element::to_string(Self, options? : SerializeOptions) -> String
 
 pub(all) enum Node {
@@ -44,12 +49,14 @@ pub(all) enum Node {
   Doctype(String)
   ProcInst(String, String)
 } derive(@debug.Debug)
+pub fn Node::to_repr(Self) -> @debug.Repr
 
 pub(all) struct SerializeOptions {
   pretty : Bool
   prolog : Bool
 } derive(@debug.Debug)
 pub fn SerializeOptions::default() -> Self
+pub fn SerializeOptions::to_repr(Self) -> @debug.Repr
 
 // Type aliases
 

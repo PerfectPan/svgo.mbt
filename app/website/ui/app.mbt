@@ -10,6 +10,9 @@ pub(all) enum Route {
 } derive(Eq)
 
 ///|
+pub extend Route with Eq::{not_equal, equal}
+
+///|
 impl @rabbita.Enumerate for Route with fn tag(self) {
   match self {
     Landing => "landing"
@@ -46,6 +49,9 @@ pub(all) struct Prefs {
   lang : Lang
   dark : Bool
 } derive(Eq)
+
+///|
+pub extend Prefs with Eq::{not_equal, equal}
 
 ///|
 pub(all) enum PrefMsg {

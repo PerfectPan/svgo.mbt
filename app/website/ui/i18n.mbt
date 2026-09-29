@@ -8,6 +8,9 @@ pub(all) enum Lang {
 } derive(Eq)
 
 ///|
+pub extend Lang with Eq::{not_equal, equal}
+
+///|
 pub let lang : Ref[Lang] = { val: En, }
 
 ///|

@@ -15,6 +15,9 @@ pub fn optimize(String, config? : Config) -> Result raise
 pub suberror UnknownPlugin {
   UnknownPlugin(String)
 } derive(@debug.Debug)
+pub fn UnknownPlugin::output(Self, &Logger) -> Unit
+pub fn UnknownPlugin::to_repr(Self) -> @debug.Repr
+pub fn UnknownPlugin::to_string(Self) -> String
 pub impl Show for UnknownPlugin
 
 // Types and methods
@@ -27,6 +30,7 @@ pub(all) struct Config {
   pretty : Bool
 } derive(@debug.Debug)
 pub fn Config::default() -> Self
+pub fn Config::to_repr(Self) -> @debug.Repr
 
 pub(all) struct Result {
   data : String
@@ -36,6 +40,7 @@ pub(all) struct Result {
   applied : Array[String]
 } derive(@debug.Debug)
 pub fn Result::saved_percent(Self) -> Double
+pub fn Result::to_repr(Self) -> @debug.Repr
 
 // Type aliases
 

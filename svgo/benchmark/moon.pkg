@@ -1,8 +1,5 @@
 import {
   "moonbitlang/core/bench",
-}
-
-import {
   "PerfectPan/svgo",
   "PerfectPan/svgo/xml",
   "PerfectPan/svgo/path",

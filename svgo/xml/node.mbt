@@ -6,6 +6,9 @@ pub(all) struct Document {
 } derive(Debug)
 
 ///|
+pub extend Document with Debug::{to_repr}
+
+///|
 /// One node of the tree. Text is stored decoded (entities resolved);
 /// comments, CDATA, doctype and processing instructions keep their raw body.
 pub(all) enum Node {
@@ -19,6 +22,9 @@ pub(all) enum Node {
 } derive(Debug)
 
 ///|
+pub extend Node with Debug::{to_repr}
+
+///|
 /// An element with its tag name, attributes and child nodes. Plugins mutate
 /// elements in place; `name` is mutable so shapes can be turned into paths.
 pub(all) struct Element {
@@ -27,6 +33,9 @@ pub(all) struct Element {
   attrs : Map[String, String]
   children : Array[Node]
 } derive(Debug)
+
+///|
+pub extend Element with Debug::{to_repr}
 
 ///|
 /// Create an element; attributes and children default to empty.

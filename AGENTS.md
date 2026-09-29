@@ -110,6 +110,11 @@ docs/ARCHITECTURE.md          design notes
 - Code blocks separated by `///|`; doc comments on every `pub` item (the
   site's API reference is generated from them).
 - Derive `Debug`, not `Show`, for data; implement `Show` only for errors.
+  A pub type's trait methods (`x.to_string()`, `x.to_repr()`, `x.equal(y)`) are
+  methods only with an explicit `pub extend T with Trait::{...}` next to the type;
+  the compiler warns about the old implicit promotion.
+- Blackbox tests (`*_test.mbt`) call the package under test with its prefix
+  (`@plugins.find_plugin`); an unqualified call is a warning.
 - Tests: `inspect(value, content=...)` snapshots for outputs, `assert_eq` for
   invariant checks. New plugin behavior gets a fixture file first, then a
   unit test if the logic is subtle. After any plugin change run

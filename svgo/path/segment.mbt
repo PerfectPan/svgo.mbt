@@ -7,10 +7,19 @@ pub(all) struct Segment {
 } derive(Debug, Eq)
 
 ///|
+pub extend Segment with Debug::{to_repr}
+
+///|
+pub extend Segment with Eq::{not_equal, equal}
+
+///|
 /// Malformed path data: a number or command was expected at the given offset.
 pub suberror PathError {
   PathError(String)
 } derive(Debug)
+
+///|
+pub extend PathError with Debug::{to_repr}
 
 ///|
 pub impl Show for PathError with fn output(self, logger) {
@@ -18,6 +27,9 @@ pub impl Show for PathError with fn output(self, logger) {
     PathError(m) => logger.write_string(m)
   }
 }
+
+///|
+pub extend PathError with Show::{to_string, output}
 
 ///|
 fn arg_count(cmd : Char) -> Int {

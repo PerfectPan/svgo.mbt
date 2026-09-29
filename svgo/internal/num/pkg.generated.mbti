@@ -44,6 +44,7 @@ pub fn write_path_number(StringBuilder, Double, Int, Int) -> Int
 pub suberror NumError {
   NumError(String)
 } derive(@debug.Debug)
+pub fn NumError::to_repr(Self) -> @debug.Repr
 
 // Types and methods
 

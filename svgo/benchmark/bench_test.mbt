@@ -3,7 +3,7 @@
 /// Each entry of the corpus is optimized end to end; the parser and the path
 /// optimizer are also measured on their own so regressions can be located.
 fn corpus_item(name : String) -> String {
-  for item in corpus {
+  for item in @benchmark.corpus {
     if item.0 == name {
       return item.1
     }

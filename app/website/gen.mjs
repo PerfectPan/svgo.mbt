@@ -38,15 +38,14 @@ ${data.rows.map((r) => `  { file: ${str(r.file)}, original: ${r.original}, mbt: 
 `);
 
 // ---------- samples.mbt ----------
-// Curated: one real editor export (the default in the playground) plus the
-// classic large test files, which make a better gallery than icons do.
+// Curated: the svgo.mbt mascot (the hero visual and the playground's default
+// sample) plus three real logos, shown optimized on the "Same pixels" screen.
+// See app/website/samples/SOURCES.md for provenance and licence.
 const SAMPLES = [
-  ["Sketch icon", "svgo/testdata/sketch-icon.svg"],
-  ["SVG logo", "packages/compare/corpus/SVG_logo.svg"],
-  ["Python logo", "packages/compare/corpus/Python_logo_and_wordmark.svg"],
-  ["Tux", "packages/compare/corpus/Tux.svg"],
-  ["Ghostscript Tiger", "packages/compare/corpus/Ghostscript_Tiger.svg"],
-  ["World map", "packages/compare/corpus/World_map_-_low_resolution.svg"],
+  ["Nib", "app/website/samples/nib.svg"],
+  ["DeepSeek", "app/website/samples/deepseek.svg"],
+  ["Qwen", "app/website/samples/qwen.svg"],
+  ["Mistral", "app/website/samples/mistral.svg"],
 ];
 writeFileSync(join(UI, "samples.mbt"), `${HEADER}
 ///|

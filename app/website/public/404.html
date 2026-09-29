@@ -7,30 +7,43 @@
 <meta name="robots" content="noindex">
 <style>
   /* Standalone page: GitHub Pages serves it at any depth, so ./style.css cannot be
-     linked. Colours are copies of --color-bg / --color-ink / --color-accent in
-     src/style.css (light and dark); keep them in step when the tokens change. */
+     linked reliably. Colours and font stacks are copies of the tokens in
+     src/style.css (light and dark; --color-paper/--color-ink/--color-mark and
+     --font-display/--font-sans) — keep them in step when the tokens change. The
+     display/sans webfonts themselves are not self-hosted here, so this page falls
+     back to system serif/sans rather than pull in another asset path. */
   body {
     margin: 0;
-    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    color: #0b0d12;
-    background: #ffffff;
+    font-family: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: #2a1f1a;
+    background: #fff7ec;
     padding: 56px 24px;
-    line-height: 1.55;
+    line-height: 1.6;
   }
-  .wrap { max-width: 1140px; margin: 0 auto; }
-  p { margin: 0.5em 0; }
-  a { color: #059669; }
+  .wrap { max-width: 640px; margin: 0 auto; text-align: center; }
+  .nib { color: #2a1f1a; margin-bottom: 24px; }
+  .nib svg { display: block; width: 200px; height: 200px; margin: 0 auto; }
+  h1 { font-family: Georgia, "Songti SC", "Noto Serif CJK SC", serif; font-weight: 600; font-size: clamp(28px,5vw,40px); margin: 0 0 12px; }
+  p { margin: 0.5em 0; color: #5c4b42; }
+  a { color: #ff6b4a; font-weight: 500; }
+  /* html[lang] is set by the bootstrap script below, mirroring the same
+     localStorage key and fallback the main app's index.html uses, so a
+     returning visitor sees the language they last chose rather than both
+     at once; English is the default before the script runs. */
+  :lang(zh) .en, :lang(en) .zh { display: none; }
   @media (prefers-color-scheme: dark) {
-    body { color: #eef0f5; background: #0b0d12; }
-    a { color: #10b981; }
+    body { color: #f7ede3; background: #1c1613; }
+    p { color: #d8c8bc; }
+    a { color: #ff8a6b; }
   }
 </style>
+<script>(function () { try { var l = localStorage.getItem("svgo-lang"); if (l !== "en" && l !== "zh") l = (navigator.language || "en").toLowerCase().indexOf("zh") === 0 ? "zh" : "en"; document.documentElement.lang = l; } catch (e) {} })();</script>
 </head>
 <body>
 <div class="wrap">
-  <p>This page does not exist. Redirecting to svgo.mbt.</p>
-  <p>该页面不存在，正在返回 svgo.mbt 首页。</p>
-  <p><a href="https://perfectpan.github.io/svgo.mbt/">https://perfectpan.github.io/svgo.mbt/</a></p>
+  <div class="nib" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="6" viewBox="0 0 256 256"><path d="M226 132v90"/><path fill="#fff7ec" stroke-linejoin="round" d="M202 140h36l10 10-10 10h-36Zm42 30h-36l-10 10 10 10h36Z"/><g transform="rotate(-6 59.757 346.893)"><rect width="24" height="24" x="72" y="196" fill="#0b6e63" rx="3" transform="rotate(14 84 208)"/><rect width="24" height="24" x="152" y="198" fill="#0b6e63" rx="3" transform="rotate(8 164 210)"/><path fill="#ff6b4a" d="M128 70c50 0 84 36 84 80 0 40-36 60-84 60s-84-20-84-60c0-44 34-80 84-80Z"/><path d="m70 62 116 16"/><circle cx="70" cy="62" r="12" fill="currentColor" stroke="none"/><circle cx="186" cy="78" r="12" fill="currentColor" stroke="none"/><rect width="24" height="24" x="116" y="58" fill="#fff7ec" rx="3"/><g stroke="none"><ellipse cx="100" cy="140" fill="#2a1f1a" rx="10" ry="14"/><ellipse cx="156" cy="144" fill="#2a1f1a" rx="9" ry="12"/><circle cx="103" cy="135" r="3.5" fill="#fff7ec"/><circle cx="159" cy="140" r="3" fill="#fff7ec"/><ellipse cx="78" cy="164" fill="#fff7ec" opacity=".45" rx="10" ry="6"/><ellipse cx="178" cy="166" fill="#fff7ec" opacity=".45" rx="10" ry="6"/></g><path stroke="#2a1f1a" stroke-width="5" d="M146 120q10-8 20 2m-48 50q5-6 10-2t10-2"/></g></svg></div>
+  <h1><span class="en">This page does not exist</span><span class="zh">页面不存在</span></h1>
+  <p><a href="https://perfectpan.github.io/svgo.mbt/"><span class="en">Back to svgo.mbt →</span><span class="zh">返回 svgo.mbt →</span></a></p>
 </div>
 <noscript><meta http-equiv="refresh" content="0; url=https://perfectpan.github.io/svgo.mbt/"></noscript>
 <script>
@@ -41,9 +54,9 @@
     var first = rest.split("/")[0];
     if (first === "playground" || first === "api") {
       location.replace(root + "#/" + rest);
-    } else {
-      location.replace(root);
     }
+    // Anything else is a genuinely unknown path: stay on this page and show
+    // the message above instead of bouncing straight to the home page.
   })();
 </script>
 </body>

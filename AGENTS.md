@@ -68,6 +68,7 @@ app/website/                  the website, itself a MoonBit module (PerfectPan/s
                               i18n.mbt: every user-facing string is t(en, zh); browser.mbt: the only JS (extern) bindings
                               lz.mbt: lz-string port for share links; highlight.mbt: lossless SVG lexer for the editors
   public/                     index.html shell, hero video, favicon; style.css is built by Tailwind
+  samples/                    the SVGs the site optimizes (Nib mascot, three model logos); SOURCES.md has provenance and licences
   src/style.css               Tailwind v4 entry: @theme tokens + component layer, @source "../ui"
   motion/                     Remotion composition for the hero video (pnpm -C app/website motion:render)
   build.mjs / dev.mjs         tailwind + gen + warren build / warren dev with live reload

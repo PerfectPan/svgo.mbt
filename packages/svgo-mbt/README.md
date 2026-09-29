@@ -1,8 +1,11 @@
+<img src="https://raw.githubusercontent.com/PerfectPan/svgo.mbt/main/app/website/public/nib.svg" width="96" height="96" align="right" alt="Nib, the svgo.mbt mascot">
+
 # @rivus/svgo
 
 WebAssembly build of [svgo.mbt](https://github.com/PerfectPan/svgo.mbt), an
 SVG optimizer written in MoonBit: all 34 plugins in svgo's preset-default, in its order and with its semantics.
-One 188 KB `wasm-gc` file plus a 2 KB loader, no other dependencies.
+One 188 KB `wasm-gc` file plus a 2 KB loader, no other dependencies; 3.6× faster than svgo at the
+median, with the same output size and 0 px render difference.
 
 ```bash
 npm i @rivus/svgo       # the library
@@ -79,8 +82,8 @@ Chrome 130+, Firefox 134+, Safari 18.4+. CI runs the fixture suite under Node,
 Bun and Deno; details in the repository README under "Runtime compatibility".
 
 Same-process timings against svgo 4.1 (ms per call, both multipass): a Sketch
-icon 0.07 vs 0.30, a 50 KB Inkscape drawing 3.5 vs 14.5, the 68 KB
-Ghostscript Tiger 7.8 vs 38. Playground and details:
+icon 0.10 vs 0.29, the 50 KB Tux drawing 5.7 vs 12.8, the 68 KB
+Ghostscript Tiger 10.1 vs 41.1. Playground and details:
 <https://perfectpan.github.io/svgo.mbt/>.
 
 MIT.

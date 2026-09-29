@@ -1,15 +1,30 @@
-# svgo.mbt
+<p align="center">
+  <img src="https://raw.githubusercontent.com/PerfectPan/svgo.mbt/main/app/website/public/nib.svg" width="136" height="136" alt="Nib, the svgo.mbt mascot: a coral blob drawn as a path, with anchor points for ears and feet">
+</p>
 
-**An SVG optimizer written in MoonBit, shipped as WebAssembly.**
-All 34 plugins in [svgo](https://github.com/svg/svgo)'s preset-default, in its
-order and with its semantics, and none of the Node.js dependency tree: a 188 KB
-`wasm-gc` module that runs in the browser, Node, Bun and Deno, a CLI that installs
-with `npx`, and a MoonBit library.
+<h1 align="center">svgo.mbt</h1>
 
-[**Website & playground**](https://perfectpan.github.io/svgo.mbt/) ·
-[API reference](https://perfectpan.github.io/svgo.mbt/#/api) ·
-[mooncakes.io](https://mooncakes.io/docs/PerfectPan/svgo) ·
-[npm `@rivus/svgo`](https://www.npmjs.com/package/@rivus/svgo)
+<p align="center">
+  <strong>Smaller SVGs, 3.6× faster, the same pixels.</strong><br>
+  <a href="https://github.com/svg/svgo">svgo</a>'s preset-default, written in MoonBit.
+</p>
+
+<p align="center">
+  <a href="https://perfectpan.github.io/svgo.mbt/"><strong>Website &amp; playground</strong></a> ·
+  <a href="https://perfectpan.github.io/svgo.mbt/#/api">API reference</a> ·
+  <a href="https://mooncakes.io/docs/PerfectPan/svgo">mooncakes.io</a> ·
+  <a href="https://www.npmjs.com/package/@rivus/svgo">npm <code>@rivus/svgo</code></a>
+</p>
+
+All 34 plugins in svgo's preset-default, in its order and with its semantics, and none of the
+Node.js dependency tree: a 188 KB `wasm-gc` module for the browser, Node.js, Bun and Deno, a CLI
+that installs with `npx` (or a native binary), and a MoonBit library. Rendering is checked pixel
+by pixel against the input: 0 differing pixels on every sample the website shows, and nothing
+beyond sub-pixel precision effects on the benchmark corpus.
+
+Nib, the mascot above, is a path drawn with its anchor points showing, and a sample too: the copy
+on the website's first screen carries the metadata a vector editor leaves behind and shrinks from
+5,713 B to 2,350 B with the same pixels.
 
 ## Quickstart
 
@@ -171,18 +186,18 @@ A plugin follows the rules the built-in ones do: it removes or rewrites only wha
 
 ## Performance
 
-Same Node process, both with multipass, milliseconds per call (`node packages/compare/collect.mjs`, Node 24, svgo 4.1.0):
+Same Node process, both with multipass and the same plugin set (svgo with moveGroupAttrsToElems off, as svgo.mbt runs by default), milliseconds per call (`node packages/compare/collect.mjs`, Node 24, svgo 4.1.0):
 
 | file | size | svgo.mbt (wasm-gc) | svgo-js | ratio |
 | --- | ---: | ---: | ---: | ---: |
-| sketch-icon.svg | 836 B | 0.119 | 0.319 | 2.7× |
-| inkscape-drawing.svg | 2 KB | 0.188 | 0.669 | 3.6× |
-| SVG_logo.svg | 4 KB | 0.579 | 1.674 | 2.9× |
-| Tux.svg | 50 KB | 7.092 | 14.238 | 2.0× |
-| Ghostscript_Tiger.svg | 68 KB | 12.485 | 36.016 | 2.9× |
-| World map (low resolution) | 85 KB | 11.889 | 51.867 | 4.4× |
+| sketch-icon.svg | 836 B | 0.095 | 0.286 | 3.0× |
+| inkscape-drawing.svg | 2 KB | 0.165 | 0.637 | 3.9× |
+| SVG_logo.svg | 4 KB | 0.470 | 1.695 | 3.6× |
+| Tux.svg | 50 KB | 5.679 | 12.833 | 2.3× |
+| Ghostscript_Tiger.svg | 68 KB | 10.096 | 41.113 | 4.1× |
+| World map (low resolution) | 85 KB | 10.605 | 50.433 | 4.8× |
 
-Between 1.7× and 4.4× depending on the file, 2.9× at the median. Cold start on a small icon, whole process (`scripts/cli-bench.sh`): native CLI about 10 ms, Node build about 50 ms, svgo CLI about 160 ms.
+Between 1.7× and 4.8× depending on the file, 3.6× at the median over the ten files in `packages/compare/corpus/` and `svgo/testdata/`. Cold start on a small icon, whole process (`scripts/cli-bench.sh`): native CLI about 10 ms, Node build about 50 ms, svgo CLI about 160 ms.
 
 ## Runtime compatibility
 

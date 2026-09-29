@@ -56,15 +56,18 @@ test "DOM matching basic" {
 
 ///|
 test "minify_value packs standalone numbers only" {
-  inspect(minify_value("opacity", "0.450000"), content=".45")
-  inspect(minify_value("stroke-dasharray", "1.0, -0.50"), content="1, -.5")
+  inspect(@css.minify_value("opacity", "0.450000"), content=".45")
+  inspect(@css.minify_value("stroke-dasharray", "1.0, -0.50"), content="1, -.5")
   // Glued tokens would re-tokenize differently once packed: `1.0.5` -> `1.5`.
-  inspect(minify_value("x", "1.0.5"), content="1.0.5")
-  inspect(minify_value("x", "Foo2.0 1-0.5 u+0.5"), content="Foo2.0 1-0.5 u+0.5")
-  inspect(minify_value("x", "1.0E3px 5.e2"), content="1.0E3px 5.e2")
+  inspect(@css.minify_value("x", "1.0.5"), content="1.0.5")
   inspect(
-    minify_value("x", "url(a0.50) var(--a,0.50) \"0.50\""),
+    @css.minify_value("x", "Foo2.0 1-0.5 u+0.5"),
+    content="Foo2.0 1-0.5 u+0.5",
+  )
+  inspect(@css.minify_value("x", "1.0E3px 5.e2"), content="1.0E3px 5.e2")
+  inspect(
+    @css.minify_value("x", "url(a0.50) var(--a,0.50) \"0.50\""),
     content="url(a0.50) var(--a,0.50) \"0.50\"",
   )
-  inspect(minify_value("--x", "0.50"), content="0.50")
+  inspect(@css.minify_value("--x", "0.50"), content="0.50")
 }

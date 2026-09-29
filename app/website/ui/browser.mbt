@@ -238,9 +238,48 @@ extern "js" fn install_motion() -> Unit =
   #|}
 
 ///|
+/// Sliding selection for segmented controls, tab rows and the API table of
+/// contents: every `[data-slide]` group gets the offset and size of its
+/// pressed/selected/current child as `--thumb-x/-y/-w/-h`, which its `::before` (the thumb, see
+/// `[data-slide]` in style.css) animates between. `data-ready` is set only
+/// after the first placement, so the thumb never slides in from 0 on load
+/// and the pressed child keeps its own fill until then. Re-placed on any
+/// pressed/selected change, text change (a language switch resizes the
+/// items) or resize; the group's `style` is left alone by the vdom since
+/// no view sets it.
+extern "js" fn install_slides() -> Unit =
+  #|() => {
+  #|  const place = (g) => {
+  #|    const a = g.querySelector(':scope > [aria-pressed="true"], :scope > [aria-selected="true"], :scope > [aria-current="true"]');
+  #|    if (!a) { g.removeAttribute("data-ready"); return; }
+  #|    g.style.setProperty("--thumb-x", a.offsetLeft + "px");
+  #|    g.style.setProperty("--thumb-y", a.offsetTop + "px");
+  #|    g.style.setProperty("--thumb-w", a.offsetWidth + "px");
+  #|    g.style.setProperty("--thumb-h", a.offsetHeight + "px");
+  #|    if (!g.hasAttribute("data-ready")) requestAnimationFrame(() => g.setAttribute("data-ready", ""));
+  #|  };
+  #|  const ro = new ResizeObserver((es) => es.forEach((e) => place(e.target)));
+  #|  const seen = new WeakSet();
+  #|  const all = () => document.querySelectorAll("[data-slide]").forEach((g) => {
+  #|    if (!seen.has(g)) { seen.add(g); ro.observe(g); }
+  #|    place(g);
+  #|  });
+  #|  let queued = false;
+  #|  new MutationObserver(() => {
+  #|    if (queued) return;
+  #|    queued = true;
+  #|    requestAnimationFrame(() => { queued = false; all(); });
+  #|  }).observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ["aria-pressed", "aria-selected", "aria-current"] });
+  #|  document.fonts && document.fonts.ready.then(all);
+  #|  all();
+  #|}
+
+///|
 /// Call once before mounting the app.
 pub fn start_motion() -> Unit {
   install_motion()
+  install_slides()
+  install_page_transitions()
 }
 
 ///|
@@ -380,6 +419,39 @@ extern "js" fn save_pref(key : String, value : String) -> Unit =
 ///|
 extern "js" fn browser_lang() -> String =
   #|() => (navigator.language || "en").toLowerCase()
+
+///|
+/// `set_theme` for the nav toggle: the new theme spreads as a circle from the
+/// visible theme button (a View Transition on the root, animated on its
+/// `::view-transition-new` with the site's `--ease-out-soft`). Browsers
+/// without View Transitions, and reduced motion, switch at once.
+extern "js" fn switch_theme(dark : Bool) -> Unit =
+  #|(dark) => {
+  #|  const root = document.documentElement;
+  #|  const apply = () => { root.dataset.theme = dark ? "dark" : "light"; };
+  #|  if (!document.startViewTransition || matchMedia("(prefers-reduced-motion: reduce)").matches) { apply(); return; }
+  #|  const b = [...document.querySelectorAll(".icon-btn")].find((e) => e.offsetParent);
+  #|  const r = b ? b.getBoundingClientRect() : { left: innerWidth, top: 0, width: 0, height: 0 };
+  #|  const x = r.left + r.width / 2, y = r.top + r.height / 2;
+  #|  const end = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+  #|  root.classList.add("vt-theme");
+  #|  const t = document.startViewTransition(apply);
+  #|  t.ready.then(() => root.animate(
+  #|    { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${end}px at ${x}px ${y}px)`] },
+  #|    { duration: 520, easing: getComputedStyle(root).getPropertyValue("--ease-out-soft").trim() || "ease-out", pseudoElement: "::view-transition-new(root)" },
+  #|  ));
+  #|  t.finished.finally(() => root.classList.remove("vt-theme"));
+  #|}
+
+///|
+/// Marks `<html>` `routed` on the first hash change, so the page entrance
+/// (`.page` in style.css: each page's content fades in rising as it mounts)
+/// plays when navigating between pages but not on the first load, where
+/// the hero has its own entrance.
+extern "js" fn install_page_transitions() -> Unit =
+  #|() => {
+  #|  addEventListener("hashchange", () => document.documentElement.classList.add("routed"), { once: true });
+  #|}
 
 ///|
 /// `data-theme` on <html> drives the dark palette (see src/style.css); the

@@ -86,10 +86,11 @@ pub fn top_nav(
         [github_icon(), text(t("GitHub", "GitHub"))],
       ),
       div(
-        class="segs mx-2 inline-flex overflow-hidden rounded-full border border-line",
+        class="segs mx-2 inline-flex overflow-hidden rounded-full border border-line [--thumb-bg:var(--color-paper-2)]",
+        attrs=Attrs::build().data_set("slide", "fill"),
         [
           button(
-            class="seg px-2.75 py-1.75 text-xs text-muted aria-pressed:bg-paper-2 aria-pressed:text-ink",
+            class="seg px-2.75 py-1.75 text-xs text-muted transition-colors aria-pressed:bg-paper-2 aria-pressed:text-ink",
             attrs=Attrs::build().aria_pressed(
               if p.lang == En {
                 "true"
@@ -101,7 +102,7 @@ pub fn top_nav(
             t("EN", "EN"),
           ),
           button(
-            class="seg px-2.75 py-1.75 text-xs text-muted aria-pressed:bg-paper-2 aria-pressed:text-ink",
+            class="seg px-2.75 py-1.75 text-xs text-muted transition-colors aria-pressed:bg-paper-2 aria-pressed:text-ink",
             attrs=Attrs::build().aria_pressed(
               if p.lang == Zh {
                 "true"
@@ -211,10 +212,18 @@ pub fn page_footer(route? : Route) -> Html {
           div(
             class="footer-links ml-auto flex flex-wrap gap-x-4 gap-y-1 max-sm:ml-0",
             [
-              a(class="text-ink-2 hover:text-ink", href=REPO_URL, "GitHub"),
-              a(class="text-ink-2 hover:text-ink", href=NPM_URL, "npm"),
               a(
-                class="text-ink-2 hover:text-ink",
+                class="grow-line text-ink-2 hover:text-ink",
+                href=REPO_URL,
+                "GitHub",
+              ),
+              a(
+                class="grow-line text-ink-2 hover:text-ink",
+                href=NPM_URL,
+                "npm",
+              ),
+              a(
+                class="grow-line text-ink-2 hover:text-ink",
                 href=MOONCAKES_URL,
                 "mooncakes.io",
               ),

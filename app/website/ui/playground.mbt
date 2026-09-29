@@ -280,6 +280,8 @@ fn plugin_row(
     // a fixed-width column, not inline after the name: a dot that shifts
     // the name around depending on whether it's there reads as punctuation,
     // not a status marker (see the "●" legend in options_and_plugins)
+    // always present and scaled to 0 when the plugin changed nothing, so
+    // toggling a plugin pops the dot in and out rather than swapping nodes
     span(
       class="pl-dot-col",
       if applied.contains(name) {
@@ -289,7 +291,7 @@ fn plugin_row(
           nothing,
         )
       } else {
-        nothing
+        span(class="applied applied-off", nothing)
       },
     ),
   ])
@@ -453,7 +455,7 @@ fn toolbar(m : PgModel, emit : Emit[PgMsg]) -> Html {
         // either wraps or clips, so it becomes a single full-width select.
         div(
           class="hidden min-w-0 items-center gap-1 overflow-x-auto lg:flex",
-          attrs=Attrs::build().role("tablist"),
+          attrs=Attrs::build().role("tablist").data_set("slide", "fill"),
           tabs,
         ),
         label(class="pg-sample min-w-0 flex-1 lg:hidden", [
@@ -575,6 +577,7 @@ fn preview_bg_toggle(dark : Bool, emit : Emit[PgMsg]) -> Html {
     class="segs inline-flex h-8 flex-none overflow-hidden rounded-full border border-line bg-paper",
     attrs=Attrs::build()
       .role("group")
+      .data_set("slide", "fill")
       .aria_label(t("Preview background", "预览背景")),
     [
       button(
@@ -765,7 +768,7 @@ fn pg_view(m : PgModel, p : Prefs, chrome : Chrome, emit : Emit[PgMsg]) -> Html 
   // disclosure comes first (collapsed), then the workbench (sticky stats,
   // preview, capped code); from 961px the same source order already puts
   // the disclosure in the left column, so no `order` override is needed here.
-  div(class="pt-14", [
+  div(class="page pt-14", [
     top_nav(Playground, t("playground", "在线体验"), p, chrome.emit),
     toolbar(m, emit),
     div(

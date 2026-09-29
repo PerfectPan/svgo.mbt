@@ -185,7 +185,7 @@ pub fn app() -> Val[Html] {
           (
             { ..m, prefs: { ..m.prefs, dark, }, },
             @rabbita.effect(fn() noraise {
-              set_theme(dark)
+              switch_theme(dark)
               save_pref("svgo-theme", if dark { "dark" } else { "light" })
             }),
           )

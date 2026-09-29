@@ -176,11 +176,10 @@ fn hero(emit : Emit[LandingMsg]) -> Html {
           ),
         ),
         div(class="cta-row flex flex-wrap items-center gap-5", [
-          a(
-            class="btn btn-coral",
-            href="#/playground",
-            t("Open the playground →", "打开在线体验 →"),
-          ),
+          a(class="btn btn-coral", href="#/playground", [
+            text(t("Open the playground", "打开在线体验")),
+            span(class="arrow", "→"),
+          ]),
           copy_pill("npm i @rivus/svgo", emit),
         ]),
       ]),
@@ -389,9 +388,12 @@ fn same_pixels_screen() -> Html {
         ),
         div(class="install-row mt-6 lg:col-span-5 lg:mt-11", [
           a(
-            class="cta-secondary",
+            class="cta-secondary inline-flex items-center gap-1.5",
             href="#/playground",
-            t("Open the playground →", "打开在线体验 →"),
+            [
+              text(t("Open the playground", "打开在线体验")),
+              span(class="arrow", "→"),
+            ],
           ),
         ]),
       ],
@@ -720,7 +722,9 @@ fn install_screen(state : LandingState, emit : Emit[LandingMsg]) -> Html {
       div(class="use", [
         div(
           class="pm-switch",
-          attrs=Attrs::build().aria_label(t("Package manager", "包管理器")),
+          attrs=Attrs::build()
+            .data_set("slide", "fill")
+            .aria_label(t("Package manager", "包管理器")),
           package_managers.mapi((idx, pm) => {
             button(
               attrs=Attrs::build().aria_pressed(
@@ -777,9 +781,9 @@ fn install_screen(state : LandingState, emit : Emit[LandingMsg]) -> Html {
           div(class="lg:col-span-7", [
             div(
               class="install-tabs mb-6 flex gap-2 border-b border-line-2",
-              attrs=Attrs::build().aria_label(
-                t("Installation method", "安装方式"),
-              ),
+              attrs=Attrs::build()
+                .data_set("slide", "line")
+                .aria_label(t("Installation method", "安装方式")),
               tabs,
             ),
             content,
@@ -890,7 +894,7 @@ pub fn landing_page(chrome : Chrome) -> Val[Html] {
     },
   )
   state.view2(chrome.prefs, (m, p) => {
-    div(class="pt-14", [
+    div(class="page pt-14", [
       top_nav(Landing, "", p, chrome.emit),
       node("main", Attrs::build(), [
         hero(emit),

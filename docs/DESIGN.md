@@ -179,6 +179,19 @@ speed-race bar in dark mode, the light theme's own `ink-2` hex).
   the checkerboard, the stats bar (in, out, saved in coral, ms, passes).
 - **API**: package switcher and TOC on the left, one reading column, MoonBit keywords as kickers
   (`struct`, `fn`, `suberror`), hairline code blocks with a copy action on multi-line ones.
+- **Sliding selection**: every segmented control and tab row (language, package manager, install
+  tabs, sample chips, preview background) carries `data-slide="fill"` or `"line"`, the API table of
+  contents `"rail"`; the selection is the group's `::before`, measured by `install_slides`
+  (browser.mbt), and slides between items (320 ms, `--ease-out-soft`). A new group only needs the
+  attribute.
+- **State changes**: every `<details>` opens to its natural height (`::details-content`); the
+  mobile menu fades down; a page's content fades in rising 8 px when you move to it (not on the
+  first load); the theme switch spreads from the toggle as a circle (a View Transition); a plugin's
+  "changed" dot pops in and out rather than appearing.
+- **Hover accents**: one vocabulary, hover only, off under `prefers-reduced-motion`: a link's
+  `.arrow` nudges right, the coral CTA lifts 1 px, Nib in the nav hops (`--ease-spring`), the theme
+  icon turns 20°, nav and footer links (`.grow-line`) grow their underline from the left. Curves
+  come from the `--ease-*` tokens, never a literal `cubic-bezier`.
 - **Theme and language**: toggles in the nav, persisted in localStorage, applied before first
   paint (`data-theme` on `<html>`). Language is remembered; the default follows
   `navigator.language`.

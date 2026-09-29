@@ -312,7 +312,11 @@ fn table_of_contents(pkg : ApiPackage) -> Html {
         "本页内容（\{pkg.items.length()}）",
       ),
     ),
-    div(class="api-toc-body", blocks),
+    div(
+      class="api-toc-body",
+      attrs=Attrs::build().data_set("slide", "rail"),
+      blocks,
+    ),
   ])
 }
 
@@ -440,7 +444,7 @@ pub fn api_page(chrome : Chrome, name : String) -> Val[Html] {
         content.push(api_member(pkg, it, emit))
       }
     }
-    div(class="pt-14", [
+    div(class="page pt-14", [
       top_nav(Api(short_name(pkg)), "API", prefs, chrome.emit),
       div(
         class="wrap grid gap-10 pb-20 pt-14 lg:grid-cols-[var(--api-side-w)_minmax(0,var(--api-main-w))]",

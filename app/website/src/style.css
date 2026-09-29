@@ -114,6 +114,12 @@
 
   /* fixed layout dimensions with no home in the spacing or container scale */
   --nav-h: 56px;
+  /* the site's two motion curves: a soft ease-out for slides, reveals and
+     hovers, and a small overshoot for the hops; easeOutCubic matches the
+     JS byte counter (animate_count) so the bar shrinks in step with it */
+  --ease-out-soft: cubic-bezier(.22,1,.36,1);
+  --ease-spring: cubic-bezier(.34,1.4,.64,1);
+  --ease-out-cubic: cubic-bezier(.215,.61,.355,1);
   --pg-sidebar-w: 280px;
   --api-side-w: 232px;
   --api-main-w: 820px;
@@ -212,6 +218,73 @@
   .mobile-nav summary::-webkit-details-marker { display: none; }
   .mobile-nav[open] .mobile-nav-chevron { transform: rotate(180deg); }
 
+  /* ---------- sliding selection ---------- */
+  /* segmented controls and tab rows marked `data-slide` (install_slides in
+     browser.mbt measures the pressed child into --thumb-*): the group's
+     ::before is the selection and slides between items; "fill" is the pill
+     behind the item, "line" the 2px coral bar under a tab. Until the first
+     measurement (no data-ready) the pressed item keeps its own fill. */
+  [data-slide] { position: relative; isolation: isolate; }
+  [data-slide] > * { position: relative; z-index: 1; }
+  [data-slide]::before { content: ""; position: absolute; top: 0; left: 0; z-index: 0; width: var(--thumb-w, 0); height: var(--thumb-h, 0); translate: var(--thumb-x, 0) var(--thumb-y, 0); border-radius: calc(infinity * 1px); background: var(--thumb-bg, var(--color-ink)); opacity: 0; pointer-events: none; }
+  [data-slide][data-ready]::before { opacity: 1; }
+  [data-slide="fill"][data-ready] > :is([aria-pressed="true"], [aria-selected="true"]) { background: transparent !important; }
+  [data-slide="line"]::before { height: --spacing(0.5); translate: var(--thumb-x, 0) calc(var(--thumb-y, 0) + var(--thumb-h, 0) - --spacing(0.5)); border-radius: 0; background: var(--color-mark); }
+  [data-slide="line"][data-ready] > [aria-pressed="true"] { border-color: transparent !important; }
+  [data-slide="rail"]::before { width: --spacing(0.5); translate: 0 var(--thumb-y, 0); border-radius: 0; background: var(--color-accent); }
+  [data-slide="rail"][data-ready] > [aria-current="true"] { border-color: transparent !important; }
+  @media (prefers-reduced-motion: no-preference) {
+    [data-slide][data-ready]::before { transition: translate .32s var(--ease-out-soft), width .32s var(--ease-out-soft), height .32s var(--ease-out-soft); }
+  }
+
+  /* ---------- disclosures, menus, page and theme changes ---------- */
+  /* details open to their natural height (interpolate-size + the
+     ::details-content pseudo; browsers without them open at once, as
+     before); the mobile menu is excluded, its panel is positioned outside
+     the flow and fades down on its own */
+  :root { interpolate-size: allow-keywords; }
+  @media (prefers-reduced-motion: no-preference) {
+    details:not(.mobile-nav)::details-content { block-size: 0; overflow-y: clip; transition: block-size .32s var(--ease-out-soft), content-visibility .32s allow-discrete; }
+    details:not(.mobile-nav)[open]::details-content { block-size: auto; }
+    .mobile-panel { opacity: 0; translate: 0 calc(-1 * --spacing(2)); transition: opacity .2s var(--ease-out-soft), translate .24s var(--ease-out-soft); }
+    .mobile-nav[open] .mobile-panel { opacity: 1; translate: 0 0; }
+  }
+  /* moving to another page: its content (not the fixed nav) fades in
+     rising 8px as it mounts; only after the first hash change (html.routed,
+     install_page_transitions), the first load has the hero's own entrance.
+     Backwards fill only, so no transform lingers on the sticky columns. */
+  @keyframes page-in { from { opacity: 0; translate: 0 --spacing(2); } }
+  @media (prefers-reduced-motion: no-preference) {
+    .routed .page > :not(.nav) { animation: page-in .32s var(--ease-out-soft) backwards; }
+  }
+  /* the theme switch's circular reveal (switch_theme): the new root is
+     clipped by a script animation, so the default cross-fade is off */
+  html.vt-theme::view-transition-old(root), html.vt-theme::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+  }
+
+  /* ---------- hover accents ---------- */
+  /* small, one vocabulary (soft ease-out, ~200ms), hover only, off under
+     reduced motion: the arrow of a "→" link nudges right, the coral CTA
+     lifts a pixel, Nib in the nav hops like the race runner, the theme
+     icon turns, footer links grow the nav's underline */
+  .arrow { display: inline-block; }
+  .grow-line { position: relative; text-decoration: none; }
+  .grow-line::after { content: ""; position: absolute; inset-inline: 0; bottom: calc(-1 * --spacing(0.5)); height: 1px; background: currentColor; transform: scaleX(0); transform-origin: left; }
+  .grow-line:hover::after { transform: scaleX(1); }
+  @keyframes nib-hop { 0%, 100% { translate: 0 0; } 45% { translate: 0 calc(-1 * --spacing(1)); } }
+  @media (prefers-reduced-motion: no-preference) {
+    .arrow { transition: translate .2s var(--ease-out-soft); }
+    a:hover .arrow { translate: --spacing(1) 0; }
+    .btn-coral { transition: translate .2s var(--ease-out-soft), box-shadow .2s var(--ease-out-soft), filter .2s; }
+    .btn-coral:hover { translate: 0 -1px; box-shadow: 0 --spacing(1.5) --spacing(4) color-mix(in srgb, var(--color-mark) 24%, transparent); }
+    .brand:hover .nib-mark { animation: nib-hop .36s var(--ease-spring); }
+    .icon-btn svg { transition: rotate .3s var(--ease-out-soft); }
+    .icon-btn:hover svg { rotate: 20deg; }
+    .grow-line::after { transition: transform .24s linear; }
+  }
+
   /* ---------- toast ---------- */
   /* @rui.sonner (app.mbt) supplies the toast's behaviour and Sonner's
      layout; its success colours come from the --rui-sonner-success-* hooks,
@@ -285,13 +358,13 @@
   .bar-fill { @apply absolute inset-0 rounded-full bg-mark origin-left; transform: scaleX(var(--kept-frac)); }
   /* matches animate_count's delay/duration (450ms/720ms) and its
      easeOutCubic, so the bar shrinks in step with the digits above it */
-  .motion .bar-fill { animation: bar-shrink .72s cubic-bezier(.215,.61,.355,1) .45s both; }
+  .motion .bar-fill { animation: bar-shrink .72s var(--ease-out-cubic) .45s both; }
   @keyframes bar-shrink { from { transform: scaleX(1); } to { transform: scaleX(var(--kept-frac)); } }
 
   /* the landing beat: once the counter settles (450ms delay + 720ms count =
      1170ms), Nib squashes once and the caption arrives with it */
   @keyframes nib-squash { 0%, 100% { scale: 1 1; } 50% { scale: 1 .9; } }
-  .motion .nib-frame { transform-origin: bottom center; animation: nib-squash .32s cubic-bezier(.34,1.4,.64,1) 1.17s both; }
+  .motion .nib-frame { transform-origin: bottom center; animation: nib-squash .32s var(--ease-spring) 1.17s both; }
 
   /* Nib blinks once every 6s starting 2.5s after load — the only idle
      motion on the page. The two pupil ellipses (rx=10 ry=14) are the only
@@ -306,12 +379,12 @@
      reduced motion, so there is no unstyled/ghost first frame. */
   @keyframes rise { from { opacity: 0; translate: 0 var(--rise-d, --spacing(4)); } to { opacity: 1; translate: 0 0; } }
   @keyframes rise-in { from { opacity: 0; scale: .92; } to { opacity: 1; scale: 1; } }
-  .motion .hero-line-1 { --rise-d: --spacing(2.5); animation: rise .38s cubic-bezier(.22,1,.36,1) both; }
-  .motion .hero-line-2 { --rise-d: --spacing(2.5); animation: rise .38s cubic-bezier(.22,1,.36,1) .06s both; }
-  .motion .hero-sub { --rise-d: --spacing(2.5); animation: rise .38s cubic-bezier(.22,1,.36,1) .12s both; }
-  .motion .cta-row { --rise-d: --spacing(2.5); animation: rise .38s cubic-bezier(.22,1,.36,1) .18s both; }
-  .motion .hero-visual { transform-origin: bottom center; animation: rise-in .42s cubic-bezier(.34,1.4,.64,1) .16s both; }
-  .motion .byte-caption { --rise-d: 0; animation: rise .14s cubic-bezier(.22,1,.36,1) 1.17s both; }
+  .motion .hero-line-1 { --rise-d: --spacing(2.5); animation: rise .38s var(--ease-out-soft) both; }
+  .motion .hero-line-2 { --rise-d: --spacing(2.5); animation: rise .38s var(--ease-out-soft) .06s both; }
+  .motion .hero-sub { --rise-d: --spacing(2.5); animation: rise .38s var(--ease-out-soft) .12s both; }
+  .motion .cta-row { --rise-d: --spacing(2.5); animation: rise .38s var(--ease-out-soft) .18s both; }
+  .motion .hero-visual { transform-origin: bottom center; animation: rise-in .42s var(--ease-spring) .16s both; }
+  .motion .byte-caption { --rise-d: 0; animation: rise .14s var(--ease-out-soft) 1.17s both; }
   /* screens that separate a text column from a graphics column (the speed
      race, the logo tiles) mark the graphics column `.reveal-graphics`: the
      outer `.reveal` then opts out of its own fade (the graphics are visible
@@ -348,7 +421,7 @@
   .race-runner { @apply pointer-events-none absolute top-1/2 z-10 size-10 -translate-y-1/2 translate-x-3.5; left: var(--race-target, 0%); }
   .motion .race-runner { opacity: 0; left: 0; }
   .motion .reveal .race-runner { transition: left var(--race-dur, 1200ms) linear, opacity .2s linear; transition-delay: 350ms; }
-  .motion .reveal.in .race-runner { opacity: 1; left: var(--race-target, 0%); animation: race-hop .24s cubic-bezier(.34,1.4,.64,1) calc(350ms + var(--race-dur, 1200ms)) both; }
+  .motion .reveal.in .race-runner { opacity: 1; left: var(--race-target, 0%); animation: race-hop .24s var(--ease-spring) calc(350ms + var(--race-dur, 1200ms)) both; }
   @keyframes race-hop { 0%, 100% { translate: --spacing(3.5) -50%; } 50% { translate: --spacing(3.5) calc(-50% - --spacing(1)); } }
 
   .byte-caption { font: var(--text-code)/var(--text-code--line-height) var(--font-mono); color: var(--color-ink-2); }
@@ -432,15 +505,10 @@
   :is(.landing-details-summary, .flags summary)::before { content: "+"; display: inline-block; width: --spacing(4.5); font: 400 var(--text-xl)/1 var(--font-mono); color: var(--color-muted); }
   :is(.landing-details[open] > .landing-details-summary, .flags[open] > summary)::before { transform: rotate(45deg); }
   .landing-details-body { padding-bottom: --spacing(14); }
-  /* animated expand/collapse: interpolate-size lets block-size go 0 -> auto,
-     ::details-content is the box the browser generates for everything but
-     <summary>. Unsupported browsers (no ::details-content match) just keep
-     the native instant open/close — a working fallback, not a broken one. */
-  :root { interpolate-size: allow-keywords; }
+  /* the height animation itself is shared by every <details> (see
+     "disclosures, menus" above); here only the "+" turns with it */
   @media (prefers-reduced-motion: no-preference) {
-    .landing-details-summary::before { transition: transform .24s cubic-bezier(.2,.7,.2,1); }
-    .landing-details::details-content { height: 0; overflow: clip; transition: height .24s cubic-bezier(.2,.7,.2,1), content-visibility .24s allow-discrete; }
-    .landing-details[open]::details-content { height: auto; }
+    :is(.landing-details-summary, .flags summary)::before { transition: transform .24s var(--ease-out-soft); }
   }
 
   .display-measure { white-space: nowrap; }
@@ -661,7 +729,7 @@
   .pg-side-summary { @apply flex cursor-pointer items-center gap-2.5; font: 500 var(--text-sm) var(--font-mono); padding: --spacing(3.5) --spacing(1); }
   .pg-side-summary::before { content: "+"; display: inline-block; width: --spacing(3.5); font: 400 var(--text-base)/1 var(--font-mono); color: var(--color-muted); }
   @media (prefers-reduced-motion: no-preference) {
-    .pg-side-summary::before { transition: transform .2s cubic-bezier(.2,.7,.2,1); }
+    .pg-side-summary::before { transition: transform .2s var(--ease-out-soft); }
   }
   #pg-toggle:checked + .pg-side-summary::before { transform: rotate(45deg); }
   .pg-side-body { @apply hidden min-h-0 p-5; }
@@ -685,6 +753,12 @@
      a name never shifts depending on whether the dot is there; the "●
      Changed this SVG" legend under the enabled/reset line explains it. */
   .applied { @apply inline-block size-1.5 flex-none rounded-full bg-accent; }
+  /* a plugin that changed nothing keeps its dot at scale 0 (see plugin_row),
+     so toggling it pops the dot in or out */
+  .applied-off { scale: 0; }
+  @media (prefers-reduced-motion: no-preference) {
+    .pl-dot-col .applied { transition: scale .24s var(--ease-spring); }
+  }
   .pl-dot-col { @apply flex w-3 flex-none items-start justify-center pt-1.75; }
   .pl-group { @apply px-0 pt-3 pb-1 text-2xs font-semibold uppercase tracking-[0.06em] text-muted; }
   /* a clean clipping edge, no fade: a persistent thin scrollbar is the
@@ -749,7 +823,7 @@
   .code-expand-label { @apply flex cursor-pointer items-center justify-center gap-2 border-t border-line bg-surface-2 py-1.5 text-center text-xs text-ink-2; }
   .code-expand-label::before { content: "+"; display: inline-block; width: --spacing(3.5); font: 400 var(--text-base)/1 var(--font-mono); color: var(--color-muted); }
   @media (prefers-reduced-motion: no-preference) {
-    .code-expand-label::before { transition: transform .2s cubic-bezier(.2,.7,.2,1); }
+    .code-expand-label::before { transition: transform .2s var(--ease-out-soft); }
   }
   .code-expand-toggle:checked ~ .code-expand-label::before { transform: rotate(45deg); }
   .code-expand-label::after { content: "Show all"; }
@@ -802,7 +876,7 @@
   .api-toc label { @apply flex cursor-pointer items-center gap-2.5; font: 500 var(--text-code) var(--font-mono); padding-block: --spacing(1); }
   .api-toc label::before { content: "+"; display: inline-block; width: --spacing(3.5); font: 400 var(--text-base)/1 var(--font-mono); color: var(--color-muted); }
   @media (prefers-reduced-motion: no-preference) {
-    .api-toc label::before { transition: transform .2s cubic-bezier(.2,.7,.2,1); }
+    .api-toc label::before { transition: transform .2s var(--ease-out-soft); }
   }
   #api-toc-toggle:checked + label::before { transform: rotate(45deg); }
   .api-toc-body { @apply hidden; }

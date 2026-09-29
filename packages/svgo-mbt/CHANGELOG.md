@@ -1,5 +1,13 @@
 # @rivus/svgo
 
+## 0.3.1
+
+### Patch Changes
+
+- [#35](https://github.com/PerfectPan/svgo.mbt/pull/35) [`212f198`](https://github.com/PerfectPan/svgo.mbt/commit/212f198e088ee613ba414796a10f8cd4b49ea88c) Thanks [@PerfectPan](https://github.com/PerfectPan)! - minifyStyles now packs numbers in `style` attributes and `<style>` rules the way svgo's csso does (`6.000000` → `6`, `0.450000` → `.45`, `0.0px` → `0`), so Inkscape-style exports come out as small as with svgo.
+
+- [#36](https://github.com/PerfectPan/svgo.mbt/pull/36) [`6df47c2`](https://github.com/PerfectPan/svgo.mbt/commit/6df47c2767cc2acc6bed8ff8abbee08bc59c072f) Thanks [@PerfectPan](https://github.com/PerfectPan)! - Plugin descriptions (`plugins()`, `svgo-mbt --list`) are now written the same way throughout: lower-case imperative, such as "remove comments" or "move common attributes of group children to the group".
+
 ## 0.3.0
 
 ### Minor Changes

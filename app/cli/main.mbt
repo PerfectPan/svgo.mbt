@@ -1,5 +1,5 @@
 ///|
-const VERSION = "0.3.0"
+const VERSION = "0.3.1"
 
 ///|
 /// The installed command name, for the npm bin and the native binary alike.

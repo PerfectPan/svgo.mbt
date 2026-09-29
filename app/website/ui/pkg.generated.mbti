@@ -105,18 +105,24 @@ pub(all) struct ApiItem {
   methods : Array[ApiMethod]
   impls : Array[String]
 } derive(Eq)
+pub fn ApiItem::equal(Self, Self) -> Bool
+pub fn ApiItem::not_equal(Self, Self) -> Bool
 
 pub(all) struct ApiMethod {
   name : String
   signature : String
   doc : String
 } derive(Eq)
+pub fn ApiMethod::equal(Self, Self) -> Bool
+pub fn ApiMethod::not_equal(Self, Self) -> Bool
 
 pub(all) struct ApiPackage {
   path : String
   short : String
   items : Array[ApiItem]
 } derive(Eq)
+pub fn ApiPackage::equal(Self, Self) -> Bool
+pub fn ApiPackage::not_equal(Self, Self) -> Bool
 
 pub(all) struct BenchRow {
   file : String
@@ -127,6 +133,8 @@ pub(all) struct BenchRow {
   mbt_ms : Double
   js_ms : Double
 } derive(Eq)
+pub fn BenchRow::equal(Self, Self) -> Bool
+pub fn BenchRow::not_equal(Self, Self) -> Bool
 
 pub(all) struct Chrome {
   prefs : @rabbita.Val[Prefs]
@@ -137,12 +145,16 @@ pub(all) struct CliFlag {
   flag : String
   description : String
 } derive(Eq)
+pub fn CliFlag::equal(Self, Self) -> Bool
+pub fn CliFlag::not_equal(Self, Self) -> Bool
 
 pub(all) enum Lang {
   En
   Zh
 } derive(Eq)
 pub fn Lang::code(Self) -> String
+pub fn Lang::equal(Self, Self) -> Bool
+pub fn Lang::not_equal(Self, Self) -> Bool
 pub fn Lang::parse(String) -> Self?
 
 pub(all) struct Outcome {
@@ -155,6 +167,8 @@ pub(all) struct Outcome {
   error : String
 } derive(Eq)
 pub fn Outcome::empty() -> Self
+pub fn Outcome::equal(Self, Self) -> Bool
+pub fn Outcome::not_equal(Self, Self) -> Bool
 pub fn Outcome::saved_percent(Self) -> Double
 
 pub(all) enum PrefMsg {
@@ -166,18 +180,24 @@ pub(all) struct Prefs {
   lang : Lang
   dark : Bool
 } derive(Eq)
+pub fn Prefs::equal(Self, Self) -> Bool
+pub fn Prefs::not_equal(Self, Self) -> Bool
 
 pub(all) enum Route {
   Landing
   Playground
   Api(String)
 } derive(Eq)
+pub fn Route::equal(Self, Self) -> Bool
+pub fn Route::not_equal(Self, Self) -> Bool
 
 pub(all) struct Sample {
   name : String
   file : String
   svg : String
 } derive(Eq)
+pub fn Sample::equal(Self, Self) -> Bool
+pub fn Sample::not_equal(Self, Self) -> Bool
 
 // Type aliases
 

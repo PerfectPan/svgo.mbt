@@ -21,6 +21,9 @@ pub(all) struct Config {
 } derive(Debug)
 
 ///|
+pub extend Config with Debug::{to_repr}
+
+///|
 /// svgo's preset-default plugins in svgo's order (except the opt-in
 /// `moveGroupAttrsToElems`), 3 decimal places, multipass on, compact output.
 pub fn Config::default() -> Config {
@@ -48,6 +51,9 @@ pub(all) struct Result {
 } derive(Debug)
 
 ///|
+pub extend Result with Debug::{to_repr}
+
+///|
 /// Bytes saved as a percentage of the original size (0 for an empty input).
 pub fn Result::saved_percent(self : Result) -> Double {
   if self.original_size == 0 {
@@ -67,11 +73,17 @@ pub suberror UnknownPlugin {
 } derive(Debug)
 
 ///|
+pub extend UnknownPlugin with Debug::{to_repr}
+
+///|
 pub impl Show for UnknownPlugin with fn output(self, logger) {
   match self {
     UnknownPlugin(n) => logger.write_string("unknown plugin '\{n}'")
   }
 }
+
+///|
+pub extend UnknownPlugin with Show::{to_string, output}
 
 ///|
 /// Optimize an SVG document.

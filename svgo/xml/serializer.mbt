@@ -9,6 +9,9 @@ pub(all) struct SerializeOptions {
 } derive(Debug)
 
 ///|
+pub extend SerializeOptions with Debug::{to_repr}
+
+///|
 /// Compact output including the prolog.
 pub fn SerializeOptions::default() -> SerializeOptions {
   { pretty: false, prolog: true, }

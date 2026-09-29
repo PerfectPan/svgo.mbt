@@ -3,6 +3,11 @@ import {
   "moonbitlang/core/math",
 }
 
+// core/string is used by host_default.mbt only (every target but wasm-gc),
+// so a wasm-gc check reports it as unused
+
+warnings = "-unused_package"
+
 options(
   targets: {
     "host_wasm.mbt": [ "wasm-gc" ],

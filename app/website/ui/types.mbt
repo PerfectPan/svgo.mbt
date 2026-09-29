@@ -11,6 +11,9 @@ pub(all) struct BenchRow {
 } derive(Eq)
 
 ///|
+pub extend BenchRow with Eq::{not_equal, equal}
+
+///|
 /// An editor export bundled with the site (see samples.mbt, generated).
 pub(all) struct Sample {
   name : String
@@ -19,11 +22,17 @@ pub(all) struct Sample {
 } derive(Eq)
 
 ///|
+pub extend Sample with Eq::{not_equal, equal}
+
+///|
 pub(all) struct ApiMethod {
   name : String
   signature : String
   doc : String
 } derive(Eq)
+
+///|
+pub extend ApiMethod with Eq::{not_equal, equal}
 
 ///|
 pub(all) struct ApiItem {
@@ -37,11 +46,17 @@ pub(all) struct ApiItem {
 } derive(Eq)
 
 ///|
+pub extend ApiItem with Eq::{not_equal, equal}
+
+///|
 pub(all) struct ApiPackage {
   path : String
   short : String
   items : Array[ApiItem]
 } derive(Eq)
+
+///|
+pub extend ApiPackage with Eq::{not_equal, equal}
 
 ///|
 /// One command-line flag, parsed from the CLI's usage text at build time
@@ -50,6 +65,9 @@ pub(all) struct CliFlag {
   flag : String
   description : String
 } derive(Eq)
+
+///|
+pub extend CliFlag with Eq::{not_equal, equal}
 
 ///|
 /// What one optimize() call produced, in a form the views can compare.
@@ -62,6 +80,9 @@ pub(all) struct Outcome {
   ms : Double
   error : String
 } derive(Eq)
+
+///|
+pub extend Outcome with Eq::{not_equal, equal}
 
 ///|
 pub fn Outcome::empty() -> Outcome {

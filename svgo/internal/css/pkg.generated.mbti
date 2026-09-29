@@ -50,6 +50,9 @@ pub(all) enum AttrMatcher {
   SuffixMatch(String)
   SubstringMatch(String)
 } derive(Eq, @debug.Debug)
+pub fn AttrMatcher::equal(Self, Self) -> Bool
+pub fn AttrMatcher::not_equal(Self, Self) -> Bool
+pub fn AttrMatcher::to_repr(Self) -> @debug.Repr
 
 pub(all) enum Combinator {
   Descendant
@@ -58,19 +61,28 @@ pub(all) enum Combinator {
   SubsequentSibling
   Deep
 } derive(Eq, @debug.Debug)
+pub fn Combinator::equal(Self, Self) -> Bool
+pub fn Combinator::not_equal(Self, Self) -> Bool
+pub fn Combinator::to_repr(Self) -> @debug.Repr
 
 pub(all) struct ComplexSelector {
   head : CompoundSelector
   tail : Array[(Combinator, CompoundSelector)]
   raw : String
 } derive(Eq, @debug.Debug)
+pub fn ComplexSelector::equal(Self, Self) -> Bool
+pub fn ComplexSelector::not_equal(Self, Self) -> Bool
 pub fn ComplexSelector::specificity(Self) -> Specificity
 pub fn ComplexSelector::to_css(Self) -> String
+pub fn ComplexSelector::to_repr(Self) -> @debug.Repr
 pub fn ComplexSelector::write_css(Self, StringBuilder) -> Unit
 
 pub(all) struct CompoundSelector {
   simples : Array[SimpleSelector]
 } derive(Eq, @debug.Debug)
+pub fn CompoundSelector::equal(Self, Self) -> Bool
+pub fn CompoundSelector::not_equal(Self, Self) -> Bool
+pub fn CompoundSelector::to_repr(Self) -> @debug.Repr
 pub fn CompoundSelector::write_css(Self, StringBuilder) -> Unit
 
 pub(all) struct Declaration {
@@ -78,7 +90,10 @@ pub(all) struct Declaration {
   value : String
   important : Bool
 } derive(Eq, @debug.Debug)
+pub fn Declaration::equal(Self, Self) -> Bool
+pub fn Declaration::not_equal(Self, Self) -> Bool
 pub fn Declaration::to_css(Self) -> String
+pub fn Declaration::to_repr(Self) -> @debug.Repr
 pub fn Declaration::write_css(Self, StringBuilder) -> Unit
 
 pub(all) struct DocumentContext {
@@ -94,6 +109,7 @@ pub(all) struct Rule {
   declarations : Array[Declaration]
 } derive(@debug.Debug)
 pub fn Rule::to_css(Self) -> String
+pub fn Rule::to_repr(Self) -> @debug.Repr
 pub fn Rule::write_css(Self, StringBuilder) -> Unit
 
 pub(all) enum SimpleSelector {
@@ -105,6 +121,9 @@ pub(all) enum SimpleSelector {
   PseudoClass(String, String?)
   PseudoElement(String)
 } derive(Eq, @debug.Debug)
+pub fn SimpleSelector::equal(Self, Self) -> Bool
+pub fn SimpleSelector::not_equal(Self, Self) -> Bool
+pub fn SimpleSelector::to_repr(Self) -> @debug.Repr
 pub fn SimpleSelector::write_css(Self, StringBuilder) -> Unit
 
 pub(all) struct Specificity {
@@ -115,13 +134,23 @@ pub(all) struct Specificity {
 } derive(Compare, Eq, @debug.Debug)
 pub fn Specificity::add(Self, Self) -> Self
 pub fn Specificity::compare(Self, Self) -> Int
+pub fn Specificity::equal(Self, Self) -> Bool
 pub fn Specificity::new(Int, Int, Int, Int) -> Self
+pub fn Specificity::not_equal(Self, Self) -> Bool
+pub fn Specificity::op_ge(Self, Self) -> Bool
+pub fn Specificity::op_gt(Self, Self) -> Bool
+pub fn Specificity::op_le(Self, Self) -> Bool
+pub fn Specificity::op_lt(Self, Self) -> Bool
+pub fn Specificity::output(Self, &Logger) -> Unit
+pub fn Specificity::to_repr(Self) -> @debug.Repr
+pub fn Specificity::to_string(Self) -> String
 pub impl Show for Specificity
 
 pub(all) struct StyleSheet {
   items : Array[StyleSheetItem]
 } derive(@debug.Debug)
 pub fn StyleSheet::to_css(Self) -> String
+pub fn StyleSheet::to_repr(Self) -> @debug.Repr
 
 pub(all) enum StyleSheetItem {
   Rule(Rule)
@@ -129,6 +158,7 @@ pub(all) enum StyleSheetItem {
   AtRule(String, String, Array[StyleSheetItem]?)
   Raw(String)
 } derive(@debug.Debug)
+pub fn StyleSheetItem::to_repr(Self) -> @debug.Repr
 pub fn StyleSheetItem::write_css(Self, StringBuilder) -> Unit
 
 pub(all) struct Usage {

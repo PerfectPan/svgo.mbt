@@ -6,11 +6,17 @@ pub suberror ParseError {
 } derive(Debug)
 
 ///|
+pub extend ParseError with Debug::{to_repr}
+
+///|
 pub impl Show for ParseError with fn output(self, logger) {
   match self {
     ParseError(msg, pos) => logger.write_string("\{msg} at offset \{pos}")
   }
 }
+
+///|
+pub extend ParseError with Show::{to_string, output}
 
 ///|
 /// Elements whose text content is significant and must be kept verbatim.

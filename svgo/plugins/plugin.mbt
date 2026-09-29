@@ -16,6 +16,9 @@ pub struct Context {
 } derive(Debug)
 
 ///|
+pub extend Context with Debug::{to_repr}
+
+///|
 /// A fresh context; create one per `optimize` run.
 pub fn Context::new(precision? : Int = 3) -> Context {
   {
@@ -49,6 +52,9 @@ pub(all) struct Plugin {
 pub impl Debug for Plugin with fn to_repr(self) {
   Repr(self.name)
 }
+
+///|
+pub extend Plugin with Debug::{to_repr}
 
 ///|
 /// Remove every child node for which `pred` holds; returns true if any was removed.

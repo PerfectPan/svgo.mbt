@@ -2339,7 +2339,7 @@ fn inherited_attr(chain : Array[@xml.Element], key : String) -> String? {
 /// (descending). Non-element children keep their relative position.
 let sort_defs_children : Plugin = {
   name: "sortDefsChildren",
-  description: "sorts children of <defs> to improve compression",
+  description: "sort children of <defs> to improve compression",
   run: (doc, _) => {
     let mut changed = false
     doc.each_element((e, _) => {
@@ -2401,7 +2401,7 @@ let sort_defs_children : Plugin = {
 /// each child's existing transform.
 let move_group_attrs_to_elems : Plugin = {
   name: "moveGroupAttrsToElems",
-  description: "moves some group attributes to the content elements",
+  description: "move some group attributes to the content elements",
   run: (doc, _) => {
     let tables = svg_tables()
     let mut changed = false
@@ -2474,7 +2474,7 @@ let move_group_attrs_to_elems : Plugin = {
 /// `convertPathData` can fold the transform into the path data).
 let move_elems_attrs_to_group : Plugin = {
   name: "moveElemsAttrsToGroup",
-  description: "Move common attributes of group children to the group",
+  description: "move common attributes of group children to the group",
   run: (doc, _) => {
     let tables = svg_tables()
     let mut has_style = false

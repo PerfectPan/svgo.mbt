@@ -10,7 +10,7 @@ curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash   # MoonBit
 git clone https://github.com/PerfectPan/svgo.mbt && cd svgo.mbt
 moon test --target native                                         # unit tests + fixtures (moon.work runs every member)
 scripts/verify.sh                                                 # what CI runs
-pnpm install                                                      # svgo-js, resvg, pixelmatch, tailwind, remotion
+pnpm install                                                      # svgo-js, resvg, pixelmatch, tailwind
 scripts/verify.sh --full                                          # + wasm, sizes, pixel diffs
 
 The MoonBit module lives in `svgo/`; `packages/` holds the npm package and the

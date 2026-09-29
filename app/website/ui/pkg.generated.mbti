@@ -37,8 +37,6 @@ pub fn flag_description(String, String, Lang) -> String
 
 pub fn fmt_int(Int) -> String
 
-pub fn fmt_kb(Int) -> String
-
 pub fn fmt_ms(Double) -> String
 
 pub fn fmt_pct(Double, digits? : Int) -> String
@@ -46,6 +44,8 @@ pub fn fmt_pct(Double, digits? : Int) -> String
 pub let generated_on : String
 
 pub fn highlight(String) -> Array[@html.Html]
+
+pub fn highlight_js(String) -> Array[@html.Html]
 
 pub let highlight_limit : Int
 
@@ -55,15 +55,11 @@ pub fn landing_page(Chrome) -> @rabbita.Val[@html.Html]
 
 pub let lang : @ref.Ref[Lang]
 
-pub fn logo(size? : String) -> @html.Html
-
 pub fn lz_compress(String) -> String
 
 pub fn lz_decompress(String) -> String?
 
-pub fn page_footer() -> @html.Html
-
-pub fn page_head(String, Array[@html.Html], String, inline? : Bool) -> @html.Html
+pub fn page_footer(route? : Route) -> @html.Html
 
 pub fn parse_api_path(String) -> (String, String?)
 
@@ -79,8 +75,6 @@ pub fn start_motion() -> Unit
 
 pub fn start_scrollspy() -> Unit
 
-pub fn start_video_lazyload() -> Unit
-
 pub fn stats_bar(Outcome, String) -> @html.Html
 
 pub fn svg_preview(String, class? : String) -> @html.Html
@@ -95,7 +89,7 @@ pub fn tokenize(String) -> Array[(String, String)]
 
 pub fn tokenize_mbt(String) -> Array[(String, String)]
 
-pub fn top_nav(Route, String, Prefs, @cmd.Emit[PrefMsg]) -> @html.Html
+pub fn top_nav(Route, Prefs, @cmd.Emit[PrefMsg]) -> @html.Html
 
 pub let wasm_bytes : Int
 
@@ -129,6 +123,7 @@ pub(all) struct BenchRow {
   original : Int
   mbt : Int
   js : Int
+  js_default : Int
   mbt_ms : Double
   js_ms : Double
 } derive(Eq)

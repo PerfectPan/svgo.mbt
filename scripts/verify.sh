@@ -49,6 +49,7 @@ if [ "${1:-}" = "--full" ]; then
   step "compare: sizes vs svgo-js, render diff, same-process speed"
   packages/compare/compare.sh
   node packages/compare/render-diff.mjs
+  node packages/compare/render-diff.mjs app/website/samples --exact
   node packages/compare/wasm-speed.mjs
 fi
 printf '\n\033[32mall good\033[0m\n'

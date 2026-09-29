@@ -62,6 +62,30 @@ pub(all) struct Chrome {
 }
 
 ///|
+/// The scope of the site's one `@rui.sonner` host (mounted in `app`), so a
+/// page's update function can raise a toast; `None` only before the first
+/// render, when nothing can have been clicked yet.
+let toast_scope : Ref[@rui.ToastScope?] = Ref(None)
+
+///|
+/// The confirmation every copy action shows: shadcn's Sonner success toast
+/// (rich colours, top centre), short enough not to outstay the action.
+fn toast_success(title : String) -> @rabbita.Cmd {
+  match toast_scope.val {
+    Some(scope) => scope.show(title~, variant=ToastSuccess, duration_ms=2000)
+    None => none
+  }
+}
+
+///|
+/// Copies `text` and confirms with the success toast once the clipboard has
+/// it (nothing is shown if the browser refuses): every copy and share
+/// action goes through here.
+fn copy_with_toast(text : String, title : String) -> @rabbita.Cmd {
+  @clipboard.copy(@clipboard.Item::Text(text), copied=toast_success(title))
+}
+
+///|
 priv struct AppModel {
   route : Route
   prefs : Prefs
@@ -137,17 +161,33 @@ pub fn app() -> Val[Html] {
               parse_api_path(f).1.map(item => "\{pkg}-\{item}")
             _ => None
           }
+          // arriving on another page plays its entrance (see mark_routed);
+          // after the render, so the page already shown never replays it
+          let entered = if route == m.route {
+            none
+          } else {
+            @cmd.custom_cmd(_ => mark_routed(), kind=@cmd.after_render)
+          }
           match target {
             Some(id) =>
               (
                 { ..m, route, },
-                @rabbita.effect(fn() noraise { scroll_to_id(id) }),
+                @rabbita.batch([
+                  entered,
+                  @rabbita.effect(fn() noraise {
+                    scroll_to_id(id)
+                    highlight_id(id)
+                  }),
+                ]),
               )
             None =>
               if route == m.route {
                 (m, none)
               } else {
-                ({ ..m, route, }, @nav.scroll_to_top())
+                (
+                  { ..m, route, },
+                  @rabbita.batch([entered, @nav.scroll_to_top()]),
+                )
               }
           }
         }
@@ -166,7 +206,7 @@ pub fn app() -> Val[Html] {
           (
             { ..m, prefs: { ..m.prefs, dark, }, },
             @rabbita.effect(fn() noraise {
-              set_theme(dark)
+              switch_theme(dark)
               save_pref("svgo-theme", if dark { "dark" } else { "light" })
             }),
           )
@@ -178,13 +218,18 @@ pub fn app() -> Val[Html] {
     prefs: model.map(m => m.prefs),
     emit: emit.map(p => Pref(p)),
   }
-  model
-  .map(m => m.route)
-  .switch(r => {
-    match r {
-      Landing => landing_page(chrome)
-      Playground => playground_page(chrome)
-      Api(pkg) => api_page(chrome, pkg)
-    }
+  let pages = model
+    .map(m => m.route)
+    .switch(r => {
+      match r {
+        Landing => landing_page(chrome)
+        Playground => playground_page(chrome)
+        Api(pkg) => api_page(chrome, pkg)
+      }
+    })
+  let toaster = @rui.sonner(max_toasts=1, position="top-center", scope => {
+    toast_scope.val = Some(scope)
+    nothing
   })
+  pages.map2(toaster, (page, toasts) => @html.fragment([page, toasts]))
 }

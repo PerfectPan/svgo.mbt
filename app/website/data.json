@@ -1,8 +1,8 @@
 {
-  "generated": "2026-09-09",
+  "generated": "2026-09-27",
   "node": "v24.18.0",
   "svgoVersion": "4.1.0",
-  "wasmBytes": 200607,
+  "wasmBytes": 188316,
   "plugins": [
     {
       "name": "removeDoctype",
@@ -191,8 +191,9 @@
       "original": 570,
       "mbt": 442,
       "js": 442,
-      "mbtMs": 0.17,
-      "jsMs": 0.283,
+      "jsDefault": 442,
+      "mbtMs": 0.158,
+      "jsMs": 0.265,
       "passes": 2
     },
     {
@@ -200,8 +201,9 @@
       "original": 1149,
       "mbt": 528,
       "js": 528,
-      "mbtMs": 0.156,
-      "jsMs": 0.569,
+      "jsDefault": 528,
+      "mbtMs": 0.141,
+      "jsMs": 0.551,
       "passes": 2
     },
     {
@@ -209,8 +211,9 @@
       "original": 2078,
       "mbt": 641,
       "js": 640,
-      "mbtMs": 0.188,
-      "jsMs": 0.669,
+      "jsDefault": 640,
+      "mbtMs": 0.165,
+      "jsMs": 0.637,
       "passes": 2
     },
     {
@@ -218,17 +221,19 @@
       "original": 836,
       "mbt": 276,
       "js": 288,
-      "mbtMs": 0.119,
-      "jsMs": 0.319,
+      "jsDefault": 288,
+      "mbtMs": 0.095,
+      "jsMs": 0.286,
       "passes": 3
     },
     {
       "file": "Ghostscript_Tiger.svg",
       "original": 68630,
       "mbt": 52690,
-      "js": 68101,
-      "mbtMs": 12.485,
-      "jsMs": 36.016,
+      "js": 52029,
+      "jsDefault": 68101,
+      "mbtMs": 10.096,
+      "jsMs": 41.113,
       "passes": 3
     },
     {
@@ -236,8 +241,9 @@
       "original": 5419,
       "mbt": 4562,
       "js": 4551,
-      "mbtMs": 0.911,
-      "jsMs": 2.716,
+      "jsDefault": 4551,
+      "mbtMs": 0.741,
+      "jsMs": 2.647,
       "passes": 3
     },
     {
@@ -245,8 +251,9 @@
       "original": 366,
       "mbt": 302,
       "js": 302,
-      "mbtMs": 0.068,
-      "jsMs": 0.165,
+      "jsDefault": 302,
+      "mbtMs": 0.059,
+      "jsMs": 0.163,
       "passes": 2
     },
     {
@@ -254,8 +261,9 @@
       "original": 4019,
       "mbt": 3546,
       "js": 3584,
-      "mbtMs": 0.579,
-      "jsMs": 1.674,
+      "jsDefault": 3584,
+      "mbtMs": 0.47,
+      "jsMs": 1.695,
       "passes": 3
     },
     {
@@ -263,8 +271,9 @@
       "original": 49983,
       "mbt": 35975,
       "js": 35983,
-      "mbtMs": 7.092,
-      "jsMs": 14.238,
+      "jsDefault": 35983,
+      "mbtMs": 5.679,
+      "jsMs": 12.833,
       "passes": 3
     },
     {
@@ -272,8 +281,9 @@
       "original": 84823,
       "mbt": 46700,
       "js": 46706,
-      "mbtMs": 11.889,
-      "jsMs": 51.867,
+      "jsDefault": 46706,
+      "mbtMs": 10.605,
+      "jsMs": 50.433,
       "passes": 3
     }
   ]

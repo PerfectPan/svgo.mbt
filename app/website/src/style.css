@@ -12,14 +12,12 @@
   --color-card: #ffffff;
   --color-ink: #2a1f1a;
   --color-ink-2: #5c4b42;
-  /* darkened from the original #8a776b: that read at 4.0:1 on paper and
-     3.75:1 on paper-2, short of 4.5:1 for small text (captions, the API
-     package count and comments); this hue holds ≥4.8:1 on both */
+  /* ≥4.8:1 on paper and paper-2, above the 4.5:1 small text needs
+     (captions, the API package count, comments) */
   --color-muted: #76665b;
   --color-line: #eadcca;
   --color-line-2: #d9c2a0;
   --color-mark: #ff6b4a;
-  --color-mark-soft: #ffd9ce;
   --color-check-a: #f4f1ea;
   --color-check-b: #e9e5dc;
   /* the playground's dark checker (Light/Dark toggle), the same in both
@@ -33,15 +31,13 @@
   /* the warm-dark ink used for text on the coral fill (see .btn-coral): the
      same in both themes, since --color-ink itself flips to cream in dark */
   --color-mark-ink: #2a1f1a;
+  /* the losing race bar: secondary ink, held at the light theme's value in
+     dark (see the dark block) so coral stays the one bar that pops */
+  --color-race-dim: var(--color-ink-2);
   --color-bg: var(--color-paper);
-  --color-bg-2: var(--color-paper-2);
   --color-surface: var(--color-paper);
   --color-surface-2: var(--color-paper-2);
   --color-accent: var(--color-ink);
-  --color-accent-soft: var(--color-paper-2);
-  --color-line-3: var(--color-ink-2);
-  --color-warn: var(--color-ink-2);
-  --color-check: var(--color-paper-2);
   /* syntax colours, warm: keywords and tags in deep coral, strings and
      numbers in teal, types and attributes in amber */
   --color-hl-tag: #b8431f;
@@ -54,13 +50,11 @@
   --font-sans: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-display: "Fraunces", "Songti SC", "Noto Serif CJK SC", serif;
   --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
-  --background-image-checker: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Cpath fill='%23888' fill-opacity='.12' d='M0 0h8v8H0zm8 8h8v8H8z'/%3E%3C/svg%3E");
 
   /* breakpoints: the three widths the layout branches on (compact nav, the
      API sidebar, two-column landing screens); the unused defaults above them
      are dropped so `xl:`/`2xl:` can't silently reintroduce a fourth one */
   --breakpoint-sm: 640px;
-  --breakpoint-md: 800px;
   --breakpoint-lg: 961px;
   --breakpoint-xl: initial;
   --breakpoint-2xl: initial;
@@ -68,8 +62,8 @@
   /* type scale: one source for every text size on the site. xs/sm/base/lg/
      xl/2xl restate Tailwind's own defaults (12/14/16/18/20/24 px) so the
      full scale is visible here in one place; --text-base--line-height is the
-     one deliberate change, from Tailwind's default 1.5 to 1.6 (see body and
-     .member .doc, the two places that used to disagree with it). */
+     one deliberate change, from Tailwind's default 1.5 to 1.6 (body copy and
+     the API's .member .doc). */
   --text-2xs: 11px;
   --text-2xs--line-height: 16px;
   --text-xs: 12px;
@@ -144,7 +138,6 @@
     --color-muted: #a6927f;
     --color-line: #3a2e27;
     --color-line-2: #4a3c32;
-    --color-mark-soft: color-mix(in srgb, var(--color-mark) 45%, transparent);
     --color-check-a: #bdb8ae;
     --color-check-b: #aca79d;
     --color-hl-tag: #ff8a6b;
@@ -154,10 +147,8 @@
     --color-hl-attr: #6fd0c0;
     --color-hl-type: #e3b06b;
     --color-hl-val: #6fd0c0;
-    /* the losing race bar (see .race-fill): a fixed dark brown, the light
-       theme's own --color-ink-2 hex, so it stays muted rather than reading
-       as bright cream — the brightest thing on the screen should stay the
-       svgo.mbt bar's coral */
+    /* the light theme's --color-ink-2: cream would make the losing race bar
+       the brightest thing on the screen */
     --color-race-dim: #5c4b41;
   }
   /* an absolutely positioned descendant (e.g. the race arrival label, see
@@ -202,37 +193,60 @@
   .footnote { font-size: var(--text-code); line-height: var(--text-code--line-height); color: var(--color-muted); margin-top: --spacing(6); overflow-wrap: anywhere; }
 
   /* ---------- nav ---------- */
-  /* the current page's link is underlined; on hover the same line grows
-     from the left edge at a constant speed (linear, 240 ms) */
-  .nav-link { position: relative; }
-  .nav-link::after { content: ""; position: absolute; inset-inline: --spacing(2); bottom: --spacing(0.5); height: var(--border-w-bold); background: currentColor; transform: scaleX(0); transform-origin: left; }
-  .nav-link:hover { color: var(--color-ink); text-decoration: none; }
-  .nav-link:hover::after, .nav-link[aria-current]::after { transform: scaleX(1); }
-  .nav-link[aria-current] { color: var(--color-ink); }
+  /* an underline that grows from the left edge at a constant speed on
+     hover (linear, 240 ms) and stays under the current page's link: nav
+     and footer links. The nav's sits inside its padding, bolder. */
+  .grow-line { position: relative; text-decoration: none; }
+  .grow-line::after { content: ""; position: absolute; inset-inline: var(--line-inset, 0); bottom: var(--line-bottom, calc(-1 * --spacing(0.5))); height: var(--line-h, 1px); background: currentColor; transform: scaleX(0); transform-origin: left; }
+  .grow-line:hover::after, .grow-line[aria-current]::after { transform: scaleX(1); }
   @media (prefers-reduced-motion: no-preference) {
-    .nav-link::after { transition: transform .24s linear; }
+    .grow-line::after { transition: transform .24s linear; }
   }
+  .nav-link { --line-inset: --spacing(2); --line-bottom: --spacing(0.5); --line-h: var(--border-w-bold); }
+  .nav-link:hover, .nav-link[aria-current] { color: var(--color-ink); }
   /* native <summary> marker suppression (Firefox: list-style, Safari: the
      pseudo-element) so only chevron_icon's own SVG shows, rotated open */
   .mobile-nav summary { list-style: none; }
   .mobile-nav summary::-webkit-details-marker { display: none; }
   .mobile-nav[open] .mobile-nav-chevron { transform: rotate(180deg); }
 
+  /* the checkboxes and radios behind label-driven disclosures, tabs and the
+     file picker are visually hidden but focusable (sr-only, not `hidden`),
+     so the keyboard reaches them; their label shows the focus */
+  :is(.sr-only:focus-visible + label, .sr-only:focus-visible ~ .code-expand-label, label:has(> .sr-only:focus-visible)) { outline: 2px solid var(--color-mark); outline-offset: 2px; }
+
+  /* ---------- disclosure "+" ---------- */
+  /* every disclosure's marker, on its <summary> or on the label of its
+     checkbox: a "+" that turns 45° into × when open, never a triangle */
+  /* drawn as two centred bars, not a "+" glyph: a glyph sits off-centre in
+     its own box, so turning it made a lopsided ×. --plus-slot is the square
+     it occupies, --plus-size the length of its bars. */
+  .plus::before { content: ""; flex: none; width: var(--plus-slot, --spacing(3.5)); height: var(--plus-slot, --spacing(3.5)); color: var(--color-muted); background: linear-gradient(currentColor, currentColor) center / var(--plus-size, --spacing(2.5)) var(--border-w-bold) no-repeat, linear-gradient(currentColor, currentColor) center / var(--border-w-bold) var(--plus-size, --spacing(2.5)) no-repeat; }
+  :is(details[open] > summary.plus, :checked + .plus, :checked ~ .plus)::before { rotate: 45deg; }
+  summary.plus { list-style: none; }
+  summary.plus::-webkit-details-marker { display: none; }
+  @media (prefers-reduced-motion: no-preference) {
+    .plus::before { transition: rotate .24s var(--ease-out-soft); }
+  }
+
   /* ---------- sliding selection ---------- */
   /* segmented controls and tab rows marked `data-slide` (install_slides in
      browser.mbt measures the pressed child into --thumb-*): the group's
      ::before is the selection and slides between items; "fill" is the pill
-     behind the item, "line" the 2px coral bar under a tab. Until the first
-     measurement (no data-ready) the pressed item keeps its own fill. */
+     behind the item, "line" the 2px coral bar under a tab, "rail" the bar
+     beside the current TOC link. The selection's colour is set only here:
+     until the first measurement (no data-ready) the pressed item itself
+     shows it, after that the thumb does; items set only their text colour. */
   [data-slide] { position: relative; isolation: isolate; }
   [data-slide] > * { position: relative; z-index: 1; }
   [data-slide]::before { content: ""; position: absolute; top: 0; left: 0; z-index: 0; width: var(--thumb-w, 0); height: var(--thumb-h, 0); translate: var(--thumb-x, 0) var(--thumb-y, 0); border-radius: calc(infinity * 1px); background: var(--thumb-bg, var(--color-ink)); opacity: 0; pointer-events: none; }
   [data-slide][data-ready]::before { opacity: 1; }
-  [data-slide="fill"][data-ready] > :is([aria-pressed="true"], [aria-selected="true"]) { background: transparent !important; }
+  [data-slide="fill"]:not([data-ready]) > :is([aria-pressed="true"], [aria-selected="true"]) { background: var(--thumb-bg, var(--color-ink)); }
   [data-slide="line"]::before { height: --spacing(0.5); translate: var(--thumb-x, 0) calc(var(--thumb-y, 0) + var(--thumb-h, 0) - --spacing(0.5)); border-radius: 0; background: var(--color-mark); }
-  [data-slide="line"][data-ready] > [aria-pressed="true"] { border-color: transparent !important; }
+  [data-slide="line"] > * { border-color: transparent; }
+  [data-slide="line"]:not([data-ready]) > [aria-pressed="true"] { border-color: var(--color-mark); }
   [data-slide="rail"]::before { width: --spacing(0.5); translate: 0 var(--thumb-y, 0); border-radius: 0; background: var(--color-accent); }
-  [data-slide="rail"][data-ready] > [aria-current="true"] { border-color: transparent !important; }
+  [data-slide="rail"]:not([data-ready]) > [aria-current="true"] { border-color: var(--color-accent); }
   @media (prefers-reduced-motion: no-preference) {
     [data-slide][data-ready]::before { transition: translate .32s var(--ease-out-soft), width .32s var(--ease-out-soft), height .32s var(--ease-out-soft); }
   }
@@ -250,8 +264,8 @@
     .mobile-nav[open] .mobile-panel { opacity: 1; translate: 0 0; }
   }
   /* moving to another page: its content (not the fixed nav) fades in
-     rising 8px as it mounts; only after the first hash change (html.routed,
-     install_page_transitions), the first load has the hero's own entrance.
+     rising 8px as it mounts; only once the app has changed page (html.routed,
+     mark_routed), the first load has the hero's own entrance.
      Backwards fill only, so no transform lingers on the sticky columns. */
   @keyframes page-in { from { opacity: 0; translate: 0 --spacing(2); } }
   @media (prefers-reduced-motion: no-preference) {
@@ -268,11 +282,8 @@
   /* small, one vocabulary (soft ease-out, ~200ms), hover only, off under
      reduced motion: the arrow of a "→" link nudges right, the coral CTA
      lifts a pixel, Nib in the nav hops like the race runner, the theme
-     icon turns, footer links grow the nav's underline */
+     icon turns (link underlines: .grow-line) */
   .arrow { display: inline-block; }
-  .grow-line { position: relative; text-decoration: none; }
-  .grow-line::after { content: ""; position: absolute; inset-inline: 0; bottom: calc(-1 * --spacing(0.5)); height: 1px; background: currentColor; transform: scaleX(0); transform-origin: left; }
-  .grow-line:hover::after { transform: scaleX(1); }
   @keyframes nib-hop { 0%, 100% { translate: 0 0; } 45% { translate: 0 calc(-1 * --spacing(1)); } }
   @media (prefers-reduced-motion: no-preference) {
     .arrow { transition: translate .2s var(--ease-out-soft); }
@@ -282,7 +293,6 @@
     .brand:hover .nib-mark { animation: nib-hop .36s var(--ease-spring); }
     .icon-btn svg { transition: rotate .3s var(--ease-out-soft); }
     .icon-btn:hover svg { rotate: 20deg; }
-    .grow-line::after { transition: transform .24s linear; }
   }
 
   /* ---------- toast ---------- */
@@ -310,12 +320,9 @@
   /* ---------- buttons ---------- */
   .btn { display: inline-flex; align-items: center; justify-content: center; gap: --spacing(2); padding: --spacing(3) --spacing(5.5); border-radius: calc(infinity * 1px); border: var(--border-w-bold) solid var(--color-ink); font-size: var(--text-sm); font-weight: 500; color: var(--color-ink); }
   .btn:hover { background: var(--color-ink); color: var(--color-paper); text-decoration: none; }
-  .btn-primary { background: var(--color-ink); color: var(--color-paper); }
-  .btn-primary:hover { background: var(--color-paper); color: var(--color-ink); }
-  /* coral is the same hue in both themes, so the label stays this fixed warm
-     dark ink (not the --color-ink token, which flips to cream in dark and
-     would fail contrast on the button) rather than the previous white,
-     which read weaker against the coral fill than the surrounding type */
+  /* coral is the same hue in both themes, so the label is the fixed warm
+     dark ink (not --color-ink, which flips to cream in dark and would fail
+     contrast on the coral) */
   .btn-coral { border-color: var(--color-mark); background: var(--color-mark); color: var(--color-mark-ink); padding: --spacing(3.75) --spacing(7); font-size: var(--text-base); font-weight: 600; box-shadow: 0 --spacing(1) --spacing(3) color-mix(in srgb, var(--color-mark) 12%, transparent); }
   .btn-coral:hover { background: var(--color-mark); color: var(--color-mark-ink); filter: brightness(.94); text-decoration: none; }
   /* the playground toolbar's secondary actions (Open file, Share link): a
@@ -443,12 +450,8 @@
   /* stops short of the lane's own width so the arrival label always has
      somewhere to sit, even for the svgo lane whose bar reaches 100% share */
   .race-track { position: relative; width: calc(100% - --spacing(18)); height: --spacing(3.25); border-radius: calc(infinity * 1px); background: color-mix(in srgb, var(--color-ink) 8%, transparent); }
-  .race-fill { position: absolute; inset: 0 auto 0 0; border-radius: calc(infinity * 1px); background: var(--color-ink-2); }
+  .race-fill { position: absolute; inset: 0 auto 0 0; border-radius: calc(infinity * 1px); background: var(--color-race-dim); }
   .race-fill-mbt { background: var(--color-mark); }
-  /* in dark theme ink-2 reads as bright cream, which would make the losing
-     bar the brightest thing on the screen; --color-race-dim keeps it muted
-     so coral (the svgo.mbt bar) stays the one thing that pops */
-  [data-theme="dark"] .race-fill:not(.race-fill-mbt) { background: var(--color-race-dim); }
   /* matches the bars' own width, so the line never runs past their right
      edge; text-wrap:pretty keeps the last line from orphaning a single word */
   .race-note { margin-top: --spacing(5); max-width: --spacing(145); font: var(--text-sm)/1.6 var(--font-sans); color: var(--color-ink-2); text-wrap: pretty; }
@@ -478,14 +481,16 @@
   /* package manager picker in the npm tab, the same pill switch as the nav's language toggle */
   .pm-switch { @apply mb-3 inline-flex rounded-full border border-line-2 p-1; }
   .pm-switch button { @apply rounded-full px-3.5 py-1 font-mono text-code text-ink-2 transition-colors hover:text-ink; }
-  .pm-switch button[aria-pressed="true"] { @apply bg-ink text-paper; }
+  .pm-switch button[aria-pressed="true"] { @apply text-paper; }
   .screen-install .install { width: 100%; max-width: none; }
   .use pre { @apply mt-6 rounded-2xl border border-line-2 bg-card p-4 font-mono text-code text-ink; overflow-x: auto; }
   /* an install code block with its corner "copy": the copy sits on the
      install line's right edge (its px-4.5), and the code keeps clear of it */
   .use .code-card { @apply relative mt-6; }
   .use .code-card pre { @apply mt-0 pr-16; }
-  .code-card-copy { @apply absolute top-4 right-4.5 min-w-12 bg-card font-mono text-xs underline underline-offset-[--spacing(0.75)]; }
+  /* the install section's "copy" (the install line and each code block) */
+  .copy-action { @apply min-w-12 font-mono text-xs underline underline-offset-[--spacing(0.75)]; }
+  .code-card-copy { @apply absolute top-4 right-4.5 bg-card; }
   /* on phones a first line is often wider than the block and scrolls under
      the corner, so the copy gets a band of its own above the code */
   @media (width < theme(--breakpoint-sm)) {
@@ -493,23 +498,16 @@
   }
   #install .use > p { font: var(--text-sm)/var(--text-sm--line-height) var(--font-sans); color: var(--color-ink-2); }
   .flags { margin-top: --spacing(6); border-block: 1px solid var(--color-line); }
-  .flags summary { @apply flex cursor-pointer list-none items-center gap-2.5 py-4 text-sm; }
-  .flags summary::-webkit-details-marker { display: none; }
+  .flags summary { @apply flex cursor-pointer items-center gap-2.5 py-4 text-sm; }
   .cli-flags td:last-child, .cli-flags th:last-child { text-align: left; font-family: var(--font-sans); }
 
   /* ---------- landing: details (benchmarks / plugins) ---------- */
   .details-section { padding-block: --spacing(2) --spacing(16); }
   .landing-details { border-bottom: 1px solid var(--color-line); }
-  .landing-details-summary { cursor: pointer; list-style: none; padding-block: --spacing(6); font: 600 var(--text-xl) var(--font-display); color: var(--color-ink); display: flex; align-items: center; gap: --spacing(2.5); }
-  .landing-details-summary::-webkit-details-marker { display: none; }
-  :is(.landing-details-summary, .flags summary)::before { content: "+"; display: inline-block; width: --spacing(4.5); font: 400 var(--text-xl)/1 var(--font-mono); color: var(--color-muted); }
-  :is(.landing-details[open] > .landing-details-summary, .flags[open] > summary)::before { transform: rotate(45deg); }
+  .landing-details-summary { cursor: pointer; padding-block: --spacing(6); font: 600 var(--text-xl) var(--font-display); color: var(--color-ink); display: flex; align-items: center; gap: --spacing(2.5); }
+  /* the landing's disclosures carry a larger "+" (see .plus) */
+  :is(.landing-details-summary, .flags summary) { --plus-slot: --spacing(4.5); --plus-size: --spacing(3.5); }
   .landing-details-body { padding-bottom: --spacing(14); }
-  /* the height animation itself is shared by every <details> (see
-     "disclosures, menus" above); here only the "+" turns with it */
-  @media (prefers-reduced-motion: no-preference) {
-    :is(.landing-details-summary, .flags summary)::before { transition: transform .24s var(--ease-out-soft); }
-  }
 
   .display-measure { white-space: nowrap; }
   .display-number { font-family: var(--font-sans); font-variant-numeric: tabular-nums; font-feature-settings: "zero" 0; letter-spacing: -.02em; }
@@ -605,10 +603,6 @@
     .pipeline-toggle { display: block; position: absolute; width: 1px; height: 1px; opacity: 0; }
     .pipeline-disclosure { display: flex; align-items: center; gap: --spacing(2.5); border-block: 1px solid var(--color-line); padding-block: --spacing(4); cursor: pointer; font-size: var(--text-sm); }
     .pipeline-toggle:focus-visible + .pipeline-disclosure { outline: 2px solid var(--color-mark); outline-offset: --spacing(1); }
-    /* the same rotating "+" as every other disclosure on the site (see
-       .landing-details-summary::before), not a triangle */
-    .pipeline-chevron { display: inline-block; width: --spacing(3.5); font: 400 var(--text-sm)/1 var(--font-mono); color: var(--color-muted); transition: transform .2s; }
-    .pipeline-toggle:checked + .pipeline-disclosure .pipeline-chevron { transform: rotate(45deg); }
     .pipeline-rest { display: none; }
     .pipeline-toggle:checked ~ .pipeline-rest { display: block; }
     .bars { padding-right: --spacing(15); }
@@ -619,7 +613,7 @@
     .size-table .sizes th:first-child, .size-table .sizes td:first-child { max-width: --spacing(25); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .cli-bar-row { grid-template-columns: --spacing(33) minmax(0,1fr); gap: --spacing(2); font-size: var(--text-xs); }
   }
-  :lang(zh) :is(.footnote, .pipeline-intro, .source-caption) { font-size: var(--text-code); line-height: var(--text-code--line-height); letter-spacing: 0; }
+  :lang(zh) :is(.footnote, .pipeline-intro) { font-size: var(--text-code); line-height: var(--text-code--line-height); letter-spacing: 0; }
   :lang(zh) :is(.section-intro, .footnote, .plugin-description, .use > p, .cli-speed > p, .race-note) { line-height: var(--leading-cjk); }
   @media (width < theme(--breakpoint-sm)) {
     .size-table .sizes :is(th, td):nth-child(2), .size-table .sizes :is(th, td):nth-child(4) { display: none; }
@@ -642,27 +636,23 @@
   .illustration { color: var(--color-mark-ink); }
 
   /* playground */
-  /* the drag-over overlay: plain `display` (not the `flex` utility) so the
-     `[hidden]` rule below — same layer, higher specificity — reliably wins;
-     a utility class of equal specificity in a later Tailwind layer would
-     always beat it regardless of source order (see install_dropzone). */
-  .pg-dropzone-overlay { @apply flex-col items-center justify-center gap-3; display: flex; }
-  .pg-dropzone-overlay[hidden] { display: none; }
+  /* the drag-over overlay; hidden until a file is dragged over (preflight's
+     [hidden] rule is !important, so the flex display never shows it early) */
+  .pg-dropzone-overlay { @apply flex flex-col items-center justify-center gap-3; }
   /* the puzzled Nib above a parse error, in the output code pane */
-  .pg-error { @apply flex-col items-center gap-3 px-4 py-10 text-center; display: flex; }
+  .pg-error { @apply flex flex-col items-center gap-3 px-4 py-10 text-center; }
 
   /* sample picker tabs (desktop): pills, the current one filled like the
      language switch in the nav */
   /* hover is the `--color-line` wash: the toolbar behind the chips is
      `--color-surface-2`, so a `bg-2` hover would be invisible */
   .chip { @apply rounded-full px-3.5 py-1.5 text-sm text-ink-2 transition-colors hover:bg-line hover:text-ink; }
-  .chip[aria-selected="true"]:hover { @apply bg-ink text-bg; }
-  .chip[aria-selected="true"] { @apply bg-ink text-bg; }
+  /* the selected chip's fill is the sliding thumb ([data-slide]); no hover wash over it */
+  .chip[aria-selected="true"], .chip[aria-selected="true"]:hover { @apply bg-transparent text-bg; }
   .pane-label { @apply flex h-8 flex-none items-center border-b border-line bg-surface px-3.5 text-xs font-semibold text-ink-2; }
-  /* the checker toggle moved to the preview's own corner (see
-     .pg-preview-bg-row / .pg-bg-overlay below), so this row holds only the
-     source title and Copy/Download — short enough in both languages to
-     stay the plain one-row .pane-label with no wrap override. */
+  /* the source label rows hold only the title and Copy/Download (the
+     background toggle sits on the preview, see .pg-bg-overlay), short
+     enough in both languages for one row */
   .pane-act { @apply cursor-pointer rounded-lg px-2 py-1 text-xs font-medium text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink; }
   /* bounded below 961px too: a large sample (the Ghostscript Tiger) must
      scroll inside the pane, not push the page to tens of thousands of px */
@@ -707,9 +697,7 @@
      a flat 4px gap reads better than that ratio at this smaller size */
   .stat .display-measure { @apply text-lg font-bold; }
   .stat .display-unit { @apply ml-1 font-normal text-muted; }
-  /* plain bold text, not a padded badge — the box shape was the only
-     "pill" left in the interface and added height nothing else in the
-     row needed */
+  /* plain bold text, not a padded badge: nothing else in the row is boxed */
   .saved { @apply inline-flex items-center gap-1.5 text-code font-bold text-mark; }
   /* one ratio-bar rule everywhere (the hero counter's bar, this one): kept
      is coral on the hairline `--color-line` track, same as `.bar-track` /
@@ -724,21 +712,17 @@
      .pg-side-body only shows once checked, forced visible again above
      961px regardless of the checkbox (see media query below). */
   .pg-side { @apply border-t border-line; }
-  /* the same rotating "+" as every other disclosure on the site (see
-     .landing-details-summary::before), not a triangle */
   .pg-side-summary { @apply flex cursor-pointer items-center gap-2.5; font: 500 var(--text-sm) var(--font-mono); padding: --spacing(3.5) --spacing(1); }
-  .pg-side-summary::before { content: "+"; display: inline-block; width: --spacing(3.5); font: 400 var(--text-base)/1 var(--font-mono); color: var(--color-muted); }
-  @media (prefers-reduced-motion: no-preference) {
-    .pg-side-summary::before { transition: transform .2s var(--ease-out-soft); }
+  .pg-side-body { @apply min-h-0 p-5; }
+  @media (width < theme(--breakpoint-lg)) {
+    .pg-side-body { display: none; }
+    .pg-toggle:checked ~ .pg-side-body { display: block; }
   }
-  #pg-toggle:checked + .pg-side-summary::before { transform: rotate(45deg); }
-  .pg-side-body { @apply hidden min-h-0 p-5; }
-  .pg-toggle:checked ~ .pg-side-body { @apply block; }
   .side-head { @apply mb-1 flex items-center justify-between text-code font-semibold text-ink; }
   .opt { @apply flex h-10 cursor-pointer items-center justify-between gap-3 text-sm font-medium leading-snug text-ink; }
   .opt small { @apply block text-xs font-normal text-muted; }
   .num { @apply h-7.5 w-16 rounded-lg border border-line bg-surface px-2 text-right tabular-nums text-ink outline-none transition-colors focus:border-accent; }
-  /* options use the same plain checkbox as the plugin list (item 2) */
+  /* options use the same plain checkbox as the plugin list */
   .opt-check { @apply size-4 accent-accent; }
   /* every row the same height (enough for a 2-line description) so the
      scroll area's bottom edge lands on a row boundary, not mid-item */
@@ -750,8 +734,8 @@
   /* a round ink dot marking a plugin that changed this SVG. In the plugin
      list it sits in its own fixed-width trailing column (not inline after
      the name) so it reads as a status marker, not stray punctuation, and so
-     a name never shifts depending on whether the dot is there; the "●
-     Changed this SVG" legend under the enabled/reset line explains it. */
+     a name never shifts depending on whether the dot is there; the heading's
+     "N changed" count and the dot's title explain it. */
   .applied { @apply inline-block size-1.5 flex-none rounded-full bg-accent; }
   /* a plugin that changed nothing keeps its dot at scale 0 (see plugin_row),
      so toggling it pops the dot in or out */
@@ -790,8 +774,7 @@
      sides are always shown from 961px regardless of which radio is
      checked. overflow-x-auto + nowrap: a narrow phone scrolls this row
      instead of wrapping "68,630 B" across three lines. */
-  /* a full-width row of its own, 44px tall — just the two tabs now that
-     the background toggle moved to the code label row (item 1) */
+  /* a full-width row of its own, 44px tall, holding just the two tabs */
   .pg-view-tabs { @apply flex h-11 flex-nowrap items-center gap-4 border-b border-line px-3.5; }
   .pg-view-tab { @apply flex-none cursor-pointer whitespace-nowrap border-b-2 border-transparent pb-1 text-code font-medium text-ink-2; }
   input:checked + .pg-view-tab { @apply border-accent text-ink; }
@@ -808,56 +791,42 @@
   .pg-bg-overlay { @apply absolute right-3 top-3; }
   .pg-preview-bg-row { @apply pointer-events-none relative z-10 hidden lg:col-span-2 lg:col-start-1 lg:row-start-2 lg:block; }
   .pg-preview-bg-row .pg-bg-overlay { @apply pointer-events-auto; }
-  .pg-body:has(#pg-view-before:checked) :is(.preview-output, .code-output, .pg-src-label-output) { @apply hidden; }
-  .pg-body:has(#pg-view-after:checked) :is(.preview-input, .code-input, .pg-src-label-input) { @apply hidden; }
+  /* phones show one side at a time (the Before/After radios) */
+  @media (width < theme(--breakpoint-lg)) {
+    .pg-body:has(#pg-view-before:checked) :is(.preview-output, .code-output, .pg-src-label-output) { display: none; }
+    .pg-body:has(#pg-view-after:checked) :is(.preview-input, .code-input, .pg-src-label-input) { display: none; }
+  }
 
   /* the code pane below each preview: capped at ~200px with a checkbox-
      driven expand/collapse control (no JS), full height from 961px where
      the control is hidden. */
   .code-collapse { @apply relative min-h-0; }
-  .code-collapse-body { @apply overflow-hidden; max-height: --spacing(50); }
-  .code-expand-toggle:checked ~ .code-collapse-body { max-height: none; }
-  /* the same rotating "+" as every other disclosure on the site: the glyph
-     in ::before, the label text in ::after (the label itself has no real
-     text child — see collapsible_code). */
-  .code-expand-label { @apply flex cursor-pointer items-center justify-center gap-2 border-t border-line bg-surface-2 py-1.5 text-center text-xs text-ink-2; }
-  .code-expand-label::before { content: "+"; display: inline-block; width: --spacing(3.5); font: 400 var(--text-base)/1 var(--font-mono); color: var(--color-muted); }
-  @media (prefers-reduced-motion: no-preference) {
-    .code-expand-label::before { transition: transform .2s var(--ease-out-soft); }
+  @media (width < theme(--breakpoint-lg)) {
+    .code-collapse-body { @apply overflow-hidden; max-height: --spacing(50); }
+    .code-expand-toggle:checked ~ .code-collapse-body { max-height: none; }
   }
-  .code-expand-toggle:checked ~ .code-expand-label::before { transform: rotate(45deg); }
-  .code-expand-label::after { content: "Show all"; }
-  .code-expand-toggle:checked ~ .code-expand-label::after { content: "Collapse"; }
-  :lang(zh) .code-expand-label::after { content: "显示全部"; }
-  :lang(zh) .code-expand-toggle:checked ~ .code-expand-label::after { content: "收起"; }
+  /* the label says "Show all" or "Collapse" by the checkbox (both are in
+     the markup, see collapsible_code); the "+" is .plus */
+  .code-expand-label { @apply flex cursor-pointer items-center justify-center gap-2 border-t border-line bg-surface-2 py-1.5 text-center text-xs text-ink-2; }
+  .code-expand-toggle:checked ~ .code-expand-label .code-expand-show,
+  .code-expand-toggle:not(:checked) ~ .code-expand-label .code-expand-hide { display: none; }
 
   @media (width < theme(--breakpoint-lg)) {
     /* the stats strip leads on mobile (see the `order` utilities on
        `.stats` and the editors grid) and stays visible while the panes
        below it scroll */
-    .stats { @apply sticky top-14 z-10 bg-surface; }
+    .stats { @apply sticky top-(--nav-h) z-10 bg-surface; }
   }
 
   @media (width >= theme(--breakpoint-lg)) {
     .pg-side { @apply h-full overflow-hidden rounded-2xl border border-line bg-surface; }
-    .pg-side-body { display: flex !important; flex-direction: column; height: 100%; }
+    .pg-side-body { display: flex; flex-direction: column; height: 100%; }
     /* fill the pane's remaining height, same role .editor played on its own
        before it grew a collapse wrapper — otherwise the wrapper takes its
        natural (unbounded) content height and blows out the whole page */
     .code-collapse { @apply flex min-h-0 flex-1 flex-col; }
-    .code-collapse-body { @apply flex min-h-0 flex-1 flex-col; max-height: none !important; overflow: visible; }
+    .code-collapse-body { @apply flex min-h-0 flex-1 flex-col; }
     .code-expand-label { display: none; }
-    /* undoes the mobile-only `hidden` above (`.pg-body:has(...) :is(...)
-       { @apply hidden; }`), restoring each pane to its own natural desktop
-       display rather than a single shared value: .preview-* is a plain
-       block div (its child `.preview` fills it only under block layout —
-       forcing flex here shrinks `.preview` to its content size, since
-       `.preview` itself is `flex: none`), while .code-* is `.code-collapse`,
-       which this same media block makes a flex column right above. */
-    .pg-body:has(#pg-view-before:checked) .preview-output,
-    .pg-body:has(#pg-view-after:checked) .preview-input { display: block !important; }
-    .pg-body:has(#pg-view-before:checked) .code-output,
-    .pg-body:has(#pg-view-after:checked) .code-input { display: flex !important; }
   }
 
   /* api */
@@ -872,18 +841,14 @@
      side_nav) — a second border-top here on mobile just doubled that one
      line, ~17px away from it (pb-4 + this rule's own border+pt). */
   .api-toc { @apply mt-4; }
-  /* the same rotating "+" as every other disclosure on the site, not a triangle */
   .api-toc label { @apply flex cursor-pointer items-center gap-2.5; font: 500 var(--text-code) var(--font-mono); padding-block: --spacing(1); }
-  .api-toc label::before { content: "+"; display: inline-block; width: --spacing(3.5); font: 400 var(--text-base)/1 var(--font-mono); color: var(--color-muted); }
-  @media (prefers-reduced-motion: no-preference) {
-    .api-toc label::before { transition: transform .2s var(--ease-out-soft); }
+  @media (width < theme(--breakpoint-lg)) {
+    .api-toc-body { display: none; }
+    #api-toc-toggle:checked ~ .api-toc-body { display: block; }
   }
-  #api-toc-toggle:checked + label::before { transform: rotate(45deg); }
-  .api-toc-body { @apply hidden; }
-  .pg-toggle:checked ~ .api-toc-body { @apply block; }
   .api-toc-body h4 { @apply mb-1 mt-3.5 pl-3 text-xs font-semibold text-muted first:mt-0; }
   .api-toc-body a { @apply block truncate border-l-2 border-transparent py-0.75 pl-3 text-ink-2 hover:text-accent; }
-  .api-toc-body a[aria-current="true"] { @apply border-accent font-semibold text-accent; }
+  .api-toc-body a[aria-current="true"] { @apply font-semibold text-accent; }
   /* hierarchy: 24px group headings, 18px mono member names, 16/25 body,
      13/20 code; 64px desktop / 48px mobile above every group's hairline
      (.member's own margin-bottom collapses into it, so :has(+ h2) zeroes
@@ -894,7 +859,7 @@
   @media (width < theme(--breakpoint-lg)) {
     .api-main h2 { @apply mb-6 mt-12; }
   }
-  .member { @apply border-t border-line py-3 scroll-mt-19; }
+  .member { @apply border-t border-line py-3; scroll-margin-top: calc(var(--nav-h) + --spacing(5)); }
   /* an API TOC link or deep link lands here — a 600ms `--accent` 12%
      background flash (see highlight_id, browser.mbt) so the jump reads as
      "here", not silent. No keyframe under reduced motion: highlight_id
@@ -915,7 +880,7 @@
   /* a trait a type implements, as a mono tag right after its name — not a
      paragraph stranded under the doc text */
   .member .impls-tag { @apply font-mono text-xs font-normal text-muted; }
-  /* "copy · source" together on the heading row (item 12): the negative
+  /* "copy · source" together on the heading row: the negative
      margin lets the padding grow the click target without moving the
      visible text; ml-auto on the wrapper, not the link itself, keeps both
      actions grouped on the right. */
@@ -932,10 +897,8 @@
      its own copy action) is a card, so it takes rounded-2xl instead. */
   .sig pre { @apply overflow-x-auto rounded-lg border border-line-2 bg-paper p-3 text-code; }
   .sig-has-copy pre { @apply rounded-2xl p-4; }
-  /* a multi-line member declaration without its own overlay copy button
-     (item 12: that action moved to the heading row — see .member
-     .member-actions) still gets the same card treatment as one that has
-     one, just without the corner clearance. */
+  /* a multi-line member declaration, whose copy is on the heading row
+     (.member .member-actions): the same card, without the corner clearance */
   .sig-card pre { @apply rounded-2xl p-4; }
   .sig pre a { @apply text-accent; }
   /* the "copy" action is corner-overlaid only on blocks that have one (two
@@ -963,9 +926,8 @@
     .sig:not(.sig-has-copy):not(.sig-card) pre { padding-left: calc(--spacing(3) + 2ch); text-indent: -2ch; }
     /* two intentional rows for every declaration header, not whichever
        arrangement flex-wrap happens to land on: symbol (kind/name/impls)
-       on row one, "copy · source" always starting its own row two — a
-       long combination like `UnknownPlugin implements Show` used to be the
-       only one that wrapped, so it alone read as broken. */
+       on row one, "copy · source" always starting its own row two, so a
+       long one like `UnknownPlugin implements Show` doesn't wrap alone. */
     .member .member-actions { flex-basis: 100%; }
     .member h3 { row-gap: --spacing(2); }
     .member h3 + .sig { margin-top: --spacing(3); }
@@ -988,6 +950,5 @@
   @media (width >= theme(--breakpoint-lg)) {
     .api-pkgs { @apply block border-b-0 pb-0; }
     .api-pkgs .api-pkg { @apply mt-1.5 h-8; }
-    .api-toc-body { display: block !important; }
   }
 }

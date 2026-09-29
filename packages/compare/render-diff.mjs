@@ -1,11 +1,16 @@
 // Rasterize every SVG in a directory before and after optimization and report the
-// number of differing pixels. Usage: node packages/compare/render-diff.mjs [dir]
-// (default: svgo/testdata; try packages/compare/corpus for the big files)
+// number of differing pixels. Usage: node packages/compare/render-diff.mjs [dir] [--exact]
+// (default: svgo/testdata; try packages/compare/corpus for the big files). It fails
+// above 0.1% differing pixels (sub-pixel precision effects pass); --exact fails on
+// any differing pixel, for the site samples, whose 0 px the website states.
 import { readFileSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 const ROOT = new URL("../../", import.meta.url).pathname;
-const TESTDATA = process.argv[2] ? resolve(process.argv[2]) : join(ROOT, "svgo/testdata");
+const args = process.argv.slice(2);
+const EXACT = args.includes("--exact");
+const dir = args.find((a) => !a.startsWith("--"));
+const TESTDATA = dir ? resolve(dir) : join(ROOT, "svgo/testdata");
 import { execFileSync } from "node:child_process";
 import { Resvg } from "@resvg/resvg-js";
 import pixelmatch from "pixelmatch";
@@ -31,6 +36,6 @@ for (const f of files) {
   const diff = pixelmatch(a.data, b.data, null, a.width, a.height, { threshold: 0.1 });
   const pct = ((diff / (a.width * a.height)) * 100).toFixed(3);
   console.log(`${f.padEnd(26)} ${String(src.length).padStart(7)} -> ${String(out.length).padStart(7)} bytes  diff pixels: ${diff} (${pct}%)`);
-  if (diff > a.width * a.height * 0.001) failed++;
+  if (EXACT ? diff > 0 : diff > a.width * a.height * 0.001) failed++;
 }
 process.exit(failed ? 1 : 0);

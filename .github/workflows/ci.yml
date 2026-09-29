@@ -32,6 +32,7 @@ jobs:
           moon build --target native --release -q
           packages/compare/compare.sh
           node packages/compare/render-diff.mjs
+          node packages/compare/render-diff.mjs app/website/samples --exact
           node packages/compare/wasm-speed.mjs
       - uses: oven-sh/setup-bun@v2
         with:

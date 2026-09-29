@@ -17,9 +17,9 @@ fn copy_pill(cmd : String, emit : Emit[LandingMsg]) -> Html {
   div(
     class="install flex items-center justify-between gap-3 rounded-full border border-line-2 bg-card px-4.5 py-3",
     [
-      code(t(cmd, cmd)),
+      code(cmd),
       button(
-        class="min-w-12 font-mono text-xs underline underline-offset-[--spacing(0.75)]",
+        class="copy-action",
         attrs=Attrs::build().aria_label(t("Copy \{cmd}", "复制 \{cmd}")),
         on_click=emit(Copy(cmd)),
         t("copy", "复制"),
@@ -42,7 +42,7 @@ fn code_card(
   div(class="code-card", [
     pre(render(source)),
     button(
-      class="code-card-copy",
+      class="copy-action code-card-copy",
       attrs=Attrs::build().aria_label(t("Copy code", "复制代码")),
       on_click=emit(Copy(source)),
       t("copy", "复制"),
@@ -71,9 +71,45 @@ fn median_bench_ms(pick : (BenchRow) -> Double) -> Double {
 }
 
 ///|
-fn median_speedup() -> Double {
-  let ratios = bench_rows.map(r => r.js_ms / r.mbt_ms)
-  median(ratios)
+/// The headline ratio: the median of the per-file speed-ups.
+let median_speedup : Double = median(bench_rows.map(r => r.js_ms / r.mbt_ms))
+
+///|
+/// The benchmark rows smallest file first, as the tables list them.
+let bench_rows_by_size : Array[BenchRow] = {
+  let sorted = bench_rows.copy()
+  sorted.sort_by((a, b) => a.original.compare(b.original))
+  sorted
+}
+
+///|
+/// A site sample optimized, with the data URI its logo tile shows.
+priv struct SampleView {
+  outcome : Outcome
+  uri : String
+}
+
+///|
+let sample_views : Ref[Array[SampleView]?] = Ref(None)
+
+///|
+/// `samples[idx]` optimized once per visit, not once per render: the
+/// samples are constants, and the landing view re-runs on every tab,
+/// language or theme change. Filled on first use, so other pages pay
+/// nothing.
+fn sample_view(idx : Int) -> SampleView {
+  let views = match sample_views.val {
+    Some(views) => views
+    None => {
+      let views = samples.map(s => {
+        let outcome = run_optimize(s.svg)
+        { outcome, uri: svg_data_uri(outcome.data), }
+      })
+      sample_views.val = Some(views)
+      views
+    }
+  }
+  views[idx]
 }
 
 ///|
@@ -90,7 +126,11 @@ let package_managers : Array[(String, String)] = [
 /// summary, closed until the reader opens it.
 fn landing_details(summary : String, children : Array[Html]) -> Html {
   node("details", Attrs::build().class("landing-details reveal"), [
-    node("summary", Attrs::build().class("landing-details-summary"), summary),
+    node(
+      "summary",
+      Attrs::build().class("landing-details-summary plus"),
+      summary,
+    ),
     div(class="landing-details-body", children),
   ])
 }
@@ -118,8 +158,8 @@ fn file_label(file : String) -> String {
     "World_map_-_low_resolution.svg" => t("World map", "世界地图")
     "sketch-icon.svg" => t("Sketch icon", "Sketch 图标")
     "figma-export.svg" => t("Figma export", "Figma 导出")
-    "illustrator-logo.svg" => t("Illustrator", "Illustrator")
-    "inkscape-drawing.svg" => t("Inkscape", "Inkscape")
+    "illustrator-logo.svg" => "Illustrator"
+    "inkscape-drawing.svg" => "Inkscape"
     "React-icon.svg" => t("React icon", "React 图标")
     "Tux.svg" => "Tux"
     _ => file
@@ -127,29 +167,29 @@ fn file_label(file : String) -> String {
 }
 
 ///|
-/// A logo rendered as an `<img>` from a data URI, so its own fill colours
-/// stay intact regardless of stray ids in the optimized markup.
-fn sample_preview(svg : String, class : String) -> Html {
-  let source = svg
-    .replace_all(old="%", new="%25")
-    .replace_all(old="#", new="%23")
-    .replace_all(old="<", new="%3C")
-    .replace_all(old=">", new="%3E")
-    .replace_all(old="\"", new="%22")
-    .replace_all(old="\n", new="%0A")
-    .replace_all(old="\r", new="%0D")
-  div(class~, [@html.img(src="data:image/svg+xml," + source, alt="")])
+/// `svg` as a `data:` URI for an `<img>`, so a logo's own fill colours stay
+/// intact regardless of stray ids in the optimized markup.
+fn svg_data_uri(svg : String) -> String {
+  "data:image/svg+xml," +
+  svg
+  .replace_all(old="%", new="%25")
+  .replace_all(old="#", new="%23")
+  .replace_all(old="<", new="%3C")
+  .replace_all(old=">", new="%3E")
+  .replace_all(old="\"", new="%22")
+  .replace_all(old="\n", new="%0A")
+  .replace_all(old="\r", new="%0D")
 }
 
 ///|
 /// The hero: Nib, optimized live, with a counter that runs from the
 /// original byte size down to the optimized one and a bar that shrinks to
-/// match. `start_count` no-ops under `prefers-reduced-motion`, so the
+/// match. `animate_count` no-ops under `prefers-reduced-motion`, so the
 /// server-rendered end state (the optimized size) is what a reduced-motion
 /// reader sees throughout.
 fn hero(emit : Emit[LandingMsg]) -> Html {
   let mascot = samples[0]
-  let output = run_optimize(mascot.svg)
+  let output = sample_view(0).outcome
   let kept = output.size.to_double() * 100.0 / output.original_size.to_double()
   div(
     class="wrap grid min-h-[calc(100svh-var(--nav-h))] grid-cols-1 content-center gap-12 py-16 max-sm:gap-6 max-sm:py-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center lg:gap-12",
@@ -163,8 +203,8 @@ fn hero(emit : Emit[LandingMsg]) -> Html {
           span(
             class="hero-line hero-line-2 accent",
             t(
-              "\{to_fixed(median_speedup(), 1)}× faster",
-              "快 \{to_fixed(median_speedup(), 1)} 倍",
+              "\{to_fixed(median_speedup, 1)}× faster",
+              "快 \{to_fixed(median_speedup, 1)} 倍",
             ),
           ),
         ]),
@@ -206,10 +246,7 @@ fn hero(emit : Emit[LandingMsg]) -> Html {
             [
               div(
                 class="bar-fill",
-                style=[
-                  "--kept: \{to_fixed(kept, 1)}%",
-                  "--kept-frac: \{to_fixed(kept / 100.0, 4)}",
-                ],
+                style=["--kept-frac: \{to_fixed(kept / 100.0, 4)}"],
                 nothing,
               ),
             ],
@@ -287,7 +324,7 @@ fn race_lane(
 fn faster_screen() -> Html {
   let median_js = median_bench_ms(r => r.js_ms)
   let median_mbt = median_bench_ms(r => r.mbt_ms)
-  let ratio = median_speedup()
+  let ratio = median_speedup
   div(class="wrap screen screen-band py-14 lg:py-24", id="faster", [
     div(
       class="reveal grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-center lg:gap-10",
@@ -334,16 +371,22 @@ fn faster_screen() -> Html {
 /// sample (see app/website/samples/SOURCES.md); the trademark note keeps the
 /// claim honest about what the samples are for.
 fn same_pixels_screen() -> Html {
-  let cards = [1, 2, 3].map(idx => {
-    let s = samples[idx]
-    let o = run_optimize(s.svg)
+  // every sample but Nib (the hero's), in gen.mjs's order
+  let logos = samples
+    .mapi((idx, s) => (idx, s))
+    .filter(it => it.1.name != "Nib")
+  let cards = logos.map(it => {
+    let (idx, s) = it
+    let o = sample_view(idx).outcome
     // Mistral's logo is a squarish mark; DeepSeek's and Qwen's are wide
     // wordmarks. object-fit:contain alone leaves the mark visually much
     // larger in the same tile, so each kind gets its own share of the
     // tile's width (see .logo-wordmark/.logo-mark in style.css).
-    let kind = if idx == 3 { "logo-mark" } else { "logo-wordmark" }
+    let kind = if s.name == "Mistral" { "logo-mark" } else { "logo-wordmark" }
     node("figure", Attrs::build().class("logo-card"), [
-      sample_preview(o.data, "logo-panel \{kind}"),
+      div(class="logo-panel \{kind}", [
+        @html.img(src=sample_view(idx).uri, alt=""),
+      ]),
       node("figcaption", Attrs::build(), [
         span(class="logo-name", s.name),
         span(class="logo-metrics", [
@@ -433,11 +476,9 @@ fn speed_row(row : BenchRow, axis_limit : Double) -> Html {
 
 ///|
 /// The collapsed "Benchmarks" detail: the full output-size table and the
-/// per-file speed chart that used to be their own landing sections, now
-/// reference material a reader opens on purpose.
+/// per-file speed chart, reference material a reader opens on purpose.
 fn benchmarks_details() -> Html {
-  let sorted = bench_rows.copy()
-  sorted.sort_by((a, b) => a.original.compare(b.original))
+  let sorted = bench_rows_by_size
   let rows = sorted.map(r => {
     tr([
       td(attrs=Attrs::build().title(r.file), [
@@ -473,10 +514,20 @@ fn benchmarks_details() -> Html {
       )
     })
     .join(" ")
-  let differences = sorted
+  let larger = sorted
     .filter(r => r.mbt > r.js)
     .map(r => "\{file_label(r.file)} +\{fmt_int(r.mbt - r.js)} B")
     .join(t(", ", "、"))
+  // each clause only when it has something to say (the data is refreshed
+  // by collect.mjs and may one day have no larger file)
+  let differences = if larger.is_empty() {
+    ""
+  } else {
+    t(
+      " svgo.mbt is larger on: \{larger}.",
+      "以下文件的 svgo.mbt 输出更大：\{larger}。",
+    )
+  }
   let mut maximum = 0.0
   for row in sorted {
     let ratio = row.js_ms / row.mbt_ms
@@ -505,8 +556,8 @@ fn benchmarks_details() -> Html {
       node("strong", Attrs::build(), [display_measure("0", "px")]),
       span(
         t(
-          "render difference across \{bench_rows.length()} tested samples",
-          "\{bench_rows.length()} 个测试样例的渲染差异",
+          "render difference on every sample this site shows; sub-pixel effects at most on the benchmark files",
+          "本站展示的每个样例的渲染差异；基准测试文件上至多只有亚像素级差异",
         ),
       ),
     ]),
@@ -523,8 +574,8 @@ fn benchmarks_details() -> Html {
           tr([
             th(t("Sample", "样例")),
             th(t("Original", "原始")),
-            th(t("svgo.mbt", "svgo.mbt")),
-            th(t("svgo", "svgo")),
+            th("svgo.mbt"),
+            th("svgo"),
             th(
               attrs=Attrs::build().title("svgo.mbt − svgo"),
               t("Δ vs svgo", "与 svgo 相差"),
@@ -536,14 +587,14 @@ fn benchmarks_details() -> Html {
       p(
         class="method-note table-note",
         t(
-          "svgo runs with moveGroupAttrsToElems off, the plugin set svgo.mbt runs by default. \{defaults} svgo.mbt is larger on: \{differences}.",
-          "svgo 关闭 moveGroupAttrsToElems，与 svgo.mbt 默认运行的插件集一致。\{defaults}以下文件的 svgo.mbt 输出更大：\{differences}。",
+          "svgo runs with moveGroupAttrsToElems off, the plugin set svgo.mbt runs by default.\{if defaults.is_empty() { "" } else { " " + defaults }}\{differences}",
+          "svgo 关闭 moveGroupAttrsToElems，与 svgo.mbt 默认运行的插件集一致。\{defaults}\{differences}",
         ),
       ),
     ]),
     div(class="speed-summary", [
       node("strong", Attrs::build(), [
-        display_measure(to_fixed(median_speedup(), 1), "×"),
+        display_measure(to_fixed(median_speedup, 1), "×"),
       ]),
       span(
         t(
@@ -589,7 +640,7 @@ fn benchmarks_details() -> Html {
       ),
       div(class="cli-bars", [
         div(class="cli-bar-row", [
-          span("svgo.mbt native"),
+          span(t("svgo.mbt native", "svgo.mbt 原生")),
           div(class="bars", [
             div(class="bar", style=["width: 6.25%"], [span("10 ms")]),
           ]),
@@ -617,6 +668,8 @@ fn benchmarks_details() -> Html {
 /// the CLI's units (1000-based, one decimal from 1 KB), then the plugins that
 /// changed it, wrapped at 76 columns like an 80-column terminal. The CLI's
 /// two-space left margin is dropped: the code block has its own padding.
+/// A copy of app/cli/report.mbt's format (the site cannot depend on the CLI
+/// module), exact for the KB-sized sample it shows; change both together.
 fn cli_report(file : String, r : Outcome) -> String {
   let size = (bytes : Int) => {
     if bytes < 1000 {
@@ -643,28 +696,17 @@ fn cli_report(file : String, r : Outcome) -> String {
 
 ///|
 fn install_screen(state : LandingState, emit : Emit[LandingMsg]) -> Html {
-  let tabs = [
-    t("JavaScript", "JavaScript"),
-    t("CLI", "CLI"),
-    t("MoonBit", "MoonBit"),
-  ].mapi((idx, label) => {
+  let tabs = ["JavaScript", "CLI", "MoonBit"].mapi((idx, label) => {
     button(
-      class="border-b-2 border-transparent px-3.5 py-2.5 font-mono text-sm text-ink-2 aria-pressed:border-mark aria-pressed:text-ink sm:px-5",
-      attrs=Attrs::build().aria_pressed(
-        if state.tab == idx {
-          "true"
-        } else {
-          "false"
-        },
-      ),
+      class="border-b-2 px-3.5 py-2.5 font-mono text-sm text-ink-2 aria-pressed:text-ink sm:px-5",
+      attrs=Attrs::build().aria_pressed((state.tab == idx).to_string()),
       on_click=emit(SelectTab(idx)),
       label,
     )
   })
   let content = match state.tab {
     1 => {
-      let sample = run_optimize(samples[0].svg)
-      let report = cli_report(samples[0].file, sample)
+      let report = cli_report(samples[0].file, sample_view(0).outcome)
       div(class="use", [
         p(
           t(
@@ -683,11 +725,11 @@ fn install_screen(state : LandingState, emit : Emit[LandingMsg]) -> Html {
           emit,
         ),
         p(class="mt-6 text-sm", t("Sample report", "示例报告")),
-        pre(class="whitespace-pre-wrap break-words", t(report, report)),
+        pre(class="whitespace-pre-wrap break-words", report),
         node("details", Attrs::build().class("flags"), [
           node(
             "summary",
-            Attrs::build(),
+            Attrs::build().class("plus"),
             t("All CLI flags", "全部 CLI 参数"),
           ),
           table(class="sizes cli-flags", [
@@ -697,7 +739,7 @@ fn install_screen(state : LandingState, emit : Emit[LandingMsg]) -> Html {
             tbody(
               cli_flags.map(f => {
                 tr([
-                  td([code(t(f.flag, f.flag))]),
+                  td([code(f.flag)]),
                   td(flag_description(f.flag, f.description, lang.val)),
                 ])
               }),
@@ -727,13 +769,7 @@ fn install_screen(state : LandingState, emit : Emit[LandingMsg]) -> Html {
             .aria_label(t("Package manager", "包管理器")),
           package_managers.mapi((idx, pm) => {
             button(
-              attrs=Attrs::build().aria_pressed(
-                if state.pm == idx {
-                  "true"
-                } else {
-                  "false"
-                },
-              ),
+              attrs=Attrs::build().aria_pressed((state.pm == idx).to_string()),
               on_click=emit(SelectPm(idx)),
               pm.0,
             )
@@ -796,8 +832,8 @@ fn install_screen(state : LandingState, emit : Emit[LandingMsg]) -> Html {
 
 ///|
 fn plugins_details() -> Html {
-  let all = @svgo.list_plugins()
-  let defaults = all.filter(item => item.2)
+  let all = all_plugins
+  let defaults = default_plugins
   let plugin = fn(number : String, item : (String, String, Bool)) -> Html {
     let (name, desc, _) = item
     let description = plugin_description(name, desc, lang.val)
@@ -811,20 +847,23 @@ fn plugins_details() -> Html {
       ),
     ])
   }
-  let plugins = defaults.mapi((idx, item) => {
-    plugin(if idx < 9 { "0\{idx + 1}" } else { "\{idx + 1}" }, item)
-  })
-  let optional = ["moveGroupAttrsToElems", "removeDimensions", "removeTitle"].map(name => {
-      let item = all.filter(item => item.0 == name)[0]
-      plugin("", item)
-    },
-  )
+  let plugins = defaults.mapi((idx, item) => plugin(pipeline_number(idx), item))
+  let optional = opt_in_plugins.map(item => plugin("", item))
+  let opt_in_list = opt_in_plugins
+    .map(it => {
+      if it.0 == svgo_default_opt_in {
+        t("\{it.0} (on by default in svgo)", "\{it.0}（svgo 默认开启）")
+      } else {
+        it.0
+      }
+    })
+    .join(t(", ", "、"))
   landing_details(t("\{all.length()} plugins", "\{all.length()} 个插件"), [
     p(
       class="section-intro pipeline-intro",
       t(
-        "\{defaults.length()} run by default, in svgo's preset-default order. \{all.length() - defaults.length()} are opt-in: moveGroupAttrsToElems (on by default in svgo), removeDimensions, removeTitle.",
-        "默认运行 \{defaults.length()} 个，顺序与 svgo preset-default 一致。\{all.length() - defaults.length()} 个可选：moveGroupAttrsToElems（svgo 默认开启）、removeDimensions、removeTitle。",
+        "\{defaults.length()} run by default, in svgo's preset-default order. \{opt_in_plugins.length()} are opt-in: \{opt_in_list}.",
+        "默认运行 \{defaults.length()} 个，顺序与 svgo preset-default 一致。\{opt_in_plugins.length()} 个可选：\{opt_in_list}。",
       ),
     ),
     div(class="pipeline-group", [
@@ -835,14 +874,9 @@ fn plugins_details() -> Html {
         class="pipeline-toggle",
       ),
       label(
-        class="pipeline-disclosure",
+        class="pipeline-disclosure plus",
         attrs=Attrs::build().for_("pipeline-expanded"),
         [
-          span(
-            class="pipeline-chevron",
-            attrs=Attrs::build().aria_hidden("true"),
-            "+",
-          ),
           text(
             t(
               "Show all \{all.length()} plugins",
@@ -864,13 +898,13 @@ fn plugins_details() -> Html {
 /// Landing page with local installation selection and copy feedback.
 pub fn landing_page(chrome : Chrome) -> Val[Html] {
   let initial : LandingState = { tab: 0, pm: 0, }
-  let mascot_output = run_optimize(samples[0].svg)
+  let mascot_output = sample_view(0).outcome
   let (state, emit) = @rabbita.create_state_with_init(
     init=fn(_) {
       (
         initial,
         @rabbita.effect(fn() noraise {
-          start_count(
+          animate_count(
             "hero-byte-count",
             mascot_output.original_size,
             mascot_output.size,
@@ -882,20 +916,13 @@ pub fn landing_page(chrome : Chrome) -> Val[Html] {
       match msg {
         SelectTab(tab) => ({ ..m, tab, }, none)
         SelectPm(pm) => ({ ..m, pm, }, none)
-        Copy(cmd) =>
-          (
-            m,
-            @rabbita.batch([
-              @rabbita.effect(fn() noraise { copy_text(cmd) }),
-              toast_success(t("Copied", "已复制")),
-            ]),
-          )
+        Copy(cmd) => (m, copy_with_toast(cmd, t("Copied", "已复制")))
       }
     },
   )
   state.view2(chrome.prefs, (m, p) => {
-    div(class="page pt-14", [
-      top_nav(Landing, "", p, chrome.emit),
+    div(class="page pt-(--nav-h)", [
+      top_nav(Landing, p, chrome.emit),
       node("main", Attrs::build(), [
         hero(emit),
         faster_screen(),

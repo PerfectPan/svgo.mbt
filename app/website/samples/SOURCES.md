@@ -11,5 +11,5 @@ owners, shown only as optimization samples; no affiliation or endorsement is imp
 | `qwen.svg` | Qwen logo | https://commons.wikimedia.org/wiki/File:Qwen_Logo.svg | Apache-2.0 per Commons; trademark of Alibaba Cloud |
 | `mistral.svg` | Mistral AI logo | https://commons.wikimedia.org/wiki/File:Mistral_AI_logo_(2025–).svg | public domain per Commons; trademark of Mistral AI |
 
-`node packages/compare/render-diff.mjs app/website/samples` must report 0 differing pixels
-for every file here; the landing page states it.
+`node packages/compare/render-diff.mjs app/website/samples --exact` must report 0 differing
+pixels for every file here (CI and `scripts/verify.sh --full` run it); the landing page states it.

@@ -58,7 +58,9 @@ fn chevron_icon() -> Html {
 ///|
 fn nav_link(href : String, label : String, current : Bool) -> Html {
   let attrs = Attrs::build()
-    .class("nav-link inline-flex items-center gap-1.5 p-2 text-sm text-ink-2")
+    .class(
+      "nav-link grow-line inline-flex items-center gap-1.5 p-2 text-sm text-ink-2",
+    )
     .href(href)
   let attrs = if current { attrs.aria_current("page") } else { attrs }
   node("a", attrs, label)
@@ -66,12 +68,7 @@ fn nav_link(href : String, label : String, current : Bool) -> Html {
 
 ///|
 /// Shared navigation. Native details keeps the narrow-screen menu keyboard accessible.
-pub fn top_nav(
-  route : Route,
-  _subtitle : String,
-  p : Prefs,
-  emit : Emit[PrefMsg],
-) -> Html {
+pub fn top_nav(route : Route, p : Prefs, emit : Emit[PrefMsg]) -> Html {
   let links = fn() -> Array[Html] {
     [
       nav_link(
@@ -79,39 +76,27 @@ pub fn top_nav(
         t("Playground", "在线体验"),
         route == Playground,
       ),
-      nav_link("#/api", t("API", "API"), route is Api(_)),
+      nav_link("#/api", "API", route is Api(_)),
       a(
-        class="nav-link inline-flex items-center gap-1.5 p-2 text-sm text-ink-2",
+        class="nav-link grow-line inline-flex items-center gap-1.5 p-2 text-sm text-ink-2",
         href=REPO_URL,
-        [github_icon(), text(t("GitHub", "GitHub"))],
+        [github_icon(), text("GitHub")],
       ),
       div(
-        class="segs mx-2 inline-flex overflow-hidden rounded-full border border-line [--thumb-bg:var(--color-paper-2)]",
+        class="segs mx-2 inline-flex overflow-hidden rounded-full border border-line",
         attrs=Attrs::build().data_set("slide", "fill"),
         [
           button(
-            class="seg px-2.75 py-1.75 text-xs text-muted transition-colors aria-pressed:bg-paper-2 aria-pressed:text-ink",
-            attrs=Attrs::build().aria_pressed(
-              if p.lang == En {
-                "true"
-              } else {
-                "false"
-              },
-            ),
+            class="seg px-2.75 py-1.75 text-xs text-muted transition-colors aria-pressed:text-paper",
+            attrs=Attrs::build().aria_pressed((p.lang == En).to_string()),
             on_click=emit(SetLang(En)),
-            t("EN", "EN"),
+            "EN",
           ),
           button(
-            class="seg px-2.75 py-1.75 text-xs text-muted transition-colors aria-pressed:bg-paper-2 aria-pressed:text-ink",
-            attrs=Attrs::build().aria_pressed(
-              if p.lang == Zh {
-                "true"
-              } else {
-                "false"
-              },
-            ),
+            class="seg px-2.75 py-1.75 text-xs text-muted transition-colors aria-pressed:text-paper",
+            attrs=Attrs::build().aria_pressed((p.lang == Zh).to_string()),
             on_click=emit(SetLang(Zh)),
-            t("中文", "中文"),
+            "中文",
           ),
         ],
       ),
@@ -130,59 +115,51 @@ pub fn top_nav(
     ]
   }
   nav(
-    class="nav fixed inset-x-0 top-0 z-20 h-14 border-b border-line bg-paper",
+    class="nav fixed inset-x-0 top-0 z-20 h-(--nav-h) border-b border-line bg-paper",
     [
-      div(class="wrap nav-inner flex h-14 items-center justify-between gap-4", [
-        a(
-          href="#/",
-          class="brand flex items-center gap-2.25 font-display text-xl font-semibold text-ink",
-          [
-            // nib.svg's figure fills about two-thirds of its viewBox, so the
-            // box is larger than the 28px mark and pulled in by margins
-            illustration(
-              "nib-logo",
-              class="nib-mark -mx-1.5 -my-2 size-10 flex-none",
-            ),
-            text(t("svgo.mbt", "svgo.mbt")),
-          ],
-        ),
-        // links, language and theme sit together on the right; the brand is
-        // the only thing on the left. No separate "Try it" CTA: the
-        // Playground link already is one.
-        div(class="ml-auto flex flex-none items-center gap-2", [
-          div(class="nav-links hidden items-center gap-2 sm:flex", links()),
-          node("details", Attrs::build().class("mobile-nav block sm:hidden"), [
-            node(
-              "summary",
-              Attrs::build().class(
-                "flex items-center gap-1.5 py-2 pl-4 font-mono text-sm",
+      div(
+        class="wrap nav-inner flex h-(--nav-h) items-center justify-between gap-4",
+        [
+          a(
+            href="#/",
+            class="brand flex items-center gap-2.25 font-display text-xl font-semibold text-ink",
+            [
+              // nib.svg's figure fills about two-thirds of its viewBox, so the
+              // box is larger than the 28px mark and pulled in by margins
+              illustration(
+                "nib-logo",
+                class="nib-mark -mx-1.5 -my-2 size-10 flex-none",
               ),
-              [text(t("Menu", "菜单")), chevron_icon()],
-            ),
-            div(
-              class="mobile-panel absolute inset-x-0 top-14 flex flex-wrap items-center gap-2 border-b border-line-2 bg-paper p-4",
-              links(),
+              text("svgo.mbt"),
+            ],
+          ),
+          // links, language and theme sit together on the right; the brand is
+          // the only thing on the left. No separate "Try it" CTA: the
+          // Playground link already is one.
+          div(class="ml-auto flex flex-none items-center gap-2", [
+            div(class="nav-links hidden items-center gap-2 sm:flex", links()),
+            node(
+              "details",
+              Attrs::build().class("mobile-nav block sm:hidden"),
+              [
+                node(
+                  "summary",
+                  Attrs::build().class(
+                    "flex items-center gap-1.5 py-2 pl-4 font-mono text-sm",
+                  ),
+                  [text(t("Menu", "菜单")), chevron_icon()],
+                ),
+                div(
+                  class="mobile-panel absolute inset-x-0 top-(--nav-h) flex flex-wrap items-center gap-2 border-b border-line-2 bg-paper p-4",
+                  links(),
+                ),
+              ],
             ),
           ]),
-        ]),
-      ]),
+        ],
+      ),
     ],
   )
-}
-
-///|
-/// Shared heading for reference and tool pages.
-pub fn page_head(
-  eyebrow : String,
-  title : Array[Html],
-  blurb : String,
-  inline? : Bool = false,
-) -> Html {
-  header(class=if inline { "pb-8 pt-14" } else { "wrap pb-8 pt-14" }, [
-    div(class="label", eyebrow),
-    h1(class="display mt-3 text-section", title),
-    p(class="mt-4 max-w-read text-base text-ink-2", blurb),
-  ])
 }
 
 ///|

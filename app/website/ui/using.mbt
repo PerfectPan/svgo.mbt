@@ -12,7 +12,6 @@ using @html {
   h2,
   h3,
   h4,
-  header,
   i,
   input,
   label,

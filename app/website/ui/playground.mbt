@@ -195,14 +195,7 @@ fn pg_update(
       } else {
         (recompute({ ..m, source: text, }), none)
       }
-    Copy =>
-      (
-        m,
-        @rabbita.batch([
-          @rabbita.effect(fn() noraise { copy_text(m.outcome.data) }),
-          toast_success(t("Copied", "已复制")),
-        ]),
-      )
+    Copy => (m, copy_with_toast(m.outcome.data, t("Copied", "已复制")))
     Download =>
       (
         m,
@@ -215,11 +208,8 @@ fn pg_update(
       (
         m,
         @rabbita.batch([
-          @rabbita.effect(fn() noraise {
-            replace_url(url)
-            copy_text(url)
-          }),
-          toast_success(t("Link copied", "链接已复制")),
+          @rabbita.effect(fn() noraise { replace_url(url) }),
+          copy_with_toast(url, t("Link copied", "链接已复制")),
         ]),
       )
     }
@@ -235,27 +225,17 @@ fn pg_update(
 /// replace the input, not how it's optimized, and tweening every keystroke
 /// would fight the editor's own responsiveness.
 fn tween_stats(old : Outcome, next : Outcome) -> @rabbita.Cmd {
-  @rabbita.effect(fn() noraise {
-    tween_int("pg-stat-in", old.original_size, next.original_size)
-    tween_int("pg-stat-out", old.size, next.size)
-  })
+  // after the render has written the new figures (see tween_int)
+  @cmd.custom_cmd(
+    _ => {
+      tween_int("pg-stat-in", old.original_size, next.original_size)
+      tween_int("pg-stat-out", old.size, next.size)
+    },
+    kind=@cmd.after_render,
+  )
 }
 
 ///|
-/// Zero-padded execution order, matching the landing page's pipeline sheet.
-fn pipeline_number(idx : Int) -> String {
-  if idx < 9 {
-    "0\{idx + 1}"
-  } else {
-    "\{idx + 1}"
-  }
-}
-
-///|
-/// Options + the numbered plugin pipeline. Collapses below the editors on
-/// narrow screens behind a checkbox-driven disclosure (no JS): the label
-/// acts as the summary and is hidden, the body forced visible again above
-/// 961 px (see style.css).
 /// One plugin's checkbox row; `number` is empty for the opt-in group, which
 /// isn't part of the numbered preset-default order (see `options_and_plugins`).
 fn plugin_row(
@@ -279,7 +259,8 @@ fn plugin_row(
     ]),
     // a fixed-width column, not inline after the name: a dot that shifts
     // the name around depending on whether it's there reads as punctuation,
-    // not a status marker (see the "●" legend in options_and_plugins)
+    // not a status marker (the heading's "N changed" count and the dot's
+    // title explain it)
     // always present and scaled to 0 when the plugin changed nothing, so
     // toggling a plugin pops the dot in and out rather than swapping nodes
     span(
@@ -316,18 +297,14 @@ fn camel_breaks(name : String) -> Array[Html] {
 }
 
 ///|
-/// Plugin names not in svgo's preset-default order (see the landing page's
-/// pipeline sheet, which uses this same split): the model everywhere on the
-/// site is 36 = 33 default + 3 opt-in.
-let opt_in_names : Array[String] = [
-  "moveGroupAttrsToElems", "removeDimensions", "removeTitle",
-]
-
-///|
+/// Options + the numbered plugin pipeline. Collapses below the editors on
+/// narrow screens behind a checkbox-driven disclosure (no JS), its label
+/// acting as the summary; from 961 px the label is hidden and the body
+/// always shown (see style.css).
 fn options_and_plugins(m : PgModel, emit : Emit[PgMsg]) -> Html {
-  let all = @svgo.list_plugins()
-  let defaults = all.filter(it => it.2)
-  let optional = opt_in_names.map(name => all.filter(it => it.0 == name)[0])
+  let all = all_plugins
+  let defaults = default_plugins
+  let optional = opt_in_plugins
   let applied = m.outcome.applied
   let plugin_rows = [
     ..defaults.mapi((idx, it) => plugin_row(pipeline_number(idx), it, m, emit)),
@@ -335,10 +312,10 @@ fn options_and_plugins(m : PgModel, emit : Emit[PgMsg]) -> Html {
     ..optional.map(it => plugin_row("", it, m, emit)),
   ]
   div(class="pg-side", [
-    input(input_type=Checkbox, id="pg-toggle", class="pg-toggle", hidden=true),
+    input(input_type=Checkbox, id="pg-toggle", class="pg-toggle sr-only"),
     label(
       for_="pg-toggle",
-      class="pg-side-summary lg:hidden",
+      class="pg-side-summary plus lg:hidden",
       t(
         "Options and plugins · \{m.enabled.length()}/\{all.length()}",
         "选项与插件 · \{m.enabled.length()}/\{all.length()}",
@@ -406,18 +383,6 @@ fn options_and_plugins(m : PgModel, emit : Emit[PgMsg]) -> Html {
             ),
           ],
         ),
-        if applied.is_empty() {
-          nothing
-        } else {
-          // the legend for the trailing dot column in the plugin list below:
-          // an actual `.applied` dot, the same size as the ones in the rows
-          // — a "●" glyph here would render at font-size (13px), visibly
-          // bigger than the 6px row dot it's meant to explain
-          p(class="mt-1 flex items-center gap-1.5 text-code text-ink-2", [
-            span(class="applied", nothing),
-            text(t("Changed this SVG", "已修改此 SVG")),
-          ])
-        },
       ]),
       div(class="pl-list-wrap", [div(class="pl-list", plugin_rows)]),
     ]),
@@ -432,23 +397,15 @@ fn toolbar(m : PgModel, emit : Emit[PgMsg]) -> Html {
   let tabs = samples.map(s => {
     button(
       class="chip flex-none",
-      attrs=Attrs::build().aria_selected(
-        if m.source == s.svg {
-          "true"
-        } else {
-          "false"
-        },
-      ),
+      attrs=Attrs::build().aria_selected((m.source == s.svg).to_string()),
       on_click=emit(LoadSample(s.name)),
       s.name,
     )
   })
   div(class="border-b border-line bg-surface-2", [
     div(
-      // one wrapping row at every width: below 961px "Share link" is a
-      // plain text action at the end of this same row (never its own
-      // indented row); from 961px it becomes the outlined button on the
-      // far right, as before.
+      // one row: the sample tabs (a select below 961px), Open file and
+      // Share; it wraps on narrow screens rather than clipping
       class="wrap flex flex-wrap items-center gap-2 py-2 lg:flex-nowrap lg:py-2.5",
       [
         // desktop: a chip per sample. Below 961px a chip row this wide
@@ -463,9 +420,24 @@ fn toolbar(m : PgModel, emit : Emit[PgMsg]) -> Html {
           select(
             class="pg-sample-select",
             on_change=emit.map(v => LoadSample(v)),
-            samples.map(s => {
-              option(value=s.name, selected=m.source == s.svg, s.name)
-            }),
+            // an edited, dropped or opened SVG matches no sample: say so,
+            // rather than showing the first sample, which then could not be
+            // picked (choosing the shown option fires no change)
+            [
+              if samples.iter().any(s => m.source == s.svg) {
+                nothing
+              } else {
+                option(
+                  value="",
+                  selected=true,
+                  disabled=true,
+                  t("Your SVG", "你的 SVG"),
+                )
+              },
+              ..samples.map(s => {
+                option(value=s.name, selected=m.source == s.svg, s.name)
+              }),
+            ],
           ),
         ]),
         // a 1px hairline + 16px gap on each side sets "Open file" apart from
@@ -474,51 +446,29 @@ fn toolbar(m : PgModel, emit : Emit[PgMsg]) -> Html {
           class="hidden h-5 w-px flex-none bg-line lg:mx-2 lg:block",
           nothing,
         ),
-        // outlined, the same style as "Share link" on both sides of 961px —
-        // two labels share the one hidden input below so it reaches
-        // whichever one is visible at the current width.
-        label(
-          class="btn btn-sm hidden flex-none lg:inline-flex",
-          for_="pg-file",
-          [
-            text(t("Open file", "打开文件")),
-            input(
-              id="pg-file",
-              input_type=File,
-              accept=".svg,image/svg+xml",
-              hidden=true,
-              on_change=emit.map(_ => FilePicked),
-            ),
-          ],
-        ),
-        // mobile: short enough to reuse the desktop copy as-is; the pill
-        // buttons plus the sample <select> share one 390px row (see the
-        // hidden input above, reused here via the same `for_`)
-        label(
-          class="btn btn-sm flex-none lg:hidden",
-          for_="pg-file",
-          t("Open file", "打开文件"),
-        ),
-        // mobile: Share, the same outlined small-button style as Open file
+        // the toolbar's two actions, outlined small buttons at every width;
+        // from 961px Share moves to the far right and says "Share link"
+        label(class="btn btn-sm flex-none", for_="pg-file", [
+          text(t("Open file", "打开文件")),
+          input(
+            id="pg-file",
+            input_type=File,
+            accept=".svg,image/svg+xml",
+            class="sr-only",
+            on_change=emit.map(_ => FilePicked),
+          ),
+        ]),
         button(
-          class="btn btn-sm flex-none lg:hidden",
+          class="btn btn-sm flex-none lg:ml-auto",
           title=t(
             "Copy a link with the current input and options", "复制包含当前输入和选项的链接",
           ),
           on_click=emit(Share),
-          t("Share", "分享"),
+          [
+            span(class="lg:hidden", t("Share", "分享")),
+            span(class="max-lg:hidden", t("Share link", "分享链接")),
+          ],
         ),
-        // desktop: the Share button, pushed to the right
-        div(class="hidden items-center gap-2 lg:ml-auto lg:flex", [
-          button(
-            class="btn btn-sm flex-none",
-            title=t(
-              "Copy a link with the current input and options", "复制包含当前输入和选项的链接",
-            ),
-            on_click=emit(Share),
-            t("Share link", "分享链接"),
-          ),
-        ]),
       ],
     ),
   ])
@@ -526,14 +476,17 @@ fn toolbar(m : PgModel, emit : Emit[PgMsg]) -> Html {
 
 ///|
 /// A code pane capped at ~200px below 961px, with a checkbox-driven
-/// `▸ expand` / `▾ collapse` control (no JS); always full height from
+/// "+ Show all" / "Collapse" control (no JS); always full height from
 /// 961px, where the control is hidden (see style.css). `view_class` places
 /// it in the desktop grid and tags it for the input/output code toggle.
 fn collapsible_code(id : String, view_class : String, body : Html) -> Html {
   div(class="code-collapse \{view_class}", [
-    input(input_type=Checkbox, id~, class="code-expand-toggle", hidden=true),
+    input(input_type=Checkbox, id~, class="code-expand-toggle sr-only"),
     div(class="code-collapse-body", [body]),
-    label(for_=id, class="code-expand-label lg:hidden", nothing),
+    label(for_=id, class="code-expand-label plus lg:hidden", [
+      span(class="code-expand-show", t("Show all", "显示全部")),
+      span(class="code-expand-hide", t("Collapse", "收起")),
+    ]),
   ])
 }
 
@@ -581,15 +534,15 @@ fn preview_bg_toggle(dark : Bool, emit : Emit[PgMsg]) -> Html {
       .aria_label(t("Preview background", "预览背景")),
     [
       button(
-        class="seg flex h-full items-center px-3 text-xs font-medium text-ink-2 transition-colors aria-pressed:bg-ink aria-pressed:text-paper",
-        attrs=Attrs::build().aria_pressed(if dark { "false" } else { "true" }),
+        class="seg flex h-full items-center px-3 text-xs font-medium text-ink-2 transition-colors aria-pressed:text-paper",
+        attrs=Attrs::build().aria_pressed((!dark).to_string()),
         title=t("Light preview background", "浅色预览背景"),
         on_click=emit(SetPreviewBg(Light)),
         t("Light", "浅色"),
       ),
       button(
-        class="seg flex h-full items-center px-3 text-xs font-medium text-ink-2 transition-colors aria-pressed:bg-ink aria-pressed:text-paper",
-        attrs=Attrs::build().aria_pressed(if dark { "true" } else { "false" }),
+        class="seg flex h-full items-center px-3 text-xs font-medium text-ink-2 transition-colors aria-pressed:text-paper",
+        attrs=Attrs::build().aria_pressed(dark.to_string()),
         title=t("Dark preview background", "深色预览背景"),
         on_click=emit(SetPreviewBg(Dark)),
         t("Dark", "深色"),
@@ -671,7 +624,7 @@ fn workbench(m : PgModel, emit : Emit[PgMsg], passes : String) -> Html {
               input_type=Radio,
               id="pg-view-before",
               name="pg-view",
-              hidden=true,
+              class="sr-only",
               checked=false,
             ),
             label(for_="pg-view-before", class="pg-view-tab", [
@@ -681,7 +634,7 @@ fn workbench(m : PgModel, emit : Emit[PgMsg], passes : String) -> Html {
               input_type=Radio,
               id="pg-view-after",
               name="pg-view",
-              hidden=true,
+              class="sr-only",
               checked=true,
             ),
             label(for_="pg-view-after", class="pg-view-tab", [
@@ -706,17 +659,15 @@ fn workbench(m : PgModel, emit : Emit[PgMsg], passes : String) -> Html {
               ]),
             ],
           ),
-          // desktop only: the background toggle overlaid on the top-right
-          // corner of the preview PAIR, spanning both grid columns — it
-          // controls both panes at once, so it no longer lives nested
-          // inside just the output preview (see .pg-preview-bg-row)
+          // desktop only: the background toggle over the top-right corner
+          // of the preview pair, spanning both columns, since it governs
+          // both panes (see .pg-preview-bg-row)
           div(class="pg-preview-bg-row", [
             div(class="pg-bg-overlay", [preview_bg_toggle(preview_dark, emit)]),
           ]),
           // mobile only: a quiet label over the code pane, matching whichever
-          // side the selector above picked; Copy/Download sit here too,
-          // beside the optimized source they act on (the background toggle
-          // moved onto the preview itself — see above)
+          // side the selector above picked; Copy/Download sit here, beside
+          // the optimized source they act on
           div(class="pane-label pg-src-label-input lg:hidden", [
             span(t("Original SVG source", "原始 SVG 源码")),
           ]),
@@ -768,8 +719,8 @@ fn pg_view(m : PgModel, p : Prefs, chrome : Chrome, emit : Emit[PgMsg]) -> Html 
   // disclosure comes first (collapsed), then the workbench (sticky stats,
   // preview, capped code); from 961px the same source order already puts
   // the disclosure in the left column, so no `order` override is needed here.
-  div(class="page pt-14", [
-    top_nav(Playground, t("playground", "在线体验"), p, chrome.emit),
+  div(class="page pt-(--nav-h)", [
+    top_nav(Playground, p, chrome.emit),
     toolbar(m, emit),
     div(
       class="wrap flex flex-col gap-4 py-4 lg:grid lg:h-[calc(100vh-var(--nav-h))] lg:min-h-160 lg:grid-cols-[var(--pg-sidebar-w)_minmax(0,1fr)]",

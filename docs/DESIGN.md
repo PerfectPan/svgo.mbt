@@ -72,8 +72,7 @@ app/website/samples`); a file that does not is not a sample. The benchmark corpu
   links, and the svgo credit.
 - Tool pages (playground) start with the tool: a thin toolbar (samples, open, share) and the
   workbench; on narrow screens the result comes first and the options follow.
-- Breakpoints: `--breakpoint-lg` 961 px (two-column layouts, the API sidebar), `--breakpoint-md`
-  800 px (reserved; nothing branches on it yet), `--breakpoint-sm` 640 px (compact nav, the stats
+- Breakpoints: `--breakpoint-lg` 961 px (two-column layouts, the API sidebar), `--breakpoint-sm` 640 px (compact nav, the stats
   bar's single row). Defined once in `style.css` `@theme`; use `sm:`/`md:`/`lg:`/`max-sm:`/
   `max-lg:`, never `min-[…px]:`/`max-[…px]:`.
 
@@ -135,7 +134,7 @@ Tokens in `style.css` `@theme`, dark palette under `[data-theme="dark"]`; use to
 Light: `paper` cream page, `paper-2` a slightly deeper cream for a screen that needs separation,
 `card` the white tile behind logos,
 `ink` warm near-black text, `ink-2` secondary, `muted` captions, `line` hairlines, `mark` coral:
-the primary CTA, the saved amount and the svgo.mbt bar, `mark-soft` its tint. Teal appears only
+the primary CTA, the saved amount and the svgo.mbt bar. Teal appears only
 inside Nib. Dark theme is warm (brown-black paper, cream ink), not blue-black; coral stays. Nib
 (hero, nav logo, illustrations, favicon) keeps its own colours in both themes: no dark variant;
 on the dark paper it gets a thin cream sticker rim (a filter) so the ink outline and antenna show.

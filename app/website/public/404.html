@@ -31,15 +31,15 @@
      returning visitor sees the language they last chose rather than both
      at once; English is the default before the script runs. */
   :lang(zh) .en, :lang(en) .zh { display: none; }
-  @media (prefers-color-scheme: dark) {
-    body { color: #f7ede3; background: #1c1613; }
-    p { color: #d8c8bc; }
-    a { color: #ff8a6b; }
-    /* the same sticker rim as the site's dark theme: Nib keeps its ink */
-    .nib svg { filter: drop-shadow(2px 0 0 #f7ede3) drop-shadow(-2px 0 0 #f7ede3) drop-shadow(0 2px 0 #f7ede3) drop-shadow(0 -2px 0 #f7ede3); }
-  }
+  /* dark when the visitor chose it on the site (svgo-theme, set by the
+     script below), exactly like the main app, not by the system setting */
+  [data-theme="dark"] body { color: #f7ede3; background: #1c1613; }
+  [data-theme="dark"] p { color: #d8c8bc; }
+  [data-theme="dark"] a { color: #ff8a6b; }
+  /* the same sticker rim as the site's dark theme: Nib keeps its ink */
+  [data-theme="dark"] .nib svg { filter: drop-shadow(2px 0 0 #f7ede3) drop-shadow(-2px 0 0 #f7ede3) drop-shadow(0 2px 0 #f7ede3) drop-shadow(0 -2px 0 #f7ede3); }
 </style>
-<script>(function () { try { var l = localStorage.getItem("svgo-lang"); if (l !== "en" && l !== "zh") l = (navigator.language || "en").toLowerCase().indexOf("zh") === 0 ? "zh" : "en"; document.documentElement.lang = l; } catch (e) {} })();</script>
+<script>(function () { try { if (localStorage.getItem("svgo-theme") === "dark") document.documentElement.dataset.theme = "dark"; var l = localStorage.getItem("svgo-lang"); if (l !== "en" && l !== "zh") l = (navigator.language || "en").toLowerCase().indexOf("zh") === 0 ? "zh" : "en"; document.documentElement.lang = l; } catch (e) {} })();</script>
 </head>
 <body>
 <div class="wrap">
@@ -47,7 +47,6 @@
   <h1><span class="en">This page does not exist</span><span class="zh">页面不存在</span></h1>
   <p><a href="https://perfectpan.github.io/svgo.mbt/"><span class="en">Back to svgo.mbt →</span><span class="zh">返回 svgo.mbt →</span></a></p>
 </div>
-<noscript><meta http-equiv="refresh" content="0; url=https://perfectpan.github.io/svgo.mbt/"></noscript>
 <script>
   (function () {
     var path = location.pathname;

@@ -119,3 +119,40 @@ pub fn run_optimize(
     error: "",
   }
 }
+
+///|
+/// svgo.mbt's plugins as (name, description, on by default).
+let all_plugins : Array[(String, String, Bool)] = @svgo.list_plugins()
+
+///|
+/// The default plugins, in svgo's preset-default order.
+let default_plugins : Array[(String, String, Bool)] = all_plugins.filter(it => {
+  it.2
+})
+
+///|
+/// The one opt-in plugin svgo itself runs by default; the site lists it
+/// first and says so.
+let svgo_default_opt_in : String = "moveGroupAttrsToElems"
+
+///|
+/// The opt-in plugins as the site lists them (the playground's plugin
+/// column and the landing page's pipeline sheet): `svgo_default_opt_in`
+/// first, then the rest in the library's order.
+let opt_in_plugins : Array[(String, String, Bool)] = {
+  let optional = all_plugins.filter(it => !it.2)
+  [
+    ..optional.filter(it => it.0 == svgo_default_opt_in),
+    ..optional.filter(it => it.0 != svgo_default_opt_in),
+  ]
+}
+
+///|
+/// A plugin's zero-padded position in the default pipeline.
+fn pipeline_number(idx : Int) -> String {
+  if idx < 9 {
+    "0\{idx + 1}"
+  } else {
+    "\{idx + 1}"
+  }
+}

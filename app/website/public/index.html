@@ -22,7 +22,7 @@
 <meta name="twitter:image:alt" content="svgo.mbt: Smaller SVGs. Same pixels. The Nib mascot, 5,713 B struck through, 2,350 B">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="./style.css">
-<script>(function () { try { var h = document.documentElement; if (localStorage.getItem("svgo-theme") === "dark") h.dataset.theme = "dark"; var l = localStorage.getItem("svgo-lang"); if (l !== "en" && l !== "zh") l = (navigator.language || "en").toLowerCase().indexOf("zh") === 0 ? "zh" : "en"; h.lang = l; if (!matchMedia("(prefers-reduced-motion: reduce)").matches) h.classList.add("motion"); } catch (e) {} })();</script>
+<script>(function () { try { var h = document.documentElement; if (localStorage.getItem("svgo-theme") === "dark") h.dataset.theme = "dark"; var l = localStorage.getItem("svgo-lang"); if (l !== "en" && l !== "zh") l = (navigator.language || "en").toLowerCase().indexOf("zh") === 0 ? "zh" : "en"; h.lang = l; if (!matchMedia("(prefers-reduced-motion: reduce)").matches && "IntersectionObserver" in window) { h.classList.add("motion"); setTimeout(function () { if (!h.hasAttribute("data-motion-ready")) h.classList.remove("motion"); }, 4000); } } catch (e) {} })();</script>
 <script src="./index.js" type="module"></script>
 </head>
 <body>

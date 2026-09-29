@@ -3,12 +3,11 @@ import {
   "moonbit-community/rabbita/html",
   "moonbit-community/rabbita/sub",
   "moonbit-community/rabbita/cmd",
+  "moonbit-community/rabbita/clipboard",
   "moonbit-community/rabbita/nav",
   "moonbit-community/rabbita/url",
-  "moonbit-community/rabbita/js",
   "moonbit-community/rui",
   "PerfectPan/svgo",
-  "moonbitlang/core/math",
   "moonbitlang/core/string",
 }
 

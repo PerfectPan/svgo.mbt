@@ -118,33 +118,44 @@ priv enum ApiMsg {
 }
 
 ///|
-/// A signature block with a text "copy" action, kept only for signatures of
-/// two lines or more — a one-liner is short enough to select by hand, and a
-/// copy link on every row was noise; the confirmation is the site toast.
-/// A zero-width space after `(` and after each `, ` — invisible characters
-/// the highlighter just colours as ordinary punctuation and passes
-/// through unchanged, but they give the browser a wrap point at an
-/// argument boundary. Only for one-line signatures: a multi-line struct
-/// already has its own real line breaks and manual field indent, which
-/// this would double up on.
-fn break_points(sig : String) -> String {
-  sig
-  .replace_all(old="(", new="(\u{200B}")
-  .replace_all(old=", ", new=", \u{200B}")
+/// A one-line signature, highlighted, with a `<wbr>` after `(` and after
+/// each `, `: the browser may wrap it at an argument boundary, and unlike a
+/// zero-width space nothing extra lands in the text a reader copies by hand.
+/// Multi-line blocks keep their own line breaks and field indent instead.
+fn highlight_one_line(sig : String) -> Array[Html] {
+  let pieces : Array[String] = []
+  let mut start = 0
+  let chars = sig.to_array()
+  for i, c in chars {
+    let cut = c == '(' || (c == ' ' && i > 0 && chars[i - 1] == ',')
+    if cut {
+      pieces.push(String::from_array(chars[start:i + 1]))
+      start = i + 1
+    }
+  }
+  pieces.push(String::from_array(chars[start:]))
+  let out : Array[Html] = []
+  for i, piece in pieces {
+    if i > 0 {
+      out.push(@html.wbr())
+    }
+    out.push_iter(highlight_mbt(piece).iter())
+  }
+  out
 }
 
 ///|
-/// `overlay_copy` renders the corner "copy" action on a multi-line block.
-/// A member's own top-level declaration turns it off — that action moved to
-/// the heading row instead (see `api_member`'s `member-actions`) — while a
-/// method's signature and the usage example keep their own.
+/// A signature block. A multi-line one is a card with a corner "copy"
+/// (`overlay_copy`; a one-liner is short enough to select by hand); a
+/// member's own top-level declaration turns it off, its copy sits on the
+/// heading row (`api_member`'s `member-actions`), while a method's
+/// signature and the usage example keep theirs.
 fn sig_block(
   signature : String,
   emit : Emit[ApiMsg],
   overlay_copy? : Bool = true,
 ) -> Html {
   let multiline = signature.contains("\n")
-  let display = if multiline { signature } else { break_points(signature) }
   let show_button = multiline && overlay_copy
   let card_class = if multiline {
     if show_button {
@@ -156,7 +167,13 @@ fn sig_block(
     "sig"
   }
   div(class=card_class, [
-    pre(highlight_mbt(display)),
+    pre(
+      if multiline {
+        highlight_mbt(signature)
+      } else {
+        highlight_one_line(signature)
+      },
+    ),
     if show_button {
       button(
         class="sig-copy",
@@ -206,10 +223,8 @@ fn api_member(pkg : ApiPackage, it : ApiItem, emit : Emit[ApiMsg]) -> Html {
     None => ""
   }
   let id = anchor(pkg, it.name)
-  // "copy · source" together on the right of the heading row: copy acts on
-  // this member's own signature, so it moved out of the signature card
-  // itself (see sig_block's overlay_copy) rather than doubling as a second
-  // right-aligned label under it.
+  // "copy · source" together on the right of the heading row; copy acts on
+  // this member's signature (so its card has no corner copy of its own)
   let actions = [
     button(class="src", on_click=emit(Copy(it.signature)), t("copy", "复制")),
     if it.file.is_empty() {
@@ -298,15 +313,10 @@ fn table_of_contents(pkg : ApiPackage) -> Html {
     }
   }
   div(class="api-toc", [
-    input(
-      input_type=Checkbox,
-      id="api-toc-toggle",
-      class="pg-toggle",
-      hidden=true,
-    ),
+    input(input_type=Checkbox, id="api-toc-toggle", class="sr-only"),
     label(
       for_="api-toc-toggle",
-      class="lg:hidden",
+      class="plus lg:hidden",
       t(
         "On this page (\{pkg.items.length()})",
         "本页内容（\{pkg.items.length()}）",
@@ -356,14 +366,7 @@ pub fn api_page(chrome : Chrome, name : String) -> Val[Html] {
     _,
   ) => {
     match msg {
-      Copy(text) =>
-        (
-          m,
-          @rabbita.batch([
-            @rabbita.effect(fn() noraise { copy_text(text) }),
-            toast_success(t("Copied", "已复制")),
-          ]),
-        )
+      Copy(text) => (m, copy_with_toast(text, t("Copied", "已复制")))
     }
   })
   state.view2(chrome.prefs, (_, prefs) => {
@@ -373,7 +376,7 @@ pub fn api_page(chrome : Chrome, name : String) -> Val[Html] {
     // header, so the two-column grid starts at the very top of the page and
     // never changes shape partway down.
     let content : Array[Html] = [
-      h1(class="display text-page", t("MoonBit API", "MoonBit API")),
+      h1(class="display text-page", "MoonBit API"),
       div(class="mt-3 flex flex-wrap items-baseline gap-2 text-sm text-ink-2", [
         code(class="text-code text-muted", pkg.short),
         span("·"),
@@ -444,8 +447,8 @@ pub fn api_page(chrome : Chrome, name : String) -> Val[Html] {
         content.push(api_member(pkg, it, emit))
       }
     }
-    div(class="page pt-14", [
-      top_nav(Api(short_name(pkg)), "API", prefs, chrome.emit),
+    div(class="page pt-(--nav-h)", [
+      top_nav(Api(short_name(pkg)), prefs, chrome.emit),
       div(
         class="wrap grid gap-10 pb-20 pt-14 lg:grid-cols-[var(--api-side-w)_minmax(0,var(--api-main-w))]",
         [side_nav(pkg), main_(class="api-main min-w-0", content)],

@@ -78,6 +78,14 @@ fn toast_success(title : String) -> @rabbita.Cmd {
 }
 
 ///|
+/// Copies `text` and confirms with the success toast once the clipboard has
+/// it (nothing is shown if the browser refuses): every copy and share
+/// action goes through here.
+fn copy_with_toast(text : String, title : String) -> @rabbita.Cmd {
+  @clipboard.copy(@clipboard.Item::Text(text), copied=toast_success(title))
+}
+
+///|
 priv struct AppModel {
   route : Route
   prefs : Prefs
@@ -153,20 +161,33 @@ pub fn app() -> Val[Html] {
               parse_api_path(f).1.map(item => "\{pkg}-\{item}")
             _ => None
           }
+          // arriving on another page plays its entrance (see mark_routed);
+          // after the render, so the page already shown never replays it
+          let entered = if route == m.route {
+            none
+          } else {
+            @cmd.custom_cmd(_ => mark_routed(), kind=@cmd.after_render)
+          }
           match target {
             Some(id) =>
               (
                 { ..m, route, },
-                @rabbita.effect(fn() noraise {
-                  scroll_to_id(id)
-                  highlight_id(id)
-                }),
+                @rabbita.batch([
+                  entered,
+                  @rabbita.effect(fn() noraise {
+                    scroll_to_id(id)
+                    highlight_id(id)
+                  }),
+                ]),
               )
             None =>
               if route == m.route {
                 (m, none)
               } else {
-                ({ ..m, route, }, @nav.scroll_to_top())
+                (
+                  { ..m, route, },
+                  @rabbita.batch([entered, @nav.scroll_to_top()]),
+                )
               }
           }
         }

@@ -753,7 +753,7 @@ fn style_text(doc : @xml.Document) -> String {
 /// group have no effect on the group's children.
 let remove_non_inheritable_group_attrs : Plugin = {
   name: "removeNonInheritableGroupAttrs",
-  description: "removes non-inheritable group's presentational attributes",
+  description: "remove non-inheritable group's presentational attributes",
   run: (doc, _) => {
     let tables = svg_tables()
     let presentation = match tables.attr_groups.get("presentation") {
@@ -802,7 +802,7 @@ fn parse_enable_background_new(value : String) -> (String, String)? {
 /// `new`. Inline `style` declarations are handled the same way.
 let cleanup_enable_background : Plugin = {
   name: "cleanupEnableBackground",
-  description: "remove or cleanup enable-background attribute when possible",
+  description: "remove or clean up enable-background attribute when possible",
   run: (doc, _) => {
     let mut has_filter = false
     let mut has_enable_background = false
@@ -931,7 +931,7 @@ fn css_attribute_names(css : String) -> Set[String] {
 /// `xml:lang` attribute is removed when a `lang` attribute is also present.
 let remove_deprecated_attrs : Plugin = {
   name: "removeDeprecatedAttrs",
-  description: "removes deprecated attributes",
+  description: "remove deprecated attributes",
   run: (doc, ctx) => {
     let tables = svg_tables()
     let remove_unsafe = ctx.param_bool("removeUnsafe", false)

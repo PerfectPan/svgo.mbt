@@ -175,17 +175,11 @@ fn pg_update(
     FilePicked =>
       (
         m,
-        @rabbita.attempt(
-          res => {
-            match res {
-              Ok(text) => emit(FileLoaded(text))
-              Err(_) => none
-            }
-          },
-          async fn() {
-            @js.suspend((resolve, _) => read_first_file("pg-file", resolve))
-          },
-        ),
+        @cmd.custom_cmd(scheduler => {
+          read_first_file("pg-file", text => {
+            scheduler.add(emit(FileLoaded(text)))
+          })
+        }),
       )
     FileLoaded(text) =>
       if text.is_empty() {

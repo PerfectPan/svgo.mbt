@@ -3,7 +3,7 @@ name = "PerfectPan/svgo-website"
 version = "0.1.0"
 
 import {
-  "moonbit-community/rabbita@0.15.6",
+  "moonbit-community/rabbita@0.16.3",
   "PerfectPan/svgo@0.3.0",
 }
 

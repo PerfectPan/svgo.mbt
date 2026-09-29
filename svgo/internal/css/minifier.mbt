@@ -5,6 +5,7 @@
 /// - Semicolon deduplication and trailing semicolon omission
 /// - Merging 4-part TRBL box-properties (e.g., margin: 1em 1em 1em 1em -> margin: 1em)
 /// - Shortening hex colors (#ffffff -> #fff)
+/// - Packing numbers like csso (0.50 -> .5, 6.000 -> 6, 0px -> 0)
 /// - Removing unused selectors/rules when element usage is provided
 
 ///|
@@ -137,7 +138,262 @@ pub fn minify_value(prop : String, val : String) -> String {
       return sb.to_string()
     }
   }
-  v
+  if prop.has_prefix("--") {
+    // Custom property values are opaque token lists (csso keeps them raw).
+    return v
+  }
+  pack_numbers(prop, v)
+}
+
+///|
+/// Length units whose zero value may drop the unit, as in csso's Dimension.
+let zero_length_units : Set[String] = Set([
+  "px", "mm", "cm", "in", "pt", "pc", "em", "ex", "ch", "rem", "vh", "vw", "vmin",
+  "vmax", "vm",
+])
+
+///|
+/// csso's packNumber: `+1.50` -> `1.5`, `0.50` -> `.5`, `-0.0` -> `0`.
+/// Numbers with an exponent stay as they are, like csso's regexp leaves them.
+fn pack_number(num : StringView) -> String {
+  let mut i = 0
+  let mut neg = false
+  if num[0] == '+' || num[0] == '-' {
+    neg = num[0] == '-'
+    i = 1
+  }
+  let int_start = i
+  while i < num.length() && num[i] >= '0' && num[i] <= '9' {
+    i += 1
+  }
+  let int_end = i
+  let mut frac_start = i
+  let mut frac_end = i
+  if i < num.length() && num[i] == '.' {
+    frac_start = i + 1
+    i += 1
+    while i < num.length() && num[i] >= '0' && num[i] <= '9' {
+      i += 1
+    }
+    frac_end = i
+  }
+  if i < num.length() {
+    // exponent
+    return num.to_owned()
+  }
+  let mut s = int_start
+  while s < int_end && num[s] == '0' {
+    s += 1
+  }
+  let mut e = frac_end
+  while e > frac_start && num[e - 1] == '0' {
+    e -= 1
+  }
+  if s == int_end && e == frac_start {
+    return "0"
+  }
+  let sb = StringBuilder()
+  if neg {
+    sb.write_char('-')
+  }
+  sb.write_string(num[s:int_end].to_owned())
+  if e > frac_start {
+    sb.write_char('.')
+    sb.write_string(num[frac_start:e].to_owned())
+  }
+  sb.to_string()
+}
+
+///|
+fn is_ascii_digit(c : UInt16) -> Bool {
+  c >= '0' && c <= '9'
+}
+
+///|
+fn is_word_char(c : UInt16) -> Bool {
+  (c >= 'a' && c <= 'z') ||
+  (c >= 'A' && c <= 'Z') ||
+  is_ascii_digit(c) ||
+  c == '_' ||
+  c == '-' ||
+  c == '\\' ||
+  c >= 0x80
+}
+
+///|
+/// Whether a CSS number token starts at `i`: a digit, `.digit`, or a sign
+/// followed by either.
+fn number_starts_at(v : String, i : Int) -> Bool {
+  let n = v.length()
+  let mut j = i
+  if v[j] == '+' || v[j] == '-' {
+    j += 1
+  }
+  if j < n && is_ascii_digit(v[j]) {
+    return true
+  }
+  j + 1 < n && v[j] == '.' && is_ascii_digit(v[j + 1])
+}
+
+///|
+/// Rewrites number, dimension and percentage tokens of a declaration value the
+/// way csso does: packed numbers, and zero lengths without their unit outside
+/// `flex` and math functions. Strings, `url()`, `var()`, hashes and identifiers
+/// are copied verbatim. A token is rewritten only when it stands alone (after a
+/// separator and not followed by `.`), where csso's output cannot re-tokenize
+/// differently; csso also rewrites glued tokens such as `1-0.5`, and would
+/// split `Foo2.0` into `Foo2 0`, which this skips.
+fn pack_numbers(prop : String, v : String) -> String {
+  let n = v.length()
+  // Cheap exit: nothing to pack without a digit.
+  let mut has_digit = false
+  for i in 0..<n {
+    if is_ascii_digit(v[i]) {
+      has_digit = true
+      break
+    }
+  }
+  if !has_digit {
+    return v
+  }
+  let lower_prop = prop.to_lower()
+  let keep_zero_unit = lower_prop == "flex" || lower_prop == "-ms-flex"
+  let sb = StringBuilder()
+  // Enclosing function names, lowercased; "" for a bare parenthesis.
+  let funcs : Array[String] = []
+  // Depth inside url()/var(), whose contents are copied verbatim.
+  let mut verbatim_depth = 0
+  let mut i = 0
+  while i < n {
+    let c = v[i]
+    if c == '"' || c == '\'' {
+      let start = i
+      i += 1
+      while i < n && v[i] != c {
+        if v[i] == '\\' {
+          i += 1
+        }
+        i += 1
+      }
+      i = if i < n { i + 1 } else { n }
+      sb.write_string(v[start:i].to_owned())
+      continue
+    }
+    if c == '(' {
+      funcs.push("")
+      if verbatim_depth > 0 {
+        verbatim_depth += 1
+      }
+      sb.write_char('(')
+      i += 1
+      continue
+    }
+    if c == ')' {
+      funcs.pop() |> ignore
+      if verbatim_depth > 0 {
+        verbatim_depth -= 1
+      }
+      sb.write_char(')')
+      i += 1
+      continue
+    }
+    if verbatim_depth == 0 && number_starts_at(v, i) {
+      let prev : UInt16 = if i == 0 { ' ' } else { v[i - 1] }
+      let standalone = prev == ' ' ||
+        prev == '\t' ||
+        prev == '\n' ||
+        prev == '\r' ||
+        prev == ',' ||
+        prev == '/' ||
+        prev == '(' ||
+        prev == '*'
+      let start = i
+      if v[i] == '+' || v[i] == '-' {
+        i += 1
+      }
+      while i < n && is_ascii_digit(v[i]) {
+        i += 1
+      }
+      if i + 1 < n && v[i] == '.' && is_ascii_digit(v[i + 1]) {
+        i += 1
+        while i < n && is_ascii_digit(v[i]) {
+          i += 1
+        }
+      }
+      if i + 1 < n && (v[i] == 'e' || v[i] == 'E') {
+        let mut j = i + 1
+        if v[j] == '+' || v[j] == '-' {
+          j += 1
+        }
+        if j < n && is_ascii_digit(v[j]) {
+          i = j
+          while i < n && is_ascii_digit(v[i]) {
+            i += 1
+          }
+        }
+      }
+      let num_end = i
+      let mut unit_ok = true
+      if i < n && v[i] == '%' {
+        i += 1
+      } else if i < n &&
+        ((v[i] >= 'a' && v[i] <= 'z') || (v[i] >= 'A' && v[i] <= 'Z')) {
+        while i < n && is_word_char(v[i]) {
+          if !((v[i] >= 'a' && v[i] <= 'z') || (v[i] >= 'A' && v[i] <= 'Z')) {
+            unit_ok = false
+          }
+          i += 1
+        }
+      } else if i < n && (is_word_char(v[i]) || v[i] == '.') {
+        unit_ok = false
+      }
+      if !standalone || !unit_ok {
+        sb.write_string(v[start:i].to_owned())
+        continue
+      }
+      let packed = pack_number(v[start:num_end])
+      let unit = v[num_end:i]
+      sb.write_string(packed)
+      let drop_unit = packed == "0" &&
+        !keep_zero_unit &&
+        zero_length_units.contains(unit.to_owned().to_lower()) &&
+        (match funcs.last() {
+          Some(f) => f != "calc" && f != "min" && f != "max" && f != "clamp"
+          None => true
+        })
+      if !drop_unit {
+        sb.write_string(unit.to_owned())
+      }
+      continue
+    }
+    if c == '#' || is_word_char(c) {
+      let start = i
+      i += 1
+      while i < n && is_word_char(v[i]) {
+        if v[i] == '\\' && i + 1 < n {
+          i += 1
+        }
+        i += 1
+      }
+      let word = v[start:i].to_owned()
+      if i < n && v[i] == '(' {
+        let name = word.to_lower()
+        funcs.push(name)
+        if verbatim_depth > 0 || name == "url" || name == "var" {
+          verbatim_depth += 1
+        }
+        sb.write_string(word)
+        sb.write_char('(')
+        i += 1
+        continue
+      }
+      sb.write_string(word)
+      continue
+    }
+    sb.write_char(c.to_int().unsafe_to_char())
+    i += 1
+  }
+  sb.to_string()
 }
 
 ///|

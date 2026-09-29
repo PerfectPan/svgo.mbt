@@ -24,7 +24,7 @@ beyond sub-pixel precision effects on the benchmark corpus.
 
 Nib, the mascot above, is a path drawn with its anchor points showing, and a sample too: the copy
 on the website's first screen carries the metadata a vector editor leaves behind and shrinks from
-5,713 B to 2,350 B with the same pixels.
+5,713 B to 2,298 B with the same pixels.
 
 ## Quickstart
 

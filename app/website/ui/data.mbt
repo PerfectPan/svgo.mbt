@@ -21,12 +21,12 @@ pub let wasm_bytes : Int = 188316
 pub let bench_rows : Array[BenchRow] = [
   { file: "figma-export.svg", original: 570, mbt: 442, js: 442, js_default: 442, mbt_ms: 0.158, js_ms: 0.265 },
   { file: "illustrator-logo.svg", original: 1149, mbt: 528, js: 528, js_default: 528, mbt_ms: 0.141, js_ms: 0.551 },
-  { file: "inkscape-drawing.svg", original: 2078, mbt: 641, js: 640, js_default: 640, mbt_ms: 0.165, js_ms: 0.637 },
+  { file: "inkscape-drawing.svg", original: 2078, mbt: 640, js: 640, js_default: 640, mbt_ms: 0.165, js_ms: 0.637 },
   { file: "sketch-icon.svg", original: 836, mbt: 276, js: 288, js_default: 288, mbt_ms: 0.095, js_ms: 0.286 },
   { file: "Ghostscript_Tiger.svg", original: 68630, mbt: 52690, js: 52029, js_default: 68101, mbt_ms: 10.096, js_ms: 41.113 },
   { file: "Python_logo_and_wordmark.svg", original: 5419, mbt: 4562, js: 4551, js_default: 4551, mbt_ms: 0.741, js_ms: 2.647 },
   { file: "React-icon.svg", original: 366, mbt: 302, js: 302, js_default: 302, mbt_ms: 0.059, js_ms: 0.163 },
   { file: "SVG_logo.svg", original: 4019, mbt: 3546, js: 3584, js_default: 3584, mbt_ms: 0.47, js_ms: 1.695 },
   { file: "Tux.svg", original: 49983, mbt: 35975, js: 35983, js_default: 35983, mbt_ms: 5.679, js_ms: 12.833 },
-  { file: "World_map_-_low_resolution.svg", original: 84823, mbt: 46700, js: 46706, js_default: 46706, mbt_ms: 10.605, js_ms: 50.433 },
+  { file: "World_map_-_low_resolution.svg", original: 84823, mbt: 46699, js: 46706, js_default: 46706, mbt_ms: 10.605, js_ms: 50.433 },
 ]

@@ -209,7 +209,7 @@
     {
       "file": "inkscape-drawing.svg",
       "original": 2078,
-      "mbt": 641,
+      "mbt": 640,
       "js": 640,
       "jsDefault": 640,
       "mbtMs": 0.165,
@@ -279,7 +279,7 @@
     {
       "file": "World_map_-_low_resolution.svg",
       "original": 84823,
-      "mbt": 46700,
+      "mbt": 46699,
       "js": 46706,
       "jsDefault": 46706,
       "mbtMs": 10.605,

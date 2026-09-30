@@ -270,13 +270,19 @@ token from `~/.moon/credentials.json` is the repository secret
 
 `main` is protected by a repository ruleset on GitHub (pull requests, rebase
 or squash, linear history, required `verify (ubuntu-latest)` and
-`verify (macos-latest)`). `./scripts/configure-github-repository.sh --repo PerfectPan/svgo.mbt`
-previews the template's classic branch protection (one approving review, last
-push approval, admins included, resolved conversations, and the `Review`
-checks); `--apply` writes it on top of the ruleset and needs an admin account.
-To require the `Review` checks without the review requirement, add
-`repository checks`, `conventional PR title` and `PR description` to the
-ruleset's required status checks instead.
+`verify (macos-latest)`). The `Review` workflow's checks, `repository checks`,
+`conventional PR title` and `PR description`, belong in that ruleset's required
+status checks; add them by editing the ruleset in the repository settings or
+through `gh api repos/PerfectPan/svgo.mbt/rulesets/<id>` (needs an admin
+account). `scripts/configure-github-repository.sh` writes classic branch
+protection instead; on this repository it would duplicate the ruleset, so use
+it only if the ruleset is removed, and then with `--approvals 0` (a sole
+maintainer cannot approve their own PRs) and `--check` for each CI job:
+
+```bash
+./scripts/configure-github-repository.sh --repo PerfectPan/svgo.mbt --approvals 0 \
+  --check "verify (ubuntu-latest)" --check "verify (macos-latest)"   # dry run; add --apply to write
+```
 
 ## Security reports
 

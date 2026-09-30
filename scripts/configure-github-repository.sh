@@ -4,17 +4,24 @@ set -euo pipefail
 apply=false
 repo=""
 branch=""
+approvals=1
+extra_checks=()
 
 usage() {
   cat <<'USAGE'
 Usage:
-  scripts/configure-github-repository.sh [--repo OWNER/REPO] [--branch BRANCH] [--apply]
+  scripts/configure-github-repository.sh [--repo OWNER/REPO] [--branch BRANCH]
+    [--approvals N] [--check NAME]... [--apply]
 
 Configures GitHub repository defaults that cannot be inherited from template files.
 
 Defaults:
   --repo    inferred from gh repo view
-  --branch  inferred from the GitHub default branch when gh is available
+  --branch     inferred from the GitHub default branch when gh is available
+  --approvals  1; use 0 for a repository with a single maintainer, who cannot
+               approve their own pull requests
+  --check      additional required status check (repeatable), such as the
+               project's CI job names
 
 Without --apply, this script prints the branch protection payload and does not call GitHub.
 USAGE
@@ -32,6 +39,14 @@ while [[ $# -gt 0 ]]; do
       ;;
     --branch)
       branch="${2:-}"
+      shift 2
+      ;;
+    --approvals)
+      approvals="${2:-}"
+      shift 2
+      ;;
+    --check)
+      extra_checks+=("${2:-}")
       shift 2
       ;;
     -h|--help)
@@ -68,22 +83,41 @@ if [[ -z "$branch" ]]; then
   fi
 fi
 
-payload="$(cat <<'JSON'
+if [[ ! "$approvals" =~ ^[0-9]+$ ]]; then
+  printf 'configure-github-repository: --approvals must be a non-negative integer\n' >&2
+  exit 1
+fi
+if (( approvals > 0 )); then
+  last_push_approval=true
+else
+  last_push_approval=false
+fi
+
+contexts=("repository checks" "conventional PR title" "PR description")
+if (( ${#extra_checks[@]} > 0 )); then
+  contexts+=("${extra_checks[@]}")
+fi
+contexts_json=""
+for context in "${contexts[@]}"; do
+  if [[ -z "$context" || "$context" == *'"'* || "$context" == *\\* ]]; then
+    printf 'configure-github-repository: invalid check name: %s\n' "$context" >&2
+    exit 1
+  fi
+  contexts_json+="${contexts_json:+, }\"${context}\""
+done
+
+payload="$(cat <<JSON
 {
   "required_status_checks": {
     "strict": true,
-    "contexts": [
-      "repository checks",
-      "conventional PR title",
-      "PR description"
-    ]
+    "contexts": [${contexts_json}]
   },
   "enforce_admins": true,
   "required_pull_request_reviews": {
     "dismiss_stale_reviews": true,
     "require_code_owner_reviews": false,
-    "require_last_push_approval": true,
-    "required_approving_review_count": 1
+    "require_last_push_approval": ${last_push_approval},
+    "required_approving_review_count": ${approvals}
   },
   "restrictions": null,
   "required_linear_history": true,

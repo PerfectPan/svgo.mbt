@@ -11,7 +11,7 @@ jobs:
     name: repository checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: ./scripts/check-repository.sh
 
   pr-title:
@@ -19,7 +19,7 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: ./scripts/check-pr-title.sh "$PR_TITLE"
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
@@ -30,7 +30,7 @@ jobs:
     if: github.event_name == 'pull_request' && github.event.pull_request.user.type != 'Bot'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: printf '%s\n' "$PR_BODY" | ./scripts/check-pr-body.sh
         env:
           PR_BODY: ${{ github.event.pull_request.body }}

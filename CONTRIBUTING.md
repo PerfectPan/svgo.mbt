@@ -12,13 +12,70 @@ moon test --target native                                         # unit tests +
 scripts/verify.sh                                                 # what CI runs
 pnpm install                                                      # svgo-js, resvg, pixelmatch, tailwind
 scripts/verify.sh --full                                          # + wasm, sizes, pixel diffs
+./scripts/install-git-hooks.sh                                    # pre-commit hook, see "Local Git hooks"
+```
 
 The MoonBit module lives in `svgo/`; `packages/` holds the npm package and the
 comparison suite; `app/website/` the website and `app/cli/` the CLI. `moon` commands run from the root.
-```
 
-The repository ships a pre-commit hook that runs `moon check`:
-`git config core.hooksPath .githooks`.
+## Change Design Gate
+
+Every change needs a requirement record. Use the smallest set of artifacts that
+makes behavior and implementation reviewable.
+
+| Change type | Required artifact |
+| --- | --- |
+| New plugin, plugin fix, or plugin parameter | The requirement in the PR description and fixtures that show it (see "Adding or changing a plugin"); no separate Spec or Plan |
+| Narrow maintenance, tests, documentation, benchmarks | Requirement and PR checklist; a separate Plan only when useful |
+| Technical refactor without changed output (pipeline, packages, wasm boundary, performance rework across targets) | Detailed Plan in `docs/plans/` with compatibility and acceptance conditions |
+| Product behavior beyond one plugin (public API, CLI interface, npm package interface, website features) | One Spec in `specs/` plus one detailed Plan for the same deliverable |
+
+A Spec defines observable interactions, scope, failure behavior, and acceptance
+examples. Use stable scenario IDs and Given/When/Then where useful. Link
+scenarios to tests (fixtures count). A Spec does not prescribe components,
+interfaces, or execution order. Keep active Specs under [`specs/`](specs/). A
+small change may keep both sections in the PR description. Split only when each
+slice has an independently demonstrable outcome.
+
+A Plan records technical decisions and the detailed execution plan that
+implements them. Shared architecture, compatibility, and cross-target decisions
+belong in a reviewed Plan. After implementation, move lasting constraints into
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`AGENTS.md`](AGENTS.md)
+invariants, or tests. This repository does not keep an RFC directory. Removing
+a proposal does not mark unimplemented ideas as delivered.
+
+## SDD Workflow And Document Lifecycle
+
+1. Record the problem, affected users or maintainers, in-scope behavior,
+   non-goals, and acceptance conditions.
+2. Choose artifacts with the [Change Design Gate](#change-design-gate). The
+   Spec states required behavior: interactions and acceptance scenarios. The
+   Plan owns the technical decisions (design, package and interface changes,
+   data flow) and the detailed execution plan (ordered tasks, tests, exit
+   conditions, validation, and rollback).
+3. Review the behavior and technical design before implementing the affected
+   scope. The Plan must resolve implementation decisions rather than leave them
+   to the implementer; keep it blocked while a material decision is
+   unresolved. New behavior revises the Spec. New implementation decisions
+   revise the Plan.
+4. Implement inside that boundary. Add evidence for each acceptance condition
+   (fixtures, tests, `scripts/verify.sh --full` output, benchmark numbers), or
+   say why existing evidence is enough. Update current-state docs in the same
+   change.
+5. Before retiring a completed Spec or Plan, move still-valid behavior,
+   invariants, and limits into current-state docs and tests. The final delivery
+   PR may delete the completed files. Keep an unfinished Spec or Plan active.
+6. Git history and the delivery PR keep the retired decision. Do not copy
+   completed Specs or Plans into a second archive.
+
+[`docs/plans/`](docs/plans/) contains active Plans. Copy
+[`0000-template.md`](docs/plans/0000-template.md) and keep only the sections
+that apply. A product plan links its paired Spec. The execution plan lists
+preconditions, a completion contract, ordered tasks with files, changes, tests,
+and exit conditions, a validation ledger, and rollback per batch. Keep unknown
+owners, dates, and interfaces marked "unconfirmed". A plan may make
+feature-specific technical decisions, but it cannot silently override
+`docs/ARCHITECTURE.md` or the invariants in `AGENTS.md`.
 
 ## Adding or changing a plugin
 
@@ -113,10 +170,69 @@ The repository ships a pre-commit hook that runs `moon check`:
   `remove`, and skipping work that is provably a no-op (path data that already
   reached its fixpoint).
 
-## Commit style
+## Commit and PR titles
 
-`type(scope): summary` with `feat`, `fix`, `perf`, `docs`, `bench`, `compare`, `site`,
-`build`, `chore`. The body says what changed in behavior or numbers.
+Commit messages and PR titles are English `type(scope): summary`. Allowed
+types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`,
+`ci`, `chore`, `revert`. `scripts/check-pr-title.sh` enforces this on every PR
+and rejects CJK characters. Areas of the repository are scopes, not types:
+
+| area | examples |
+| --- | --- |
+| a plugin | `fix(minifyStyles): ...`, `feat(removeXlink): ...` |
+| benchmarks | `perf(bench): ...`, `test(bench): ...` |
+| svgo-js comparison suite | `test(compare): ...`, `chore(compare): ...` |
+| website | `feat(site): ...`, `fix(site): ...`, `docs(site): ...` |
+| CLI, npm package, wasm | `feat(cli): ...`, `fix(npm): ...`, `perf(wasm): ...` |
+| releases | `chore(release): version packages` (the release PR from `release.yml`) |
+
+The body says what changed in behavior or numbers.
+
+## Pull requests
+
+Every PR answers: what changed, why, how it was tested, which validation gates
+were skipped and why, what evidence backs the claim (fixtures, render diff,
+benchmark numbers, screenshots for site changes), and what risks follow.
+
+The description keeps every `##` section of
+[`.github/pull_request_template.md`](.github/pull_request_template.md) (the
+GitLab copy in `.gitlab/merge_request_templates/` stays identical apart from
+PR/MR wording). Summary and Validation must hold real content, not template
+placeholders, and the description carries no agent attribution lines such as
+"Generated with <tool>"; the author is accountable for the content. Check it
+before opening or editing the PR:
+
+```bash
+./scripts/check-pr-title.sh "fix(minifyStyles): minify numbers in style attributes"
+./scripts/check-pr-body.sh pr-body.md      # or pipe the body on stdin
+```
+
+The `Review` workflow runs `repository checks`, `conventional PR title` and
+`PR description` on every PR event, including description edits. PRs opened by
+bot accounts (the release PR) skip the description check but not the title
+check. Update the description when review feedback, rebases, or follow-up
+commits change the scope or the validation result.
+
+## Repository checks
+
+`./scripts/check-repository.sh` catches missing repository files, tracked local
+or generated artifacts, obvious secrets, personal filesystem paths, and drift
+between the PR/MR templates. It does not replace `scripts/verify.sh`; run both
+before opening review. Do not commit tokens, local config, internal hostnames,
+or personal paths, including inside fixtures and `svgo/testdata/`.
+
+## Local Git hooks
+
+```bash
+./scripts/install-git-hooks.sh
+```
+
+This sets `core.hooksPath` to `.githooks`. The pre-commit hook runs
+`git diff --cached --check`, `./scripts/check-repository.sh --staged` and
+`moon check`. If `core.hooksPath` already points elsewhere, the script fails
+instead of overwriting it; re-run with `--force` only after moving those hooks
+into `.githooks`. Hooks are a local guardrail; CI and branch protection are the
+enforcement.
 
 ## Releasing
 
@@ -128,7 +244,8 @@ The repository ships a pre-commit hook that runs `moon check`:
 2. When that PR lands, `release.yml` opens (or updates) the release PR on the
    branch `changeset-release/main` by running `pnpm version-packages`:
    changesets bumps `packages/svgo-mbt/package.json` and writes
-   `CHANGELOG.md`, then `scripts/sync-version.mjs` copies the version into
+   `packages/svgo-mbt/CHANGELOG.md` (the root `CHANGELOG.md` only points
+   there), then `scripts/sync-version.mjs` copies the version into
    `svgo/moon.mod`, the app modules' dependency, the CLI's `--version` and the
    wasm's `version()`. `scripts/verify.sh` fails if those ever disagree.
    Further changesets merged later are folded into the same PR.
@@ -150,4 +267,19 @@ token because only an existing package can be given one), and the mooncakes
 token from `~/.moon/credentials.json` is the repository secret
 `MOONCAKES_TOKEN`. No npm token is stored anywhere. `gh workflow run release.yml -f dry_run=true` and
 `gh workflow run binaries.yml -f dry_run=true` rehearse without publishing.
+
+`main` is protected by a repository ruleset on GitHub (pull requests, rebase
+or squash, linear history, required `verify (ubuntu-latest)` and
+`verify (macos-latest)`). `./scripts/configure-github-repository.sh --repo PerfectPan/svgo.mbt`
+previews the template's classic branch protection (one approving review, last
+push approval, admins included, resolved conversations, and the `Review`
+checks); `--apply` writes it on top of the ruleset and needs an admin account.
+To require the `Review` checks without the review requirement, add
+`repository checks`, `conventional PR title` and `PR description` to the
+ruleset's required status checks instead.
+
+## Security reports
+
+Follow [`SECURITY.md`](SECURITY.md). Do not put exploit details, secrets, or
+private infrastructure in public issues or pull requests.
 

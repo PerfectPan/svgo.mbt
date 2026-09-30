@@ -3,8 +3,10 @@
 An SVG optimizer in MoonBit, compatible in spirit with svgo's preset-default.
 Everything below is what an agent needs to work here without re-deriving it.
 Human-facing docs: `README.mbt.md` (usage), `docs/ARCHITECTURE.md` (design),
-`CONTRIBUTING.md` (how to add a plugin or fixture), `docs/DESIGN.md` (website
-guidelines: voice, layout, type scale, tokens, interaction; every site change follows it).
+`CONTRIBUTING.md` (how to add a plugin or fixture, which changes need a Spec or
+Plan, PR rules, releasing), `docs/DESIGN.md` (website guidelines: voice, layout,
+type scale, tokens, interaction; every site change follows it), `docs/README.md`
+(what belongs in `docs/`).
 
 ## Repository shape
 
@@ -22,6 +24,9 @@ root installs every JS package.
 | update snapshot expectations after an intended output change | `moon test --update` |
 | format and refresh the generated `.mbti` interface files | `moon fmt && moon info` |
 | everything CI checks, in one go | `scripts/verify.sh` (`--full` adds wasm build, svgo-js comparison, render diff) |
+| repository hygiene: required files, tracked artifacts, secrets, personal paths, PR/MR template drift | `./scripts/check-repository.sh` (the `Review` workflow runs it too) |
+| install the pre-commit hook (whitespace, staged repository check, `moon check`) | `./scripts/install-git-hooks.sh` |
+| check a PR title / PR description before opening or editing a PR | `./scripts/check-pr-title.sh "<title>"` / `./scripts/check-pr-body.sh <file>` (or stdin) |
 | CLI cold start (native / node build / svgo CLI), the numbers quoted on the site | `scripts/cli-bench.sh [file] [runs]` |
 | micro benchmarks as a table | `scripts/bench.sh [native\|js] [bench_test.mbt\|profile_test.mbt]` |
 | byte-for-byte output comparison against a reference build | `scripts/regress.sh <dir>` (see CONTRIBUTING) |
@@ -77,8 +82,12 @@ app/cli/                      the CLI, itself a MoonBit module (PerfectPan/svgo-
   params.mbt                  --param plugin.key=value parser
   io_native.mbt / io.c        C file I/O, isatty and a monotonic clock for the native backend (io_js.mbt: the node equivalents)
   io_stub.mbt                 stubs so the package type-checks on wasm
-scripts/                      build-wasm, verify, bench, regress, gen-fixtures
-docs/ARCHITECTURE.md          design notes
+scripts/                      build-wasm, verify, bench, regress, gen-fixtures; check-repository, check-pr-title,
+                              check-pr-body, install-git-hooks, configure-github-repository (shared project template)
+.githooks/pre-commit          installed by scripts/install-git-hooks.sh
+docs/ARCHITECTURE.md          design notes; docs/README.md lists the current-state docs
+specs/, docs/plans/           active Specs (behavior) and Plans (technical decisions + execution plan); see CONTRIBUTING
+CHANGELOG.md                  points to packages/svgo-mbt/CHANGELOG.md, which changesets writes
 ```
 
 ## Invariants (tests enforce these; keep them)
@@ -132,6 +141,26 @@ docs/ARCHITECTURE.md          design notes
   `lexical_compare`); `s[a:b]` is a `StringView`, `.to_owned()` to keep it;
   `for k, v in map` iterates key/value but `for i, x in array` is index/value;
   `Map`/`Set` literals are `Map([])`/`Set([])`; `@env.now()` is milliseconds.
+
+## Changes and pull requests
+
+- Pick artifacts with the Change Design Gate in `CONTRIBUTING.md`: a plugin
+  addition or fix needs only the requirement in the PR plus fixtures; a
+  refactor across packages or targets needs a Plan in `docs/plans/`; public
+  API, CLI, npm interface or website features need a Spec in `specs/` plus a
+  Plan. Do not start a Plan that is blocked on an unresolved decision; after
+  delivery move lasting constraints into `docs/ARCHITECTURE.md`, the invariants
+  above, or tests, and delete the finished Spec/Plan.
+- Commit messages and PR titles are English `type(scope): summary` with types
+  `feat fix docs style refactor perf test build ci chore revert`. Areas are
+  scopes: `perf(bench):`, `test(compare):`, `feat(site):`, `fix(<pluginName>):`.
+- PR descriptions keep every section of `.github/pull_request_template.md`,
+  list the exact validation commands and skipped gates, and carry no
+  "Generated with <tool>" lines. Run `./scripts/check-pr-title.sh` and
+  `./scripts/check-pr-body.sh` before `gh pr create` or editing the body.
+- Keep the GitHub PR and GitLab MR templates identical apart from PR/MR wording.
+- User-visible changes add a changeset (`pnpm changeset`); never edit
+  `CHANGELOG.md` files by hand.
 
 ## Adding a plugin (short version, details in CONTRIBUTING.md)
 

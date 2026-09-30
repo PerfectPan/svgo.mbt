@@ -1,3 +1,9 @@
-#!/bin/sh
+#!/usr/bin/env bash
+set -euo pipefail
 
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+git diff --cached --check
+./scripts/check-repository.sh --staged
 moon check

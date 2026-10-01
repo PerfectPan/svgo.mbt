@@ -87,4 +87,5 @@ icon 0.10 vs 0.29, the 50 KB Tux drawing 5.7 vs 12.8, the 68 KB
 Ghostscript Tiger 10.1 vs 41.1. Playground and details:
 <https://perfectpan.github.io/svgo.mbt/>.
 
-MIT.
+MIT. svgo.mbt ports svgo (MIT, © Kir Belevich and contributors);
+`THIRD_PARTY_NOTICES.md` carries svgo's license.

@@ -23,7 +23,9 @@ name: release
 #
 # npm authentication is OIDC trusted publishing (no token in the repo): the
 # package's Trusted Publisher on npmjs.com must point at this repository and
-# this workflow file. Provenance is attached automatically.
+# this workflow file. `changeset publish` runs `pnpm publish`, which exchanges
+# the job's id-token for a publish token itself and attaches provenance for a
+# public repository; neither npm nor an `.npmrc` token is involved.
 
 on:
   push:
@@ -31,7 +33,7 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: "Build and test, run npm publish --dry-run, tag nothing"
+        description: "Build and test, run pnpm publish --dry-run, tag nothing"
         type: boolean
         default: true
 
@@ -55,7 +57,7 @@ jobs:
       has_changesets: ${{ steps.changesets.outputs.has-changesets }}
       pr_number: ${{ steps.changesets.outputs.pr-number }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       # `pnpm version-packages` ends with `moon info`, so the toolchain is needed
@@ -64,15 +66,16 @@ jobs:
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
           echo "$HOME/.moon/bin" >> $GITHUB_PATH
           "$HOME/.moon/bin/moon" update
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      # pnpm (the `packageManager` version) and Node.js; also runs the frozen
+      # `pnpm install`
+      - uses: pnpm/setup@v3
         with:
-          node-version: 24
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
+          runtime: node@24
+          cache: true
+          require-lockfile: true
       - name: Open or update the release PR
         id: changesets
-        uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
+        uses: changesets/action@v2
         with:
           version-script: pnpm version-packages
           commit-message: "chore(release): version packages"
@@ -96,7 +99,7 @@ jobs:
     if: ${{ !cancelled() && (github.event_name == 'workflow_dispatch' || (needs.version.result == 'success' && needs.version.outputs.has_changesets == 'false')) }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Install MoonBit
@@ -104,33 +107,32 @@ jobs:
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
           echo "$HOME/.moon/bin" >> $GITHUB_PATH
           "$HOME/.moon/bin/moon" update
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      # pnpm (the `packageManager` version) and Node.js; also runs the frozen
+      # `pnpm install`
+      - uses: pnpm/setup@v3
         with:
-          node-version: 24
-          cache: pnpm
-          registry-url: https://registry.npmjs.org
+          runtime: node@24
+          cache: true
+          require-lockfile: true
       - name: Versions agree across the repo
         run: node scripts/sync-version.mjs --check
       - name: Build the wasm and the JS CLI, run the package tests
         run: |
-          pnpm install --frozen-lockfile
           scripts/build-wasm.sh
           scripts/build-cli.sh
           cd packages/svgo-mbt && node --test
       - name: Publish (dry run)
         if: github.event_name == 'workflow_dispatch' && inputs.dry_run
         working-directory: packages/svgo-mbt
-        # `npm publish --dry-run` still refuses a version that is already on
-        # npm, which is the normal state between releases; report it instead.
+        # The same `pnpm publish` that `changeset publish` runs. A version that
+        # is already on npm, the normal state between releases, is skipped by
+        # the real run; say so.
         run: |
           v=$(node -p "require('./package.json').version")
-          if npm view "@rivus/svgo@$v" version --registry https://registry.npmjs.org >/dev/null 2>&1; then
+          if pnpm view "@rivus/svgo@$v" version >/dev/null 2>&1; then
             echo "@rivus/svgo@$v is already on npm; the real run would publish nothing"
-            npm pack --ignore-scripts --dry-run
-          else
-            npm publish --ignore-scripts --access public --dry-run
           fi
+          pnpm publish --dry-run --ignore-scripts --access public --no-git-checks
       - name: Publish and tag
         if: github.event_name == 'push' || !inputs.dry_run
         run: |
@@ -148,5 +150,4 @@ jobs:
             esac
           done
         env:
-          NPM_CONFIG_PROVENANCE: "true"
           GH_TOKEN: ${{ github.token }}

@@ -1,3 +1,18 @@
-#!/bin/sh
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+git diff --cached --check
+
+# CI runs the same check and is authoritative, so a checkout without the
+# extension warns instead of blocking the commit.
+if gh repo-checks --help >/dev/null 2>&1; then
+  gh repo-checks repository --staged
+else
+  printf 'pre-commit: gh repo-checks is not installed; skipping repository checks\n' >&2
+  printf 'pre-commit: install it with: gh extension install PerfectPan/gh-repo-checks\n' >&2
+fi
 
 moon check

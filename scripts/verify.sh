@@ -13,6 +13,10 @@ if git grep -n -E '^(<<<<<<< |>>>>>>> )' -- . ':!node_modules'; then
   echo "unresolved merge conflict markers (see above)" >&2
   exit 1
 fi
+step "svgo/ carries the same LICENSE and THIRD_PARTY_NOTICES.md as the root"
+for f in LICENSE THIRD_PARTY_NOTICES.md; do
+  cmp "$f" "svgo/$f" || { echo "svgo/$f differs from $f; copy it again" >&2; exit 1; }
+done
 step "one version everywhere (scripts/sync-version.mjs)"
 node scripts/sync-version.mjs --check
 step "moon check"

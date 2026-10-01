@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "description": "svgo.mbt website: MoonBit (Rabbita) app with Tailwind CSS v4",
+  "license": "MIT",
   "scripts": {
     "dev": "node dev.mjs",
     "build": "node build.mjs",

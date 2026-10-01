@@ -11,23 +11,24 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Install MoonBit
         run: |
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
           echo "$HOME/.moon/bin" >> $GITHUB_PATH
           # the registry index is not present on a fresh runner
           "$HOME/.moon/bin/moon" update
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      # pnpm (the `packageManager` version) and Node.js; also runs the frozen
+      # `pnpm install`
+      - uses: pnpm/setup@v3
         with:
-          node-version: 24
-          cache: pnpm
+          runtime: node@24
+          cache: true
+          require-lockfile: true
       - name: Check, format, interfaces, fixtures, tests on js / native
         run: scripts/verify.sh
       - name: Wasm artifact, size comparison, render diff, speed
         run: |
-          pnpm install --frozen-lockfile
           scripts/build-wasm.sh
           moon build --target native --release -q
           packages/compare/compare.sh

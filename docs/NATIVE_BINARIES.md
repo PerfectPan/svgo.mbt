@@ -68,9 +68,10 @@ svgo-mbt-X.Y.Z-linux-arm64.tar.gz
 svgo-mbt-X.Y.Z-macos-arm64.tar.gz
 ```
 
-Each archive contains a single `svgo-mbt` executable. macOS x86_64 and Windows
-are not built (no runner in the matrix); build from source with
-`moon build --target native --release app/cli` there. The binary is named
+Each archive holds a `svgo-mbt/` directory with the `svgo-mbt` executable,
+`LICENSE`, `THIRD_PARTY_NOTICES.md` and the npm package's `README.md`. macOS
+x86_64 and Windows are not built (no runner in the matrix); build from source
+with `moon build --target native --release app/cli` there. The binary is named
 `svgo-mbt` to avoid colliding with the original `svgo` CLI; the npm bin entry
 uses the same name.
 

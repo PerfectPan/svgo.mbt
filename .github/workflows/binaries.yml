@@ -41,7 +41,7 @@ jobs:
             asset: macos-arm64
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Install MoonBit
         run: |
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
@@ -56,10 +56,10 @@ jobs:
           version=$("$bin" --version | tr -d '[:space:]')
           mkdir -p dist/svgo-mbt
           cp "$bin" dist/svgo-mbt/svgo-mbt
-          cp LICENSE packages/svgo-mbt/README.md dist/svgo-mbt/
+          cp LICENSE THIRD_PARTY_NOTICES.md packages/svgo-mbt/README.md dist/svgo-mbt/
           tar -C dist -czf "svgo-mbt-$version-${{ matrix.asset }}.tar.gz" svgo-mbt
           ls -la svgo-mbt-*.tar.gz
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: svgo-mbt-${{ matrix.asset }}
           path: svgo-mbt-*.tar.gz
@@ -69,8 +69,8 @@ jobs:
     if: github.event_name == 'push' || !inputs.dry_run
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
         with:
           path: assets
           merge-multiple: true
@@ -87,7 +87,7 @@ jobs:
     env:
       MOONCAKES_TOKEN: ${{ secrets.MOONCAKES_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Install MoonBit
         run: |
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash

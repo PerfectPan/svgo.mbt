@@ -3,8 +3,10 @@
 An SVG optimizer in MoonBit, compatible in spirit with svgo's preset-default.
 Everything below is what an agent needs to work here without re-deriving it.
 Human-facing docs: `README.mbt.md` (usage), `docs/ARCHITECTURE.md` (design),
-`CONTRIBUTING.md` (how to add a plugin or fixture), `docs/DESIGN.md` (website
-guidelines: voice, layout, type scale, tokens, interaction; every site change follows it).
+`CONTRIBUTING.md` (how to add a plugin or fixture, which changes need a Spec or
+Plan, PR rules, releasing), `docs/DESIGN.md` (website guidelines: voice, layout,
+type scale, tokens, interaction; every site change follows it), `docs/README.md`
+(what belongs in `docs/`).
 
 ## Repository shape
 
@@ -22,6 +24,10 @@ root installs every JS package.
 | update snapshot expectations after an intended output change | `moon test --update` |
 | format and refresh the generated `.mbti` interface files | `moon fmt && moon info` |
 | everything CI checks, in one go | `scripts/verify.sh` (`--full` adds wasm build, svgo-js comparison, render diff) |
+| install the shared review checks (once per machine) | `gh extension install PerfectPan/gh-repo-checks` |
+| repository hygiene: required files, tracked artifacts, secrets, personal paths, PR/MR template sections | `gh repo-checks repository` (the `Review` workflow runs it too; additions in `.github/repo-checks.conf`) |
+| install the pre-commit hook (whitespace, staged repository check, `moon check`) | `./scripts/install-git-hooks.sh` |
+| check a PR title / PR description before opening or editing a PR | `gh repo-checks pr-title "<title>"` / `gh repo-checks pr-body <file>` (or stdin) |
 | CLI cold start (native / node build / svgo CLI), the numbers quoted on the site | `scripts/cli-bench.sh [file] [runs]` |
 | micro benchmarks as a table | `scripts/bench.sh [native\|js] [bench_test.mbt\|profile_test.mbt]` |
 | byte-for-byte output comparison against a reference build | `scripts/regress.sh <dir>` (see CONTRIBUTING) |
@@ -31,8 +37,8 @@ root installs every JS package.
 | wasm artifact for `packages/svgo-mbt` and the site | `scripts/build-wasm.sh` (release + pinned wasm-opt; run `pnpm install` first) |
 | compare with svgo-js (sizes, render diff, speed) | `pnpm compare` (or the scripts in `packages/compare/`) |
 | refresh the numbers on the site | `node packages/compare/collect.mjs` → `app/website/data.json` |
-| API docs data (also what mooncakes.io renders) | `pnpm docs` (= `MOON_WORK=off moon -C svgo doc`, workspace mode off because the app member is js-only) → `svgo/_build/doc/` |
-| build the site into `_build/app` | `pnpm app` (= `pnpm docs && node app/website/build.mjs`; needs `moon install moonbit-community/warren`) |
+| API docs data (also what mooncakes.io renders) | `pnpm run docs` (= `MOON_WORK=off moon -C svgo doc`, workspace mode off because the app member is js-only) → `svgo/_build/doc/` |
+| build the site into `_build/app` | `pnpm app` (= `pnpm run docs && node app/website/build.mjs`; needs `moon install moonbit-community/warren`) |
 | dev server with live reload | `pnpm dev` → http://localhost:4173 (warren dev + tailwind --watch) |
 | regenerate the site's data files | `node app/website/gen.mjs` (after collect.mjs or moon doc changed) |
 | record a user-visible change for the changelog | `pnpm changeset` in the PR (writes `.changeset/*.md`) |
@@ -41,7 +47,10 @@ root installs every JS package.
 ## Layout
 
 ```
-moon.work, package.json       workspace roots (MoonBit members / pnpm packages), .npmrc pins registry.npmjs.org
+LICENSE                       MIT; svgo/LICENSE is a copy for the mooncakes module
+THIRD_PARTY_NOTICES.md        notices for svgo (ported plugins, fixtures), the MoonBit core library in every build, and the website's bundle (lz-string, Rabbita, Rabbita UI, moonbitlang/async, Tailwind CSS); copied to svgo/ and into the site
+moon.work, package.json       workspace roots (MoonBit members / pnpm packages); package.json pins pnpm 12, .npmrc pins registry.npmjs.org
+pnpm-workspace.yaml           pnpm packages and allowBuilds (dependency build scripts are blocked unless listed)
 svgo/                         the MoonBit module PerfectPan/svgo
   svgo.mbt, svgo_test.mbt     public API: optimize(svg, config?) -> Result, Config (custom plugins via Config::custom), list_plugins
   xml/                        Document/Node/Element, parse, serialize (SVG-oriented, keeps prolog)
@@ -77,8 +86,11 @@ app/cli/                      the CLI, itself a MoonBit module (PerfectPan/svgo-
   params.mbt                  --param plugin.key=value parser
   io_native.mbt / io.c        C file I/O, isatty and a monotonic clock for the native backend (io_js.mbt: the node equivalents)
   io_stub.mbt                 stubs so the package type-checks on wasm
-scripts/                      build-wasm, verify, bench, regress, gen-fixtures
-docs/ARCHITECTURE.md          design notes
+scripts/                      build-wasm, verify, bench, regress, gen-fixtures; install-git-hooks (shared project template)
+.github/repo-checks.conf      required-file additions for `gh repo-checks repository` (PerfectPan/gh-repo-checks)
+.githooks/pre-commit          installed by scripts/install-git-hooks.sh
+docs/ARCHITECTURE.md          design notes; docs/README.md lists the current-state docs
+docs/specs/, docs/plans/      active Specs (behavior) and Plans (technical decisions + execution plan); see CONTRIBUTING
 ```
 
 ## Invariants (tests enforce these; keep them)
@@ -132,6 +144,28 @@ docs/ARCHITECTURE.md          design notes
   `lexical_compare`); `s[a:b]` is a `StringView`, `.to_owned()` to keep it;
   `for k, v in map` iterates key/value but `for i, x in array` is index/value;
   `Map`/`Set` literals are `Map([])`/`Set([])`; `@env.now()` is milliseconds.
+
+## Changes and pull requests
+
+- Pick artifacts with the Change Design Gate in `CONTRIBUTING.md`: a plugin
+  addition or fix needs only the requirement in the PR plus fixtures; a
+  refactor across packages or targets needs a Plan in `docs/plans/`; public
+  API, CLI, npm interface or website features need a Spec in `docs/specs/`
+  plus a Plan. Do not start a Plan that is blocked on an unresolved decision;
+  after delivery move lasting constraints into `docs/ARCHITECTURE.md`, the
+  invariants above, or tests, and delete the finished Spec/Plan.
+- Commit messages and PR titles are English `type(scope): summary` with types
+  `feat fix docs style refactor perf test build ci chore revert`. Areas are
+  scopes: `perf(bench):`, `test(compare):`, `feat(site):`, `fix(<pluginName>):`.
+- PR descriptions keep every section of `.github/pull_request_template.md`,
+  list the exact validation commands and skipped gates, and carry no
+  "Generated with <tool>" lines. Run `gh repo-checks pr-title` and
+  `gh repo-checks pr-body` before `gh pr create` or editing the body.
+- Keep the GitHub PR and GitLab MR templates identical apart from PR/MR wording.
+- Release notes come from changesets: record each user-visible change with
+  `pnpm changeset` in the same PR, and changesets writes
+  `packages/svgo-mbt/CHANGELOG.md` at release time. Never edit that generated
+  changelog by hand or add a hand-written root `CHANGELOG.md`.
 
 ## Adding a plugin (short version, details in CONTRIBUTING.md)
 

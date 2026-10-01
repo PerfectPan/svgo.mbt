@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Build the js-target CLI and place it in the npm package (packages/svgo-mbt).
+# Build the js-target CLI and place it in the npm package (packages/svgo-mbt),
+# together with the license files the package ships.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 moon build --target js --release -q
@@ -11,4 +12,5 @@ JS=$(find _build/js/release/build -type f -path "*/svgo-cli/svgo-cli.js" | head 
   cat "$JS"
 } > packages/svgo-mbt/cli.mjs
 chmod +x packages/svgo-mbt/cli.mjs
+cp LICENSE THIRD_PARTY_NOTICES.md packages/svgo-mbt/
 ls -la packages/svgo-mbt/cli.mjs

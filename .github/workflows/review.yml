@@ -1,0 +1,37 @@
+name: Review
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize, ready_for_review]
+  push:
+    branches: [main]
+
+jobs:
+  repository-checks:
+    name: repository checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: PerfectPan/gh-repo-checks@v1
+        with:
+          check: repository
+
+  pr-title:
+    name: conventional PR title
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: PerfectPan/gh-repo-checks@v1
+        with:
+          check: pr-title
+
+  pr-body:
+    name: PR description
+    # Bot PRs (dependency updates, release PRs) do not use the template; their titles are still checked.
+    if: github.event_name == 'pull_request' && github.event.pull_request.user.type != 'Bot'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: PerfectPan/gh-repo-checks@v1
+        with:
+          check: pr-body

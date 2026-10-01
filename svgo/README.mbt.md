@@ -235,4 +235,4 @@ Runs unit tests, svgo's own fixture suite, resvg pixel diff, and byte-for-byte c
 
 ## License
 
-MIT. Plugin semantics follow svgo (MIT, © Kir Belevich and contributors).
+MIT. Plugin semantics follow svgo (MIT, © Kir Belevich and contributors); svgo's license and the notices for the ported code and fixtures are in [THIRD_PARTY_NOTICES.md](https://github.com/PerfectPan/svgo.mbt/blob/main/THIRD_PARTY_NOTICES.md).

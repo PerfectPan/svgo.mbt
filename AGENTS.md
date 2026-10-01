@@ -24,9 +24,10 @@ root installs every JS package.
 | update snapshot expectations after an intended output change | `moon test --update` |
 | format and refresh the generated `.mbti` interface files | `moon fmt && moon info` |
 | everything CI checks, in one go | `scripts/verify.sh` (`--full` adds wasm build, svgo-js comparison, render diff) |
-| repository hygiene: required files, tracked artifacts, secrets, personal paths, PR/MR template drift | `./scripts/check-repository.sh` (the `Review` workflow runs it too) |
+| install the shared review checks (once per machine) | `gh extension install PerfectPan/gh-repo-checks` |
+| repository hygiene: required files, tracked artifacts, secrets, personal paths, PR/MR template sections | `gh repo-checks repository` (the `Review` workflow runs it too; additions in `.github/repo-checks.conf`) |
 | install the pre-commit hook (whitespace, staged repository check, `moon check`) | `./scripts/install-git-hooks.sh` |
-| check a PR title / PR description before opening or editing a PR | `./scripts/check-pr-title.sh "<title>"` / `./scripts/check-pr-body.sh <file>` (or stdin) |
+| check a PR title / PR description before opening or editing a PR | `gh repo-checks pr-title "<title>"` / `gh repo-checks pr-body <file>` (or stdin) |
 | CLI cold start (native / node build / svgo CLI), the numbers quoted on the site | `scripts/cli-bench.sh [file] [runs]` |
 | micro benchmarks as a table | `scripts/bench.sh [native\|js] [bench_test.mbt\|profile_test.mbt]` |
 | byte-for-byte output comparison against a reference build | `scripts/regress.sh <dir>` (see CONTRIBUTING) |
@@ -84,8 +85,8 @@ app/cli/                      the CLI, itself a MoonBit module (PerfectPan/svgo-
   params.mbt                  --param plugin.key=value parser
   io_native.mbt / io.c        C file I/O, isatty and a monotonic clock for the native backend (io_js.mbt: the node equivalents)
   io_stub.mbt                 stubs so the package type-checks on wasm
-scripts/                      build-wasm, verify, bench, regress, gen-fixtures; check-repository, check-pr-title,
-                              check-pr-body, install-git-hooks, configure-github-repository (shared project template)
+scripts/                      build-wasm, verify, bench, regress, gen-fixtures; install-git-hooks (shared project template)
+.github/repo-checks.conf      required-file additions for `gh repo-checks repository` (PerfectPan/gh-repo-checks)
 .githooks/pre-commit          installed by scripts/install-git-hooks.sh
 docs/ARCHITECTURE.md          design notes; docs/README.md lists the current-state docs
 docs/specs/, docs/plans/      active Specs (behavior) and Plans (technical decisions + execution plan); see CONTRIBUTING
@@ -157,8 +158,8 @@ docs/specs/, docs/plans/      active Specs (behavior) and Plans (technical decis
   scopes: `perf(bench):`, `test(compare):`, `feat(site):`, `fix(<pluginName>):`.
 - PR descriptions keep every section of `.github/pull_request_template.md`,
   list the exact validation commands and skipped gates, and carry no
-  "Generated with <tool>" lines. Run `./scripts/check-pr-title.sh` and
-  `./scripts/check-pr-body.sh` before `gh pr create` or editing the body.
+  "Generated with <tool>" lines. Run `gh repo-checks pr-title` and
+  `gh repo-checks pr-body` before `gh pr create` or editing the body.
 - Keep the GitHub PR and GitLab MR templates identical apart from PR/MR wording.
 - Release notes come from changesets: record each user-visible change with
   `pnpm changeset` in the same PR, and changesets writes

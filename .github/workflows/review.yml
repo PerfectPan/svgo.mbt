@@ -12,17 +12,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - run: ./scripts/check-repository.sh
+      - uses: PerfectPan/gh-repo-checks@v1
+        with:
+          check: repository
 
   pr-title:
     name: conventional PR title
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - run: ./scripts/check-pr-title.sh "$PR_TITLE"
-        env:
-          PR_TITLE: ${{ github.event.pull_request.title }}
+      - uses: PerfectPan/gh-repo-checks@v1
+        with:
+          check: pr-title
 
   pr-body:
     name: PR description
@@ -31,6 +32,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - run: printf '%s\n' "$PR_BODY" | ./scripts/check-pr-body.sh
-        env:
-          PR_BODY: ${{ github.event.pull_request.body }}
+      - uses: PerfectPan/gh-repo-checks@v1
+        with:
+          check: pr-body

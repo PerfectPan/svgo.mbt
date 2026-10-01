@@ -16,9 +16,9 @@ Allowed types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `buil
 
 ## Validation
 
-- [ ] Repository checks: `./scripts/check-repository.sh`
-- [ ] MR title: `./scripts/check-pr-title.sh "<title>"`
-- [ ] MR description: `./scripts/check-pr-body.sh <body-file>`
+- [ ] Repository checks: `gh repo-checks repository`
+- [ ] MR title: `gh repo-checks pr-title "<title>"`
+- [ ] MR description: `gh repo-checks pr-body <body-file>`
 - [ ] Check, format, interfaces, fixtures, tests on js and native: `scripts/verify.sh`
 - [ ] Wasm, npm package tests, CLI smoke test, size comparison, render diff (plugin, wasm, or output changes): `scripts/verify.sh --full`
 - [ ] Performance (hot-path changes): `scripts/bench.sh` before and after; output unchanged with `scripts/regress.sh <dir>`

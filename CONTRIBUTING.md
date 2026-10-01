@@ -12,6 +12,7 @@ moon test --target native                                         # unit tests +
 scripts/verify.sh                                                 # what CI runs
 pnpm install                                                      # svgo-js, resvg, pixelmatch, tailwind
 scripts/verify.sh --full                                          # + wasm, sizes, pixel diffs
+gh extension install PerfectPan/gh-repo-checks                    # review checks, see "Repository checks"
 ./scripts/install-git-hooks.sh                                    # pre-commit hook, see "Local Git hooks"
 ```
 
@@ -175,7 +176,7 @@ feature-specific technical decisions, but it cannot silently override
 
 Commit messages and PR titles are English `type(scope): summary`. Allowed
 types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`,
-`ci`, `chore`, `revert`. `scripts/check-pr-title.sh` enforces this on every PR
+`ci`, `chore`, `revert`. `gh repo-checks pr-title` enforces this on every PR
 and rejects CJK characters. Areas of the repository are scopes, not types:
 
 | area | examples |
@@ -204,8 +205,8 @@ placeholders, and the description carries no agent attribution lines such as
 before opening or editing the PR:
 
 ```bash
-./scripts/check-pr-title.sh "fix(minifyStyles): minify numbers in style attributes"
-./scripts/check-pr-body.sh pr-body.md      # or pipe the body on stdin
+gh repo-checks pr-title "fix(minifyStyles): minify numbers in style attributes"
+gh repo-checks pr-body pr-body.md      # or pipe the body on stdin
 ```
 
 The `Review` workflow runs `repository checks`, `conventional PR title` and
@@ -216,10 +217,20 @@ commits change the scope or the validation result.
 
 ## Repository checks
 
-`./scripts/check-repository.sh` catches missing repository files, tracked local
-or generated artifacts, obvious secrets, personal filesystem paths, and drift
-between the PR/MR templates. It does not replace `scripts/verify.sh`; run both
-before opening review. Do not commit tokens, local config, internal hostnames,
+The review checks come from
+[`PerfectPan/gh-repo-checks`](https://github.com/PerfectPan/gh-repo-checks):
+CI runs them through its GitHub Action (`uses: PerfectPan/gh-repo-checks@v1`),
+and locally they run as a GitHub CLI extension
+(`gh extension install PerfectPan/gh-repo-checks`). Do not copy the check
+scripts into this repository; change them upstream. Repository-specific
+additions, such as extra required files or forbidden patterns, go in
+`.github/repo-checks.conf`, and repository-specific scripts run as extra steps
+after the shared check.
+
+`gh repo-checks repository` catches missing repository files, tracked local or
+generated artifacts, obvious secrets, personal filesystem paths, and PR/MR
+templates that lost a review section. It does not replace `scripts/verify.sh`;
+run both before opening review. Do not commit tokens, local config, internal hostnames,
 or personal paths, including inside fixtures and `svgo/testdata/`.
 
 Workflows reference actions by their latest major version tag, such as
@@ -234,8 +245,8 @@ rather than local edits.
 ```
 
 This sets `core.hooksPath` to `.githooks`. The pre-commit hook runs
-`git diff --cached --check`, `./scripts/check-repository.sh --staged` and
-`moon check`. If `core.hooksPath` already points elsewhere, the script fails
+`git diff --cached --check`, `gh repo-checks repository --staged` and
+`moon check`; without the extension it warns and skips the repository check. If `core.hooksPath` already points elsewhere, the script fails
 instead of overwriting it; re-run with `--force` only after moving those hooks
 into `.githooks`. Hooks are a local guardrail; CI and branch protection are the
 enforcement.
@@ -303,13 +314,13 @@ or squash, linear history, required `verify (ubuntu-latest)` and
 `conventional PR title` and `PR description`, belong in that ruleset's required
 status checks; add them by editing the ruleset in the repository settings or
 through `gh api repos/PerfectPan/svgo.mbt/rulesets/<id>` (needs an admin
-account). `scripts/configure-github-repository.sh` writes classic branch
-protection instead; on this repository it would duplicate the ruleset, so use
-it only if the ruleset is removed, and then with `--approvals 0` (a sole
-maintainer cannot approve their own PRs) and `--check` for each CI job:
+account). `gh repo-checks protect` writes classic branch protection instead;
+on this repository it would duplicate the ruleset, so use it only if the
+ruleset is removed, and then with `--approvals 0` (a sole maintainer cannot
+approve their own PRs) and `--check` for each CI job:
 
 ```bash
-./scripts/configure-github-repository.sh --repo PerfectPan/svgo.mbt --approvals 0 \
+gh repo-checks protect --repo PerfectPan/svgo.mbt --approvals 0 \
   --check "verify (ubuntu-latest)" --check "verify (macos-latest)"   # dry run; add --apply to write
 ```
 

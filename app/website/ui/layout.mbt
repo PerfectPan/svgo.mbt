@@ -180,7 +180,7 @@ pub fn page_footer(route? : Route) -> Html {
         class="footer-row flex flex-wrap items-center gap-x-5 gap-y-2.5 font-mono text-code text-ink-2 max-sm:flex-col max-sm:items-start",
         [
           span(class="footer-brand font-semibold text-ink", "svgo.mbt"),
-          span("v\{project_version} · GPL-3.0-only"),
+          span("v\{project_version} · MIT"),
           if measurement == "" {
             nothing
           } else {

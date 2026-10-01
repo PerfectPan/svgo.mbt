@@ -1,7 +1,7 @@
 # Third-party notices
 
-svgo.mbt is licensed under GPL-3.0-only (see `LICENSE`). It contains code and
-data derived from the projects below, which remain available under their own
+svgo.mbt is licensed under MIT (see `LICENSE`). It contains code and data
+derived from the projects below, which remain available under their own
 licenses. Paths are relative to the repository root,
 https://github.com/PerfectPan/svgo.mbt; the `PerfectPan/svgo` MoonBit module
 is its `svgo/` directory. This file ships with the MoonBit module, the npm

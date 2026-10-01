@@ -12,7 +12,7 @@ readme = "README.md"
 
 repository = "https://github.com/PerfectPan/svgo.mbt"
 
-license = "GPL-3.0-only"
+license = "MIT"
 
 keywords = [ ]
 

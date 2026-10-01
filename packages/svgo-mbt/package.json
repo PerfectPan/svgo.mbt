@@ -32,7 +32,7 @@
   "engines": {
     "node": ">=24"
   },
-  "license": "GPL-3.0-only",
+  "license": "MIT",
   "publishConfig": {
     "access": "public"
   },

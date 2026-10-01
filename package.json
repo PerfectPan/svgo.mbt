@@ -2,7 +2,7 @@
   "name": "svgo.mbt-workspace",
   "private": true,
   "description": "svgo.mbt monorepo: MoonBit module (svgo/), npm package (packages/svgo-mbt), comparison suite (packages/compare), website (app/website), CLI (app/cli)",
-  "license": "GPL-3.0-only",
+  "license": "MIT",
   "packageManager": "pnpm@9.0.0",
   "scripts": {
     "dev": "pnpm -C app/website dev",

@@ -250,11 +250,10 @@ it.
 
 ## License
 
-svgo.mbt is licensed under GPL-3.0-only ([`LICENSE`](LICENSE)). Distributing
-the software or a modified version requires releasing its source under the
-same license. Package metadata (`package.json`, `moon.mod`) uses the SPDX
-identifier `GPL-3.0-only`. Change the license only as a deliberate project
-decision. Releases up to 0.3.1 were published under MIT and stay so.
+svgo.mbt is licensed under MIT ([`LICENSE`](LICENSE)): it is a library and a
+tool, and tools and libraries use MIT (applications use GPL-3.0-only). Package
+metadata (`package.json`, `moon.mod`) uses the SPDX identifier `MIT`. Change
+the license only as a deliberate project decision.
 
 Keep third-party notices for code or data copied from other projects in
 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md); svgo's MIT license covers

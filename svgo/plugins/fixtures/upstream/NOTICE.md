@@ -5,8 +5,7 @@ https://github.com/svg/svgo (`test/plugins/*.svg.txt`, commit
 e4cb29bebcc9820ac979dfc05106b512cc5de986, 2026-08-27) for every plugin in
 svgo's preset-default, including the nine svgo.mbt has not written yet. svgo is
 MIT licensed, Copyright (c) Kir Belevich; the license text is in
-[`THIRD_PARTY_NOTICES.md`](../../../THIRD_PARTY_NOTICES.md). These files stay
-under that license; the rest of svgo.mbt is GPL-3.0-only.
+[`THIRD_PARTY_NOTICES.md`](../../../THIRD_PARTY_NOTICES.md).
 
 Format: an optional description, `===`, then `input @@@ expected [@@@ params]`.
 `scripts/gen-fixtures.py` turns them into `fixtures_test.mbt`, following

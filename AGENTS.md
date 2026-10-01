@@ -46,7 +46,7 @@ root installs every JS package.
 ## Layout
 
 ```
-LICENSE                       GPL-3.0-only; svgo/LICENSE is a copy for the mooncakes module
+LICENSE                       MIT; svgo/LICENSE is a copy for the mooncakes module
 THIRD_PARTY_NOTICES.md        MIT notices for code and data from svgo (ported plugins, fixtures) and lz-string; copied to svgo/
 moon.work, package.json       workspace roots (MoonBit members / pnpm packages), .npmrc pins registry.npmjs.org
 svgo/                         the MoonBit module PerfectPan/svgo

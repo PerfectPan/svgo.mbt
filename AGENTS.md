@@ -86,7 +86,7 @@ scripts/                      build-wasm, verify, bench, regress, gen-fixtures; 
                               check-pr-body, install-git-hooks, configure-github-repository (shared project template)
 .githooks/pre-commit          installed by scripts/install-git-hooks.sh
 docs/ARCHITECTURE.md          design notes; docs/README.md lists the current-state docs
-specs/, docs/plans/           active Specs (behavior) and Plans (technical decisions + execution plan); see CONTRIBUTING
+docs/specs/, docs/plans/      active Specs (behavior) and Plans (technical decisions + execution plan); see CONTRIBUTING
 CHANGELOG.md                  points to packages/svgo-mbt/CHANGELOG.md, which changesets writes
 ```
 
@@ -147,10 +147,10 @@ CHANGELOG.md                  points to packages/svgo-mbt/CHANGELOG.md, which ch
 - Pick artifacts with the Change Design Gate in `CONTRIBUTING.md`: a plugin
   addition or fix needs only the requirement in the PR plus fixtures; a
   refactor across packages or targets needs a Plan in `docs/plans/`; public
-  API, CLI, npm interface or website features need a Spec in `specs/` plus a
-  Plan. Do not start a Plan that is blocked on an unresolved decision; after
-  delivery move lasting constraints into `docs/ARCHITECTURE.md`, the invariants
-  above, or tests, and delete the finished Spec/Plan.
+  API, CLI, npm interface or website features need a Spec in `docs/specs/`
+  plus a Plan. Do not start a Plan that is blocked on an unresolved decision;
+  after delivery move lasting constraints into `docs/ARCHITECTURE.md`, the
+  invariants above, or tests, and delete the finished Spec/Plan.
 - Commit messages and PR titles are English `type(scope): summary` with types
   `feat fix docs style refactor perf test build ci chore revert`. Areas are
   scopes: `perf(bench):`, `test(compare):`, `feat(site):`, `fix(<pluginName>):`.

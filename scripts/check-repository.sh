@@ -66,7 +66,7 @@ required_files=(
   "scripts/install-git-hooks.sh"
   "scripts/configure-github-repository.sh"
   "scripts/lib/review-sections.sh"
-  "specs/0000-template.md"
+  "docs/specs/0000-template.md"
   "docs/plans/0000-template.md"
 )
 

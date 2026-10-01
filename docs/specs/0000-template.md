@@ -1,6 +1,6 @@
 # Spec 0000: Product Behavior
 
-Use this template for an active declarative contract. Follow the [SDD Workflow And Document Lifecycle](../CONTRIBUTING.md#sdd-workflow-and-document-lifecycle) for the complete workflow.
+Use this template for an active declarative contract. Follow the [SDD Workflow And Document Lifecycle](../../CONTRIBUTING.md#sdd-workflow-and-document-lifecycle) for the complete workflow.
 
 ## Status
 

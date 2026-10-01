@@ -28,14 +28,15 @@ makes behavior and implementation reviewable.
 | New plugin, plugin fix, or plugin parameter | The requirement in the PR description and fixtures that show it (see "Adding or changing a plugin"); no separate Spec or Plan |
 | Narrow maintenance, tests, documentation, benchmarks | Requirement and PR checklist; a separate Plan only when useful |
 | Technical refactor without changed output (pipeline, packages, wasm boundary, performance rework across targets) | Detailed Plan in `docs/plans/` with compatibility and acceptance conditions |
-| Product behavior beyond one plugin (public API, CLI interface, npm package interface, website features) | One Spec in `specs/` plus one detailed Plan for the same deliverable |
+| Product behavior beyond one plugin (public API, CLI interface, npm package interface, website features) | One Spec in `docs/specs/` plus one detailed Plan for the same deliverable |
 
 A Spec defines observable interactions, scope, failure behavior, and acceptance
 examples. Use stable scenario IDs and Given/When/Then where useful. Link
 scenarios to tests (fixtures count). A Spec does not prescribe components,
-interfaces, or execution order. Keep active Specs under [`specs/`](specs/). A
-small change may keep both sections in the PR description. Split only when each
-slice has an independently demonstrable outcome.
+interfaces, or execution order. Keep active Specs under
+[`docs/specs/`](docs/specs/). A small change may keep both sections in the PR
+description. Split only when each slice has an independently demonstrable
+outcome.
 
 A Plan records technical decisions and the detailed execution plan that
 implements them. Shared architecture, compatibility, and cross-target decisions

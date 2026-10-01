@@ -14,8 +14,8 @@
     "@rivus/svgo": "workspace:*"
   },
   "devDependencies": {
-    "@tailwindcss/cli": "^4.1.0",
-    "tailwindcss": "^4.1.0",
+    "@tailwindcss/cli": "^4.3.3",
+    "tailwindcss": "^4.3.3",
     "terser": "^5.51.2"
   }
 }

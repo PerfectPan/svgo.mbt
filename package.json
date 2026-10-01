@@ -9,15 +9,15 @@
     "build:wasm": "scripts/build-wasm.sh",
     "compare": "pnpm -C packages/compare run all",
     "docs": "MOON_WORK=off moon -C svgo doc",
-    "app": "pnpm -s run docs && node app/website/build.mjs",
+    "app": "pnpm --reporter=silent run docs && node app/website/build.mjs",
     "verify": "scripts/verify.sh",
     "changeset": "changeset",
     "version-packages": "changeset version && node scripts/sync-version.mjs && moon info"
   },
   "devDependencies": {
     "@changesets/changelog-github": "1.0.1",
-    "@changesets/cli": "3.0.2",
-    "binaryen": "123.0.0",
+    "@changesets/cli": "3.0.3",
+    "binaryen": "132.0.0",
     "@rivus/svgo": "workspace:*"
   }
 }

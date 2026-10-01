@@ -19,7 +19,11 @@ gh extension install PerfectPan/gh-repo-checks                    # review check
 `package.json` pins pnpm with `packageManager`; pnpm 10 and later switch to
 that version by themselves. Dependency build scripts are blocked unless
 `allowBuilds` in `pnpm-workspace.yaml` lists the package, and nothing here
-needs one.
+needs one. pnpm resolves only versions published at least a day ago
+(`minimumReleaseAge: 1440` in `pnpm-workspace.yaml`, pnpm's default); an
+install that needs a newer release fails with
+`ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION`, so pick a mature version or wait a
+day rather than lowering the setting.
 
 The MoonBit module lives in `svgo/`; `packages/` holds the npm package and the
 comparison suite; `app/website/` the website and `app/cli/` the CLI. `moon` commands run from the root.
@@ -303,8 +307,10 @@ license, update `THIRD_PARTY_NOTICES.md` in the same PR.
    (`gh pr close <n> && gh pr reopen <n>`) or push an empty commit to its
    branch. `gh workflow run ci.yml` does not count: a dispatched run is not
    attached to the PR and does not satisfy the required checks. Merging runs
-   `release.yml` again: build, tests, `changeset publish` (npm, OIDC trusted
-   publishing, so no token lives in the repo) and the tag `@rivus/svgo@X.Y.Z`.
+   `release.yml` again: build, tests, `changeset publish` and the tag
+   `@rivus/svgo@X.Y.Z`. `changeset publish` runs `pnpm publish`, which
+   authenticates to npm through OIDC trusted publishing (no token lives in the
+   repo) and attaches provenance for this public repository by itself.
 4. The tag runs `binaries.yml`: native CLI tarballs for linux-x86_64,
    linux-arm64 and macos-arm64 on a GitHub release, and `moon publish` of
    `PerfectPan/svgo` to mooncakes using the `MOONCAKES_TOKEN` secret.

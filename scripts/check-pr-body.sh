@@ -43,7 +43,9 @@ fi
 # Descriptions edited in the GitHub web UI arrive with CRLF line endings.
 body="${body//$'\r'/}"
 
-if [[ -z "${body//[[:space:]]/}" ]]; then
+# A regex test instead of ${body//[[:space:]]/}: that expansion takes minutes on
+# a long body under macOS /bin/bash 3.2.
+if [[ ! "$body" =~ [^[:space:]] ]]; then
   printf 'check-pr-body: missing PR body\n' >&2
   exit 1
 fi

@@ -15,7 +15,7 @@
   "dependencies": {
     "@rivus/svgo": "workspace:*",
     "@resvg/resvg-js": "^2.6.2",
-    "pixelmatch": "^6.0.0",
+    "pixelmatch": "^7.2.0",
     "pngjs": "^7.0.0",
     "svgo": "^4.1.0"
   }

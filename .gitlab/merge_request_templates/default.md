@@ -39,7 +39,7 @@ Skipped gates and reasons:
 
 - [ ] No credentials, tokens, private hostnames, personal filesystem paths, or generated logs are included.
 - [ ] Local config, generated output, build artifacts, and temporary workspaces are not staged.
-- [ ] User-facing behavior, docs, changelog, migrations, or rollback notes are updated when relevant.
+- [ ] User-facing behavior, docs, release change files, migrations, or rollback notes are updated when relevant.
 - [ ] Completed Spec/Plan constraints are migrated to tests or current-state docs before retirement; unfinished scope remains active.
 - [ ] The branch is current enough for review, and the remote head matches the intended commit.
 

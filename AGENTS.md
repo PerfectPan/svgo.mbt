@@ -87,7 +87,6 @@ scripts/                      build-wasm, verify, bench, regress, gen-fixtures; 
 .githooks/pre-commit          installed by scripts/install-git-hooks.sh
 docs/ARCHITECTURE.md          design notes; docs/README.md lists the current-state docs
 docs/specs/, docs/plans/      active Specs (behavior) and Plans (technical decisions + execution plan); see CONTRIBUTING
-CHANGELOG.md                  points to packages/svgo-mbt/CHANGELOG.md, which changesets writes
 ```
 
 ## Invariants (tests enforce these; keep them)
@@ -159,8 +158,10 @@ CHANGELOG.md                  points to packages/svgo-mbt/CHANGELOG.md, which ch
   "Generated with <tool>" lines. Run `./scripts/check-pr-title.sh` and
   `./scripts/check-pr-body.sh` before `gh pr create` or editing the body.
 - Keep the GitHub PR and GitLab MR templates identical apart from PR/MR wording.
-- User-visible changes add a changeset (`pnpm changeset`); never edit
-  `CHANGELOG.md` files by hand.
+- Release notes come from changesets: record each user-visible change with
+  `pnpm changeset` in the same PR, and changesets writes
+  `packages/svgo-mbt/CHANGELOG.md` at release time. Never edit that generated
+  changelog by hand or add a hand-written root `CHANGELOG.md`.
 
 ## Adding a plugin (short version, details in CONTRIBUTING.md)
 

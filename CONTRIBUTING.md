@@ -240,6 +240,14 @@ instead of overwriting it; re-run with `--force` only after moving those hooks
 into `.githooks`. Hooks are a local guardrail; CI and branch protection are the
 enforcement.
 
+## Release notes
+
+Release notes come from changesets. A PR that changes what users get records
+each user-facing change as a change file (`pnpm changeset`), and changesets
+writes `packages/svgo-mbt/CHANGELOG.md` at release time. Do not edit that
+generated changelog by hand or keep a hand-written root `CHANGELOG.md` beside
+it.
+
 ## Releasing
 
 `main` is protected: every change is a pull request, merged by rebase or squash
@@ -250,10 +258,10 @@ enforcement.
 2. When that PR lands, `release.yml` opens (or updates) the release PR on the
    branch `changeset-release/main` by running `pnpm version-packages`:
    changesets bumps `packages/svgo-mbt/package.json` and writes
-   `packages/svgo-mbt/CHANGELOG.md` (the root `CHANGELOG.md` only points
-   there), then `scripts/sync-version.mjs` copies the version into
-   `svgo/moon.mod`, the app modules' dependency, the CLI's `--version` and the
-   wasm's `version()`. `scripts/verify.sh` fails if those ever disagree.
+   `packages/svgo-mbt/CHANGELOG.md`, then `scripts/sync-version.mjs` copies
+   the version into `svgo/moon.mod`, the app modules' dependency, the CLI's
+   `--version` and the wasm's `version()`. `scripts/verify.sh` fails if those
+   ever disagree.
    Further changesets merged later are folded into the same PR.
 3. To release, run CI on the release PR and merge it. The PR is opened with
    the workflow token, and GitHub does not start workflows for events that

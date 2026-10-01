@@ -48,7 +48,6 @@ required_files=(
   "CONTRIBUTING.md"
   "README.md"
   "SECURITY.md"
-  "CHANGELOG.md"
   "docs/README.md"
   ".editorconfig"
   ".gitignore"

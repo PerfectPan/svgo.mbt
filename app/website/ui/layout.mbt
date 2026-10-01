@@ -11,6 +11,9 @@ pub const NPM_URL = "https://www.npmjs.com/package/@rivus/svgo"
 pub const MOONCAKES_URL = "https://mooncakes.io/docs/PerfectPan/svgo"
 
 ///|
+pub const NOTICES_URL = "https://github.com/PerfectPan/svgo.mbt/blob/main/THIRD_PARTY_NOTICES.md"
+
+///|
 fn icon(svg : String) -> Html {
   span(class="inline-flex", attrs=Attrs::build().inner_html(svg), nothing)
 }
@@ -203,6 +206,11 @@ pub fn page_footer(route? : Route) -> Html {
                 class="grow-line text-ink-2 hover:text-ink",
                 href=MOONCAKES_URL,
                 "mooncakes.io",
+              ),
+              a(
+                class="grow-line text-ink-2 hover:text-ink",
+                href=NOTICES_URL,
+                t("Third-party notices", "第三方声明"),
               ),
             ],
           ),

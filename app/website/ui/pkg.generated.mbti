@@ -11,6 +11,8 @@ import {
 // Values
 pub const MOONCAKES_URL : String = "https://mooncakes.io/docs/PerfectPan/svgo"
 
+pub const NOTICES_URL : String = "https://github.com/PerfectPan/svgo.mbt/blob/main/THIRD_PARTY_NOTICES.md"
+
 pub const NPM_URL : String = "https://www.npmjs.com/package/@rivus/svgo"
 
 pub const REPO_URL : String = "https://github.com/PerfectPan/svgo.mbt"

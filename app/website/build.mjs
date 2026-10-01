@@ -20,5 +20,7 @@ run(process.execPath, [join(APP, "gen.mjs")]);
 run("warren", ["build", "--browser-entry", "main", "--server-entry", "", "--dist", "dist"]);
 rmSync(OUT, { recursive: true, force: true });
 cpSync(join(APP, "dist"), OUT, { recursive: true });
+// The bundle compiles in third-party code; ship its notices with the site.
+for (const f of ["LICENSE", "THIRD_PARTY_NOTICES.md"]) cpSync(join(ROOT, f), join(OUT, f));
 writeFileSync(join(OUT, ".nojekyll"), "");
 console.log(`site: ${OUT}`);

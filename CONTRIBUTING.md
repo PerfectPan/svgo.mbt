@@ -271,8 +271,11 @@ Keep third-party notices for code or data copied from other projects in
 the ported plugin code, the generated SVG tables and the upstream fixtures.
 The published artifacts carry both files: `svgo/` holds copies for the
 mooncakes module (`scripts/verify.sh` fails if they drift),
-`scripts/build-cli.sh` copies them into the npm package, and `binaries.yml`
-puts them in the native archives.
+`scripts/build-cli.sh` copies them into the npm package, `binaries.yml` puts
+them in the native archives, and `app/website/build.mjs` copies them into the
+site, whose footer links to the notices. When a dependency that is compiled
+into an artifact (including the website's bundle) is added or changes its
+license, update `THIRD_PARTY_NOTICES.md` in the same PR.
 
 ## Releasing
 

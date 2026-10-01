@@ -157,9 +157,9 @@ docs/specs/, docs/plans/      active Specs (behavior) and Plans (technical decis
 - Commit messages and PR titles are English `type(scope): summary` with types
   `feat fix docs style refactor perf test build ci chore revert`. Areas are
   scopes: `perf(bench):`, `test(compare):`, `feat(site):`, `fix(<pluginName>):`.
-- PR descriptions keep every section of `.github/pull_request_template.md`,
-  list the exact validation commands and skipped gates, and carry no
-  "Generated with <tool>" lines. Run `gh repo-checks pr-title` and
+- PR descriptions have a Summary (what changed and why) and a Validation
+  section (exact commands and results, skipped gates with reasons), plus Risks
+  when there are any, and carry no "Generated with <tool>" lines. Run `gh repo-checks pr-title` and
   `gh repo-checks pr-body` before `gh pr create` or editing the body.
 - Keep the GitHub PR and GitLab MR templates identical apart from PR/MR wording.
 - Release notes come from changesets: record each user-visible change with

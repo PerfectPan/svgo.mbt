@@ -9,7 +9,7 @@
     "build:wasm": "scripts/build-wasm.sh",
     "compare": "pnpm -C packages/compare run all",
     "docs": "MOON_WORK=off moon -C svgo doc",
-    "app": "pnpm -s run docs && node app/website/build.mjs",
+    "app": "pnpm --reporter=silent run docs && node app/website/build.mjs",
     "verify": "scripts/verify.sh",
     "changeset": "changeset",
     "version-packages": "changeset version && node scripts/sync-version.mjs && moon info"

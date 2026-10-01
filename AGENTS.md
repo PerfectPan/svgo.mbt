@@ -37,8 +37,8 @@ root installs every JS package.
 | wasm artifact for `packages/svgo-mbt` and the site | `scripts/build-wasm.sh` (release + pinned wasm-opt; run `pnpm install` first) |
 | compare with svgo-js (sizes, render diff, speed) | `pnpm compare` (or the scripts in `packages/compare/`) |
 | refresh the numbers on the site | `node packages/compare/collect.mjs` → `app/website/data.json` |
-| API docs data (also what mooncakes.io renders) | `pnpm docs` (= `MOON_WORK=off moon -C svgo doc`, workspace mode off because the app member is js-only) → `svgo/_build/doc/` |
-| build the site into `_build/app` | `pnpm app` (= `pnpm docs && node app/website/build.mjs`; needs `moon install moonbit-community/warren`) |
+| API docs data (also what mooncakes.io renders) | `pnpm run docs` (= `MOON_WORK=off moon -C svgo doc`, workspace mode off because the app member is js-only) → `svgo/_build/doc/` |
+| build the site into `_build/app` | `pnpm app` (= `pnpm run docs && node app/website/build.mjs`; needs `moon install moonbit-community/warren`) |
 | dev server with live reload | `pnpm dev` → http://localhost:4173 (warren dev + tailwind --watch) |
 | regenerate the site's data files | `node app/website/gen.mjs` (after collect.mjs or moon doc changed) |
 | record a user-visible change for the changelog | `pnpm changeset` in the PR (writes `.changeset/*.md`) |
@@ -49,7 +49,8 @@ root installs every JS package.
 ```
 LICENSE                       MIT; svgo/LICENSE is a copy for the mooncakes module
 THIRD_PARTY_NOTICES.md        notices for svgo (ported plugins, fixtures), the MoonBit core library in every build, and the website's bundle (lz-string, Rabbita, Rabbita UI, moonbitlang/async, Tailwind CSS); copied to svgo/ and into the site
-moon.work, package.json       workspace roots (MoonBit members / pnpm packages), .npmrc pins registry.npmjs.org
+moon.work, package.json       workspace roots (MoonBit members / pnpm packages); package.json pins pnpm 12, .npmrc pins registry.npmjs.org
+pnpm-workspace.yaml           pnpm packages and allowBuilds (dependency build scripts are blocked unless listed)
 svgo/                         the MoonBit module PerfectPan/svgo
   svgo.mbt, svgo_test.mbt     public API: optimize(svg, config?) -> Result, Config (custom plugins via Config::custom), list_plugins
   xml/                        Document/Node/Element, parse, serialize (SVG-oriented, keeps prolog)

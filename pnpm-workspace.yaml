@@ -1,3 +1,9 @@
 packages:
   - "packages/*"
   - "app/website"
+
+# Dependency build scripts are blocked unless listed here. @parcel/watcher's
+# install script only compiles from source on request; the prebuilt platform
+# package is used instead.
+allowBuilds:
+  "@parcel/watcher": false

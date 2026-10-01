@@ -201,17 +201,22 @@ The body says what changed in behavior or numbers.
 
 ## Pull requests
 
-Every PR answers: what changed, why, how it was tested, which validation gates
-were skipped and why, what evidence backs the claim (fixtures, render diff,
-benchmark numbers, screenshots for site changes), and what risks follow.
-
-The description keeps every `##` section of
+The PR template,
 [`.github/pull_request_template.md`](.github/pull_request_template.md) (the
 GitLab copy in `.gitlab/merge_request_templates/` stays identical apart from
-PR/MR wording). Summary and Validation must hold real content, not template
-placeholders, and the description carries no agent attribution lines such as
-"Generated with <tool>"; the author is accountable for the content. Check it
-before opening or editing the PR:
+PR/MR wording), has three sections:
+
+- **Summary**: what changed and why, with links to the issue, Spec or Plan.
+- **Validation**: the commands you ran and their results, the evidence behind
+  the claim (fixtures, render diff, benchmark numbers, screenshots for site
+  changes), and skipped gates with reasons.
+- **Risks** (optional): compatibility, rollout, rollback or follow-up risks.
+  Delete it when there are none.
+
+Summary and Validation must hold real content, not template placeholders;
+other sections are optional. The description carries no agent attribution
+lines such as "Generated with <tool>"; the author is accountable for the
+content. Check it before opening or editing the PR:
 
 ```bash
 gh repo-checks pr-title "fix(minifyStyles): minify numbers in style attributes"

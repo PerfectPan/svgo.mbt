@@ -222,6 +222,11 @@ between the PR/MR templates. It does not replace `scripts/verify.sh`; run both
 before opening review. Do not commit tokens, local config, internal hostnames,
 or personal paths, including inside fixtures and `svgo/testdata/`.
 
+Workflows reference actions by their latest major version tag, such as
+`actions/checkout@v7`, not by commit SHA. `.github/workflows/review.yml` is
+copied from the project template and takes action upgrades from the template
+rather than local edits.
+
 ## Local Git hooks
 
 ```bash

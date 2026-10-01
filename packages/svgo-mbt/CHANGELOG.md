@@ -1,5 +1,13 @@
 # @rivus/svgo
 
+## 0.3.2
+
+### Patch Changes
+
+- [#39](https://github.com/PerfectPan/svgo.mbt/pull/39) [`76ab4f5`](https://github.com/PerfectPan/svgo.mbt/commit/76ab4f528f30705c40aa6aa933a1412a16a98239) Thanks [@PerfectPan](https://github.com/PerfectPan)! - The npm package and the native CLI archives now include `LICENSE` and `THIRD_PARTY_NOTICES.md`, which carries svgo's MIT notice for the ported code.
+
+- [#44](https://github.com/PerfectPan/svgo.mbt/pull/44) [`95f992d`](https://github.com/PerfectPan/svgo.mbt/commit/95f992de4ab96113e36e9c14438a1efde88f578b) Thanks [@PerfectPan](https://github.com/PerfectPan)! - `svgo.wasm` is now optimized with Binaryen 132's `wasm-opt` (was 123), which makes it 261 bytes smaller; its output is unchanged.
+
 ## 0.3.1
 
 ### Patch Changes

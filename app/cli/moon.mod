@@ -10,7 +10,7 @@ readme = "../../README.mbt.md"
 
 repository = "https://github.com/PerfectPan/svgo.mbt"
 
-license = "MIT"
+license = "GPL-3.0-only"
 
 keywords = [ "svg", "svgo", "optimizer", "cli" ]
 

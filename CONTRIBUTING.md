@@ -248,6 +248,22 @@ writes `packages/svgo-mbt/CHANGELOG.md` at release time. Do not edit that
 generated changelog by hand or keep a hand-written root `CHANGELOG.md` beside
 it.
 
+## License
+
+svgo.mbt is licensed under GPL-3.0-only ([`LICENSE`](LICENSE)). Distributing
+the software or a modified version requires releasing its source under the
+same license. Package metadata (`package.json`, `moon.mod`) uses the SPDX
+identifier `GPL-3.0-only`. Change the license only as a deliberate project
+decision. Releases up to 0.3.1 were published under MIT and stay so.
+
+Keep third-party notices for code or data copied from other projects in
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md); svgo's MIT license covers
+the ported plugin code, the generated SVG tables and the upstream fixtures.
+The published artifacts carry both files: `svgo/` holds copies for the
+mooncakes module (`scripts/verify.sh` fails if they drift),
+`scripts/build-cli.sh` copies them into the npm package, and `binaries.yml`
+puts them in the native archives.
+
 ## Releasing
 
 `main` is protected: every change is a pull request, merged by rebase or squash

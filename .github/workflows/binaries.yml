@@ -56,7 +56,7 @@ jobs:
           version=$("$bin" --version | tr -d '[:space:]')
           mkdir -p dist/svgo-mbt
           cp "$bin" dist/svgo-mbt/svgo-mbt
-          cp LICENSE packages/svgo-mbt/README.md dist/svgo-mbt/
+          cp LICENSE THIRD_PARTY_NOTICES.md packages/svgo-mbt/README.md dist/svgo-mbt/
           tar -C dist -czf "svgo-mbt-$version-${{ matrix.asset }}.tar.gz" svgo-mbt
           ls -la svgo-mbt-*.tar.gz
       - uses: actions/upload-artifact@v7

@@ -21,7 +21,9 @@
     "index.mjs",
     "cli.mjs",
     "svgo.wasm",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md"
   ],
   "scripts": {
     "test": "node --test",
@@ -30,7 +32,7 @@
   "engines": {
     "node": ">=24"
   },
-  "license": "MIT",
+  "license": "GPL-3.0-only",
   "publishConfig": {
     "access": "public"
   },

@@ -53,6 +53,15 @@ jobs:
           moon install moonbit-community/warren
           MOON_WORK=off moon -C svgo doc
           node app/website/build.mjs
+      # The build regenerates the ui data files (gen.mjs); they are committed,
+      # so they must not drift. Same shape as the .mbti check in verify.sh.
+      - name: Generated website data is committed up to date
+        run: |
+          git diff --exit-code -- app/website/ui/api_data.mbt app/website/ui/cli_data.mbt app/website/ui/data.mbt app/website/ui/samples.mbt || {
+            echo "generated website data is stale; regenerate and commit:" >&2
+            echo "  MOON_WORK=off moon -C svgo doc && node app/website/gen.mjs" >&2
+            exit 1
+          }
       - name: Benchmarks (native)
         if: matrix.os == 'macos-latest'
         run: scripts/bench.sh

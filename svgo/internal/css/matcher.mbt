@@ -25,7 +25,7 @@ fn match_attribute_value(val : String, matcher : AttrMatcher) -> Bool {
 ///|
 pub fn match_simple(
   ctx : DocumentContext,
-  node_id : Int,
+  node_id : Int32,
   simple : SimpleSelector,
 ) -> Bool {
   let el = ctx.elements[node_id]
@@ -75,7 +75,7 @@ pub fn match_simple(
 ///|
 pub fn match_compound(
   ctx : DocumentContext,
-  node_id : Int,
+  node_id : Int32,
   compound : CompoundSelector,
 ) -> Bool {
   for s in compound.simples {
@@ -90,7 +90,7 @@ pub fn match_compound(
 /// Test if a complex selector matches a node in its document context.
 pub fn match_complex(
   ctx : DocumentContext,
-  node_id : Int,
+  node_id : Int32,
   selector : ComplexSelector,
 ) -> Bool {
   let n = selector.tail.length()
@@ -105,7 +105,7 @@ pub fn match_complex(
   }
 
   // Work backwards from right to left
-  fn match_prev(curr_id : Int, step_idx : Int) -> Bool {
+  fn match_prev(curr_id : Int32, step_idx : Int32) -> Bool {
     if step_idx < 0 {
       return true
     }
@@ -172,21 +172,21 @@ pub fn match_complex(
 /// A flattened indexed view of an XML document for fast DOM traversal during CSS matching.
 pub(all) struct DocumentContext {
   elements : Array[@xml.Element]
-  parents : Array[Int]
-  prev_siblings : Array[Int]
+  parents : Array[Int32]
+  prev_siblings : Array[Int32]
 }
 
 ///|
 pub fn DocumentContext::build(doc : @xml.Document) -> DocumentContext {
   let elements : Array[@xml.Element] = []
-  let parents : Array[Int] = []
-  let prev_siblings : Array[Int] = []
+  let parents : Array[Int32] = []
+  let prev_siblings : Array[Int32] = []
 
   fn walk_node(
     node : @xml.Node,
-    parent_idx : Int,
-    prev_sibling_idx : Int,
-  ) -> Int {
+    parent_idx : Int32,
+    prev_sibling_idx : Int32,
+  ) -> Int32 {
     match node {
       Element(el) => {
         let my_idx = elements.length()
@@ -220,8 +220,8 @@ pub fn DocumentContext::build(doc : @xml.Document) -> DocumentContext {
 pub fn DocumentContext::find_all_matches(
   self : DocumentContext,
   selector : ComplexSelector,
-) -> Array[Int] {
-  let result : Array[Int] = []
+) -> Array[Int32] {
+  let result : Array[Int32] = []
   for i = 0; i < self.elements.length(); i = i + 1 {
     if match_complex(self, i, selector) {
       result.push(i)

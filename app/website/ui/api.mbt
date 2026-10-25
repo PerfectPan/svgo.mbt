@@ -153,7 +153,7 @@ fn highlight_one_line(sig : String) -> Array[Html] {
 fn sig_block(
   signature : String,
   emit : Emit[ApiMsg],
-  overlay_copy? : Bool = true,
+  overlay_copy~ : Bool = true,
 ) -> Html {
   let multiline = signature.contains("\n")
   let show_button = multiline && overlay_copy

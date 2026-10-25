@@ -4,19 +4,19 @@ extern "C" fn c_svgo_read_file(path : Bytes) -> Bytes = "svgo_read_file"
 
 ///|
 #borrow(path, data)
-extern "C" fn c_svgo_write_file(path : Bytes, data : Bytes) -> Int = "svgo_write_file"
+extern "C" fn c_svgo_write_file(path : Bytes, data : Bytes) -> Int32 = "svgo_write_file"
 
 ///|
 extern "C" fn c_svgo_read_stdin() -> Bytes = "svgo_read_stdin"
 
 ///|
-extern "C" fn c_svgo_is_tty(fd : Int) -> Int = "svgo_is_tty"
+extern "C" fn c_svgo_is_tty(fd : Int32) -> Int32 = "svgo_is_tty"
 
 ///|
 extern "C" fn c_svgo_clock_ms() -> Double = "svgo_clock_ms"
 
 ///|
-extern "C" fn c_svgo_exit(code : Int) -> Unit = "svgo_exit"
+extern "C" fn c_svgo_exit(code : Int32) -> Unit = "svgo_exit"
 
 ///|
 #borrow(s)
@@ -24,7 +24,7 @@ extern "C" fn c_svgo_eprint(s : Bytes) -> Unit = "svgo_eprint"
 
 ///|
 #borrow(path)
-extern "C" fn c_svgo_is_dir(path : Bytes) -> Int = "svgo_is_dir"
+extern "C" fn c_svgo_is_dir(path : Bytes) -> Int32 = "svgo_is_dir"
 
 ///|
 #borrow(path)
@@ -32,7 +32,7 @@ extern "C" fn c_svgo_list_dir(path : Bytes) -> Bytes = "svgo_list_dir"
 
 ///|
 #borrow(path)
-extern "C" fn c_svgo_mkdir_p(path : Bytes) -> Int = "svgo_mkdir_p"
+extern "C" fn c_svgo_mkdir_p(path : Bytes) -> Int32 = "svgo_mkdir_p"
 
 ///|
 fn cstr(s : String) -> Bytes {
@@ -50,7 +50,7 @@ fn svgo_read_file(path : String) -> Bytes {
 
 ///|
 /// Write a byte buffer to a file. Returns 0 on success, non-zero on failure.
-fn svgo_write_file(path : String, data : Bytes) -> Int {
+fn svgo_write_file(path : String, data : Bytes) -> Int32 {
   c_svgo_write_file(cstr(path), data)
 }
 
@@ -62,7 +62,7 @@ fn svgo_read_stdin() -> Bytes {
 
 ///|
 /// Returns true if file descriptor `fd` (0 stdin, 1 stdout, 2 stderr) is a terminal.
-fn svgo_is_tty(fd : Int) -> Bool {
+fn svgo_is_tty(fd : Int32) -> Bool {
   c_svgo_is_tty(fd) != 0
 }
 
@@ -74,7 +74,7 @@ fn svgo_clock_ms() -> Double {
 
 ///|
 /// Exit the process with the given status code.
-fn svgo_exit(code : Int) -> Unit {
+fn svgo_exit(code : Int32) -> Unit {
   c_svgo_exit(code)
 }
 
@@ -106,7 +106,7 @@ fn svgo_list_dir(path : String) -> String {
 ///|
 /// Create a directory and all its parents. Returns 0 on success, non-zero on
 /// failure.
-fn svgo_mkdir_p(path : String) -> Int {
+fn svgo_mkdir_p(path : String) -> Int32 {
   c_svgo_mkdir_p(cstr(path))
 }
 

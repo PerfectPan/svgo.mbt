@@ -2,10 +2,10 @@
 /// A row of the benchmark table (see data.mbt, generated).
 pub(all) struct BenchRow {
   file : String
-  original : Int
-  mbt : Int
-  js : Int
-  js_default : Int
+  original : Int32
+  mbt : Int32
+  js : Int32
+  js_default : Int32
   mbt_ms : Double
   js_ms : Double
 } derive(Eq)
@@ -73,9 +73,9 @@ pub extend CliFlag with Eq::{not_equal, equal}
 /// What one optimize() call produced, in a form the views can compare.
 pub(all) struct Outcome {
   data : String
-  original_size : Int
-  size : Int
-  passes : Int
+  original_size : Int32
+  size : Int32
+  passes : Int32
   applied : Array[String]
   ms : Double
   error : String
@@ -113,9 +113,9 @@ pub fn Outcome::saved_percent(self : Outcome) -> Double {
 pub fn run_optimize(
   svg : String,
   plugins? : Array[String],
-  precision? : Int = 3,
-  multipass? : Bool = true,
-  pretty? : Bool = false,
+  precision~ : Int32 = 3,
+  multipass~ : Bool = true,
+  pretty~ : Bool = false,
 ) -> Outcome {
   let base = @svgo.Config::default()
   let config : @svgo.Config = {
@@ -170,7 +170,7 @@ let opt_in_plugins : Array[(String, String, Bool)] = {
 
 ///|
 /// A plugin's zero-padded position in the default pipeline.
-fn pipeline_number(idx : Int) -> String {
+fn pipeline_number(idx : Int32) -> String {
   if idx < 9 {
     "0\{idx + 1}"
   } else {

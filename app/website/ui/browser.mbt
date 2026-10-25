@@ -136,7 +136,7 @@ fn dropzone_sub(
 /// model, not the DOM: the vdom has usually already patched the element to
 /// `to` by the time this runs, so reading its current text back out would
 /// find no change to animate.
-extern "js" fn tween_int(id : String, from : Int, to : Int) -> Unit =
+extern "js" fn tween_int(id : String, from : Int32, to : Int32) -> Unit =
   #|(id, from, to) => {
   #|  const el = document.getElementById(id);
   #|  const node = el && el.firstChild;
@@ -163,11 +163,11 @@ extern "js" fn replace_url(url : String) -> Unit =
   #|(url) => history.replaceState(null, "", url)
 
 ///|
-extern "js" fn to_fixed(d : Double, digits : Int) -> String =
+extern "js" fn to_fixed(d : Double, digits : Int32) -> String =
   #|(d, n) => d.toFixed(n)
 
 ///|
-extern "js" fn with_commas(n : Int) -> String =
+extern "js" fn with_commas(n : Int32) -> String =
   #|(n) => n.toLocaleString("en-US")
 
 ///|
@@ -183,12 +183,12 @@ pub fn fmt_ms(ms : Double) -> String {
 }
 
 ///|
-pub fn fmt_int(n : Int) -> String {
+pub fn fmt_int(n : Int32) -> String {
   with_commas(n)
 }
 
 ///|
-pub fn fmt_pct(p : Double, digits? : Int = 1) -> String {
+pub fn fmt_pct(p : Double, digits~ : Int32 = 1) -> String {
   to_fixed(p, digits)
 }
 
@@ -302,7 +302,7 @@ pub fn start_motion() -> Unit {
 /// lands crisply. Does nothing under `prefers-reduced-motion` (the element
 /// keeps showing `to` throughout). Retries `requestAnimationFrame` until the
 /// id mounts, the same pattern as `scroll_to_id`.
-extern "js" fn animate_count(id : String, from : Int, to : Int) -> Unit =
+extern "js" fn animate_count(id : String, from : Int32, to : Int32) -> Unit =
   #|(id, from, to) => {
   #|  if (!document.documentElement.classList.contains("motion")) return;
   #|  let tries = 60;

@@ -29,7 +29,7 @@ pub extend NumError with Debug::{to_repr}
 /// `10^-precision` as svgo computes it (`+Math.pow(.1, precision).toFixed(precision)`),
 /// i.e. the correctly rounded value. A single division gives exactly that;
 /// `pow` does not for precision 4 and 5.
-pub fn epsilon(precision : Int) -> Double {
+pub fn epsilon(precision : Int32) -> Double {
   if precision < 0 {
     pow10[if precision < -22 { 22 } else { -precision }]
   } else {
@@ -52,7 +52,7 @@ pub fn parse_number(s : String) -> Double? {
 
 ///|
 /// Round to `precision` decimal places (0..15; anything larger is identity).
-pub fn round_to(v : Double, precision : Int) -> Double {
+pub fn round_to(v : Double, precision : Int32) -> Double {
   if precision >= 15 {
     return v
   }
@@ -70,7 +70,7 @@ pub fn round_to(v : Double, precision : Int) -> Double {
 /// within `10^-precision` of a `precision-1`-place boundary, snap to that
 /// boundary. This kills near-zero values like 0.0005 (at precision 3 → 0)
 /// instead of writing them as 0.001.
-pub fn strong_round(v : Double, precision : Int) -> Double {
+pub fn strong_round(v : Double, precision : Int32) -> Double {
   if precision <= 0 {
     return round_to(v, precision)
   }
@@ -95,8 +95,8 @@ pub fn strong_round(v : Double, precision : Int) -> Double {
 /// back to the general parser.
 pub fn scan_number(
   cu : ArrayView[UInt16],
-  i : Int,
-) -> (Double, Int) raise NumError {
+  i : Int32,
+) -> (Double, Int32) raise NumError {
   let n = cu.length()
   let start = i
   let mut j = i
@@ -185,8 +185,8 @@ pub fn scan_number(
 /// digits without their sign (the caller applies it).
 fn slow_path(
   cu : ArrayView[UInt16],
-  start : Int,
-  end : Int,
+  start : Int32,
+  end : Int32,
 ) -> Double raise NumError {
   let text = String::from_iter(
     cu[start:end].iter().map(u => u.to_int().unsafe_to_char()),
@@ -198,7 +198,7 @@ fn slow_path(
 }
 
 ///|
-fn digits_of(v : Int64) -> Int {
+fn digits_of(v : Int64) -> Int32 {
   let mut n = 1
   let mut v = v
   while v >= 10 {
@@ -228,9 +228,9 @@ fn write_digits(sb : StringBuilder, v : Int64) -> Unit {
 fn format_into(
   sb : StringBuilder?,
   v : Double,
-  precision : Int,
-  prev? : Int = 0,
-) -> Int {
+  precision : Int32,
+  prev~ : Int32 = 0,
+) -> Int32 {
   let p = if precision < 0 {
     0
   } else if precision > 15 {
@@ -330,7 +330,7 @@ fn format_into(
 ///|
 /// Shortest decimal representation of a number for path data:
 /// no trailing zeros, no leading zero before the decimal point.
-pub fn format_number(v : Double, precision : Int) -> String {
+pub fn format_number(v : Double, precision : Int32) -> String {
   let sb = StringBuilder()
   ignore(format_into(Some(sb), v, precision))
   sb.to_string()
@@ -338,7 +338,7 @@ pub fn format_number(v : Double, precision : Int) -> String {
 
 ///|
 /// Append `format_number(v, precision)` to `sb` without intermediate strings.
-pub fn write_number(sb : StringBuilder, v : Double, precision : Int) -> Unit {
+pub fn write_number(sb : StringBuilder, v : Double, precision : Int32) -> Unit {
   ignore(format_into(Some(sb), v, precision))
 }
 
@@ -350,9 +350,9 @@ pub fn write_number(sb : StringBuilder, v : Double, precision : Int) -> Unit {
 pub fn write_path_number(
   sb : StringBuilder,
   v : Double,
-  precision : Int,
-  prev : Int,
-) -> Int {
+  precision : Int32,
+  prev : Int32,
+) -> Int32 {
   format_into(Some(sb), v, precision, prev~)
 }
 
@@ -361,7 +361,7 @@ pub fn write_path_number(
 /// none, e.g. right after a command letter) and one of shape `next`. None is
 /// needed before a '-', or before a '.' when the previous number already has
 /// one; only the flag bits of `next` are read.
-pub fn needs_separator(prev : Int, next : Int) -> Bool {
+pub fn needs_separator(prev : Int32, next : Int32) -> Bool {
   prev != 0 && (next & 1) == 0 && ((next & 2) == 0 || (prev & 4) == 0)
 }
 
@@ -369,6 +369,6 @@ pub fn needs_separator(prev : Int, next : Int) -> Bool {
 /// Shape of `format_number(v, precision)` packed into an Int, so callers can
 /// measure output without building strings: bits 3.. hold the length; flag 1:
 /// starts with '-'; flag 2: starts with '.'; flag 4: contains a '.'.
-pub fn number_shape(v : Double, precision : Int) -> Int {
+pub fn number_shape(v : Double, precision : Int32) -> Int32 {
   format_into(None, v, precision)
 }

@@ -5,7 +5,7 @@
 /// draws something (see `is_drawing_command`), which is all a caller needs to
 /// tell an empty or single-point path from a visible one without reading the
 /// whole string.
-fn parse_prefix(d : String, until_drawing? : Bool = false) -> Array[Segment] {
+fn parse_prefix(d : String, until_drawing~ : Bool = false) -> Array[Segment] {
   let out : Array[Segment] = []
   parse_into(out, d, until_drawing~) catch {
     _ => ()
@@ -17,13 +17,13 @@ fn parse_prefix(d : String, until_drawing? : Bool = false) -> Array[Segment] {
 fn parse_into(
   out : Array[Segment],
   d : String,
-  until_drawing? : Bool = false,
+  until_drawing~ : Bool = false,
 ) -> Unit raise PathError {
   let cu = d.code_units()
   let n = cu.length()
   let mut i = 0
   let mut cmd : Char = ' '
-  fn skip(i : Int) -> Int {
+  fn skip(i : Int32) -> Int32 {
     let mut i = i
     while i < n &&
           (
@@ -94,7 +94,7 @@ fn parse_into(
 fn write_path(
   sb : StringBuilder,
   segments : Array[Segment],
-  precision : Int,
+  precision : Int32,
 ) -> Unit {
   // The leading moveto is always from the origin, so its absolute/relative
   // form is interchangeable. Match its case to the following lineto so the
@@ -149,7 +149,7 @@ fn write_path(
 ///|
 /// Length of `stringify([seg])`: the command letter plus its arguments with
 /// the same separator rules as `stringify`.
-fn segment_len(seg : Segment, precision : Int) -> Int {
+fn segment_len(seg : Segment, precision : Int32) -> Int32 {
   let mut len = 1
   let is_arc = seg.cmd == 'a' || seg.cmd == 'A'
   let mut prev = 0

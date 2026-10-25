@@ -78,8 +78,8 @@ fn px_factor(unit : String) -> Double? {
 fn convert_to_px(
   n : Double,
   unit : String,
-  original_len : Int,
-  precision : Int,
+  original_len : Int32,
+  precision : Int32,
 ) -> (Double, String) {
   match px_factor(unit) {
     Some(factor) => {
@@ -185,7 +185,7 @@ fn convert_color(v : String, ctx : Context, in_mask : Bool) -> String {
       .map(p => p.to_owned())
       .to_array()
     if parts.length() == 3 {
-      let vals : Array[Int] = []
+      let vals : Array[Int32] = []
       for p in parts {
         match split_unit(p) {
           Some((n, "%")) =>
@@ -220,7 +220,7 @@ fn convert_color(v : String, ctx : Context, in_mask : Bool) -> String {
 }
 
 ///|
-fn hex2(n : Int) -> String {
+fn hex2(n : Int32) -> String {
   n.to_string(radix=16).pad_start(2, '0')
 }
 

@@ -138,7 +138,7 @@ fn cleanup_ids_run(doc : @xml.Document, ctx : Context) -> Bool {
 }
 
 ///|
-fn short_id(index : Int) -> String {
+fn short_id(index : Int32) -> String {
   let alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
   let tail = alphabet[index % 52:index % 52 + 1].to_owned()
   if index < 52 {

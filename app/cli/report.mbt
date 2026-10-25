@@ -9,13 +9,13 @@ struct Term {
   /// `→`, `−` and `…`, else `->`, `-` and `...`
   unicode : Bool
   /// columns available for a line
-  width : Int
+  width : Int32
 }
 
 ///|
 /// Capabilities of file descriptor `fd` (1 stdout, 2 stderr), from the
 /// environment. Only callers that never write SVG data to `fd` may style it.
-fn Term::detect(fd : Int) -> Term {
+fn Term::detect(fd : Int32) -> Term {
   let env = (key : String) => {
     match @env.get_env_var(key) {
       Some("") | None => None
@@ -111,7 +111,7 @@ fn Term::ellipsis(self : Term) -> String {
 
 ///|
 /// Byte count in 1000-based units, one decimal from 1 KB up: `836 B`, `4.2 KB`.
-fn human_size(bytes : Int) -> String {
+fn human_size(bytes : Int32) -> String {
   if bytes < 1000 {
     return "\{bytes} B"
   }
@@ -140,7 +140,7 @@ fn human_ms(ms : Double) -> String {
 
 ///|
 /// `x` rounded to `digits` decimals (1 or 2), always printing them.
-fn fixed(x : Double, digits : Int) -> String {
+fn fixed(x : Double, digits : Int32) -> String {
   let scale = if digits == 1 { 10 } else { 100 }
   let n = (x * scale.to_double()).round().to_int()
   let frac = (n % scale).to_string()
@@ -149,7 +149,7 @@ fn fixed(x : Double, digits : Int) -> String {
 
 ///|
 /// Size change in whole percent of the original: negative when it shrank.
-fn change_percent(original : Int, size : Int) -> Int {
+fn change_percent(original : Int32, size : Int32) -> Int32 {
   if original == 0 {
     0
   } else {
@@ -161,7 +161,7 @@ fn change_percent(original : Int, size : Int) -> Int {
 
 ///|
 /// Keep the end of `s`, the part that names the file, within `max` columns.
-fn shorten_left(s : String, max : Int, ellipsis : String) -> String {
+fn shorten_left(s : String, max : Int32, ellipsis : String) -> String {
   if s.length() <= max {
     return s
   }
@@ -180,7 +180,7 @@ const PERCENT_WIDTH = 5
 
 ///|
 /// Left margin plus every column after the path in a report row.
-const ROW_TAIL : Int = 2 + 2 + SIZE_WIDTH + 4 + SIZE_WIDTH + 2 + PERCENT_WIDTH
+const ROW_TAIL : Int32 = 2 + 2 + SIZE_WIDTH + 4 + SIZE_WIDTH + 2 + PERCENT_WIDTH
 
 ///|
 /// The size table printed after files are optimized: one row per file as it
@@ -188,7 +188,7 @@ const ROW_TAIL : Int = 2 + 2 + SIZE_WIDTH + 4 + SIZE_WIDTH + 2 + PERCENT_WIDTH
 struct Report {
   term : Term
   /// width of the first column, fixed up front so rows can print one by one
-  label_width : Int
+  label_width : Int32
 }
 
 ///|
@@ -217,8 +217,8 @@ fn Report::label(self : Report, s : String) -> String {
 /// share one reset code.
 fn Report::sizes(
   self : Report,
-  original : Int,
-  size : Int,
+  original : Int32,
+  size : Int32,
   dim~ : Bool,
 ) -> String {
   let t = self.term
@@ -286,10 +286,10 @@ fn Report::plugins(self : Report, applied : Array[String]) -> String {
 /// were optimized.
 fn Report::totals(
   self : Report,
-  files~ : Int,
-  failed~ : Int,
-  original~ : Int,
-  size~ : Int,
+  files~ : Int32,
+  failed~ : Int32,
+  original~ : Int32,
+  size~ : Int32,
   elapsed_ms~ : Double,
 ) -> String {
   let t = self.term
@@ -312,9 +312,9 @@ fn Report::totals(
 fn Report::bench(
   self : Report,
   label : String,
-  runs~ : Int,
+  runs~ : Int32,
   total_ms~ : Double,
-  input_size~ : Int,
+  input_size~ : Int32,
 ) -> String {
   let per = human_ms(total_ms / runs.to_double()) + "/run"
   "  \{self.label(label)}  \{runs} runs  \{human_ms(total_ms).pad_start(8, ' ')}  \{self.term.bold(per.pad_start(12, ' '))}  \{human_size(input_size).pad_start(SIZE_WIDTH, ' ')}"

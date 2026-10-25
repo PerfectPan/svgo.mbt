@@ -617,7 +617,7 @@ let sort_attrs : Plugin = {
   description: "sort attributes",
   run: (doc, ctx) => {
     let order = if ctx.has_param("order") {
-      let ranks : Map[String, Int] = Map([])
+      let ranks : Map[String, Int32] = Map([])
       for name in ctx.param_strings("order") {
         if !ranks.contains(name) {
           ranks[name] = ranks.length() + 1
@@ -664,7 +664,7 @@ let sort_attrs : Plugin = {
 ///|
 /// Sort order of well known attributes; `xmlns*` first, then this list (an
 /// attribute like `stroke-width` sorts with `stroke`), then the rest.
-let attr_order : Map[String, Int] = {
+let attr_order : Map[String, Int32] = {
   "id": 1,
   "width": 2,
   "height": 3,
@@ -685,7 +685,7 @@ let attr_order : Map[String, Int] = {
 }
 
 ///|
-fn attr_rank(k : String, order : Map[String, Int], front : Bool) -> Int {
+fn attr_rank(k : String, order : Map[String, Int32], front : Bool) -> Int32 {
   let namespace_rank = if front && k == "xmlns" {
     0
   } else if front && k.has_prefix("xmlns:") {

@@ -4,7 +4,7 @@
 /// the exact segment structure (for example markers or animations).
 pub(all) struct Options {
   /// decimal places kept for coordinates
-  precision : Int
+  precision : Int32
   /// choose between absolute and relative form per segment by length
   utilize_absolute : Bool
   /// drop zero-length segments and `L` back to the subpath start before `Z`
@@ -136,7 +136,7 @@ fn to_absolute(seg : Segment, cx : Double, cy : Double) -> Abs {
 }
 
 ///|
-fn approx(a : Double, b : Double, precision : Int) -> Bool {
+fn approx(a : Double, b : Double, precision : Int32) -> Bool {
   @num.round_to(a, precision) == @num.round_to(b, precision)
 }
 
@@ -191,7 +191,7 @@ priv struct Emitter {
 }
 
 ///|
-fn Emitter::seg_len(self : Emitter, seg : Segment) -> Int {
+fn Emitter::seg_len(self : Emitter, seg : Segment) -> Int32 {
   segment_len(seg, self.options.precision)
 }
 
@@ -1069,7 +1069,7 @@ fn make_arcs(segments : Array[Segment], options : Options) -> Array[Segment] {
 /// Total stringified length of a run of curve segments, used to compare
 /// against the arc form. The original command (`c` or `s`) is preserved
 /// because `s` is shorter than `c`.
-fn curves_length(curves : Array[Segment], precision : Int) -> Int {
+fn curves_length(curves : Array[Segment], precision : Int32) -> Int32 {
   stringify(curves, precision~).length()
 }
 
@@ -1081,8 +1081,8 @@ fn arc_length(
   sweep : Double,
   endx : Double,
   endy : Double,
-  precision : Int,
-) -> Int {
+  precision : Int32,
+) -> Int32 {
   segment_len(
     { cmd: 'a', args: [r, r, 0.0, large_arc, sweep, endx, endy], },
     precision,
@@ -1095,7 +1095,7 @@ fn arc_length(
 /// is preserved up to the configured precision.
 pub fn optimize(
   segments : Array[Segment],
-  options? : Options = Options::default(),
+  options~ : Options = Options::default(),
 ) -> Array[Segment] {
   let segments = make_arcs(segments, options)
   let p = options.precision
@@ -1638,7 +1638,7 @@ pub fn optimize(
 /// Convenience: parse, optimize and stringify path data.
 pub fn optimize_string(
   d : String,
-  options? : Options = Options::default(),
+  options~ : Options = Options::default(),
 ) -> String raise PathError {
   stringify(optimize(parse(d), options~), precision=options.precision)
 }

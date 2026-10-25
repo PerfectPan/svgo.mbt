@@ -9,7 +9,7 @@ pub fn parse(d : String) -> Array[Segment] raise PathError {
 
 ///|
 /// Serialize segments to the shortest valid path data string.
-pub fn stringify(segments : Array[Segment], precision? : Int = 3) -> String {
+pub fn stringify(segments : Array[Segment], precision~ : Int32 = 3) -> String {
   let sb = StringBuilder()
   write_path(sb, segments, precision)
   sb.to_string()

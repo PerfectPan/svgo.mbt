@@ -4,7 +4,7 @@
 /// their document order. Core's `sort_by` is an unstable introsort and each
 /// element type instantiates about 2 KB of it in the wasm; this merge sort
 /// is a fraction of that per type and the arrays here are short.
-fn[T] stable_sort_by(arr : Array[T], cmp : (T, T) -> Int) -> Unit {
+fn[T] stable_sort_by(arr : Array[T], cmp : (T, T) -> Int32) -> Unit {
   let n = arr.length()
   if n < 2 {
     return

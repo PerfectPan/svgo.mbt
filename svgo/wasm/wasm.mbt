@@ -112,7 +112,7 @@ impl Show for WireError with fn output(self, logger) {
 priv struct Reader {
   cu : ArrayView[UInt16]
   text : String
-  mut pos : Int
+  mut pos : Int32
 }
 
 ///|
@@ -139,7 +139,7 @@ fn Reader::next(self : Reader) -> String raise WireError {
 }
 
 ///|
-fn int_of(t : String) -> Int raise WireError {
+fn int_of(t : String) -> Int32 raise WireError {
   match @num.parse_number(t) {
     Some(v) => v.to_int()
     None => raise WireError("expected a number, got '\{t}'")

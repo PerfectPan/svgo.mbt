@@ -36,7 +36,11 @@ pub fn Context::param_bool(
 
 ///|
 /// Read an integer parameter, falling back for absent or incorrectly typed values.
-pub fn Context::param_int(self : Context, name : String, default : Int) -> Int {
+pub fn Context::param_int(
+  self : Context,
+  name : String,
+  default : Int32,
+) -> Int32 {
   match self.param(name) {
     Some(Number(n, ..)) => n.to_int()
     _ => default

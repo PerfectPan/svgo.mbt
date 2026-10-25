@@ -37,11 +37,11 @@ pub fn code_view(String, label~ : String) -> @html.Html
 
 pub fn flag_description(String, String, Lang) -> String
 
-pub fn fmt_int(Int) -> String
+pub fn fmt_int(Int32) -> String
 
 pub fn fmt_ms(Double) -> String
 
-pub fn fmt_pct(Double, digits? : Int) -> String
+pub fn fmt_pct(Double, digits? : Int32) -> String
 
 pub let generated_on : String
 
@@ -49,7 +49,7 @@ pub fn highlight(String) -> Array[@html.Html]
 
 pub fn highlight_js(String) -> Array[@html.Html]
 
-pub let highlight_limit : Int
+pub let highlight_limit : Int32
 
 pub fn highlight_mbt(String) -> Array[@html.Html]
 
@@ -69,7 +69,7 @@ pub fn playground_page(Chrome) -> @rabbita.Val[@html.Html]
 
 pub fn plugin_description(String, String, Lang) -> String
 
-pub fn run_optimize(String, plugins? : Array[String], precision? : Int, multipass? : Bool, pretty? : Bool) -> Outcome
+pub fn run_optimize(String, plugins? : Array[String], precision? : Int32, multipass? : Bool, pretty? : Bool) -> Outcome
 
 pub let samples : Array[Sample]
 
@@ -93,7 +93,7 @@ pub fn tokenize_mbt(String) -> Array[(String, String)]
 
 pub fn top_nav(Route, Prefs, @cmd.Emit[PrefMsg]) -> @html.Html
 
-pub let wasm_bytes : Int
+pub let wasm_bytes : Int32
 
 // Errors
 
@@ -128,10 +128,10 @@ pub fn ApiPackage::not_equal(Self, Self) -> Bool
 
 pub(all) struct BenchRow {
   file : String
-  original : Int
-  mbt : Int
-  js : Int
-  js_default : Int
+  original : Int32
+  mbt : Int32
+  js : Int32
+  js_default : Int32
   mbt_ms : Double
   js_ms : Double
 } derive(Eq)
@@ -161,9 +161,9 @@ pub fn Lang::parse(String) -> Self?
 
 pub(all) struct Outcome {
   data : String
-  original_size : Int
-  size : Int
-  passes : Int
+  original_size : Int32
+  size : Int32
+  passes : Int32
   applied : Array[String]
   ms : Double
   error : String

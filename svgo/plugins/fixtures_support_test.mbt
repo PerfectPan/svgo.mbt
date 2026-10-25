@@ -6,7 +6,7 @@ fn check_fixture(
   plugin : String,
   input : String,
   expected : String,
-  precision~ : Int,
+  precision~ : Int32,
   multipass~ : Bool,
   params~ : String,
 ) -> Unit raise {
@@ -37,9 +37,9 @@ fn check_fixture_upstream(
   plugin : String,
   input : String,
   expected : String,
-  precision~ : Int,
+  precision~ : Int32,
   params~ : String,
-  passes~ : Int,
+  passes~ : Int32,
   expect_fail~ : Bool,
 ) -> Unit raise {
   guard @plugins.find_plugin(plugin) is Some(p) else {

@@ -1,10 +1,10 @@
 ///|
-fn Term::plain(width? : Int = 80) -> Term {
+fn Term::plain(width~ : Int32 = 80) -> Term {
   { style: false, color: false, unicode: true, width, }
 }
 
 ///|
-fn result(original : Int, size : Int) -> @svgo.Result {
+fn result(original : Int32, size : Int32) -> @svgo.Result {
   { data: "", original_size: original, size, passes: 1, applied: [], }
 }
 

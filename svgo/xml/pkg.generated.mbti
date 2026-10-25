@@ -10,7 +10,7 @@ pub fn parse(String) -> Document raise ParseError
 
 // Errors
 pub suberror ParseError {
-  ParseError(String, Int)
+  ParseError(String, Int32)
 } derive(@debug.Debug)
 pub fn ParseError::output(Self, &Logger) -> Unit
 pub fn ParseError::to_repr(Self) -> @debug.Repr

@@ -5,7 +5,7 @@
 priv struct Parser {
   text : String
   src : ArrayView[UInt16]
-  mut pos : Int
+  mut pos : Int32
 }
 
 ///|
@@ -14,7 +14,7 @@ fn Parser::new(text : String) -> Parser {
 }
 
 ///|
-fn Parser::peek(self : Parser, offset? : Int = 0) -> Int {
+fn Parser::peek(self : Parser, offset~ : Int32 = 0) -> Int32 {
   let i = self.pos + offset
   if i < self.src.length() {
     self.src[i].to_int()
@@ -43,7 +43,7 @@ fn Parser::starts_with(self : Parser, s : String) -> Bool {
 }
 
 ///|
-fn Parser::slice(self : Parser, start : Int, end : Int) -> String {
+fn Parser::slice(self : Parser, start : Int32, end : Int32) -> String {
   self.text[start:end].to_owned()
 }
 
@@ -69,12 +69,12 @@ fn Parser::skip_ws_and_comments(self : Parser) -> Unit {
 }
 
 ///|
-fn is_ident_start(c : Int) -> Bool {
+fn is_ident_start(c : Int32) -> Bool {
   (c >= 97 && c <= 122) || (c >= 65 && c <= 90) || c == 95 || c >= 128
 }
 
 ///|
-fn is_ident_char(c : Int) -> Bool {
+fn is_ident_char(c : Int32) -> Bool {
   is_ident_start(c) || (c >= 48 && c <= 57) || c == 45
 }
 

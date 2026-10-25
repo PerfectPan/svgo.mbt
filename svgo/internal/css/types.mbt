@@ -1,10 +1,10 @@
 ///|
 /// CSS AST types and specificity representation.
 pub(all) struct Specificity {
-  a : Int // inline style (1 or 0)
-  b : Int // IDs
-  c : Int // classes, attributes, pseudo-classes
-  d : Int // type (tag) selectors, pseudo-elements
+  a : Int32 // inline style (1 or 0)
+  b : Int32 // IDs
+  c : Int32 // classes, attributes, pseudo-classes
+  d : Int32 // type (tag) selectors, pseudo-elements
 } derive(Eq, Compare, Debug)
 
 ///|
@@ -33,12 +33,17 @@ pub impl Show for Specificity with fn output(self, logger) {
 pub extend Specificity with Show::{to_string, output}
 
 ///|
-pub fn Specificity::new(a : Int, b : Int, c : Int, d : Int) -> Specificity {
+pub fn Specificity::new(
+  a : Int32,
+  b : Int32,
+  c : Int32,
+  d : Int32,
+) -> Specificity {
   { a, b, c, d, }
 }
 
 ///|
-pub fn Specificity::compare(self : Specificity, other : Specificity) -> Int {
+pub fn Specificity::compare(self : Specificity, other : Specificity) -> Int32 {
   if self.a != other.a {
     return self.a - other.a
   }

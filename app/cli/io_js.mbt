@@ -9,7 +9,7 @@ extern "js" fn node_read_file(path : String) -> Bytes =
   #|}
 
 ///|
-extern "js" fn node_write_file(path : String, data : Bytes) -> Int =
+extern "js" fn node_write_file(path : String, data : Bytes) -> Int32 =
   #|(path, data) => {
   #|  const fs = require("fs");
   #|  try { fs.writeFileSync(path, Buffer.from(data)); return 0; } catch (e) { return -1; }
@@ -23,7 +23,7 @@ extern "js" fn node_read_stdin() -> Bytes =
   #|}
 
 ///|
-extern "js" fn node_is_tty(fd : Int) -> Bool =
+extern "js" fn node_is_tty(fd : Int32) -> Bool =
   #|(fd) => require("tty").isatty(fd)
 
 ///|
@@ -31,7 +31,7 @@ extern "js" fn node_clock_ms() -> Double =
   #|() => performance.now()
 
 ///|
-extern "js" fn node_exit(code : Int) -> Unit =
+extern "js" fn node_exit(code : Int32) -> Unit =
   #|(code) => process.exit(code)
 
 ///|
@@ -53,7 +53,7 @@ extern "js" fn node_list_dir(path : String) -> String =
   #|}
 
 ///|
-extern "js" fn node_mkdir_p(path : String) -> Int =
+extern "js" fn node_mkdir_p(path : String) -> Int32 =
   #|(path) => {
   #|  const fs = require("fs");
   #|  try { fs.mkdirSync(path, { recursive: true }); return 0; } catch (e) { return -1; }
@@ -67,7 +67,7 @@ fn svgo_read_file(path : String) -> Bytes {
 
 ///|
 /// Write a byte buffer to a file. Returns 0 on success, non-zero on failure.
-fn svgo_write_file(path : String, data : Bytes) -> Int {
+fn svgo_write_file(path : String, data : Bytes) -> Int32 {
   node_write_file(path, data)
 }
 
@@ -79,7 +79,7 @@ fn svgo_read_stdin() -> Bytes {
 
 ///|
 /// Returns true if file descriptor `fd` (0 stdin, 1 stdout, 2 stderr) is a terminal.
-fn svgo_is_tty(fd : Int) -> Bool {
+fn svgo_is_tty(fd : Int32) -> Bool {
   node_is_tty(fd)
 }
 
@@ -91,7 +91,7 @@ fn svgo_clock_ms() -> Double {
 
 ///|
 /// Exit the process with the given status code.
-fn svgo_exit(code : Int) -> Unit {
+fn svgo_exit(code : Int32) -> Unit {
   node_exit(code)
 }
 
@@ -123,7 +123,7 @@ fn svgo_list_dir(path : String) -> String {
 ///|
 /// Create a directory and all its parents. Returns 0 on success, non-zero on
 /// failure.
-fn svgo_mkdir_p(path : String) -> Int {
+fn svgo_mkdir_p(path : String) -> Int32 {
   node_mkdir_p(path)
 }
 

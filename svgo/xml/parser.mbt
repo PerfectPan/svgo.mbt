@@ -2,7 +2,7 @@
 /// Malformed input; carries a message and the code unit offset where
 /// parsing stopped.
 pub suberror ParseError {
-  ParseError(String, Int)
+  ParseError(String, Int32)
 } derive(Debug)
 
 ///|
@@ -28,11 +28,11 @@ let text_elements : Array[String] = [
 priv struct Parser {
   text : String
   src : ArrayView[UInt16]
-  mut pos : Int
+  mut pos : Int32
 }
 
 ///|
-fn Parser::peek(self : Parser, offset? : Int = 0) -> Int {
+fn Parser::peek(self : Parser, offset~ : Int32 = 0) -> Int32 {
   let i = self.pos + offset
   if i < self.src.length() {
     self.src[i].to_int()
@@ -61,17 +61,17 @@ fn Parser::starts_with(self : Parser, s : String) -> Bool {
 }
 
 ///|
-fn Parser::slice(self : Parser, start : Int, end : Int) -> String {
+fn Parser::slice(self : Parser, start : Int32, end : Int32) -> String {
   self.text[start:end].to_owned()
 }
 
 ///|
-fn is_space(c : Int) -> Bool {
+fn is_space(c : Int32) -> Bool {
   c == 32 || c == 9 || c == 10 || c == 13
 }
 
 ///|
-fn is_name_start(c : Int) -> Bool {
+fn is_name_start(c : Int32) -> Bool {
   (c >= 97 && c <= 122) ||
   (c >= 65 && c <= 90) ||
   c == 95 ||
@@ -80,7 +80,7 @@ fn is_name_start(c : Int) -> Bool {
 }
 
 ///|
-fn is_name_char(c : Int) -> Bool {
+fn is_name_char(c : Int32) -> Bool {
   is_name_start(c) || (c >= 48 && c <= 57) || c == 45 || c == 46
 }
 
@@ -342,7 +342,7 @@ fn decode_entities(s : String) -> String {
 ///|
 /// The code point written in a character reference, `base` 10 or 16; None for
 /// no digits, a non-digit, or a value outside the Unicode range.
-fn parse_code(digits : StringView, base : Int) -> Char? {
+fn parse_code(digits : StringView, base : Int32) -> Char? {
   let mut code = 0
   let mut count = 0
   for c in digits {

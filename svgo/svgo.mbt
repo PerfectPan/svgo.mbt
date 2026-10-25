@@ -13,7 +13,7 @@ pub(all) struct Config {
   /// per-plugin JSON parameter objects, keyed by plugin name
   params : Map[String, Json]
   /// decimal places kept for numbers
-  precision : Int
+  precision : Int32
   /// repeat the pipeline until nothing changes (at most 10 passes)
   multipass : Bool
   /// indent the output
@@ -43,9 +43,9 @@ pub fn Config::default() -> Config {
 pub(all) struct Result {
   data : String
   /// UTF-8 byte sizes before and after
-  original_size : Int
-  size : Int
-  passes : Int
+  original_size : Int32
+  size : Int32
+  passes : Int32
   /// plugins that changed the document at least once
   applied : Array[String]
 } derive(Debug)
@@ -89,7 +89,7 @@ pub extend UnknownPlugin with Show::{to_string, output}
 /// Optimize an SVG document.
 pub fn optimize(
   svg : String,
-  config? : Config = Config::default(),
+  config~ : Config = Config::default(),
 ) -> Result raise {
   let doc = @xml.parse(svg)
   let plugins : Array[@plugins.Plugin] = []
@@ -152,7 +152,7 @@ pub fn list_plugins() -> Array[(String, String, Bool)] {
 
 ///|
 /// Number of bytes of the UTF-8 encoding of `s`, without encoding it.
-fn utf8_length(s : String) -> Int {
+fn utf8_length(s : String) -> Int32 {
   let mut n = 0
   for c in s.code_units() {
     let u = c.to_int()

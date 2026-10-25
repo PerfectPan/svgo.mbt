@@ -467,7 +467,7 @@ SOFTWARE.
 - Source: https://github.com/moonbit-community/rabbita
 - License: Apache-2.0 (text under "Apache License 2.0" below); the project
   publishes no `NOTICE` file
-- Used in: `moonbit-community/rabbita` 0.16.3, the UI framework the site is
+- Used in: `moonbit-community/rabbita` 0.16.4, the UI framework the site is
   written in.
 
 ### moonbitlang/async
@@ -483,7 +483,7 @@ SOFTWARE.
 
 - Source: https://github.com/moonbit-community/rabbita (`rui/`)
 - License: MIT, Copyright (c) 2026 Rabbita UI contributors
-- Used in: `moonbit-community/rui` 0.3.4, the site's UI components. Rabbita UI
+- Used in: `moonbit-community/rui` 0.3.6, the site's UI components. Rabbita UI
   translates visual recipes from shadcn/ui and calendar behavior from React
   DayPicker; its notices for both follow its license.
 

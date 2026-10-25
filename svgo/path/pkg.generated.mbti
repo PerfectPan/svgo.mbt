@@ -16,7 +16,7 @@ pub fn optimize_string(String, options? : Options) -> String raise PathError
 
 pub fn parse(String) -> Array[Segment] raise PathError
 
-pub fn stringify(Array[Segment], precision? : Int) -> String
+pub fn stringify(Array[Segment], precision? : Int32) -> String
 
 // Errors
 pub suberror PathError {
@@ -29,7 +29,7 @@ pub impl Show for PathError
 
 // Types and methods
 pub(all) struct Options {
-  precision : Int
+  precision : Int32
   utilize_absolute : Bool
   remove_useless : Bool
   straight_curves : Bool

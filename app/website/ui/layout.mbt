@@ -237,7 +237,7 @@ pub fn page_footer(route? : Route) -> Html {
 
 ///|
 /// Checkerboard preview box that renders an SVG string as live DOM.
-pub fn svg_preview(svg : String, class? : String = "preview") -> Html {
+pub fn svg_preview(svg : String, class~ : String = "preview") -> Html {
   div(attrs=Attrs::build().class(class).inner_html(svg), nothing)
 }
 

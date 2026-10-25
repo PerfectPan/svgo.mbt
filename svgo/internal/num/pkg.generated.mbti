@@ -14,31 +14,31 @@ pub fn atan(Double) -> Double
 
 pub fn cos(Double) -> Double
 
-pub fn epsilon(Int) -> Double
+pub fn epsilon(Int32) -> Double
 
-pub fn format_number(Double, Int) -> String
+pub fn format_number(Double, Int32) -> String
 
-pub fn needs_separator(Int, Int) -> Bool
+pub fn needs_separator(Int32, Int32) -> Bool
 
-pub fn number_shape(Double, Int) -> Int
+pub fn number_shape(Double, Int32) -> Int32
 
 pub fn number_to_string(Double) -> String
 
 pub fn parse_number(String) -> Double?
 
-pub fn round_to(Double, Int) -> Double
+pub fn round_to(Double, Int32) -> Double
 
-pub fn scan_number(ArrayView[UInt16], Int) -> (Double, Int) raise NumError
+pub fn scan_number(ArrayView[UInt16], Int32) -> (Double, Int32) raise NumError
 
 pub fn sin(Double) -> Double
 
-pub fn strong_round(Double, Int) -> Double
+pub fn strong_round(Double, Int32) -> Double
 
 pub fn tan(Double) -> Double
 
-pub fn write_number(StringBuilder, Double, Int) -> Unit
+pub fn write_number(StringBuilder, Double, Int32) -> Unit
 
-pub fn write_path_number(StringBuilder, Double, Int, Int) -> Int
+pub fn write_path_number(StringBuilder, Double, Int32, Int32) -> Int32
 
 // Errors
 pub suberror NumError {

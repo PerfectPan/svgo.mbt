@@ -1,15 +1,15 @@
 ///|
 /// A reference's exact source span excludes '#' and timing suffixes.
 priv struct IdReference {
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
   id : String
 }
 
 ///|
 fn id_references(name : String, value : String) -> Array[IdReference] {
   let refs : Array[IdReference] = []
-  fn add(start : Int, end : Int) {
+  fn add(start : Int32, end : Int32) {
     if end > start {
       refs.push({ start, end, id: decode_id(value[start:end].to_owned()), })
     }
@@ -68,7 +68,7 @@ fn decode_id(value : String) -> String {
     return value
   }
   let sb = StringBuilder()
-  let bytes : Array[Int] = []
+  let bytes : Array[Int32] = []
   let cu = value.code_units()
   let mut i = 0
   while i < cu.length() {
@@ -100,7 +100,7 @@ fn decode_id(value : String) -> String {
 }
 
 ///|
-fn hex_pair(hi : Int, lo : Int) -> Int? {
+fn hex_pair(hi : Int32, lo : Int32) -> Int32? {
   guard hex_digit(hi) is Some(h) && hex_digit(lo) is Some(l) else {
     return None
   }
@@ -108,7 +108,7 @@ fn hex_pair(hi : Int, lo : Int) -> Int? {
 }
 
 ///|
-fn hex_digit(c : Int) -> Int? {
+fn hex_digit(c : Int32) -> Int32? {
   if c >= 48 && c <= 57 {
     Some(c - 48)
   } else if c >= 97 && c <= 102 {
@@ -122,7 +122,7 @@ fn hex_digit(c : Int) -> Int? {
 
 ///|
 /// Decode `bytes` as UTF-8 into `sb` and empty it; false on malformed input.
-fn flush_utf8(bytes : Array[Int], sb : StringBuilder) -> Bool {
+fn flush_utf8(bytes : Array[Int32], sb : StringBuilder) -> Bool {
   let mut i = 0
   while i < bytes.length() {
     let b = bytes[i]

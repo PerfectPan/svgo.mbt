@@ -39,22 +39,22 @@ let mbt_keywords : Set[String] = Set::from_array([
 ])
 
 ///|
-fn is_mbt_ident_start(c : Int) -> Bool {
+fn is_mbt_ident_start(c : Int32) -> Bool {
   (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'
 }
 
 ///|
-fn is_mbt_ident_cont(c : Int) -> Bool {
+fn is_mbt_ident_cont(c : Int32) -> Bool {
   is_mbt_ident_start(c) || (c >= '0' && c <= '9') || c == '\''
 }
 
 ///|
-fn is_digit(c : Int) -> Bool {
+fn is_digit(c : Int32) -> Bool {
   c >= '0' && c <= '9'
 }
 
 ///|
-fn is_upper(c : Int) -> Bool {
+fn is_upper(c : Int32) -> Bool {
   c >= 'A' && c <= 'Z'
 }
 
@@ -82,7 +82,7 @@ fn tokenize_code(
   let n = src.length()
   let mut start = 0
   let mut kind : MbtTok = Name
-  let flush = fn(upto : Int, next : MbtTok) {
+  let flush = fn(upto : Int32, next : MbtTok) {
     if upto > start {
       out.push((kind.class(), src.unsafe_substring(start~, end=upto)))
     }

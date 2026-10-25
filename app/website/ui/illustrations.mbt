@@ -6,7 +6,7 @@
 /// themes. `nib-logo` is public/nib.svg itself (`nib_svg`, generated). Callers size and place each one with their own wrapper
 /// class; `name` not matching a known illustration renders nothing, which
 /// is also the state before an illustration exists (see CONTRIBUTING).
-fn illustration(name : String, class? : String = "") -> Html {
+fn illustration(name : String, class~ : String = "") -> Html {
   let svg = match name {
     "nib-logo" => nib_svg
     "nib-dash" => nib_dash_svg

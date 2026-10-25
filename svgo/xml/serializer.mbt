@@ -61,7 +61,7 @@ fn escape_attr(s : String) -> String {
 /// Serialize a document back to SVG text.
 pub fn Document::to_string(
   self : Document,
-  options? : SerializeOptions = SerializeOptions::default(),
+  options~ : SerializeOptions = SerializeOptions::default(),
 ) -> String {
   let sb = StringBuilder()
   let mut first = true
@@ -85,7 +85,7 @@ pub fn Document::to_string(
 /// Serialize a single element (and its subtree).
 pub fn Element::to_string(
   self : Element,
-  options? : SerializeOptions = SerializeOptions::default(),
+  options~ : SerializeOptions = SerializeOptions::default(),
 ) -> String {
   let sb = StringBuilder()
   write_node(sb, Element(self), 0, options)
@@ -93,7 +93,7 @@ pub fn Element::to_string(
 }
 
 ///|
-fn indent(sb : StringBuilder, depth : Int) -> Unit {
+fn indent(sb : StringBuilder, depth : Int32) -> Unit {
   for _ in 0..<depth {
     sb.write_string("  ")
   }
@@ -103,7 +103,7 @@ fn indent(sb : StringBuilder, depth : Int) -> Unit {
 fn write_node(
   sb : StringBuilder,
   node : Node,
-  depth : Int,
+  depth : Int32,
   options : SerializeOptions,
 ) -> Unit {
   match node {

@@ -3,12 +3,12 @@
 /// that lives for the whole run.
 pub struct Context {
   /// decimal places for numeric attribute values and path data
-  precision : Int
+  precision : Int32
   /// current plugin parameter object; set by the pipeline before each run
   mut params : Json
   /// path data convertPathData has already left unchanged in this run,
   /// with the element style it was optimized for
-  optimized_paths : Map[String, Int]
+  optimized_paths : Map[String, Int32]
   /// convex hulls of each subpath, per path data string, for mergePaths'
   /// intersection test (paths are compared against both neighbours on
   /// every pass, so this saves most of the parsing and hull building)
@@ -20,7 +20,7 @@ pub extend Context with Debug::{to_repr}
 
 ///|
 /// A fresh context; create one per `optimize` run.
-pub fn Context::new(precision? : Int = 3) -> Context {
+pub fn Context::new(precision~ : Int32 = 3) -> Context {
   {
     precision,
     params: Json::object(Map([])),

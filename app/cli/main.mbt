@@ -49,12 +49,12 @@ struct CliConfig {
   inputs : Array[String]
   output : String?
   recursive : Bool
-  precision : Int
+  precision : Int32
   pretty : Bool
   multipass : Bool
   stats : Bool
   json : Bool
-  bench : Int
+  bench : Int32
   quiet : Bool
   params : Map[String, Json]
   disabled : Array[String]
@@ -231,7 +231,7 @@ fn bench(
   inputs : Array[String],
   labels : Array[String],
   config : @svgo.Config,
-  runs : Int,
+  runs : Int32,
 ) -> Bool {
   let report = Report::new(Term::detect(1), labels)
   let errors = Report::new(Term::detect(2), labels)
@@ -465,7 +465,7 @@ fn expand_dir(dir : String, out : Array[String]) -> Unit {
 
 ///|
 /// Return the index of the last occurrence of `ch` in `s`, or -1 if absent.
-fn last_index_of(s : String, ch : Char) -> Int {
+fn last_index_of(s : String, ch : Char) -> Int32 {
   let mut idx = -1
   let mut i = 0
   for c in s {
@@ -499,13 +499,13 @@ fn output_path_for(input : String, output : String?, multi : Bool) -> String? {
 /// Machine readable result, the same shape the wasm build returns.
 fn to_json(r : @svgo.Result, data~ : Bool) -> String {
   let obj : Map[String, Json] = {
-    "originalSize": r.original_size.to_json(),
-    "size": r.size.to_json(),
-    "passes": r.passes.to_json(),
-    "applied": r.applied.map(s => s.to_json()).to_json(),
+    "originalSize": Json(r.original_size),
+    "size": Json(r.size),
+    "passes": Json(r.passes),
+    "applied": Json(r.applied.map(s => Json(s))),
   }
   if data {
-    obj["data"] = r.data.to_json()
+    obj["data"] = Json(r.data)
   }
   Json::object(obj).stringify()
 }

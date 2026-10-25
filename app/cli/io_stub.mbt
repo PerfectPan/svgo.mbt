@@ -6,7 +6,7 @@ fn svgo_read_file(_path : String) -> Bytes {
 }
 
 ///|
-fn svgo_write_file(_path : String, _data : Bytes) -> Int {
+fn svgo_write_file(_path : String, _data : Bytes) -> Int32 {
   -1
 }
 
@@ -16,7 +16,7 @@ fn svgo_read_stdin() -> Bytes {
 }
 
 ///|
-fn svgo_is_tty(_fd : Int) -> Bool {
+fn svgo_is_tty(_fd : Int32) -> Bool {
   true
 }
 
@@ -26,7 +26,7 @@ fn svgo_clock_ms() -> Double {
 }
 
 ///|
-fn svgo_exit(_code : Int) -> Unit {
+fn svgo_exit(_code : Int32) -> Unit {
 
 }
 
@@ -51,7 +51,7 @@ fn svgo_list_dir(_path : String) -> String {
 }
 
 ///|
-fn svgo_mkdir_p(_path : String) -> Int {
+fn svgo_mkdir_p(_path : String) -> Int32 {
   -1
 }
 

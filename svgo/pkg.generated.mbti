@@ -25,7 +25,7 @@ pub(all) struct Config {
   plugins : Array[String]
   custom : Array[@plugins.Plugin]
   params : Map[String, Json]
-  precision : Int
+  precision : Int32
   multipass : Bool
   pretty : Bool
 } derive(@debug.Debug)
@@ -34,9 +34,9 @@ pub fn Config::to_repr(Self) -> @debug.Repr
 
 pub(all) struct Result {
   data : String
-  original_size : Int
-  size : Int
-  passes : Int
+  original_size : Int32
+  size : Int32
+  passes : Int32
   applied : Array[String]
 } derive(@debug.Debug)
 pub fn Result::saved_percent(Self) -> Double

@@ -30,10 +30,10 @@ fn Tok::class(self : Tok) -> String {
 ///|
 /// Above this many code units the editor shows plain text: the win from
 /// colour is small on a huge document and the span count is not.
-pub let highlight_limit : Int = 120_000
+pub let highlight_limit : Int32 = 120_000
 
 ///|
-fn is_name_unit(c : Int) -> Bool {
+fn is_name_unit(c : Int32) -> Bool {
   (c >= 'a' && c <= 'z') ||
   (c >= 'A' && c <= 'Z') ||
   (c >= '0' && c <= '9') ||
@@ -45,7 +45,7 @@ fn is_name_unit(c : Int) -> Bool {
 }
 
 ///|
-fn find_from(s : String, sub : String, from : Int) -> Int? {
+fn find_from(s : String, sub : String, from : Int32) -> Int32? {
   if from >= s.length() {
     return None
   }
@@ -79,7 +79,7 @@ pub fn tokenize(src : String) -> Array[(String, String)] {
   let cu = src.code_units()
   let mut start = 0
   let mut kind : Tok = Text
-  let flush = fn(upto : Int, next : Tok) {
+  let flush = fn(upto : Int32, next : Tok) {
     if upto > start {
       out.push((kind.class(), src.unsafe_substring(start~, end=upto)))
     }

@@ -2,7 +2,7 @@
 priv struct PgModel {
   source : String
   enabled : Array[String]
-  precision : Int
+  precision : Int32
   multipass : Bool
   pretty : Bool
   outcome : Outcome
@@ -509,7 +509,7 @@ fn output_code_body(m : PgModel) -> Html {
 /// "Input · 68,630 B" / "Optimized · 52,690 B": the byte-labelled pane
 /// header, desktop only (mobile has its own, unlabelled Before/After
 /// toggle directly over the preview — see `workbench`).
-fn io_label(title_en : String, title_zh : String, bytes : Int) -> Html {
+fn io_label(title_en : String, title_zh : String, bytes : Int32) -> Html {
   // running text, not a display numeral: a real space before the unit (the
   // tight display-unit gap is for the hero-sized stats strip figures only)
   span([

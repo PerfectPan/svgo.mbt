@@ -152,7 +152,7 @@ fn transforms_multiply(ts : Array[Tf]) -> Tf {
 
 ///|
 /// Number of digits after the decimal point.
-fn float_digits(v : Double) -> Int {
+fn float_digits(v : Double) -> Int32 {
   let s = @num.number_to_string(v)
   match s.find(".") {
     Some(i) => s.length() - i - 1
@@ -162,7 +162,7 @@ fn float_digits(v : Double) -> Int {
 
 ///|
 /// Total number of digits in a number (ignoring sign and decimal point).
-fn total_digits(v : Double) -> Int {
+fn total_digits(v : Double) -> Int32 {
   let s = @num.number_to_string(v)
   let mut n = 0
   for c in s {
@@ -178,9 +178,9 @@ fn total_digits(v : Double) -> Int {
 /// transform list and the base float precision.
 fn define_precision(
   ts : Array[Tf],
-  float_prec : Int,
-  transform_prec_default : Int,
-) -> (Int, Int, Int) {
+  float_prec : Int32,
+  transform_prec_default : Int32,
+) -> (Int32, Int32, Int32) {
   let matrix_vals : Array[Double] = []
   for t in ts {
     if t.name == "matrix" && t.args.length() >= 4 {
@@ -230,9 +230,9 @@ fn define_precision(
 /// Round a transform's arguments according to its type.
 fn round_transform(
   t : Tf,
-  float_prec : Int,
-  transform_prec : Int,
-  deg_prec : Int,
+  float_prec : Int32,
+  transform_prec : Int32,
+  deg_prec : Int32,
 ) -> Tf {
   let args : Array[Double] = match t.name {
     "translate" => t.args.map(a => @num.strong_round(a, float_prec))
@@ -474,9 +474,9 @@ fn optimize_list(rounded : Array[Tf], raw : Array[Tf]) -> Array[Tf] {
 /// transforms, or return the original matrix if no shorter form is found.
 fn matrix_to_transform(
   matrix : Tf,
-  float_prec : Int,
-  transform_prec : Int,
-  deg_prec : Int,
+  float_prec : Int32,
+  transform_prec : Int32,
+  deg_prec : Int32,
 ) -> Array[Tf] {
   let m = matrix.args
   let decompositions : Array[Array[Tf]] = []
@@ -524,10 +524,10 @@ fn matrix_to_transform(
 /// (without actually building it), used to pick the shortest decomposition.
 fn transforms_string_len(
   ts : Array[Tf],
-  float_prec : Int,
-  transform_prec : Int,
-  deg_prec : Int,
-) -> Int {
+  float_prec : Int32,
+  transform_prec : Int32,
+  deg_prec : Int32,
+) -> Int32 {
   let mut len = 0
   for t in ts {
     len += t.name.length() + 2 // name + "()"
@@ -554,9 +554,9 @@ fn transforms_string_len(
 /// Format a single transform's arguments as a string.
 fn format_args(
   t : Tf,
-  float_prec : Int,
-  transform_prec : Int,
-  deg_prec : Int,
+  float_prec : Int32,
+  transform_prec : Int32,
+  deg_prec : Int32,
 ) -> String {
   let sb = StringBuilder()
   for i, a in t.args {
@@ -581,9 +581,9 @@ fn format_args(
 /// Convert a list of transforms to their string representation.
 fn transforms_to_string(
   ts : Array[Tf],
-  float_prec : Int,
-  transform_prec : Int,
-  deg_prec : Int,
+  float_prec : Int32,
+  transform_prec : Int32,
+  deg_prec : Int32,
 ) -> String {
   let sb = StringBuilder()
   for t in ts {

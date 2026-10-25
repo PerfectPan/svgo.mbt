@@ -1,14 +1,14 @@
 ///|
 priv struct LandingState {
-  tab : Int
+  tab : Int32
   /// index into `package_managers` for the npm tab's install command
-  pm : Int
+  pm : Int32
 } derive(Eq)
 
 ///|
 priv enum LandingMsg {
-  SelectTab(Int)
-  SelectPm(Int)
+  SelectTab(Int32)
+  SelectPm(Int32)
   Copy(String)
 }
 
@@ -97,7 +97,7 @@ let sample_views : Ref[Array[SampleView]?] = Ref(None)
 /// samples are constants, and the landing view re-runs on every tab,
 /// language or theme change. Filled on first use, so other pages pay
 /// nothing.
-fn sample_view(idx : Int) -> SampleView {
+fn sample_view(idx : Int32) -> SampleView {
   let views = match sample_views.val {
     Some(views) => views
     None => {
@@ -140,7 +140,7 @@ fn landing_details(summary : String, children : Array[Html]) -> Html {
 /// figure: the number is set at the ancestor's font size, the unit rides at
 /// 0.45em beside it. `id` is set on the number span alone, so a caller can
 /// animate just the digits in place (see the hero byte counter).
-fn display_measure(value : String, unit : String, id? : String = "") -> Html {
+fn display_measure(value : String, unit : String, id~ : String = "") -> Html {
   let number = if id == "" {
     span(class="display-number", value)
   } else {
@@ -671,7 +671,7 @@ fn benchmarks_details() -> Html {
 /// A copy of app/cli/report.mbt's format (the site cannot depend on the CLI
 /// module), exact for the KB-sized sample it shows; change both together.
 fn cli_report(file : String, r : Outcome) -> String {
-  let size = (bytes : Int) => {
+  let size = (bytes : Int32) => {
     if bytes < 1000 {
       "\{bytes} B"
     } else {

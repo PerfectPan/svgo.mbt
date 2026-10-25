@@ -6,8 +6,8 @@
 let lz_alphabet : String = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$"
 
 ///|
-let lz_reverse : Map[Int, Int] = {
-  let m : Map[Int, Int] = Map([])
+let lz_reverse : Map[Int32, Int32] = {
+  let m : Map[Int32, Int32] = Map([])
   for i, u in lz_alphabet.code_units() {
     m[u.to_int()] = i
   }
@@ -17,12 +17,12 @@ let lz_reverse : Map[Int, Int] = {
 ///|
 priv struct BitWriter {
   out : StringBuilder
-  mut val : Int
-  mut position : Int
+  mut val : Int32
+  mut position : Int32
 }
 
 ///|
-fn BitWriter::push(self : BitWriter, bit : Int) -> Unit {
+fn BitWriter::push(self : BitWriter, bit : Int32) -> Unit {
   self.val = (self.val << 1) | bit
   if self.position == 5 {
     self.position = 0
@@ -34,7 +34,7 @@ fn BitWriter::push(self : BitWriter, bit : Int) -> Unit {
 }
 
 ///|
-fn BitWriter::push_bits(self : BitWriter, value : Int, count : Int) -> Unit {
+fn BitWriter::push_bits(self : BitWriter, value : Int32, count : Int32) -> Unit {
   let mut v = value
   for _ in 0..<count {
     self.push(v & 1)
@@ -46,12 +46,12 @@ fn BitWriter::push_bits(self : BitWriter, value : Int, count : Int) -> Unit {
 /// One UTF-16 code unit as a string. Lone surrogates cannot be built from a
 /// `Char`, so characters outside the BMP come back as U+FFFD after a
 /// roundtrip; SVG sources practically never contain them.
-fn unit_string(code : Int) -> String {
+fn unit_string(code : Int32) -> String {
   String::from_array([code.to_char().unwrap_or('\u{FFFD}')])
 }
 
 ///|
-fn unit_at(s : String, i : Int) -> Int {
+fn unit_at(s : String, i : Int32) -> Int32 {
   s.code_units()[i].to_int()
 }
 
@@ -61,7 +61,7 @@ pub fn lz_compress(input : String) -> String {
   if input.is_empty() {
     return ""
   }
-  let dict : Map[String, Int] = Map([])
+  let dict : Map[String, Int32] = Map([])
   let to_create : Set[String] = Set([])
   let w = BitWriter::{ out: StringBuilder(), val: 0, position: 0, }
   let mut current = ""
@@ -129,13 +129,13 @@ pub fn lz_compress(input : String) -> String {
 ///|
 priv struct BitReader {
   input : String
-  mut val : Int
-  mut position : Int
-  mut index : Int
+  mut val : Int32
+  mut position : Int32
+  mut index : Int32
 }
 
 ///|
-fn BitReader::next_value(self : BitReader) -> Int {
+fn BitReader::next_value(self : BitReader) -> Int32 {
   let i = self.index
   self.index += 1
   if i < self.input.length() {
@@ -146,7 +146,7 @@ fn BitReader::next_value(self : BitReader) -> Int {
 }
 
 ///|
-fn BitReader::read_bits(self : BitReader, count : Int) -> Int {
+fn BitReader::read_bits(self : BitReader, count : Int32) -> Int32 {
   let mut bits = 0
   let mut power = 1
   for _ in 0..<count {

@@ -145,11 +145,11 @@ priv struct SelectorEntry {
   matched_selector : @css.ComplexSelector
   declarations : Array[@css.Declaration]
   parent_items : Array[@css.StyleSheetItem]
-  item_idx : Int
-  selector_idx : Int
-  order : Int
+  item_idx : Int32
+  selector_idx : Int32
+  order : Int32
   specificity : @css.Specificity
-  mut matched_indices : Array[Int]
+  mut matched_indices : Array[Int32]
 }
 
 ///|
@@ -378,7 +378,7 @@ fn run_inline_styles(doc : @xml.Document, ctx : Context) -> Bool {
       }
       let existing_decls = @css.parse_declarations(existing_style)
       // name -> index of its last declaration
-      let decl_map : Map[String, Int] = Map([])
+      let decl_map : Map[String, Int32] = Map([])
       for i = 0; i < existing_decls.length(); i = i + 1 {
         decl_map[existing_decls[i].name] = i
       }

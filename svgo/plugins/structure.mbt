@@ -1226,7 +1226,7 @@ fn scale_stroke_attr(
   name : String,
   default_value : String,
   scale : Double,
-  precision : Int,
+  precision : Int32,
 ) -> Unit {
   let raw = (match e.attrs.get(name) {
       Some(v) => v
@@ -1245,7 +1245,7 @@ fn scale_stroke_attr(
 /// Replace every run of digits (with optional sign and decimal point) in `s`
 /// by that number multiplied by `scale`, preserving surrounding text. Used to
 /// scale stroke-width / dasharray / dashoffset values.
-fn scale_numbers(s : String, scale : Double, precision : Int) -> String {
+fn scale_numbers(s : String, scale : Double, precision : Int32) -> String {
   let sb = StringBuilder()
   let cu = s.code_units()
   let n = cu.length()
@@ -2346,7 +2346,7 @@ let sort_defs_children : Plugin = {
       if e.name != "defs" {
         return
       }
-      let frequencies : Map[String, Int] = Map([])
+      let frequencies : Map[String, Int32] = Map([])
       for c in e.children {
         if c is @xml.Element(child) {
           let f = frequencies.get(child.name).unwrap_or(0)

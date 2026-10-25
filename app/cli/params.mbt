@@ -17,7 +17,7 @@ fn parse_param(arg : String, params : Map[String, Json]) -> Bool {
       n => Some(n)
     }
     match integer {
-      Some(n) => n.to_json()
+      Some(n) => Json(n)
       None =>
         if raw.contains(",") {
           Json::array(

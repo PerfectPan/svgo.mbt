@@ -41,8 +41,8 @@ pub extend Element with Debug::{to_repr}
 /// Create an element; attributes and children default to empty.
 pub fn Element::new(
   name : String,
-  attrs? : Map[String, String] = Map([]),
-  children? : Array[Node] = [],
+  attrs~ : Map[String, String] = Map([]),
+  children~ : Array[Node] = [],
 ) -> Element {
   { name, attrs, children, }
 }

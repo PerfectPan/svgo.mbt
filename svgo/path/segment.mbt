@@ -32,7 +32,7 @@ pub impl Show for PathError with fn output(self, logger) {
 pub extend PathError with Show::{to_string, output}
 
 ///|
-fn arg_count(cmd : Char) -> Int {
+fn arg_count(cmd : Char) -> Int32 {
   match cmd.to_ascii_lowercase() {
     'm' | 'l' | 't' => 2
     'h' | 'v' => 1

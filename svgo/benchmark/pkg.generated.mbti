@@ -2,7 +2,7 @@
 package "PerfectPan/svgo/benchmark"
 
 // Values
-pub let corpus : Array[(String, String, Int)]
+pub let corpus : Array[(String, String, Int32)]
 
 // Errors
 

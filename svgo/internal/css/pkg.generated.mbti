@@ -14,11 +14,11 @@ pub fn compound_specificity(CompoundSelector) -> Specificity
 
 pub fn compress_box_properties(Array[Declaration]) -> Array[Declaration]
 
-pub fn match_complex(DocumentContext, Int, ComplexSelector) -> Bool
+pub fn match_complex(DocumentContext, Int32, ComplexSelector) -> Bool
 
-pub fn match_compound(DocumentContext, Int, CompoundSelector) -> Bool
+pub fn match_compound(DocumentContext, Int32, CompoundSelector) -> Bool
 
-pub fn match_simple(DocumentContext, Int, SimpleSelector) -> Bool
+pub fn match_simple(DocumentContext, Int32, SimpleSelector) -> Bool
 
 pub fn min_box_shorthand(String, String, String, String) -> String
 
@@ -98,11 +98,11 @@ pub fn Declaration::write_css(Self, StringBuilder) -> Unit
 
 pub(all) struct DocumentContext {
   elements : Array[@xml.Element]
-  parents : Array[Int]
-  prev_siblings : Array[Int]
+  parents : Array[Int32]
+  prev_siblings : Array[Int32]
 }
 pub fn DocumentContext::build(@xml.Document) -> Self
-pub fn DocumentContext::find_all_matches(Self, ComplexSelector) -> Array[Int]
+pub fn DocumentContext::find_all_matches(Self, ComplexSelector) -> Array[Int32]
 
 pub(all) struct Rule {
   selectors : Array[ComplexSelector]
@@ -127,15 +127,15 @@ pub fn SimpleSelector::to_repr(Self) -> @debug.Repr
 pub fn SimpleSelector::write_css(Self, StringBuilder) -> Unit
 
 pub(all) struct Specificity {
-  a : Int
-  b : Int
-  c : Int
-  d : Int
+  a : Int32
+  b : Int32
+  c : Int32
+  d : Int32
 } derive(Compare, Eq, @debug.Debug)
 pub fn Specificity::add(Self, Self) -> Self
-pub fn Specificity::compare(Self, Self) -> Int
+pub fn Specificity::compare(Self, Self) -> Int32
 pub fn Specificity::equal(Self, Self) -> Bool
-pub fn Specificity::new(Int, Int, Int, Int) -> Self
+pub fn Specificity::new(Int32, Int32, Int32, Int32) -> Self
 pub fn Specificity::not_equal(Self, Self) -> Bool
 pub fn Specificity::op_ge(Self, Self) -> Bool
 pub fn Specificity::op_gt(Self, Self) -> Bool

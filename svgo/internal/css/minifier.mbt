@@ -223,7 +223,7 @@ fn is_word_char(c : UInt16) -> Bool {
 ///|
 /// Whether a CSS number token starts at `i`: a digit, `.digit`, or a sign
 /// followed by either.
-fn number_starts_at(v : String, i : Int) -> Bool {
+fn number_starts_at(v : String, i : Int32) -> Bool {
   let n = v.length()
   let mut j = i
   if v[j] == '+' || v[j] == '-' {

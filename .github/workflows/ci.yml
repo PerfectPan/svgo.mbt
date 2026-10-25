@@ -35,6 +35,11 @@ jobs:
           node packages/compare/render-diff.mjs
           node packages/compare/render-diff.mjs app/website/samples --exact
           node packages/compare/wasm-speed.mjs
+      # The wasm built above, under Node: the same step as verify.sh --full and
+      # release.yml. node --test also runs index.test.mjs (plugin entries,
+      # params merging), which the Bun / Deno fixture runs below do not cover.
+      - name: npm package tests (node --test)
+        run: cd packages/svgo-mbt && node --test
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest

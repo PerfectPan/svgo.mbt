@@ -7,7 +7,7 @@ pub let generated_on : String = "2026-09-27"
 let node_version : String = "v24.18.0"
 
 ///|
-let project_version : String = "0.3.1"
+let project_version : String = "0.3.2"
 
 ///|
 pub let svgo_js_version : String = "4.1.0"

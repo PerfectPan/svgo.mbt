@@ -12,7 +12,7 @@
     "app": "pnpm --reporter=silent run docs && node app/website/build.mjs",
     "verify": "scripts/verify.sh",
     "changeset": "changeset",
-    "version-packages": "changeset version && node scripts/sync-version.mjs && moon info"
+    "version-packages": "changeset version && node scripts/sync-version.mjs && moon info && node app/website/gen.mjs"
   },
   "devDependencies": {
     "@changesets/changelog-github": "1.0.1",

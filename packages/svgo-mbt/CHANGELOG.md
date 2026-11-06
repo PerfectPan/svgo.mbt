@@ -1,5 +1,11 @@
 # @rivus/svgo
 
+## 0.3.3
+
+### Patch Changes
+
+- [#52](https://github.com/PerfectPan/svgo.mbt/pull/52) [`b0d2e9a`](https://github.com/PerfectPan/svgo.mbt/commit/b0d2e9ac747f9da432232defbd28bbf82276a755) Thanks [@PerfectPan](https://github.com/PerfectPan)! - The package now builds with the MoonBit v0.10.19 toolchain, with sources migrated to the new `#derive(...)` attribute syntax (the trailing `derive(...)` form is deprecated); optimized SVG output is unchanged.
+
 ## 0.3.2
 
 ### Patch Changes

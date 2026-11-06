@@ -16,6 +16,10 @@ gh extension install PerfectPan/gh-repo-checks                    # review check
 ./scripts/install-git-hooks.sh                                    # pre-commit hook, see "Local Git hooks"
 ```
 
+The code requires moonc ≥ 0.10.19 (it uses the `Int32` names and the
+`#derive(...)` attribute syntax). If `moon check` fails with undefined
+`Int32`, run `moon upgrade`.
+
 `package.json` pins pnpm with `packageManager`; pnpm 10 and later switch to
 that version by themselves. Dependency build scripts are blocked unless
 `allowBuilds` in `pnpm-workspace.yaml` lists the package, and nothing here

@@ -2,6 +2,7 @@
 /// What to run and how to print: the plugin list in execution order,
 /// numeric precision, multipass and pretty printing. Start from
 /// `Config::default()` and override fields with record update syntax.
+#derive(Debug)
 pub(all) struct Config {
   /// names of plugins to run, in order; defaults to the preset. A name
   /// resolves to a plugin in `custom` first, then to a built-in one
@@ -18,7 +19,7 @@ pub(all) struct Config {
   multipass : Bool
   /// indent the output
   pretty : Bool
-} derive(Debug)
+}
 
 ///|
 pub extend Config with Debug::{to_repr}
@@ -40,6 +41,7 @@ pub fn Config::default() -> Config {
 ///|
 /// Outcome of `optimize`: the optimized document plus size statistics and
 /// the list of plugins that changed something.
+#derive(Debug)
 pub(all) struct Result {
   data : String
   /// UTF-8 byte sizes before and after
@@ -48,7 +50,7 @@ pub(all) struct Result {
   passes : Int32
   /// plugins that changed the document at least once
   applied : Array[String]
-} derive(Debug)
+}
 
 ///|
 pub extend Result with Debug::{to_repr}
@@ -68,9 +70,10 @@ pub fn Result::saved_percent(self : Result) -> Double {
 ///|
 /// Raised by `optimize` when `Config::plugins` names a plugin that is neither
 /// built in nor in `Config::custom`.
+#derive(Debug)
 pub suberror UnknownPlugin {
   UnknownPlugin(String)
-} derive(Debug)
+}
 
 ///|
 pub extend UnknownPlugin with Debug::{to_repr}

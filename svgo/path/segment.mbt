@@ -1,10 +1,11 @@
 ///|
 /// One path segment. `cmd` is the command letter as written (absolute when
 /// uppercase), `args` the numeric arguments of exactly one command instance.
+#derive(Debug, Eq)
 pub(all) struct Segment {
   cmd : Char
   args : Array[Double]
-} derive(Debug, Eq)
+}
 
 ///|
 pub extend Segment with Debug::{to_repr}
@@ -14,9 +15,10 @@ pub extend Segment with Eq::{not_equal, equal}
 
 ///|
 /// Malformed path data: a number or command was expected at the given offset.
+#derive(Debug)
 pub suberror PathError {
   PathError(String)
-} derive(Debug)
+}
 
 ///|
 pub extend PathError with Debug::{to_repr}

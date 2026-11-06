@@ -2,6 +2,7 @@
 /// Knobs of the path optimizer; every field defaults to on except that
 /// `precision` is 3. Disable individual rewrites when a consumer depends on
 /// the exact segment structure (for example markers or animations).
+#derive(Debug)
 pub(all) struct Options {
   /// decimal places kept for coordinates
   precision : Int32
@@ -31,7 +32,7 @@ pub(all) struct Options {
   make_arcs_threshold : Double
   /// arc-fit tolerance as a fraction of the radius (percentage points)
   make_arcs_tolerance : Double
-} derive(Debug)
+}
 
 ///|
 pub extend Options with Debug::{to_repr}

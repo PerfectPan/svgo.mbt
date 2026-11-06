@@ -1,9 +1,10 @@
 ///|
 /// A parsed XML/SVG document: a sequence of top level nodes, usually a
 /// prolog (`<?xml ...?>`, doctype, comments) followed by one root element.
+#derive(Debug)
 pub(all) struct Document {
   children : Array[Node]
-} derive(Debug)
+}
 
 ///|
 pub extend Document with Debug::{to_repr}
@@ -11,6 +12,7 @@ pub extend Document with Debug::{to_repr}
 ///|
 /// One node of the tree. Text is stored decoded (entities resolved);
 /// comments, CDATA, doctype and processing instructions keep their raw body.
+#derive(Debug)
 pub(all) enum Node {
   Element(Element)
   Text(String)
@@ -19,7 +21,7 @@ pub(all) enum Node {
   Doctype(String)
   /// processing instruction: target and data (`<?target data?>`)
   ProcInst(String, String)
-} derive(Debug)
+}
 
 ///|
 pub extend Node with Debug::{to_repr}
@@ -27,12 +29,13 @@ pub extend Node with Debug::{to_repr}
 ///|
 /// An element with its tag name, attributes and child nodes. Plugins mutate
 /// elements in place; `name` is mutable so shapes can be turned into paths.
+#derive(Debug)
 pub(all) struct Element {
   mut name : String
   /// attributes in source order; MoonBit maps preserve insertion order
   attrs : Map[String, String]
   children : Array[Node]
-} derive(Debug)
+}
 
 ///|
 pub extend Element with Debug::{to_repr}

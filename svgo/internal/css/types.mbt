@@ -1,11 +1,12 @@
 ///|
 /// CSS AST types and specificity representation.
+#derive(Eq, Compare, Debug)
 pub(all) struct Specificity {
   a : Int32 // inline style (1 or 0)
   b : Int32 // IDs
   c : Int32 // classes, attributes, pseudo-classes
   d : Int32 // type (tag) selectors, pseudo-elements
-} derive(Eq, Compare, Debug)
+}
 
 ///|
 pub extend Specificity with Eq::{not_equal, equal}
@@ -67,11 +68,12 @@ pub fn Specificity::add(self : Specificity, other : Specificity) -> Specificity 
 }
 
 ///|
+#derive(Eq, Debug)
 pub(all) struct Declaration {
   name : String
   value : String
   important : Bool
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Declaration with Eq::{not_equal, equal}
@@ -80,13 +82,14 @@ pub extend Declaration with Eq::{not_equal, equal}
 pub extend Declaration with Debug::{to_repr}
 
 ///|
+#derive(Eq, Debug)
 pub(all) enum Combinator {
   Descendant // space
   Child // >
   NextSibling // +
   SubsequentSibling // ~
   Deep // /deep/
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Combinator with Eq::{not_equal, equal}
@@ -95,6 +98,7 @@ pub extend Combinator with Eq::{not_equal, equal}
 pub extend Combinator with Debug::{to_repr}
 
 ///|
+#derive(Eq, Debug)
 pub(all) enum AttrMatcher {
   Exists // [attr]
   Equals(String) // [attr=val]
@@ -103,7 +107,7 @@ pub(all) enum AttrMatcher {
   PrefixMatch(String) // [attr^=val]
   SuffixMatch(String) // [attr$=val]
   SubstringMatch(String) // [attr*=val]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend AttrMatcher with Eq::{not_equal, equal}
@@ -112,6 +116,7 @@ pub extend AttrMatcher with Eq::{not_equal, equal}
 pub extend AttrMatcher with Debug::{to_repr}
 
 ///|
+#derive(Eq, Debug)
 pub(all) enum SimpleSelector {
   Universal
   Type(String)
@@ -120,7 +125,7 @@ pub(all) enum SimpleSelector {
   Attribute(String, AttrMatcher)
   PseudoClass(String, String?) // e.g. :hover, :not(...)
   PseudoElement(String) // e.g. ::before
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend SimpleSelector with Eq::{not_equal, equal}
@@ -129,9 +134,10 @@ pub extend SimpleSelector with Eq::{not_equal, equal}
 pub extend SimpleSelector with Debug::{to_repr}
 
 ///|
+#derive(Eq, Debug)
 pub(all) struct CompoundSelector {
   simples : Array[SimpleSelector]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend CompoundSelector with Eq::{not_equal, equal}
@@ -140,11 +146,12 @@ pub extend CompoundSelector with Eq::{not_equal, equal}
 pub extend CompoundSelector with Debug::{to_repr}
 
 ///|
+#derive(Eq, Debug)
 pub(all) struct ComplexSelector {
   head : CompoundSelector
   tail : Array[(Combinator, CompoundSelector)]
   raw : String
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend ComplexSelector with Eq::{not_equal, equal}
@@ -153,29 +160,32 @@ pub extend ComplexSelector with Eq::{not_equal, equal}
 pub extend ComplexSelector with Debug::{to_repr}
 
 ///|
+#derive(Debug)
 pub(all) struct Rule {
   selectors : Array[ComplexSelector]
   declarations : Array[Declaration]
-} derive(Debug)
+}
 
 ///|
 pub extend Rule with Debug::{to_repr}
 
 ///|
+#derive(Debug)
 pub(all) enum StyleSheetItem {
   Rule(Rule)
   Declarations(Array[Declaration]) // declaration block inside @font-face, @viewport, @page, etc.
   AtRule(String, String, Array[StyleSheetItem]?) // name, params, block (if any)
   Raw(String)
-} derive(Debug)
+}
 
 ///|
 pub extend StyleSheetItem with Debug::{to_repr}
 
 ///|
+#derive(Debug)
 pub(all) struct StyleSheet {
   items : Array[StyleSheetItem]
-} derive(Debug)
+}
 
 ///|
 pub extend StyleSheet with Debug::{to_repr}

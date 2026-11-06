@@ -18,9 +18,10 @@ let pow10_i64 : Array[Int64] = [
 /// Error raised by the number scanner when a token is not a valid number;
 /// callers (parse_number, path's parse_into) translate it into their own
 /// error type.
+#derive(Debug)
 pub suberror NumError {
   NumError(String)
-} derive(Debug)
+}
 
 ///|
 pub extend NumError with Debug::{to_repr}

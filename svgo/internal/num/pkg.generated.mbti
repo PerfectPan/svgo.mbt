@@ -41,9 +41,10 @@ pub fn write_number(StringBuilder, Double, Int32) -> Unit
 pub fn write_path_number(StringBuilder, Double, Int32, Int32) -> Int32
 
 // Errors
+#derive(@debug.Debug)
 pub suberror NumError {
   NumError(String)
-} derive(@debug.Debug)
+}
 pub fn NumError::to_repr(Self) -> @debug.Repr
 
 // Types and methods

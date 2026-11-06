@@ -19,15 +19,17 @@ pub fn parse(String) -> Array[Segment] raise PathError
 pub fn stringify(Array[Segment], precision? : Int32) -> String
 
 // Errors
+#derive(@debug.Debug)
 pub suberror PathError {
   PathError(String)
-} derive(@debug.Debug)
+}
 pub fn PathError::output(Self, &Logger) -> Unit
 pub fn PathError::to_repr(Self) -> @debug.Repr
 pub fn PathError::to_string(Self) -> String
 pub impl Show for PathError
 
 // Types and methods
+#derive(@debug.Debug)
 pub(all) struct Options {
   precision : Int32
   utilize_absolute : Bool
@@ -43,14 +45,15 @@ pub(all) struct Options {
   make_arcs : Bool
   make_arcs_threshold : Double
   make_arcs_tolerance : Double
-} derive(@debug.Debug)
+}
 pub fn Options::default() -> Self
 pub fn Options::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Segment {
   cmd : Char
   args : Array[Double]
-} derive(Eq, @debug.Debug)
+}
 pub fn Segment::equal(Self, Self) -> Bool
 pub fn Segment::not_equal(Self, Self) -> Bool
 pub fn Segment::to_repr(Self) -> @debug.Repr

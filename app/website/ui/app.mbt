@@ -3,11 +3,12 @@
 /// included) without a rewrite rule: `#/`, `#/playground`, `#/api/<pkg>`
 /// (one page per package: svgo, xml, path, plugins) and
 /// `#/api/<pkg>/<Item>` for a member anchor.
+#derive(Eq)
 pub(all) enum Route {
   Landing
   Playground
   Api(String)
-} derive(Eq)
+}
 
 ///|
 pub extend Route with Eq::{not_equal, equal}
@@ -45,10 +46,11 @@ pub fn parse_api_path(fragment : String) -> (String, String?) {
 ///|
 /// Interface preferences, kept by the root and mirrored into `<html>`
 /// attributes and localStorage.
+#derive(Eq)
 pub(all) struct Prefs {
   lang : Lang
   dark : Bool
-} derive(Eq)
+}
 
 ///|
 pub extend Prefs with Eq::{not_equal, equal}
@@ -92,10 +94,11 @@ fn copy_with_toast(text : String, title : String) -> @rabbita.Cmd {
 }
 
 ///|
+#derive(Eq)
 priv struct AppModel {
   route : Route
   prefs : Prefs
-} derive(Eq)
+}
 
 ///|
 priv enum AppMsg {

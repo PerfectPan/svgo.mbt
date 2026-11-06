@@ -2,10 +2,11 @@
 /// Interface language. The root component keeps the choice in its model and
 /// mirrors it into `lang` before rendering, so views can call `t` without
 /// threading it through every function. `t` picks a string, `tm` markup.
+#derive(Eq)
 pub(all) enum Lang {
   En
   Zh
-} derive(Eq)
+}
 
 ///|
 pub extend Lang with Eq::{not_equal, equal}

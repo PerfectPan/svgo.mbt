@@ -1,9 +1,10 @@
 ///|
 /// Malformed input; carries a message and the code unit offset where
 /// parsing stopped.
+#derive(Debug)
 pub suberror ParseError {
   ParseError(String, Int32)
-} derive(Debug)
+}
 
 ///|
 pub extend ParseError with Debug::{to_repr}

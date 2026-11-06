@@ -1,6 +1,7 @@
 ///|
 /// Shared state passed to every plugin: the numeric precision plus a cache
 /// that lives for the whole run.
+#derive(Debug)
 pub struct Context {
   /// decimal places for numeric attribute values and path data
   precision : Int32
@@ -13,7 +14,7 @@ pub struct Context {
   /// intersection test (paths are compared against both neighbours on
   /// every pass, so this saves most of the parsing and hull building)
   path_hulls : Map[String, Array[Array[(Double, Double)]]]
-} derive(Debug)
+}
 
 ///|
 pub extend Context with Debug::{to_repr}

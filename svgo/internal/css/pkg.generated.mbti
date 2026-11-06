@@ -41,6 +41,7 @@ pub fn serialize_declarations(Array[Declaration]) -> String
 // Errors
 
 // Types and methods
+#derive(Eq, @debug.Debug)
 pub(all) enum AttrMatcher {
   Exists
   Equals(String)
@@ -49,27 +50,29 @@ pub(all) enum AttrMatcher {
   PrefixMatch(String)
   SuffixMatch(String)
   SubstringMatch(String)
-} derive(Eq, @debug.Debug)
+}
 pub fn AttrMatcher::equal(Self, Self) -> Bool
 pub fn AttrMatcher::not_equal(Self, Self) -> Bool
 pub fn AttrMatcher::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Combinator {
   Descendant
   Child
   NextSibling
   SubsequentSibling
   Deep
-} derive(Eq, @debug.Debug)
+}
 pub fn Combinator::equal(Self, Self) -> Bool
 pub fn Combinator::not_equal(Self, Self) -> Bool
 pub fn Combinator::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) struct ComplexSelector {
   head : CompoundSelector
   tail : Array[(Combinator, CompoundSelector)]
   raw : String
-} derive(Eq, @debug.Debug)
+}
 pub fn ComplexSelector::equal(Self, Self) -> Bool
 pub fn ComplexSelector::not_equal(Self, Self) -> Bool
 pub fn ComplexSelector::specificity(Self) -> Specificity
@@ -77,19 +80,21 @@ pub fn ComplexSelector::to_css(Self) -> String
 pub fn ComplexSelector::to_repr(Self) -> @debug.Repr
 pub fn ComplexSelector::write_css(Self, StringBuilder) -> Unit
 
+#derive(Eq, @debug.Debug)
 pub(all) struct CompoundSelector {
   simples : Array[SimpleSelector]
-} derive(Eq, @debug.Debug)
+}
 pub fn CompoundSelector::equal(Self, Self) -> Bool
 pub fn CompoundSelector::not_equal(Self, Self) -> Bool
 pub fn CompoundSelector::to_repr(Self) -> @debug.Repr
 pub fn CompoundSelector::write_css(Self, StringBuilder) -> Unit
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Declaration {
   name : String
   value : String
   important : Bool
-} derive(Eq, @debug.Debug)
+}
 pub fn Declaration::equal(Self, Self) -> Bool
 pub fn Declaration::not_equal(Self, Self) -> Bool
 pub fn Declaration::to_css(Self) -> String
@@ -104,14 +109,16 @@ pub(all) struct DocumentContext {
 pub fn DocumentContext::build(@xml.Document) -> Self
 pub fn DocumentContext::find_all_matches(Self, ComplexSelector) -> Array[Int32]
 
+#derive(@debug.Debug)
 pub(all) struct Rule {
   selectors : Array[ComplexSelector]
   declarations : Array[Declaration]
-} derive(@debug.Debug)
+}
 pub fn Rule::to_css(Self) -> String
 pub fn Rule::to_repr(Self) -> @debug.Repr
 pub fn Rule::write_css(Self, StringBuilder) -> Unit
 
+#derive(Eq, @debug.Debug)
 pub(all) enum SimpleSelector {
   Universal
   Type(String)
@@ -120,18 +127,19 @@ pub(all) enum SimpleSelector {
   Attribute(String, AttrMatcher)
   PseudoClass(String, String?)
   PseudoElement(String)
-} derive(Eq, @debug.Debug)
+}
 pub fn SimpleSelector::equal(Self, Self) -> Bool
 pub fn SimpleSelector::not_equal(Self, Self) -> Bool
 pub fn SimpleSelector::to_repr(Self) -> @debug.Repr
 pub fn SimpleSelector::write_css(Self, StringBuilder) -> Unit
 
+#derive(Compare, Eq, @debug.Debug)
 pub(all) struct Specificity {
   a : Int32
   b : Int32
   c : Int32
   d : Int32
-} derive(Compare, Eq, @debug.Debug)
+}
 pub fn Specificity::add(Self, Self) -> Self
 pub fn Specificity::compare(Self, Self) -> Int32
 pub fn Specificity::equal(Self, Self) -> Bool
@@ -146,18 +154,20 @@ pub fn Specificity::to_repr(Self) -> @debug.Repr
 pub fn Specificity::to_string(Self) -> String
 pub impl Show for Specificity
 
+#derive(@debug.Debug)
 pub(all) struct StyleSheet {
   items : Array[StyleSheetItem]
-} derive(@debug.Debug)
+}
 pub fn StyleSheet::to_css(Self) -> String
 pub fn StyleSheet::to_repr(Self) -> @debug.Repr
 
+#derive(@debug.Debug)
 pub(all) enum StyleSheetItem {
   Rule(Rule)
   Declarations(Array[Declaration])
   AtRule(String, String, Array[StyleSheetItem]?)
   Raw(String)
-} derive(@debug.Debug)
+}
 pub fn StyleSheetItem::to_repr(Self) -> @debug.Repr
 pub fn StyleSheetItem::write_css(Self, StringBuilder) -> Unit
 

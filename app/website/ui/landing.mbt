@@ -1,9 +1,10 @@
 ///|
+#derive(Eq)
 priv struct LandingState {
   tab : Int32
   /// index into `package_managers` for the npm tab's install command
   pm : Int32
-} derive(Eq)
+}
 
 ///|
 priv enum LandingMsg {

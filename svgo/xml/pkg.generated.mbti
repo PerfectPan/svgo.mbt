@@ -9,29 +9,32 @@ import {
 pub fn parse(String) -> Document raise ParseError
 
 // Errors
+#derive(@debug.Debug)
 pub suberror ParseError {
   ParseError(String, Int32)
-} derive(@debug.Debug)
+}
 pub fn ParseError::output(Self, &Logger) -> Unit
 pub fn ParseError::to_repr(Self) -> @debug.Repr
 pub fn ParseError::to_string(Self) -> String
 pub impl Show for ParseError
 
 // Types and methods
+#derive(@debug.Debug)
 pub(all) struct Document {
   children : Array[Node]
-} derive(@debug.Debug)
+}
 pub fn Document::each_element(Self, (Element, Element?) -> Unit) -> Unit
 pub fn Document::each_element_post(Self, (Element, Element?) -> Unit) -> Unit
 pub fn Document::root(Self) -> Element?
 pub fn Document::to_repr(Self) -> @debug.Repr
 pub fn Document::to_string(Self, options? : SerializeOptions) -> String
 
+#derive(@debug.Debug)
 pub(all) struct Element {
   mut name : String
   attrs : Map[String, String]
   children : Array[Node]
-} derive(@debug.Debug)
+}
 pub fn Element::elements(Self) -> Array[Self]
 pub fn Element::get(Self, String) -> String?
 pub fn Element::has(Self, String) -> Bool
@@ -41,6 +44,7 @@ pub fn Element::set(Self, String, String) -> Unit
 pub fn Element::to_repr(Self) -> @debug.Repr
 pub fn Element::to_string(Self, options? : SerializeOptions) -> String
 
+#derive(@debug.Debug)
 pub(all) enum Node {
   Element(Element)
   Text(String)
@@ -48,13 +52,14 @@ pub(all) enum Node {
   CData(String)
   Doctype(String)
   ProcInst(String, String)
-} derive(@debug.Debug)
+}
 pub fn Node::to_repr(Self) -> @debug.Repr
 
+#derive(@debug.Debug)
 pub(all) struct SerializeOptions {
   pretty : Bool
   prolog : Bool
-} derive(@debug.Debug)
+}
 pub fn SerializeOptions::default() -> Self
 pub fn SerializeOptions::to_repr(Self) -> @debug.Repr
 

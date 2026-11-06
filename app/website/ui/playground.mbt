@@ -1,4 +1,5 @@
 ///|
+#derive(Eq)
 priv struct PgModel {
   source : String
   enabled : Array[String]
@@ -7,7 +8,7 @@ priv struct PgModel {
   pretty : Bool
   outcome : Outcome
   preview_bg : PreviewBg
-} derive(Eq)
+}
 
 ///|
 /// The preview checkerboard, set by the "Preview background" segmented
@@ -15,10 +16,11 @@ priv struct PgModel {
 /// site theme, so a dark sample stays visible on first load. Not persisted,
 /// and not part of the share link — it's a local inspection aid, not an
 /// input.
+#derive(Eq)
 priv enum PreviewBg {
   Light
   Dark
-} derive(Eq)
+}
 
 ///|
 priv enum PgMsg {

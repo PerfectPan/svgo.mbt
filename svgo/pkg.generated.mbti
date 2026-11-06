@@ -4,6 +4,7 @@ package "PerfectPan/svgo"
 import {
   "PerfectPan/svgo/plugins",
   "moonbitlang/core/debug",
+  "moonbitlang/core/json",
 }
 
 // Values
@@ -12,33 +13,36 @@ pub fn list_plugins() -> Array[(String, String, Bool)]
 pub fn optimize(String, config? : Config) -> Result raise
 
 // Errors
+#derive(@debug.Debug)
 pub suberror UnknownPlugin {
   UnknownPlugin(String)
-} derive(@debug.Debug)
+}
 pub fn UnknownPlugin::output(Self, &Logger) -> Unit
 pub fn UnknownPlugin::to_repr(Self) -> @debug.Repr
 pub fn UnknownPlugin::to_string(Self) -> String
 pub impl Show for UnknownPlugin
 
 // Types and methods
+#derive(@debug.Debug)
 pub(all) struct Config {
   plugins : Array[String]
   custom : Array[@plugins.Plugin]
-  params : Map[String, Json]
+  params : Map[String, @json.Json]
   precision : Int32
   multipass : Bool
   pretty : Bool
-} derive(@debug.Debug)
+}
 pub fn Config::default() -> Self
 pub fn Config::to_repr(Self) -> @debug.Repr
 
+#derive(@debug.Debug)
 pub(all) struct Result {
   data : String
   original_size : Int32
   size : Int32
   passes : Int32
   applied : Array[String]
-} derive(@debug.Debug)
+}
 pub fn Result::saved_percent(Self) -> Double
 pub fn Result::to_repr(Self) -> @debug.Repr
 

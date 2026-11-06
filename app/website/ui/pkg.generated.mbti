@@ -98,6 +98,7 @@ pub let wasm_bytes : Int32
 // Errors
 
 // Types and methods
+#derive(Eq)
 pub(all) struct ApiItem {
   kind : String
   name : String
@@ -106,26 +107,29 @@ pub(all) struct ApiItem {
   file : String
   methods : Array[ApiMethod]
   impls : Array[String]
-} derive(Eq)
+}
 pub fn ApiItem::equal(Self, Self) -> Bool
 pub fn ApiItem::not_equal(Self, Self) -> Bool
 
+#derive(Eq)
 pub(all) struct ApiMethod {
   name : String
   signature : String
   doc : String
-} derive(Eq)
+}
 pub fn ApiMethod::equal(Self, Self) -> Bool
 pub fn ApiMethod::not_equal(Self, Self) -> Bool
 
+#derive(Eq)
 pub(all) struct ApiPackage {
   path : String
   short : String
   items : Array[ApiItem]
-} derive(Eq)
+}
 pub fn ApiPackage::equal(Self, Self) -> Bool
 pub fn ApiPackage::not_equal(Self, Self) -> Bool
 
+#derive(Eq)
 pub(all) struct BenchRow {
   file : String
   original : Int32
@@ -134,7 +138,7 @@ pub(all) struct BenchRow {
   js_default : Int32
   mbt_ms : Double
   js_ms : Double
-} derive(Eq)
+}
 pub fn BenchRow::equal(Self, Self) -> Bool
 pub fn BenchRow::not_equal(Self, Self) -> Bool
 
@@ -143,22 +147,25 @@ pub(all) struct Chrome {
   emit : @cmd.Emit[PrefMsg]
 }
 
+#derive(Eq)
 pub(all) struct CliFlag {
   flag : String
   description : String
-} derive(Eq)
+}
 pub fn CliFlag::equal(Self, Self) -> Bool
 pub fn CliFlag::not_equal(Self, Self) -> Bool
 
+#derive(Eq)
 pub(all) enum Lang {
   En
   Zh
-} derive(Eq)
+}
 pub fn Lang::code(Self) -> String
 pub fn Lang::equal(Self, Self) -> Bool
 pub fn Lang::not_equal(Self, Self) -> Bool
 pub fn Lang::parse(String) -> Self?
 
+#derive(Eq)
 pub(all) struct Outcome {
   data : String
   original_size : Int32
@@ -167,7 +174,7 @@ pub(all) struct Outcome {
   applied : Array[String]
   ms : Double
   error : String
-} derive(Eq)
+}
 pub fn Outcome::empty() -> Self
 pub fn Outcome::equal(Self, Self) -> Bool
 pub fn Outcome::not_equal(Self, Self) -> Bool
@@ -178,26 +185,29 @@ pub(all) enum PrefMsg {
   ToggleDark
 }
 
+#derive(Eq)
 pub(all) struct Prefs {
   lang : Lang
   dark : Bool
-} derive(Eq)
+}
 pub fn Prefs::equal(Self, Self) -> Bool
 pub fn Prefs::not_equal(Self, Self) -> Bool
 
+#derive(Eq)
 pub(all) enum Route {
   Landing
   Playground
   Api(String)
-} derive(Eq)
+}
 pub fn Route::equal(Self, Self) -> Bool
 pub fn Route::not_equal(Self, Self) -> Bool
 
+#derive(Eq)
 pub(all) struct Sample {
   name : String
   file : String
   svg : String
-} derive(Eq)
+}
 pub fn Sample::equal(Self, Self) -> Bool
 pub fn Sample::not_equal(Self, Self) -> Bool
 

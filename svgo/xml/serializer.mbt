@@ -1,12 +1,13 @@
 ///|
 /// How `Document::to_string` prints: compact or indented, with or without
 /// the XML prolog.
+#derive(Debug)
 pub(all) struct SerializeOptions {
   /// indent with newlines and two spaces per level
   pretty : Bool
   /// emit the `<?xml ...?>` and doctype nodes
   prolog : Bool
-} derive(Debug)
+}
 
 ///|
 pub extend SerializeOptions with Debug::{to_repr}

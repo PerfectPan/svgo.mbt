@@ -42,7 +42,7 @@ root installs every JS package.
 | dev server with live reload | `pnpm dev` → http://localhost:4173 (warren dev + tailwind --watch) |
 | regenerate the site's data files | `node app/website/gen.mjs` (after collect.mjs or moon doc changed) |
 | record a user-visible change for the changelog | `pnpm changeset` in the PR (writes `.changeset/*.md`) |
-| release (npm via OIDC, then native binaries + GitHub release + mooncakes) | `release.yml` opens the release PR (branch `changeset-release/main`, from `pnpm version-packages`: changesets bump + `scripts/sync-version.mjs`) whenever changesets are pending on main. To release: `gh pr close <n> && gh pr reopen <n>` so CI runs on it (a bot-opened PR gets no CI by itself), then merge; `release.yml` publishes to npm and tags `@rivus/svgo@X.Y.Z`, `binaries.yml` does the rest (needs the `MOONCAKES_TOKEN` secret). Rehearse with `gh workflow run release.yml -f dry_run=true`. See CONTRIBUTING.md "Releasing". |
+| release (npm, native binaries and mooncakes) | Follow [Releasing](CONTRIBUTING.md#releasing) to review the draft version PR, verify CI, and publish the npm package and matching tagged binaries. Rehearse with `gh workflow run release.yml -f dry_run=true`. |
 
 ## Layout
 

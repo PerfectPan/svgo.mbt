@@ -312,19 +312,14 @@ license, update `THIRD_PARTY_NOTICES.md` in the same PR.
    `--version` and the wasm's `version()`. `scripts/verify.sh` fails if those
    ever disagree.
    Further changesets merged later are folded into the same PR.
-3. To release, run CI on the release PR and merge it. The PR is opened with
-   the workflow token, and GitHub does not start workflows for events that
-   token causes, so CI has to be started by a person: close and reopen the PR
-   (`gh pr close <n> && gh pr reopen <n>`) or push an empty commit to its
-   branch. `gh workflow run ci.yml` does not count: a dispatched run is not
-   attached to the PR and does not satisfy the required checks. Merging runs
-   `release.yml` again: build, tests, `changeset publish` and the tag
-   `@rivus/svgo@X.Y.Z`. `changeset publish` runs `pnpm publish`, which
-   authenticates to npm through OIDC trusted publishing (no token lives in the
-   repo) and attaches provenance for this public repository by itself.
-4. The tag runs `binaries.yml`: native CLI tarballs for linux-x86_64,
-   linux-arm64 and macos-arm64 on a GitHub release, and `moon publish` of
-   `PerfectPan/svgo` to mooncakes using the `MOONCAKES_TOKEN` secret.
+3. Changesets returns the version PR to Draft on every update. Review the version changes, mark
+   the PR Ready, and verify that both required CI jobs pass on its current head. Merging
+   it runs `release.yml` again to build and test the npm package. Changesets publishes
+   through npm Trusted Publishing and creates the package tag and GitHub Release.
+4. The publish action reports the released package and version. The workflow dispatches
+   `binaries.yml` at that tag to attach the Linux x86-64, Linux arm64 and macOS arm64
+   CLI archives and publish the matching MoonBit source to mooncakes. To retry the
+   attachments, dispatch `binaries.yml` with `tag=@rivus/svgo@X.Y.Z` and `dry_run=false`.
 
 One-time setup, done: `@rivus/svgo` has a Trusted Publisher on npmjs.com
 pointing at this repository and `release.yml` (the first publish needed a

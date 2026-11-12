@@ -1,153 +1,77 @@
 name: release
 
-# Opens the release pull request and publishes @rivus/svgo to npm.
-#
-# Flow: pull requests add changesets (`pnpm changeset`). On every push to main
-# the `version` job looks at `.changeset/`:
-#   - changesets pending: changesets/action runs `pnpm version-packages` (bumps
-#     packages/svgo-mbt/package.json and CHANGELOG.md, copies the version into
-#     the MoonBit modules) and opens or updates the release PR on the branch
-#     `changeset-release/main`. Nothing is published.
-#   - none pending: the `npm` job builds, tests and runs `changeset publish`,
-#     which publishes only if the version is not on npm yet and tags the commit
-#     `@rivus/svgo@X.Y.Z`. That tag triggers binaries.yml (native CLI builds,
-#     the GitHub release and the mooncakes publish).
-#
-# The release PR is opened with GITHUB_TOKEN, and GitHub does not start
-# workflows for events that token causes, so CI does not run on it by itself.
-# main requires the two `verify` checks, so before merging, close and reopen
-# the PR (or push an empty commit to its branch) as a person:
-# `gh pr close <n> && gh pr reopen <n>`. That is a normal pull_request event and
-# ci.yml runs. Do not `gh workflow run ci.yml` on the branch instead: a
-# workflow_dispatch run is not attached to the PR and does not satisfy the rule.
-#
-# npm authentication is OIDC trusted publishing (no token in the repo): the
-# package's Trusted Publisher on npmjs.com must point at this repository and
-# this workflow file. `changeset publish` runs `pnpm publish`, which exchanges
-# the job's id-token for a publish token itself and attaches provenance for a
-# public repository; neither npm nor an `.npmrc` token is involved.
-
 on:
   push:
     branches: [main]
   workflow_dispatch:
     inputs:
       dry_run:
-        description: "Build and test, run pnpm publish --dry-run, tag nothing"
+        description: "Build and test the npm package without publishing or tagging"
         type: boolean
         default: true
 
-permissions:
-  contents: write
-  pull-requests: write
-  id-token: write
-  actions: write
+permissions: {}
 
 concurrency:
   group: release
   cancel-in-progress: false
 
 jobs:
-  # Open or update the release PR when changesets are pending. Skipped on
-  # workflow_dispatch: rehearsals only exercise the publish job.
-  version:
-    if: github.event_name == 'push'
+  release:
+    if: github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && inputs.dry_run)
     runs-on: ubuntu-latest
-    outputs:
-      has_changesets: ${{ steps.changesets.outputs.has-changesets }}
-      pr_number: ${{ steps.changesets.outputs.pr-number }}
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+      actions: write
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      # `pnpm version-packages` ends with `moon info`, so the toolchain is needed
-      - name: Install MoonBit
-        run: |
-          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
-          echo "$HOME/.moon/bin" >> $GITHUB_PATH
-          "$HOME/.moon/bin/moon" update
-      # pnpm (the `packageManager` version) and Node.js; also runs the frozen
-      # `pnpm install`
+          persist-credentials: false
       - uses: pnpm/setup@v3
         with:
           runtime: node
           cache: true
           require-lockfile: true
-      - name: Open or update the release PR
-        id: changesets
-        uses: changesets/action@v2
+      - uses: changesets/action/select-mode@v2.1.2
+        id: mode
+        if: github.event_name == 'push'
+
+      # Versioning refreshes the MoonBit interfaces; publication builds the wasm module and CLI.
+      - name: Install MoonBit
+        if: github.event_name == 'workflow_dispatch' || steps.mode.outputs.mode != 'none'
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+          "$HOME/.moon/bin/moon" update
+      - uses: changesets/action/version@v2.1.2
+        if: steps.mode.outputs.mode == 'version'
         with:
-          version-script: pnpm version-packages
+          script: pnpm version-packages
           commit-message: "chore(release): version packages"
           pr-title: "chore(release): version packages"
-          create-github-releases: false
-        env:
-          # changelog-github reads PR titles and authors through the API
-          GITHUB_TOKEN: ${{ github.token }}
-      - name: Summary
-        run: |
-          if [ "${{ steps.changesets.outputs.has-changesets }}" = "true" ]; then
-            echo "release PR #${{ steps.changesets.outputs.pr-number }} is up to date; close and reopen it to run CI, then merge" >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "no changesets pending" >> "$GITHUB_STEP_SUMMARY"
-          fi
+          pr-draft: always
 
-  # Build, test and publish. Runs when nothing is pending (a release PR has
-  # just been merged, or a push changed nothing user-visible) and on dispatch.
-  npm:
-    needs: version
-    if: ${{ !cancelled() && (github.event_name == 'workflow_dispatch' || (needs.version.result == 'success' && needs.version.outputs.has_changesets == 'false')) }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-      - name: Install MoonBit
+      - name: Build and test the npm package
+        if: github.event_name == 'workflow_dispatch' || steps.mode.outputs.mode == 'publish'
         run: |
-          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
-          echo "$HOME/.moon/bin" >> $GITHUB_PATH
-          "$HOME/.moon/bin/moon" update
-      # pnpm (the `packageManager` version) and Node.js; also runs the frozen
-      # `pnpm install`
-      - uses: pnpm/setup@v3
-        with:
-          runtime: node
-          cache: true
-          require-lockfile: true
-      - name: Versions agree across the repo
-        run: node scripts/sync-version.mjs --check
-      - name: Build the wasm and the JS CLI, run the package tests
-        run: |
+          node scripts/sync-version.mjs --check
           scripts/build-wasm.sh
           scripts/build-cli.sh
           cd packages/svgo-mbt && node --test
-      - name: Publish (dry run)
+      - name: Rehearse publishing
         if: github.event_name == 'workflow_dispatch' && inputs.dry_run
         working-directory: packages/svgo-mbt
-        # The same `pnpm publish` that `changeset publish` runs. A version that
-        # is already on npm, the normal state between releases, is skipped by
-        # the real run; say so.
-        run: |
-          v=$(node -p "require('./package.json').version")
-          if pnpm view "@rivus/svgo@$v" version >/dev/null 2>&1; then
-            echo "@rivus/svgo@$v is already on npm; the real run would publish nothing"
-          fi
-          pnpm publish --dry-run --ignore-scripts --access public --no-git-checks
-      - name: Publish and tag
-        if: github.event_name == 'push' || !inputs.dry_run
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          before=" $(git tag -l '@rivus/svgo@*' | tr '\n' ' ') "
-          pnpm changeset publish
-          git push --tags
-          # A tag pushed with GITHUB_TOKEN does not trigger workflows on its
-          # own, so start binaries.yml for each tag this run created.
-          for t in $(git tag -l '@rivus/svgo@*'); do
-            case "$before" in *" $t "*) ;; *)
-              echo "dispatching binaries.yml for $t"
-              gh workflow run binaries.yml --ref main -f dry_run=false -f tag="$t" ;;
-            esac
-          done
+        run: pnpm publish --dry-run --ignore-scripts --access public --no-git-checks
+      - uses: changesets/action/publish@v2.1.2
+        id: publish
+        if: steps.mode.outputs.mode == 'publish' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run)
+      # Tags created with GITHUB_TOKEN do not trigger tag-push workflows.
+      - name: Build native binaries for the published package
+        if: steps.publish.outputs.published == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
+          TAG: ${{ format('{0}@{1}', fromJSON(steps.publish.outputs.published-packages)[0].name, fromJSON(steps.publish.outputs.published-packages)[0].version) }}
+        run: gh workflow run binaries.yml --ref "$TAG" -f dry_run=false

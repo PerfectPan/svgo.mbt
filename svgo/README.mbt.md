@@ -226,7 +226,15 @@ svgo also has 19 opt-in plugins; `removeDimensions` and `removeTitle` are implem
 
 ## Verification
 
+CI installs the current official MoonBit release on Linux and macOS and records
+`moon version --all` in the job log and run summary. It checks and builds the
+supported backends, runs the JS/native tests, exercises the native and JS CLIs,
+and builds the website. The `wasm-gc` library imports `Math`, `Number` and
+`String` from its JavaScript host, so its tests run through the shipped npm
+loader under Node, Bun and Deno; standalone `moonrun` does not supply those imports.
+
 ```bash
+moon version --all          # record the toolchain used for compatibility checks
 scripts/verify.sh            # check, fmt, .mbti drift, fixtures, tests on js / native
 scripts/verify.sh --full     # + wasm build, sizes vs svgo-js, resvg pixel diff, speed (needs pnpm install)
 ```

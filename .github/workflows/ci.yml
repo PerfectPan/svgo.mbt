@@ -22,7 +22,7 @@ jobs:
       # `pnpm install`
       - uses: pnpm/setup@v3
         with:
-          runtime: node@24
+          runtime: node
           cache: true
           require-lockfile: true
       - name: Check, format, interfaces, fixtures, tests on js / native

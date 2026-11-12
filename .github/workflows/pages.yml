@@ -30,7 +30,7 @@ jobs:
       # `pnpm install`
       - uses: pnpm/setup@v3
         with:
-          runtime: node@26.13.1
+          runtime: node
           cache: true
           require-lockfile: true
       - name: Build wasm, API docs and the site

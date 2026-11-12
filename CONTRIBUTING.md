@@ -20,6 +20,7 @@ The code requires moonc ≥ 0.10.19 (it uses the `Int32` names and the
 `#derive(...)` attribute syntax). If `moon check` fails with undefined
 `Int32`, run `moon upgrade`.
 
+Use Node.js 26.13.1 for development (see `.node-version`).
 `package.json` pins pnpm with `packageManager`; pnpm 10 and later switch to
 that version by themselves. Dependency build scripts are blocked unless
 `allowBuilds` in `pnpm-workspace.yaml` lists the package, and nothing here

@@ -32,7 +32,7 @@ jobs:
           persist-credentials: false
       - uses: pnpm/setup@v3
         with:
-          runtime: node@24
+          runtime: node
           cache: true
           require-lockfile: true
       - uses: changesets/action/select-mode@v2.1.2

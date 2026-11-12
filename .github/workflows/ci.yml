@@ -19,11 +19,20 @@ jobs:
           echo "$HOME/.moon/bin" >> $GITHUB_PATH
           # the registry index is not present on a fresh runner
           "$HOME/.moon/bin/moon" update
+      - name: Record the verified MoonBit toolchain
+        run: |
+          moon version --all
+          {
+            echo '### MoonBit toolchain'
+            echo '```text'
+            moon version --all
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
       # pnpm (the `packageManager` version) and Node.js; also runs the frozen
       # `pnpm install`
       - uses: pnpm/setup@v3
         with:
-          runtime: node@24
+          runtime: node
           cache: true
           require-lockfile: true
       - name: Check, format, interfaces, fixtures, tests on js / native
@@ -32,6 +41,8 @@ jobs:
         run: |
           scripts/build-wasm.sh
           moon build --target native --release -q
+          "$(scripts/bin-path.sh)" --version
+          "$(scripts/bin-path.sh)" svgo/testdata/sketch-icon.svg --json > /dev/null
           packages/compare/compare.sh
           node packages/compare/render-diff.mjs
           node packages/compare/render-diff.mjs app/website/samples --exact

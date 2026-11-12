@@ -73,5 +73,7 @@ jobs:
         if: steps.publish.outputs.published == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ format('{0}@{1}', fromJSON(steps.publish.outputs.published-packages)[0].name, fromJSON(steps.publish.outputs.published-packages)[0].version) }}
-        run: gh workflow run binaries.yml --ref "$TAG" -f dry_run=false
+          PUBLISHED_PACKAGES: ${{ steps.publish.outputs.published-packages }}
+        run: |
+          TAG=$(jq -er '.[0] | select(.name and .version) | "\(.name)@\(.version)"' <<< "$PUBLISHED_PACKAGES")
+          gh workflow run binaries.yml --ref "$TAG" -f dry_run=false

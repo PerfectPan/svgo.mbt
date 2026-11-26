@@ -1,38 +1,31 @@
 # <Design title>
 
-Copy this file when starting a plan. A plan records the technical decisions (sections 1-5) and the detailed execution plan (section 6) for one deliverable. Keep the sections that apply to a new system, a change, or a migration, and delete the rest. If an owner, reviewer, or date is unknown, write "unconfirmed". Do not invent them.
+Copy this file when starting a plan for a non-trivial change (see `CONTRIBUTING.md`). Keep the sections that apply to a new system, a change, or a migration, and delete the rest. If an owner or date is unknown, write "unconfirmed". Do not invent them.
 
 Writing and review rules live in the `technical-design-docs` skill when it is installed. This file is only the document shape.
 
-<!-- Keep the sections that apply to a new system, a change, or a migration. Merge sections in a small design and delete the rest. If an owner, reviewer, or date is unknown, write "unconfirmed". Do not invent them. -->
-
-- Status: draft / blocked / in review / accepted
-- Owner: <name or team>
-- Reviewer: <name or team>
+- Status: draft / blocked / in review / active
+- Owner: <name or unconfirmed>
 - Last updated: <date>
-- Paired Spec: <path, or none>
-
-## Contents
-
-<!-- List the top-level sections you keep. Delete this comment before review. -->
+- Issue / PR: <link or none>
 
 ## 1. Background and goals
 
 ### 1.1 Current behavior and constraints
 
-State the existing behavior and limits that this design depends on. For a new system, state the demand and the external constraints. Important conclusions need evidence from code, an interface, data, or an earlier decision.
+State the existing behavior and limits that this design depends on. For a new system, state the demand and external constraints. Important conclusions need evidence from code, an interface, data, or an earlier decision.
 
 ### 1.2 Problem
 
 State the concrete problem. For a change or migration, state why it is worth changing: cost, risk, failure mode, or a missing capability.
 
-### 1.3 Goals and success criteria
+### 1.3 Goals and acceptance criteria
 
-List results the design must achieve and that someone can check.
+List checkable outcomes, observable behavior, and invariants the change must satisfy.
 
 ### 1.4 Non-goals
 
-State related problems this design will not handle, so the review does not expand.
+State related problems this design will not handle, so the scope and review do not expand.
 
 ## 2. Outline
 
@@ -42,7 +35,7 @@ Keep only principles that actually constrain a choice.
 
 ### 2.2 Boundaries and responsibilities
 
-Name the systems or domains involved, who owns each, and what each owns. If ownership moves, say what changes. Add a diagram when the relationship is hard to follow in prose.
+Name the systems, modules, or domains involved, who owns each, and what each owns. If ownership moves, say what changes. Add a diagram when the relationship is hard to follow in prose.
 
 ### 2.3 Main path
 
@@ -54,7 +47,7 @@ For each important choice, state the alternatives considered and why this one wa
 
 ## 3. Detailed design
 
-<!-- Keep the subsections you need, and add domain-specific ones. -->
+<!-- Keep only the subsections that apply, and add domain-specific ones. -->
 
 ### 3.1 Entry points and request path
 
@@ -76,11 +69,11 @@ For each important choice, state the alternatives considered and why this one wa
 
 ## 4. Rollout and stability
 
-<!-- Keep this when the change ships or migrates data. For a local tool, describe release and recovery at the actual risk. -->
+<!-- Keep this when the change ships to production or migrates persisted data. For a local tool, describe release and recovery at the actual risk. -->
 
 ### 4.1 Gates and rollout stages
 
-State the entry conditions, the rollout steps, and when to stop widening the rollout.
+State entry conditions, rollout steps, and when to stop widening the rollout.
 
 ### 4.2 Signals and alerts
 
@@ -88,11 +81,11 @@ List success, failure, latency, and quality signals, and who owns each.
 
 ### 4.3 Rollback
 
-State the trigger, the steps, the data impact, and the expected recovery time.
+State the trigger, steps, data impact, and expected recovery time.
 
 ## 5. Verification
 
-<!-- Keep the checks that match the risk. A local tool or a low-risk change needs the important checks, not all four. -->
+<!-- Keep the checks that match the risk. -->
 
 ### 5.1 Functional checks
 
@@ -104,25 +97,27 @@ State the trigger, the steps, the data impact, and the expected recovery time.
 
 ## 6. Execution plan
 
-An implementer should be able to follow this section without making new design decisions. Keep the Status `blocked` while a decision that changes scope, interfaces, data, or rollout is unresolved, and list it in section 7.
+<!-- Keep this when the work spans multiple PRs/sessions or an agent/implementer executes in batches; delete for a single-PR design. -->
+
+An implementer should be able to follow this section without making new design decisions. Keep Status `blocked` while a decision changing scope, interfaces, data, or rollout is unresolved, and list it in section 7.
 
 ### 6.1 Preconditions
 
-State what must be true before work starts: reviewed Spec and design, compatibility baseline, access, or upstream releases.
+State what must be true before work starts: reviewed design, compatibility baseline, access, or upstream releases.
 
 ### 6.2 Completion contract
 
-List the checkable conditions that make this plan done. Link each paired Spec scenario ID to the task and test that proves it.
+List the checkable conditions that make this plan done, linking each acceptance criterion to the task and test that proves it.
 
 ### 6.3 Execution order
 
-Order tasks so each one leaves the repository buildable and reviewable. Group tasks into batches that ship as one PR/MR.
+Order tasks so each leaves the repository buildable and reviewable. Group tasks into batches that ship as one PR/MR.
 
 #### Task 1: <name>
 
 - Files: <paths to create, change, or delete>
 - Change: <what changes in each file and why>
-- Tests: <tests to add or update, with scenario IDs>
+- Tests: <tests to add or update>
 - Exit condition: <command output or observable result that ends the task>
 
 ### 6.4 Validation ledger
@@ -135,22 +130,16 @@ Order tasks so each one leaves the repository buildable and reviewable. Group ta
 
 State the smallest reversible batch, how to revert it, and any persisted-data or release-order constraint. Deployment rollback stays in 4.3.
 
-### 6.6 Work split and schedule
+## 7. Risks and open questions
 
-Keep this when more than one person delivers the change. Mark unconfirmed owners and dates as "unconfirmed". Estimates must state their basis, assumptions, and dependencies. An estimate is not a team commitment.
-
-| Batch or component | Owner | Depends on | Effort | When |
-| --- | --- | --- | --- | --- |
-| <batch> | <owner> | <dependency> | <range or person-days> | <range> |
-
-State cross-component compatibility and the required release order when batches ship separately.
-
-## 7. Risks, open questions, and follow-up
-
-| Item | Type | Impact | Owner | Next step or deadline |
+| Item | Type | Impact | Owner | Next step |
 | --- | --- | --- | --- | --- |
 | <item> | risk / open question / follow-up | <impact> | <owner> | <next step> |
 
-## Appendix
+## 8. Retirement checklist
 
-Put evidence, rejected options, and long references here when they would break the main review.
+Complete before deleting this file in the final delivery PR/MR:
+
+- [ ] Remaining manual checks or follow-up items moved to issues
+- [ ] Lasting non-code knowledge (invariants, tradeoffs, external quirks, validation limits) migrated to `docs/` or local `Why:` comments
+- [ ] This plan file deleted in the final delivery PR/MR

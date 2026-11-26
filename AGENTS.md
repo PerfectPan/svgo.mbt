@@ -3,8 +3,8 @@
 An SVG optimizer in MoonBit, compatible in spirit with svgo's preset-default.
 Everything below is what an agent needs to work here without re-deriving it.
 Human-facing docs: `README.mbt.md` (usage), `docs/ARCHITECTURE.md` (design),
-`CONTRIBUTING.md` (how to add a plugin or fixture, which changes need a Spec or
-Plan, PR rules, releasing), `docs/DESIGN.md` (website guidelines: voice, layout,
+`CONTRIBUTING.md` (how to add a plugin or fixture, which changes need a Plan,
+PR rules, releasing), `docs/DESIGN.md` (website guidelines: voice, layout,
 type scale, tokens, interaction; every site change follows it), `docs/README.md`
 (what belongs in `docs/`).
 
@@ -90,7 +90,7 @@ scripts/                      build-wasm, verify, bench, regress, gen-fixtures; 
 .github/repo-checks.conf      required-file additions for `gh repo-checks repository` (PerfectPan/gh-repo-checks)
 .githooks/pre-commit          installed by scripts/install-git-hooks.sh
 docs/ARCHITECTURE.md          design notes; docs/README.md lists the current-state docs
-docs/specs/, docs/plans/      active Specs (behavior) and Plans (technical decisions + execution plan); see CONTRIBUTING
+docs/plans/                   active implementation plans while non-trivial work is in flight; see CONTRIBUTING
 ```
 
 ## Invariants (tests enforce these; keep them)
@@ -147,13 +147,14 @@ docs/specs/, docs/plans/      active Specs (behavior) and Plans (technical decis
 
 ## Changes and pull requests
 
-- Pick artifacts with the Change Design Gate in `CONTRIBUTING.md`: a plugin
-  addition or fix needs only the requirement in the PR plus fixtures; a
-  refactor across packages or targets needs a Plan in `docs/plans/`; public
-  API, CLI, npm interface or website features need a Spec in `docs/specs/`
-  plus a Plan. Do not start a Plan that is blocked on an unresolved decision;
-  after delivery move lasting constraints into `docs/ARCHITECTURE.md`, the
-  invariants above, or tests, and delete the finished Spec/Plan.
+- Check the Change Design Gate in `CONTRIBUTING.md`: a plugin addition/fix or
+  routine change needs only a clear PR description (plus fixtures for plugins);
+  new subsystems, public API/CLI/npm/wasm contract changes, major cross-target
+  refactors, or multi-PR work use one Plan in `docs/plans/`. Do not start a Plan
+  that is blocked on an unresolved decision; when code lands, move lasting
+  non-code constraints into `docs/ARCHITECTURE.md`, the invariants above, tests,
+  or local `Why:` comments, move follow-ups to issues, and delete the Plan in
+  the final PR.
 - Commit messages and PR titles are English `type(scope): summary` with types
   `feat fix docs style refactor perf test build ci chore revert`. Areas are
   scopes: `perf(bench):`, `test(compare):`, `feat(site):`, `fix(<pluginName>):`.

@@ -4,7 +4,7 @@ Allowed types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `buil
 
 ## Summary
 
-<!-- What changed and why. Link the issue, Spec, or Plan when there is one. -->
+<!-- What changed and why. Link the issue or Plan when there is one. -->
 
 -
 

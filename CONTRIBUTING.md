@@ -36,63 +36,25 @@ comparison suite; `app/website/` the website and `app/cli/` the CLI. `moon` comm
 
 ## Change Design Gate
 
-Every change needs a requirement record. Use the smallest set of artifacts that
-makes behavior and implementation reviewable.
+Most changes need only a clear PR description (`## Summary` and `## Validation`), not a separate document.
 
-| Change type | Required artifact |
+| Change scope | Required artifact |
 | --- | --- |
-| New plugin, plugin fix, or plugin parameter | The requirement in the PR description and fixtures that show it (see "Adding or changing a plugin"); no separate Spec or Plan |
-| Narrow maintenance, tests, documentation, benchmarks | Requirement and PR checklist; a separate Plan only when useful |
-| Technical refactor without changed output (pipeline, packages, wasm boundary, performance rework across targets) | Detailed Plan in `docs/plans/` with compatibility and acceptance conditions |
-| Product behavior beyond one plugin (public API, CLI interface, npm package interface, website features) | One Spec in `docs/specs/` plus one detailed Plan for the same deliverable |
+| New plugin, plugin fix, or plugin parameter | PR description and fixtures (see "Adding or changing a plugin"); no Plan |
+| Bugfix, localized feature/refactor, tests, benchmarks, dependencies, or docs | PR description explaining what changed, why, and how it was verified |
+| New subsystem or package, public API / CLI / npm / wasm contract change, major cross-target refactor, or multi-PR/multi-session work | One Plan in [`docs/plans/`](docs/plans/) |
 
-A Spec defines observable interactions, scope, failure behavior, and acceptance
-examples. Use stable scenario IDs and Given/When/Then where useful. Link
-scenarios to tests (fixtures count). A Spec does not prescribe components,
-interfaces, or execution order. Keep active Specs under
-[`docs/specs/`](docs/specs/). A small change may keep both sections in the PR
-description. Split only when each slice has an independently demonstrable
-outcome.
+## Plan Lifecycle And Retirement
 
-A Plan records technical decisions and the detailed execution plan that
-implements them. Shared architecture, compatibility, and cross-target decisions
-belong in a reviewed Plan. After implementation, move lasting constraints into
-[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`AGENTS.md`](AGENTS.md)
-invariants, or tests. This repository does not keep an RFC directory. Removing
-a proposal does not mark unimplemented ideas as delivered.
+1. Draft a plan from [`docs/plans/0000-template.md`](docs/plans/0000-template.md) only when triggered by the [Change Design Gate](#change-design-gate). Keep `Status: blocked` while a material scope, interface, data, or rollout decision is unresolved.
+2. Review the goals, boundaries, and key decisions before implementing; update the plan if design choices change mid-flight.
+3. Implement within that scope, adding evidence for each acceptance criterion (fixtures, tests, `scripts/verify.sh --full` output, benchmark numbers) and updating current-state docs in the same change.
+4. Retire the plan as soon as its code scope lands on the default branch. Do not keep a completed plan in `docs/plans/` waiting on deferred manual checks or future polish. In the final delivery PR:
+   - Move any remaining manual verification or follow-up work to issues.
+   - Migrate lasting knowledge that code cannot express (invariants, cross-target tradeoffs, external quirks, validation limits) into [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`AGENTS.md`](AGENTS.md) invariants, tests, or local `Why:` comments.
+   - Delete the completed plan file. Git history and the delivery PR keep the full execution record.
 
-## SDD Workflow And Document Lifecycle
-
-1. Record the problem, affected users or maintainers, in-scope behavior,
-   non-goals, and acceptance conditions.
-2. Choose artifacts with the [Change Design Gate](#change-design-gate). The
-   Spec states required behavior: interactions and acceptance scenarios. The
-   Plan owns the technical decisions (design, package and interface changes,
-   data flow) and the detailed execution plan (ordered tasks, tests, exit
-   conditions, validation, and rollback).
-3. Review the behavior and technical design before implementing the affected
-   scope. The Plan must resolve implementation decisions rather than leave them
-   to the implementer; keep it blocked while a material decision is
-   unresolved. New behavior revises the Spec. New implementation decisions
-   revise the Plan.
-4. Implement inside that boundary. Add evidence for each acceptance condition
-   (fixtures, tests, `scripts/verify.sh --full` output, benchmark numbers), or
-   say why existing evidence is enough. Update current-state docs in the same
-   change.
-5. Before retiring a completed Spec or Plan, move still-valid behavior,
-   invariants, and limits into current-state docs and tests. The final delivery
-   PR may delete the completed files. Keep an unfinished Spec or Plan active.
-6. Git history and the delivery PR keep the retired decision. Do not copy
-   completed Specs or Plans into a second archive.
-
-[`docs/plans/`](docs/plans/) contains active Plans. Copy
-[`0000-template.md`](docs/plans/0000-template.md) and keep only the sections
-that apply. A product plan links its paired Spec. The execution plan lists
-preconditions, a completion contract, ordered tasks with files, changes, tests,
-and exit conditions, a validation ledger, and rollback per batch. Keep unknown
-owners, dates, and interfaces marked "unconfirmed". A plan may make
-feature-specific technical decisions, but it cannot silently override
-`docs/ARCHITECTURE.md` or the invariants in `AGENTS.md`.
+[`docs/plans/`](docs/plans/) holds active Plans only while non-trivial work is in flight. Copy [`0000-template.md`](docs/plans/0000-template.md) and keep only the sections that apply. State the problem, goals, non-goals, boundaries, rejected alternatives, failure/rollback behavior, and verification; a file list alone is not a design. Keep unknown owners, dates, and interfaces marked "unconfirmed". A plan may make feature-specific technical decisions, but it cannot silently override `docs/ARCHITECTURE.md` or the invariants in `AGENTS.md`. This repository does not keep an RFC directory.
 
 ## Adding or changing a plugin
 
@@ -212,7 +174,7 @@ The PR template,
 GitLab copy in `.gitlab/merge_request_templates/` stays identical apart from
 PR/MR wording), has three sections:
 
-- **Summary**: what changed and why, with links to the issue, Spec or Plan.
+- **Summary**: what changed and why, with links to the issue or Plan when there is one.
 - **Validation**: the commands you ran and their results, the evidence behind
   the claim (fixtures, render diff, benchmark numbers, screenshots for site
   changes), and skipped gates with reasons.

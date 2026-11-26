@@ -1,9 +1,9 @@
 # Implementation Plans
 
-A plan records the technical decisions and the detailed execution plan for one deliverable. The Spec says what behavior is required; the plan says how it is built and exactly what the implementer does, in order. Product work pairs a plan with one behavioral Spec. A technical refactor may use a plan alone.
+A plan records the design and execution steps for one non-trivial deliverable. Bugfixes and routine changes do not need a plan—explain what changed, why, and how it was verified directly in the PR/MR description. See the [Change Design Gate](../../CONTRIBUTING.md#change-design-gate).
 
-Start from [`0000-template.md`](0000-template.md). Keep only the sections the change needs: background, outline, detailed design, rollout, verification, and the execution plan. Delete the rest. The execution plan lists preconditions, a completion contract, ordered tasks with files, changes, tests, and exit conditions, a validation ledger, and rollback per batch. Keep a plan `blocked` while a material decision is unresolved. Unknown owners and dates stay "unconfirmed".
+Start from [`0000-template.md`](0000-template.md). Keep only the sections the change needs—typically background and goals, outline, detailed design, rollout, verification, and (for multi-PR or agent-executed work) the execution plan—and delete the rest. Keep a plan `blocked` while a material decision is unresolved. Unknown owners and dates stay "unconfirmed".
 
-The design sections match the `technical-design-docs` skill. Install that skill for writing and review rules. This repository does not copy those rules.
+The design sections match the `technical-design-docs` skill when installed; this repository does not copy those rules.
 
-Shared decisions follow [CONTRIBUTING](../../CONTRIBUTING.md#change-design-gate). At completion, move lasting constraints into current-state docs and tests, then delete the finished Spec and plan in the final delivery PR. Keep unfinished scope. Follow the [SDD lifecycle](../../CONTRIBUTING.md#sdd-workflow-and-document-lifecycle).
+Once the code lands on the default branch, retire the plan in the final delivery PR/MR following the [plan lifecycle](../../CONTRIBUTING.md#plan-lifecycle-and-retirement): move unfinished manual checks or follow-ups to issues, migrate lasting non-code constraints into current-state `docs/` (or local `Why:` comments in code), and delete the plan file.

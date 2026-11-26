@@ -1,6 +1,6 @@
 # Documentation Standards
 
-Use `docs/` for durable project knowledge that a maintainer should be able to read without replaying pull requests or chat history. This includes current architecture, development guides, and factual references.
+Use `docs/` for durable project knowledge that a maintainer or user cannot easily infer from reading the code alone. This includes current architecture and tradeoffs, user guides, factual references, and development workflows.
 
 Keep collaboration policy in `CONTRIBUTING.md`, AI-agent instructions in `AGENTS.md`, issue and review evidence requirements in templates, and automated enforcement in scripts or CI workflows.
 
@@ -14,18 +14,19 @@ Documentation owned elsewhere: usage and the plugin table in [`svgo/README.mbt.m
 
 ## Adding Documents
 
-Add a document when there is real current-state knowledge for a reader need: architecture, development guides, factual references (APIs, CLI flags, configuration), or tutorials. Do not create empty directories or placeholder files. List every new document in the section above.
+Add a document when there is real current-state knowledge for a reader need: user guides (`guides/`), factual references (`reference/` for APIs, CLI flags, configuration), architecture (`architecture/`), or development workflows (`development/`). Do not create empty directories or placeholder files. List every new document in the section above.
 
-## Spec And Plan Boundary
+## Active Plans Boundary
 
-- [`specs/`](specs/) declares active product behavior and acceptance contracts.
-- [`plans/`](plans/) contains active technical decisions and detailed execution plans.
+- [`plans/`](plans/) contains active implementation plans only while non-trivial work is in flight.
 
-The Change Design Gate in [`CONTRIBUTING.md`](../CONTRIBUTING.md) decides which artifacts a change needs. After delivery, lasting constraints belong in current-state `docs/`. Git history keeps the retired Spec or Plan.
+The Change Design Gate in [`CONTRIBUTING.md`](../CONTRIBUTING.md#change-design-gate) decides when a change needs a plan. After the code lands on the default branch, move lasting non-code knowledge into `docs/` (and local `Why:` comments in code), move remaining follow-up items to issues, and delete the completed plan. Git history and the delivery PR keep the full plan.
 
 ## Writing Standards
 
 - Give every durable document one clear audience, purpose, and owner area.
+- Record what source code cannot express: *why* a design or workaround was chosen, alternatives rejected, ownership and trust boundaries, external system quirks, and known validation limits.
+- Do not duplicate directory trees, symbol lists, or type signatures that source code and type checks already express.
 - Prefer current-state language over historical narration in `docs/`; link to the delivery PR for decision history.
 - Keep examples runnable when practical; otherwise label them as illustrative and explain the validation gap.
 - Link to source files, commands, schemas, or dashboards when they are the real source of truth.

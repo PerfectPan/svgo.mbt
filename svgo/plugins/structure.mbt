@@ -1338,7 +1338,7 @@ fn collect_style_props(
           k == "marker-start" ||
           k == "marker-mid" ||
           k == "marker-end" {
-          markers.add(cls)
+          markers.insert(cls)
         }
       }
     }
@@ -1488,16 +1488,16 @@ fn collect_merge_style(
         k == "marker-mid" ||
         k == "marker-end" {
         for cls in classes {
-          markers.add(cls)
+          markers.insert(cls)
         }
       } else if k == "clip-path" || k == "mask" || k == "mask-image" {
         for cls in classes {
-          clip_mask.add(cls)
+          clip_mask.insert(cls)
         }
       } else if (k == "fill" || k == "stroke" || k == "filter") &&
         v.contains("url(") {
         for cls in classes {
-          urls.add(cls)
+          urls.insert(cls)
         }
       }
     }

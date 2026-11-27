@@ -37,7 +37,7 @@ extern "C" fn c_svgo_mkdir_p(path : Bytes) -> Int32 = "svgo_mkdir_p"
 ///|
 fn cstr(s : String) -> Bytes {
   let buf = Buffer()
-  buf.write_bytes(@utf8.encode(s))
+  buf.write_bytesview(@utf8.encode(s))
   buf.write_byte(b'\x00')
   buf.contents()
 }

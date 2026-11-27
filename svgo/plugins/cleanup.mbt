@@ -251,7 +251,7 @@ let remove_empty_containers : Plugin = {
         return false
       }
       if e.attrs.contains("id") {
-        removed_ids.add(e.attrs.get("id").unwrap())
+        removed_ids.insert(e.attrs.get("id").unwrap())
       }
       true
     })
@@ -442,7 +442,7 @@ fn remove_from_parent(
   removed_ids : Set[String],
 ) -> Unit {
   if e.attrs.get("id") is Some(id) {
-    removed_ids.add(id)
+    removed_ids.insert(id)
   }
   if ancestors.last() is Some(parent) {
     parent.children.retain(n => !(n is Element(c) && physical_equal(c, e)))
@@ -596,11 +596,11 @@ let remove_unused_ns : Plugin = {
     let used : Set[String] = Set([])
     doc.each_element((e, _) => {
       if e.name.find(":") is Some(i) {
-        used.add(e.name[:i].to_owned())
+        used.insert(e.name[:i].to_owned())
       }
       for k, _ in e.attrs {
         if !k.has_prefix("xmlns:") && k.find(":") is Some(i) {
-          used.add(k[:i].to_owned())
+          used.insert(k[:i].to_owned())
         }
       }
     })
@@ -915,7 +915,7 @@ fn css_attribute_names(css : String) -> Set[String] {
         }
       }
       if i > start {
-        names.add(css[start:i].to_owned())
+        names.insert(css[start:i].to_owned())
       }
     } else {
       i += 1

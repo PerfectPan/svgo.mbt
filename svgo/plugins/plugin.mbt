@@ -155,7 +155,7 @@ fn referenced_ids(doc : @xml.Document) -> Set[String] {
     for k, v in e.attrs {
       if k == "href" || k == "xlink:href" {
         if v.has_prefix("#") {
-          ids.add(v[1:].to_owned())
+          ids.insert(v[1:].to_owned())
         }
       } else if k == "begin" || k == "end" {
         collect_timing_refs(v, ids)
@@ -192,7 +192,7 @@ fn collect_url_refs(v : String, ids : Set[String]) -> Unit {
       end += 1
     }
     if end > start {
-      ids.add(v[start:end].to_owned())
+      ids.insert(v[start:end].to_owned())
     }
     i = end
   }
@@ -215,7 +215,7 @@ fn collect_timing_refs(v : String, ids : Set[String]) -> Unit {
     }
     // "0.5s" is a clock value, not a reference
     if ok && !id.get_char(0).unwrap().is_ascii_digit() {
-      ids.add(id.to_owned())
+      ids.insert(id.to_owned())
     }
   }
 }

@@ -106,7 +106,7 @@ pub fn optimize(
           None => raise UnknownPlugin(name)
         }
     }
-    named.add(name)
+    named.insert(name)
   }
   for p in config.custom {
     if !named.contains(p.name) {
@@ -123,7 +123,7 @@ pub fn optimize(
       ctx.set_params(config.params.get(p.name).unwrap_or(Json::object(Map([]))))
       if (p.run)(doc, ctx) {
         changed = true
-        applied.add(p.name)
+        applied.insert(p.name)
       }
     }
     if !changed || !config.multipass || passes >= 10 {

@@ -1,5 +1,11 @@
 # @rivus/svgo
 
+## 0.3.4
+
+### Patch Changes
+
+- [#57](https://github.com/PerfectPan/svgo.mbt/pull/57) [`c01cd98`](https://github.com/PerfectPan/svgo.mbt/commit/c01cd98b6e74e2f40cb433a650b15cf243a98f02) Thanks [@PerfectPan](https://github.com/PerfectPan)! - Support the MoonBit v1.0.0-rc1 toolchain without deprecation warnings by migrating `Set::add` calls to `Set::insert` and `Buffer::write_bytes` to `Buffer::write_bytesview`; optimized SVG output is unchanged.
+
 ## 0.3.3
 
 ### Patch Changes

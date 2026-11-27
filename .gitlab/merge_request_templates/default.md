@@ -17,7 +17,7 @@ Allowed types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `buil
 - [ ] Check, format, interfaces, fixtures, tests on js and native: `scripts/verify.sh`
 - [ ] Wasm, npm package tests, CLI smoke test, size comparison, render diff (plugin, wasm, or output changes): `scripts/verify.sh --full`
 - [ ] Performance (hot-path changes): `scripts/bench.sh` before and after; output unchanged with `scripts/regress.sh <dir>`
-- [ ] Website (site changes): `pnpm app`, reviewed against `docs/development/website-design.md`
+- [ ] Website (site changes): `pnpm app`, reviewed against `app/website/DESIGN.md`
 - [ ] Changeset for user-visible changes: `pnpm changeset`
 
 ## Risks

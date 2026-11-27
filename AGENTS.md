@@ -5,8 +5,8 @@ Everything below is what an agent needs to work here without re-deriving it.
 Human-facing docs: `svgo/README.mbt.md` (symlinked at `README.md`, usage),
 `docs/architecture/overview.md` (design), `CONTRIBUTING.md` (how to add a plugin
 or fixture, which changes need a Plan, PR rules, releasing),
-`docs/development/website-design.md` (website guidelines: voice, layout, type
-scale, tokens, interaction; every site change follows it),
+`app/website/DESIGN.md` (website guidelines: voice, layout, type scale, tokens,
+interaction; every site change follows it),
 `docs/development/native-binaries.md` (native CLI builds and releases), and
 `docs/README.md` (documentation index).
 
@@ -80,7 +80,8 @@ app/website/                  the website, itself a MoonBit module (PerfectPan/s
   public/                     index.html shell, favicon, og.jpg (social card), fonts; style.css is built by Tailwind
   samples/                    the SVGs the site optimizes (Nib mascot, three model logos); SOURCES.md has provenance and licences
   src/style.css               Tailwind v4 entry: @theme tokens + component layer, @source "../ui"
-  shots.mjs                   full-page screenshots of _build/app for design review (see docs/development/website-design.md)
+  DESIGN.md                   website design guidelines (voice, layout, tokens, interaction)
+  shots.mjs                   full-page screenshots of _build/app for design review (see app/website/DESIGN.md)
   build.mjs / dev.mjs         tailwind + gen + warren build / warren dev with live reload
 app/cli/                      the CLI, itself a MoonBit module (PerfectPan/svgo-cli)
   main.mbt                    argument parsing, help, --list and the optimize/print loop
@@ -93,7 +94,7 @@ scripts/                      build-wasm, verify, bench, regress, gen-fixtures; 
 .githooks/pre-commit          installed by scripts/install-git-hooks.sh
 docs/AGENTS.md                documentation placement, writing rules, and plan retirement
 docs/architecture/overview.md design notes; docs/README.md lists all docs under docs/
-docs/development/             contributor docs (website-design.md, native-binaries.md)
+docs/development/             contributor docs (native-binaries.md)
 docs/plans/                   active implementation plans while non-trivial work is in flight; see CONTRIBUTING
 ```
 

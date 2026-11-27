@@ -6,4 +6,4 @@ Start from [`0000-template.md`](0000-template.md). Keep only the sections the ch
 
 The design sections match the `technical-design-docs` skill when installed; this repository does not copy those rules.
 
-Once the code lands on the default branch, retire the plan in the final delivery PR/MR following the [plan lifecycle](../../CONTRIBUTING.md#plan-lifecycle-and-retirement): move unfinished manual checks or follow-ups to issues, migrate lasting non-code constraints into current-state `docs/` (or local `Why:` comments in code), and delete the plan file.
+Retire the plan in its final delivery PR/MR following [`docs/AGENTS.md` §4](../AGENTS.md#4-retiring-a-plan) (see the [plan lifecycle](../../CONTRIBUTING.md#plan-lifecycle-and-retirement)).

@@ -49,10 +49,7 @@ Most changes need only a clear PR description (`## Summary` and `## Validation`)
 1. Draft a plan from [`docs/plans/0000-template.md`](docs/plans/0000-template.md) only when triggered by the [Change Design Gate](#change-design-gate). Keep `Status: blocked` while a material scope, interface, data, or rollout decision is unresolved.
 2. Review the goals, boundaries, and key decisions before implementing; update the plan if design choices change mid-flight.
 3. Implement within that scope, adding evidence for each acceptance criterion (fixtures, tests, `scripts/verify.sh --full` output, benchmark numbers) and updating current-state docs in the same change.
-4. Retire the plan as soon as its code scope lands on the default branch. Do not keep a completed plan in `docs/plans/` waiting on deferred manual checks or future polish. In the final delivery PR:
-   - Move any remaining manual verification or follow-up work to issues.
-   - Migrate lasting knowledge that code cannot express (invariants, cross-target tradeoffs, external quirks, validation limits) into [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`AGENTS.md`](AGENTS.md) invariants, tests, or local `Why:` comments.
-   - Delete the completed plan file. Git history and the delivery PR keep the full execution record.
+4. Retire the plan in its final delivery PR as soon as its code scope lands on the default branch; move deferred manual checks and future polish to issues rather than keeping the plan open. Follow [`docs/AGENTS.md` §4](docs/AGENTS.md#4-retiring-a-plan) (migrating lasting constraints into [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`AGENTS.md`](AGENTS.md) invariants, tests, or `Why:` comments).
 
 [`docs/plans/`](docs/plans/) holds active Plans only while non-trivial work is in flight. Copy [`0000-template.md`](docs/plans/0000-template.md) and keep only the sections that apply. State the problem, goals, non-goals, boundaries, rejected alternatives, failure/rollback behavior, and verification; a file list alone is not a design. Keep unknown owners, dates, and interfaces marked "unconfirmed". A plan may make feature-specific technical decisions, but it cannot silently override `docs/ARCHITECTURE.md` or the invariants in `AGENTS.md`. This repository does not keep an RFC directory.
 

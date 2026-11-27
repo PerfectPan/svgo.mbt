@@ -136,10 +136,6 @@ State the smallest reversible batch, how to revert it, and any persisted-data or
 | --- | --- | --- | --- | --- |
 | <item> | risk / open question / follow-up | <impact> | <owner> | <next step> |
 
-## 8. Retirement checklist
+## 8. Retirement
 
-Complete before deleting this file in the final delivery PR/MR:
-
-- [ ] Remaining manual checks or follow-up items moved to issues
-- [ ] Lasting non-code knowledge (invariants, tradeoffs, external quirks, validation limits) migrated to `docs/` or local `Why:` comments
-- [ ] This plan file deleted in the final delivery PR/MR
+Retire this plan in its final delivery PR/MR following [`docs/AGENTS.md` §4](../AGENTS.md#4-retiring-a-plan) (add the `Plan retirement` table under `## Summary` in the PR/MR description, migrate lasting non-code knowledge, open follow-up issues, and delete this file).

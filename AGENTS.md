@@ -89,6 +89,7 @@ app/cli/                      the CLI, itself a MoonBit module (PerfectPan/svgo-
 scripts/                      build-wasm, verify, bench, regress, gen-fixtures; install-git-hooks (shared project template)
 .github/repo-checks.conf      required-file additions for `gh repo-checks repository` (PerfectPan/gh-repo-checks)
 .githooks/pre-commit          installed by scripts/install-git-hooks.sh
+docs/AGENTS.md                documentation placement, writing rules, and plan retirement
 docs/ARCHITECTURE.md          design notes; docs/README.md lists the current-state docs
 docs/plans/                   active implementation plans while non-trivial work is in flight; see CONTRIBUTING
 ```
@@ -147,14 +148,15 @@ docs/plans/                   active implementation plans while non-trivial work
 
 ## Changes and pull requests
 
+- Read [`docs/AGENTS.md`](docs/AGENTS.md) before writing non-code knowledge:
+  adding or changing a file under `docs/`, choosing between a doc and a `Why:`
+  comment, or retiring a Plan.
 - Check the Change Design Gate in `CONTRIBUTING.md`: a plugin addition/fix or
   routine change needs only a clear PR description (plus fixtures for plugins);
   new subsystems, public API/CLI/npm/wasm contract changes, major cross-target
   refactors, or multi-PR work use one Plan in `docs/plans/`. Do not start a Plan
-  that is blocked on an unresolved decision; when code lands, move lasting
-  non-code constraints into `docs/ARCHITECTURE.md`, the invariants above, tests,
-  or local `Why:` comments, move follow-ups to issues, and delete the Plan in
-  the final PR.
+  that is blocked on an unresolved decision; retire a completed Plan in its final
+  delivery PR per [`docs/AGENTS.md` §4](docs/AGENTS.md#4-retiring-a-plan).
 - Commit messages and PR titles are English `type(scope): summary` with types
   `feat fix docs style refactor perf test build ci chore revert`. Areas are
   scopes: `perf(bench):`, `test(compare):`, `feat(site):`, `fix(<pluginName>):`.

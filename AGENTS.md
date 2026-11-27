@@ -2,11 +2,13 @@
 
 An SVG optimizer in MoonBit, compatible in spirit with svgo's preset-default.
 Everything below is what an agent needs to work here without re-deriving it.
-Human-facing docs: `README.mbt.md` (usage), `docs/ARCHITECTURE.md` (design),
-`CONTRIBUTING.md` (how to add a plugin or fixture, which changes need a Spec or
-Plan, PR rules, releasing), `docs/DESIGN.md` (website guidelines: voice, layout,
-type scale, tokens, interaction; every site change follows it), `docs/README.md`
-(what belongs in `docs/`).
+Human-facing docs: `svgo/README.mbt.md` (symlinked at `README.md`, usage),
+`docs/architecture/overview.md` (design), `CONTRIBUTING.md` (how to add a plugin
+or fixture, which changes need a Plan, PR rules, releasing),
+`app/website/DESIGN.md` (website guidelines: voice, layout, type scale, tokens,
+interaction; every site change follows it),
+`docs/development/native-binaries.md` (native CLI builds and releases), and
+`docs/README.md` (documentation index).
 
 ## Repository shape
 
@@ -78,7 +80,8 @@ app/website/                  the website, itself a MoonBit module (PerfectPan/s
   public/                     index.html shell, favicon, og.jpg (social card), fonts; style.css is built by Tailwind
   samples/                    the SVGs the site optimizes (Nib mascot, three model logos); SOURCES.md has provenance and licences
   src/style.css               Tailwind v4 entry: @theme tokens + component layer, @source "../ui"
-  shots.mjs                   full-page screenshots of _build/app for design review (see docs/DESIGN.md)
+  DESIGN.md                   website design guidelines (voice, layout, tokens, interaction)
+  shots.mjs                   full-page screenshots of _build/app for design review (see app/website/DESIGN.md)
   build.mjs / dev.mjs         tailwind + gen + warren build / warren dev with live reload
 app/cli/                      the CLI, itself a MoonBit module (PerfectPan/svgo-cli)
   main.mbt                    argument parsing, help, --list and the optimize/print loop
@@ -89,8 +92,10 @@ app/cli/                      the CLI, itself a MoonBit module (PerfectPan/svgo-
 scripts/                      build-wasm, verify, bench, regress, gen-fixtures; install-git-hooks (shared project template)
 .github/repo-checks.conf      required-file additions for `gh repo-checks repository` (PerfectPan/gh-repo-checks)
 .githooks/pre-commit          installed by scripts/install-git-hooks.sh
-docs/ARCHITECTURE.md          design notes; docs/README.md lists the current-state docs
-docs/specs/, docs/plans/      active Specs (behavior) and Plans (technical decisions + execution plan); see CONTRIBUTING
+docs/AGENTS.md                documentation placement, writing rules, and plan retirement
+docs/architecture/overview.md design notes; docs/README.md lists all docs under docs/
+docs/development/             contributor docs (native-binaries.md)
+docs/plans/                   active implementation plans while non-trivial work is in flight; see CONTRIBUTING
 ```
 
 ## Invariants (tests enforce these; keep them)
@@ -147,13 +152,15 @@ docs/specs/, docs/plans/      active Specs (behavior) and Plans (technical decis
 
 ## Changes and pull requests
 
-- Pick artifacts with the Change Design Gate in `CONTRIBUTING.md`: a plugin
-  addition or fix needs only the requirement in the PR plus fixtures; a
-  refactor across packages or targets needs a Plan in `docs/plans/`; public
-  API, CLI, npm interface or website features need a Spec in `docs/specs/`
-  plus a Plan. Do not start a Plan that is blocked on an unresolved decision;
-  after delivery move lasting constraints into `docs/ARCHITECTURE.md`, the
-  invariants above, or tests, and delete the finished Spec/Plan.
+- Read [`docs/AGENTS.md`](docs/AGENTS.md) before writing non-code knowledge:
+  adding or changing a file under `docs/`, choosing between a doc and a `Why:`
+  comment, or retiring a Plan.
+- Check the Change Design Gate in `CONTRIBUTING.md`: a plugin addition/fix or
+  routine change needs only a clear PR description (plus fixtures for plugins);
+  new subsystems, public API/CLI/npm/wasm contract changes, major cross-target
+  refactors, or multi-PR work use one Plan in `docs/plans/`. Do not start a Plan
+  that is blocked on an unresolved decision; retire a completed Plan in its final
+  delivery PR per [`docs/AGENTS.md` §4](docs/AGENTS.md#4-retiring-a-plan).
 - Commit messages and PR titles are English `type(scope): summary` with types
   `feat fix docs style refactor perf test build ci chore revert`. Areas are
   scopes: `perf(bench):`, `test(compare):`, `feat(site):`, `fix(<pluginName>):`.
@@ -169,10 +176,10 @@ docs/specs/, docs/plans/      active Specs (behavior) and Plans (technical decis
 
 ## Adding a plugin (short version, details in CONTRIBUTING.md)
 
-1. Write `pub let my_plugin : Plugin = { name: "svgoName", description, run }`
-   in the matching `svgo/plugins/*.mbt` file. `run` mutates the `@xml.Document` and
+1. Write `let my_plugin : Plugin = { name: "svgoName", description, run }`
+   in the matching `svgo/plugins/*.mbt` file (package-private; exposed through `preset_default` / `optional_plugins`). `run` mutates the `@xml.Document` and
    returns `true` iff it changed anything.
 2. Add it to `preset_default` (in svgo's order) or `optional_plugins`.
 3. Add `svgo/plugins/fixtures/svgoName.01.txt`, run `python3 scripts/gen-fixtures.py`,
    then `moon test`.
-4. Document it in the README plugin table; `moon fmt && moon info`.
+4. Document it in the `svgo/README.mbt.md` plugin table; `moon fmt && moon info`.

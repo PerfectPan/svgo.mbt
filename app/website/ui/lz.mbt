@@ -98,7 +98,7 @@ pub fn lz_compress(input : String) -> String {
     if !dict.contains(c) {
       dict[c] = dict_size
       dict_size += 1
-      to_create.add(c)
+      to_create.insert(c)
     }
     let wc = current + c
     if dict.contains(wc) {

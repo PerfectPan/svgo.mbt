@@ -180,9 +180,9 @@ fn run_minify_styles(doc : @xml.Document, ctx : Context) -> Bool {
         let ids : Set[String] = Set([], capacity=0)
         let classes : Set[String] = Set([], capacity=0)
         fn collect_usage(elem : @xml.Element) -> Unit {
-          tags.add(elem.name)
+          tags.insert(elem.name)
           match elem.attrs.get("id") {
-            Some(id) => ids.add(id)
+            Some(id) => ids.insert(id)
             None => ()
           }
           match elem.attrs.get("class") {
@@ -190,7 +190,7 @@ fn run_minify_styles(doc : @xml.Document, ctx : Context) -> Bool {
               for c in cls.split(" ") {
                 let s = c.trim().to_owned()
                 if !s.is_empty() {
-                  classes.add(s)
+                  classes.insert(s)
                 }
               }
             None => ()
@@ -226,9 +226,9 @@ fn run_minify_styles(doc : @xml.Document, ctx : Context) -> Bool {
         let ids : Set[String] = Set([], capacity=0)
         let classes : Set[String] = Set([], capacity=0)
         fn collect_usage(elem : @xml.Element) -> Unit {
-          tags.add(elem.name)
+          tags.insert(elem.name)
           match elem.attrs.get("id") {
-            Some(id) => ids.add(id)
+            Some(id) => ids.insert(id)
             None => ()
           }
           match elem.attrs.get("class") {
@@ -236,7 +236,7 @@ fn run_minify_styles(doc : @xml.Document, ctx : Context) -> Bool {
               for c in cls.split(" ") {
                 let s = c.trim().to_owned()
                 if !s.is_empty() {
-                  classes.add(s)
+                  classes.insert(s)
                 }
               }
             None => ()

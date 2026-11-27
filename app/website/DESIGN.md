@@ -29,7 +29,7 @@ for the project; its copy carries editor-style metadata so there is something to
 three model logos (DeepSeek, Qwen, Mistral). `SOURCES.md` there records where each came from
 and its licence; logos are trademarks of their owners and the page says so under them. Every
 sample must render with 0 differing pixels (`node packages/compare/render-diff.mjs
-app/website/samples`); a file that does not is not a sample. The benchmark corpus
+app/website/samples --exact`); a file that does not is not a sample. The benchmark corpus
 (`svgo/testdata/`, `packages/compare/corpus/`) is separate and only feeds the numbers.
 
 ## Voice

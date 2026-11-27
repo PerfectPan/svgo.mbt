@@ -13,7 +13,7 @@ pub let api_packages : Array[ApiPackage] = [
         signature: "pub(all) struct Config {\n  plugins : Array[String]\n  custom : Array[@PerfectPan/svgo/plugins.Plugin]\n  params : Map[String, @moonbitlang/core/json.Json]\n  precision : Int\n  multipass : Bool\n  pretty : Bool\n} derive(@moonbitlang/core/debug.Debug)",
         doc: "\n What to run and how to print: the plugin list in execution order,\n numeric precision, multipass and pretty printing. Start from\n `Config::default()` and override fields with record update syntax.",
         file: "svgo.mbt#L6",
-        methods: [{ name: "default", signature: "fn Config::default() -> Config", doc: "\n svgo's preset-default plugins in svgo's order (except the opt-in\n `moveGroupAttrsToElems`), 3 decimal places, multipass on, compact output." }, { name: "to_repr", signature: "fn Config::to_repr(Config) -> @moonbitlang/core/debug.Repr", doc: "" }],
+        methods: [{ name: "default", signature: "fn Config::default() -> Config", doc: "\n svgo's preset-default plugins in svgo's order (except the opt-in\n `moveGroupAttrsToElems`), 3 decimal places, multipass on, compact output." }, { name: "to_repr", signature: "fn Config::to_repr(Config) -> @moonbitlang/core/debug.Repr", doc: "automatically derived" }],
         impls: [],
       },
       {
@@ -22,7 +22,7 @@ pub let api_packages : Array[ApiPackage] = [
         signature: "pub(all) struct Result {\n  data : String\n  original_size : Int\n  size : Int\n  passes : Int\n  applied : Array[String]\n} derive(@moonbitlang/core/debug.Debug)",
         doc: "\n Outcome of `optimize`: the optimized document plus size statistics and\n the list of plugins that changed something.",
         file: "svgo.mbt#L45",
-        methods: [{ name: "saved_percent", signature: "fn Result::saved_percent(self : Result) -> Double", doc: "\n Bytes saved as a percentage of the original size (0 for an empty input)." }, { name: "to_repr", signature: "fn Result::to_repr(Result) -> @moonbitlang/core/debug.Repr", doc: "" }],
+        methods: [{ name: "saved_percent", signature: "fn Result::saved_percent(self : Result) -> Double", doc: "\n Bytes saved as a percentage of the original size (0 for an empty input)." }, { name: "to_repr", signature: "fn Result::to_repr(Result) -> @moonbitlang/core/debug.Repr", doc: "automatically derived" }],
         impls: [],
       },
       {
@@ -31,7 +31,7 @@ pub let api_packages : Array[ApiPackage] = [
         signature: "pub suberror UnknownPlugin {\n  UnknownPlugin(String)\n} derive(@moonbitlang/core/debug.Debug)",
         doc: "\n Raised by `optimize` when `Config::plugins` names a plugin that is neither\n built in nor in `Config::custom`.",
         file: "svgo.mbt#L74",
-        methods: [{ name: "output", signature: "fn UnknownPlugin::output(self : UnknownPlugin, logger : &Logger) -> Unit", doc: "" }, { name: "to_repr", signature: "fn UnknownPlugin::to_repr(UnknownPlugin) -> @moonbitlang/core/debug.Repr", doc: "" }, { name: "to_string", signature: "fn UnknownPlugin::to_string(self : UnknownPlugin) -> String", doc: "" }],
+        methods: [{ name: "output", signature: "fn UnknownPlugin::output(self : UnknownPlugin, logger : &Logger) -> Unit", doc: "" }, { name: "to_repr", signature: "fn UnknownPlugin::to_repr(UnknownPlugin) -> @moonbitlang/core/debug.Repr", doc: "automatically derived" }, { name: "to_string", signature: "fn UnknownPlugin::to_string(self : UnknownPlugin) -> String", doc: "\n Default implementation for `Show::to_string`, uses a `StringBuilder`" }],
         impls: ["Show"],
       },
       {
@@ -64,7 +64,7 @@ pub let api_packages : Array[ApiPackage] = [
         signature: "pub(all) struct Document {\n  children : Array[Node]\n} derive(@moonbitlang/core/debug.Debug)",
         doc: "\n A parsed XML/SVG document: a sequence of top level nodes, usually a\n prolog (`<?xml ...?>`, doctype, comments) followed by one root element.",
         file: "node.mbt#L5",
-        methods: [{ name: "each_element", signature: "fn Document::each_element(self : Document, f : (Element, Element?) -> Unit) -> Unit", doc: "\n Depth first traversal over all elements, parents before children." }, { name: "each_element_post", signature: "fn Document::each_element_post(self : Document, f : (Element, Element?) -> Unit) -> Unit", doc: "\n Depth first traversal, children before parents; useful when a visitor\n removes or merges the nodes it visits." }, { name: "root", signature: "fn Document::root(self : Document) -> Element?", doc: "\n The root `<svg>` element, if any." }, { name: "to_repr", signature: "fn Document::to_repr(Document) -> @moonbitlang/core/debug.Repr", doc: "" }, { name: "to_string", signature: "fn Document::to_string(self : Document, options? : SerializeOptions) -> String", doc: "\n Serialize a document back to SVG text." }],
+        methods: [{ name: "each_element", signature: "fn Document::each_element(self : Document, f : (Element, Element?) -> Unit) -> Unit", doc: "\n Depth first traversal over all elements, parents before children." }, { name: "each_element_post", signature: "fn Document::each_element_post(self : Document, f : (Element, Element?) -> Unit) -> Unit", doc: "\n Depth first traversal, children before parents; useful when a visitor\n removes or merges the nodes it visits." }, { name: "root", signature: "fn Document::root(self : Document) -> Element?", doc: "\n The root `<svg>` element, if any." }, { name: "to_repr", signature: "fn Document::to_repr(Document) -> @moonbitlang/core/debug.Repr", doc: "automatically derived" }, { name: "to_string", signature: "fn Document::to_string(self : Document, options? : SerializeOptions) -> String", doc: "\n Serialize a document back to SVG text." }],
         impls: [],
       },
       {
@@ -73,7 +73,7 @@ pub let api_packages : Array[ApiPackage] = [
         signature: "pub(all) struct Element {\n  name : String\n  attrs : Map[String, String]\n  children : Array[Node]\n} derive(@moonbitlang/core/debug.Debug)",
         doc: "\n An element with its tag name, attributes and child nodes. Plugins mutate\n elements in place; `name` is mutable so shapes can be turned into paths.",
         file: "node.mbt#L33",
-        methods: [{ name: "elements", signature: "fn Element::elements(self : Element) -> Array[Element]", doc: "\n Child elements only (skipping text and comments)." }, { name: "get", signature: "fn Element::get(self : Element, name : String) -> String?", doc: "\n Attribute value by name." }, { name: "has", signature: "fn Element::has(self : Element, name : String) -> Bool", doc: "\n Whether the attribute is present." }, { name: "new", signature: "fn Element::new(name : String, attrs? : Map[String, String], children? : Array[Node]) -> Element", doc: "\n Create an element; attributes and children default to empty." }, { name: "remove", signature: "fn Element::remove(self : Element, name : String) -> Unit", doc: "\n Remove an attribute if present." }, { name: "set", signature: "fn Element::set(self : Element, name : String, value : String) -> Unit", doc: "\n Set (or append) an attribute." }, { name: "to_repr", signature: "fn Element::to_repr(Element) -> @moonbitlang/core/debug.Repr", doc: "" }, { name: "to_string", signature: "fn Element::to_string(self : Element, options? : SerializeOptions) -> String", doc: "\n Serialize a single element (and its subtree)." }],
+        methods: [{ name: "elements", signature: "fn Element::elements(self : Element) -> Array[Element]", doc: "\n Child elements only (skipping text and comments)." }, { name: "get", signature: "fn Element::get(self : Element, name : String) -> String?", doc: "\n Attribute value by name." }, { name: "has", signature: "fn Element::has(self : Element, name : String) -> Bool", doc: "\n Whether the attribute is present." }, { name: "new", signature: "fn Element::new(name : String, attrs? : Map[String, String], children? : Array[Node]) -> Element", doc: "\n Create an element; attributes and children default to empty." }, { name: "remove", signature: "fn Element::remove(self : Element, name : String) -> Unit", doc: "\n Remove an attribute if present." }, { name: "set", signature: "fn Element::set(self : Element, name : String, value : String) -> Unit", doc: "\n Set (or append) an attribute." }, { name: "to_repr", signature: "fn Element::to_repr(Element) -> @moonbitlang/core/debug.Repr", doc: "automatically derived" }, { name: "to_string", signature: "fn Element::to_string(self : Element, options? : SerializeOptions) -> String", doc: "\n Serialize a single element (and its subtree)." }],
         impls: [],
       },
       {
@@ -82,7 +82,7 @@ pub let api_packages : Array[ApiPackage] = [
         signature: "pub(all) enum Node {\n  Element(Element)\n  Text(String)\n  Comment(String)\n  CData(String)\n  Doctype(String)\n  ProcInst(String, String)\n} derive(@moonbitlang/core/debug.Debug)",
         doc: "\n One node of the tree. Text is stored decoded (entities resolved);\n comments, CDATA, doctype and processing instructions keep their raw body.",
         file: "node.mbt#L16",
-        methods: [{ name: "to_repr", signature: "fn Node::to_repr(Node) -> @moonbitlang/core/debug.Repr", doc: "" }],
+        methods: [{ name: "to_repr", signature: "fn Node::to_repr(Node) -> @moonbitlang/core/debug.Repr", doc: "automatically derived" }],
         impls: [],
       },
       {
@@ -91,7 +91,7 @@ pub let api_packages : Array[ApiPackage] = [
         signature: "pub(all) struct SerializeOptions {\n  pretty : Bool\n  prolog : Bool\n} derive(@moonbitlang/core/debug.Debug)",
         doc: "\n How `Document::to_string` prints: compact or indented, with or without\n the XML prolog.",
         file: "serializer.mbt#L5",
-        methods: [{ name: "default", signature: "fn SerializeOptions::default() -> SerializeOptions", doc: "\n Compact output including the prolog." }, { name: "to_repr", signature: "fn SerializeOptions::to_repr(SerializeOptions) -> @moonbitlang/core/debug.Repr", doc: "" }],
+        methods: [{ name: "default", signature: "fn SerializeOptions::default() -> SerializeOptions", doc: "\n Compact output including the prolog." }, { name: "to_repr", signature: "fn SerializeOptions::to_repr(SerializeOptions) -> @moonbitlang/core/debug.Repr", doc: "automatically derived" }],
         impls: [],
       },
       {
@@ -100,7 +100,7 @@ pub let api_packages : Array[ApiPackage] = [
         signature: "pub suberror ParseError {\n  ParseError(String, Int)\n} derive(@moonbitlang/core/debug.Debug)",
         doc: "\n Malformed input; carries a message and the code unit offset where\n parsing stopped.",
         file: "parser.mbt#L5",
-        methods: [{ name: "output", signature: "fn ParseError::output(self : ParseError, logger : &Logger) -> Unit", doc: "" }, { name: "to_repr", signature: "fn ParseError::to_repr(ParseError) -> @moonbitlang/core/debug.Repr", doc: "" }, { name: "to_string", signature: "fn ParseError::to_string(self : ParseError) -> String", doc: "" }],
+        methods: [{ name: "output", signature: "fn ParseError::output(self : ParseError, logger : &Logger) -> Unit", doc: "" }, { name: "to_repr", signature: "fn ParseError::to_repr(ParseError) -> @moonbitlang/core/debug.Repr", doc: "automatically derived" }, { name: "to_string", signature: "fn ParseError::to_string(self : ParseError) -> String", doc: "\n Default implementation for `Show::to_string`, uses a `StringBuilder`" }],
         impls: ["Show"],
       },
       {
@@ -124,7 +124,7 @@ pub let api_packages : Array[ApiPackage] = [
         signature: "pub(all) struct Options {\n  precision : Int\n  utilize_absolute : Bool\n  remove_useless : Bool\n  straight_curves : Bool\n  convert_to_q : Bool\n  smooth_shorthands : Bool\n  collapse_repeated : Bool\n  convert_to_z : Bool\n  linecap : String\n  linejoin : String\n  has_stroke : Bool\n  make_arcs : Bool\n  make_arcs_threshold : Double\n  make_arcs_tolerance : Double\n} derive(@moonbitlang/core/debug.Debug)",
         doc: "\n Knobs of the path optimizer; every field defaults to on except that\n `precision` is 3. Disable individual rewrites when a consumer depends on\n the exact segment structure (for example markers or animations).",
         file: "optimize.mbt#L6",
-        methods: [{ name: "default", signature: "fn Options::default() -> Options", doc: "\n Precision 3 with every rewrite enabled." }, { name: "to_repr", signature: "fn Options::to_repr(Options) -> @moonbitlang/core/debug.Repr", doc: "" }],
+        methods: [{ name: "default", signature: "fn Options::default() -> Options", doc: "\n Precision 3 with every rewrite enabled." }, { name: "to_repr", signature: "fn Options::to_repr(Options) -> @moonbitlang/core/debug.Repr", doc: "automatically derived" }],
         impls: [],
       },
       {
@@ -133,7 +133,7 @@ pub let api_packages : Array[ApiPackage] = [
         signature: "pub(all) struct Segment {\n  cmd : Char\n  args : Array[Double]\n} derive(Eq, @moonbitlang/core/debug.Debug)",
         doc: "\n One path segment. `cmd` is the command letter as written (absolute when\n uppercase), `args` the numeric arguments of exactly one command instance.",
         file: "segment.mbt#L5",
-        methods: [{ name: "equal", signature: "fn Segment::equal(Segment, Segment) -> Bool", doc: "" }, { name: "not_equal", signature: "fn Segment::not_equal(x : Segment, y : Segment) -> Bool", doc: "" }, { name: "to_repr", signature: "fn Segment::to_repr(Segment) -> @moonbitlang/core/debug.Repr", doc: "" }],
+        methods: [{ name: "equal", signature: "fn Segment::equal(Segment, Segment) -> Bool", doc: "automatically derived" }, { name: "not_equal", signature: "fn Segment::not_equal(x : Segment, y : Segment) -> Bool", doc: "automatically derived" }, { name: "to_repr", signature: "fn Segment::to_repr(Segment) -> @moonbitlang/core/debug.Repr", doc: "automatically derived" }],
         impls: [],
       },
       {
@@ -142,7 +142,7 @@ pub let api_packages : Array[ApiPackage] = [
         signature: "pub suberror PathError {\n  PathError(String)\n} derive(@moonbitlang/core/debug.Debug)",
         doc: "\n Malformed path data: a number or command was expected at the given offset.",
         file: "segment.mbt#L19",
-        methods: [{ name: "output", signature: "fn PathError::output(self : PathError, logger : &Logger) -> Unit", doc: "" }, { name: "to_repr", signature: "fn PathError::to_repr(PathError) -> @moonbitlang/core/debug.Repr", doc: "" }, { name: "to_string", signature: "fn PathError::to_string(self : PathError) -> String", doc: "" }],
+        methods: [{ name: "output", signature: "fn PathError::output(self : PathError, logger : &Logger) -> Unit", doc: "" }, { name: "to_repr", signature: "fn PathError::to_repr(PathError) -> @moonbitlang/core/debug.Repr", doc: "automatically derived" }, { name: "to_string", signature: "fn PathError::to_string(self : PathError) -> String", doc: "\n Default implementation for `Show::to_string`, uses a `StringBuilder`" }],
         impls: ["Show"],
       },
       {
@@ -211,7 +211,7 @@ pub let api_packages : Array[ApiPackage] = [
         signature: "pub struct Context {\n  precision : Int\n  params : @moonbitlang/core/json.Json\n  optimized_paths : Map[String, Int]\n  path_hulls : Map[String, Array[Array[(Double, Double)]]]\n} derive(@moonbitlang/core/debug.Debug)",
         doc: "\n Shared state passed to every plugin: the numeric precision plus a cache\n that lives for the whole run.",
         file: "plugin.mbt#L5",
-        methods: [{ name: "has_param", signature: "fn Context::has_param(self : Context, name : String) -> Bool", doc: "\n Whether a parameter was supplied, including explicit false or empty arrays." }, { name: "new", signature: "fn Context::new(precision? : Int) -> Context", doc: "\n A fresh context; create one per `optimize` run." }, { name: "param_bool", signature: "fn Context::param_bool(self : Context, name : String, default : Bool) -> Bool", doc: "\n Read a boolean, falling back for absent or incorrectly typed values." }, { name: "param_int", signature: "fn Context::param_int(self : Context, name : String, default : Int) -> Int", doc: "\n Read an integer parameter, falling back for absent or incorrectly typed values." }, { name: "param_string", signature: "fn Context::param_string(self : Context, name : String, default : String) -> String", doc: "\n Read a string parameter, falling back for absent or incorrectly typed values." }, { name: "param_strings", signature: "fn Context::param_strings(self : Context, name : String) -> Array[String]", doc: "\n Read a string or an array of strings; ignore non-string entries." }, { name: "set_params", signature: "fn Context::set_params(self : Context, params : @moonbitlang/core/json.Json) -> Unit", doc: "\n Set the current plugin's parameters; non-object values behave as empty objects." }, { name: "to_repr", signature: "fn Context::to_repr(Context) -> @moonbitlang/core/debug.Repr", doc: "" }],
+        methods: [{ name: "has_param", signature: "fn Context::has_param(self : Context, name : String) -> Bool", doc: "\n Whether a parameter was supplied, including explicit false or empty arrays." }, { name: "new", signature: "fn Context::new(precision? : Int) -> Context", doc: "\n A fresh context; create one per `optimize` run." }, { name: "param_bool", signature: "fn Context::param_bool(self : Context, name : String, default : Bool) -> Bool", doc: "\n Read a boolean, falling back for absent or incorrectly typed values." }, { name: "param_int", signature: "fn Context::param_int(self : Context, name : String, default : Int) -> Int", doc: "\n Read an integer parameter, falling back for absent or incorrectly typed values." }, { name: "param_string", signature: "fn Context::param_string(self : Context, name : String, default : String) -> String", doc: "\n Read a string parameter, falling back for absent or incorrectly typed values." }, { name: "param_strings", signature: "fn Context::param_strings(self : Context, name : String) -> Array[String]", doc: "\n Read a string or an array of strings; ignore non-string entries." }, { name: "set_params", signature: "fn Context::set_params(self : Context, params : @moonbitlang/core/json.Json) -> Unit", doc: "\n Set the current plugin's parameters; non-object values behave as empty objects." }, { name: "to_repr", signature: "fn Context::to_repr(Context) -> @moonbitlang/core/debug.Repr", doc: "automatically derived" }],
         impls: [],
       },
       {
@@ -228,7 +228,7 @@ pub let api_packages : Array[ApiPackage] = [
         name: "find_plugin",
         signature: "fn find_plugin(name : String) -> Plugin?",
         doc: "\n Look a plugin up by its svgo name (for example `\"convertPathData\"`).",
-        file: "preset.mbt#L35",
+        file: "preset.mbt#L34",
         methods: [],
         impls: [],
       },
@@ -237,7 +237,7 @@ pub let api_packages : Array[ApiPackage] = [
         name: "optional_plugins",
         signature: "let optional_plugins : Array[Plugin]",
         doc: "\n Plugins that are available but not enabled by default.\n\n `move_group_attrs_to_elems` is implemented and passes svgo's cases for it,\n but it stays off here: pushing a group's `transform` onto its children lets\n `convert_path_data` bake the matrix into every path, which lengthens the\n coordinates and leaves formerly identical siblings unmergeable. Measured\n over the eleven files in `svgo/testdata/` and `packages/compare/corpus/`,\n enabling it costs 15,859 bytes on the Ghostscript tiger and saves 48 bytes\n everywhere else combined (it does help small icons: 27 bytes on the Sketch\n export, 21 on the twelve-fold world map). svgo's own output shows the same effect (68,101\n bytes with it, 52,029 without), so this is a deliberate deviation, not a\n missing plugin. Enable it with `--enable moveGroupAttrsToElems`.",
-        file: "preset.mbt#L29",
+        file: "preset.mbt#L28",
         methods: [],
         impls: [],
       },
@@ -245,8 +245,8 @@ pub let api_packages : Array[ApiPackage] = [
         kind: "fn",
         name: "preset_default",
         signature: "let preset_default : Array[Plugin]",
-        doc: "\n The default plugin pipeline, in svgo's preset-default order (the plugins\n that are not implemented yet are listed in the README). `remove_desc` sits\n last because svgo removes descriptions after the structural passes.",
-        file: "preset.mbt#L5",
+        doc: "\n The default plugin pipeline, in svgo's preset-default order. `remove_desc` sits\n last because svgo removes descriptions after the structural passes.",
+        file: "preset.mbt#L4",
         methods: [],
         impls: [],
       },

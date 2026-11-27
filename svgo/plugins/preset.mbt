@@ -1,6 +1,5 @@
 ///|
-/// The default plugin pipeline, in svgo's preset-default order (the plugins
-/// that are not implemented yet are listed in the README). `remove_desc` sits
+/// The default plugin pipeline, in svgo's preset-default order. `remove_desc` sits
 /// last because svgo removes descriptions after the structural passes.
 pub let preset_default : Array[Plugin] = [
   remove_doctype, remove_xml_proc_inst, remove_comments, remove_deprecated_attrs,

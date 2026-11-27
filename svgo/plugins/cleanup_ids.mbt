@@ -51,7 +51,7 @@ fn cleanup_ids_run(doc : @xml.Document, ctx : Context) -> Bool {
           e.attrs.remove(name)
           changed = true
         } else {
-          ids.add(value)
+          ids.insert(value)
           nodes.push(e)
         }
       } else if name == "begin" || name == "end" || value.contains_code_unit(35) {
@@ -61,7 +61,7 @@ fn cleanup_ids_run(doc : @xml.Document, ctx : Context) -> Bool {
         let refs = id_references(name, value)
         if !refs.is_empty() {
           for reference in refs {
-            references.add(reference.id)
+            references.insert(reference.id)
           }
           attributes.push((e, name, value, refs))
         }
@@ -80,12 +80,12 @@ fn cleanup_ids_run(doc : @xml.Document, ctx : Context) -> Bool {
   let reserved : Set[String] = Set([])
   for id in references {
     if !ids.contains(id) {
-      reserved.add(id)
+      reserved.insert(id)
     }
   }
   for id in ids {
     if keep(id) || (!remove && !references.contains(id)) {
-      reserved.add(id)
+      reserved.insert(id)
     }
   }
   let mut next = 0

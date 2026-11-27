@@ -1,5 +1,5 @@
 ///|
-/// Micro benchmarks: `moon bench --target native --release` (or wasm-gc / js).
+/// Micro benchmarks: `moon bench --target native --release` (or `js`).
 /// Each entry of the corpus is optimized end to end; the parser and the path
 /// optimizer are also measured on their own so regressions can be located.
 fn corpus_item(name : String) -> String {

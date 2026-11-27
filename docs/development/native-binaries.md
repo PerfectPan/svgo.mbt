@@ -71,40 +71,30 @@ svgo-mbt-X.Y.Z-macos-arm64.tar.gz
 Each archive holds a `svgo-mbt/` directory with the `svgo-mbt` executable,
 `LICENSE`, `THIRD_PARTY_NOTICES.md` and the npm package's `README.md`. macOS
 x86_64 and Windows are not built (no runner in the matrix); build from source
-with `moon build --target native --release app/cli` there. The binary is named
+with `moon build --target native --release` there. The binary is named
 `svgo-mbt` to avoid colliding with the original `svgo` CLI; the npm bin entry
 uses the same name.
 
-### Installer script
-
-A `scripts/install.sh` (published to the release and served from the repo)
-detects the OS and arch, downloads the matching archive, and installs the
-binary to `/usr/local/bin` (or `$HOME/.local/bin`):
-
-```
-curl -fsSL https://raw.githubusercontent.com/PerfectPan/svgo.mbt/main/scripts/install.sh | sh
-```
-
-### Package managers (future)
-
-- **Homebrew** (macOS/Linux): a tap formula that downloads the release tarball.
-- **Scoop** (Windows): a manifest in a scoop bucket.
-- **npm**: the `@rivus/svgo` package already ships a JS CLI (`cli.mjs`); the
-  native binary could be an optional dependency via `optionalDependencies`
-  keyed on `os`/`cpu`, but that adds complexity and is not planned.
-
 ## Versioning
 
-The CLI's `VERSION` constant (`app/cli/main.mbt`) and the npm package version
-both track the git tag. The release workflow reads the tag and passes it to
-the build so the binary reports the right version with `--version`.
+`packages/svgo-mbt/package.json` is the single version source. Running
+`pnpm version-packages` (in the release PR opened by `release.yml`) runs
+`scripts/sync-version.mjs` to copy that version into `svgo/moon.mod`,
+`app/website/moon.mod`, `app/cli/moon.mod`, `app/cli/main.mbt` (`const VERSION`),
+and `svgo/wasm/wasm.mbt` (`version()`). `scripts/verify.sh` checks that all
+six stay in sync, and `binaries.yml` builds from the published `@rivus/svgo@X.Y.Z`
+tag and reads the version from the compiled binary's `--version` output.
 
 ## CI
 
-The existing `ci.yml` workflow builds the native binary on `ubuntu-latest` and
-`macos-latest` as part of `scripts/verify.sh`. A separate `release.yml`
-workflow (to be added) runs only on tags and produces the multi-platform
-release assets.
+- `.github/workflows/ci.yml` builds and smoke-tests the native binary on
+  `ubuntu-latest` and `macos-latest` on every push and pull request.
+- `.github/workflows/release.yml` opens the Changesets release PR on pushes to
+  `main`, publishes `@rivus/svgo` to npm via OIDC Trusted Publishing when that
+  PR merges, and dispatches `binaries.yml` at the published `@rivus/svgo@X.Y.Z` tag.
+- `.github/workflows/binaries.yml` builds the Linux x86_64, Linux arm64, and
+  macOS arm64 release archives, attaches them to the GitHub release, and
+  publishes `PerfectPan/svgo` to mooncakes.
 
 ## What is deliberately not here
 
@@ -114,5 +104,8 @@ release assets.
 - **Alpine/musl by default.** The default Linux build links against glibc;
   a musl build is available via `CC=x86_64-linux-musl-gcc` for users who need
   it.
-- **Code signing / notarization.** Not planned for the initial release; macOS
-  will show a "unidentified developer" warning that users can bypass.
+- **Installer scripts or OS package managers.** No `install.sh`, Homebrew tap,
+  Scoop bucket, or npm `optionalDependencies` native binary wrapper is maintained;
+  users download the GitHub release archive or install `@rivus/svgo` from npm.
+- **Code signing / notarization.** Not planned; macOS Gatekeeper may show an
+  unidentified developer warning that users can bypass.

@@ -91,7 +91,7 @@ fn svg_tables() -> SvgTables {
     if row.to_owned().split_once("|") is Some((name, _)) {
       let name = name.to_owned()
       tables.elements[name] = row.to_owned()
-      tables.known_elements.add(name)
+      tables.known_elements.insert(name)
     }
   }
   svg_tables_cache.val = Some(tables)
@@ -112,7 +112,7 @@ fn SvgTables::element(self : SvgTables, name : String) -> SvgElementTables? {
   for group in table_list(fields[1]) {
     if self.attr_groups.get(group) is Some(values) {
       for value in values {
-        attrs.add(value)
+        attrs.insert(value)
       }
     }
     if self.group_defaults.get(group) is Some(values) {
@@ -125,7 +125,7 @@ fn SvgTables::element(self : SvgTables, name : String) -> SvgElementTables? {
   for group in table_list(fields[4]) {
     if self.content_groups.get(group) is Some(values) {
       for value in values {
-        children.add(value)
+        children.insert(value)
       }
     }
   }
@@ -144,10 +144,10 @@ fn SvgTables::element(self : SvgTables, name : String) -> SvgElementTables? {
     if self.deprecated_groups.get(group) is Some(lists) &&
       lists.split_once("|") is Some((safe, unsafe_attrs)) {
       for name in table_list(safe) {
-        deprecated_safe.add(name)
+        deprecated_safe.insert(name)
       }
       for name in table_list(unsafe_attrs) {
-        deprecated_unsafe.add(name)
+        deprecated_unsafe.insert(name)
       }
     }
   }

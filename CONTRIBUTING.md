@@ -36,7 +36,7 @@ comparison suite; `app/website/` the website and `app/cli/` the CLI. `moon` comm
 
 ## Change Design Gate
 
-Most changes need only a clear PR description (`## Summary` and `## Validation`), not a separate document.
+Most changes need only a clear PR description (`## Summary` and `## Validation`), not a separate document. Write a Plan only when upfront alignment with a human is needed before implementing. Do not write a Plan for adjustments requested during implementation or review—reflect those directly in code, durable docs, and the PR description.
 
 | Change scope | Required artifact |
 | --- | --- |
@@ -47,7 +47,7 @@ Most changes need only a clear PR description (`## Summary` and `## Validation`)
 ## Plan Lifecycle And Retirement
 
 1. Draft a plan from [`docs/plans/0000-template.md`](docs/plans/0000-template.md) only when triggered by the [Change Design Gate](#change-design-gate). Keep `Status: blocked` while a material scope, interface, data, or rollout decision is unresolved.
-2. Review the goals, boundaries, and key decisions before implementing; update the plan if design choices change mid-flight.
+2. Review the goals, boundaries, and key decisions before implementing; update an active plan mid-flight only when remaining multi-PR or multi-session work still needs re-alignment.
 3. Implement within that scope, adding evidence for each acceptance criterion (fixtures, tests, `scripts/verify.sh --full` output, benchmark numbers) and updating current-state docs in the same change.
 4. Retire the plan in its final delivery PR as soon as its code scope lands on the default branch; move deferred manual checks and future polish to issues rather than keeping the plan open. Follow [`docs/AGENTS.md` §4](docs/AGENTS.md#4-retiring-a-plan) (migrating lasting constraints into [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`AGENTS.md`](AGENTS.md) invariants, tests, or `Why:` comments).
 

@@ -10,7 +10,7 @@ Route each piece to one owning surface:
 - Readers who change this repository → `architecture/` or `development/`.
 - A constraint tied to one file or function → a source comment prefixed with `Why:` (so `rg 'Why:'` finds it).
 
-Each category starts as one file (`docs/architecture.md`) and becomes a directory with its second document. `docs/README.md` lists this repository's documents and any repository-specific surfaces (such as a decision log or translations); for those surfaces, its rules take precedence.
+Keep each category in its own directory under `docs/` (`guides/`, `reference/`, `architecture/`, `development/`), even for a single document. `docs/README.md` lists this repository's documents and any repository-specific surfaces (such as a decision log or translations); for those surfaces, its rules take precedence.
 
 | Surface | Audience | Put here | Route elsewhere |
 | --- | --- | --- | --- |
@@ -26,8 +26,7 @@ Other surfaces keep their own scope: `README.md` (orientation and quick start), 
 ## 2. File Naming And Splitting
 
 - Use kebab-case filenames (`overview.md`, `public-interface.md`, `adding-a-provider.md`).
-- Start `architecture/` with `overview.md` once a single `docs/architecture.md` splits.
-- Split out `architecture/conventions.md` only when a repository has strict layering, modeling, or extension rules that outgrow `overview.md` and root `AGENTS.md`.
+- Start `architecture/` with `overview.md`. Split out `architecture/conventions.md` only when a repository has strict layering, modeling, or extension rules that outgrow `overview.md` and root `AGENTS.md`.
 - Split a document when it mixes user lookup with maintainer internals or combines distinct audiences.
 
 ## 3. Writing Rules

@@ -1,6 +1,6 @@
 // The plugin fixture suite, run through the shipped wasm instead of `moon test`.
 // `moon test` covers the js and native targets; the wasm-gc build takes trig
-// and slow number parsing from the host (svgo/path/host_wasm.mbt), so this is
+// and slow number parsing from the host (svgo/internal/num/host_wasm.mbt), so this is
 // the run that exercises those imports. Semantics mirror scripts/gen-fixtures.py
 // and svgo/plugins/fixtures_support_test.mbt: one plugin per case, upstream
 // cases run twice (once for the single-pass plugins) and must match after

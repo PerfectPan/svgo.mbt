@@ -7,7 +7,7 @@ each can be used, tested and benchmarked on its own.
 ```
           ┌────────┐    Document     ┌──────────────────┐   Document   ┌───────────┐
   String ─┤  @xml  ├────────────────▶│ @plugins (×pass) ├─────────────▶│   @xml    ├─▶ String
-          │ parse  │                 │ 25 × run(doc,ctx)│              │ serialize │
+          │ parse  │                 │ 33 × run(doc,ctx)│              │ serialize │
           └────────┘                 └───────┬──────────┘              └───────────┘
                                              │ d="..."
                                        ┌─────▼─────┐
@@ -132,5 +132,7 @@ that did something. `utf8_length` counts bytes without encoding.
 
 ## What is deliberately not here
 
-- Matrix folding in `convertTransform` and `applyTransforms` on path data.
-  Both are correctness-sensitive; they come with render-diff coverage or not at all.
+- **`moveGroupAttrsToElems` enabled by default.** It is implemented and available via `--enable moveGroupAttrsToElems`, but kept opt-in because pushing group transforms onto children makes `convertPathData` bake matrices into paths and bloats complex illustrations (see `svgo/README.mbt.md`).
+- **JavaScript custom plugins in the wasm module.** Custom plugins run in the MoonBit library through `Config::custom`; JS callers pre- or post-process the SVG string around `optimize`.
+- **Full regular expressions in `removeComments.preservePatterns`.** Only literal substrings and `^`-prefixed literal prefixes are supported, avoiding pulling a regex engine into the wasm bundle.
+- **svgo's remaining 17 opt-in plugins** (outside `preset-default`, `removeDimensions`, and `removeTitle`).

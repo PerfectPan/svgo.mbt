@@ -5,9 +5,9 @@ Contribution workflow and Change Design Gate: [`CONTRIBUTING.md`](../CONTRIBUTIN
 
 ## Index
 
-- [`ARCHITECTURE.md`](ARCHITECTURE.md) — parse, plugins, serialize pipeline, MoonBit packages and public surfaces, and design decisions.
-- [`DESIGN.md`](DESIGN.md) — website guidelines (voice, layout, type scale, tokens, interaction); every site change follows it.
-- [`NATIVE_BINARIES.md`](NATIVE_BINARIES.md) — how the native CLI binary is built and distributed.
+- [`architecture/overview.md`](architecture/overview.md) — parse, plugins, serialize pipeline, MoonBit packages and public surfaces, and design decisions.
+- [`development/website-design.md`](development/website-design.md) — website guidelines (voice, layout, type scale, tokens, interaction); every site change follows it.
+- [`development/native-binaries.md`](development/native-binaries.md) — how the native CLI binary is built and distributed.
 - [`plans/`](plans/) — active implementation plans; each is retired in its final delivery PR.
 
 ## Repository-Specific Surfaces

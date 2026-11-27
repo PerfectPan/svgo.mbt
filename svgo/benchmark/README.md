@@ -4,10 +4,12 @@
 from `svgo/testdata/` and `packages/compare/corpus/`). Run them with
 
 ```bash
-scripts/bench.sh                      # native, release: end-to-end + stages
-scripts/bench.sh wasm-gc              # same on wasm-gc (moonrun)
+scripts/bench.sh                           # native, release: end-to-end + stages
+scripts/bench.sh js                        # same on js (what the website runs)
 scripts/bench.sh native profile_test.mbt   # cost of every plugin on the Tiger
 ```
+
+For wasm-gc timings against svgo-js, use `node packages/compare/wasm-speed.mjs` (`moonrun` does not provide the JS host imports of `svgo/internal/num/host_wasm.mbt`).
 
 ## Reference numbers
 
@@ -78,21 +80,7 @@ Tried and dropped, because the targets disagree:
 
 ## Against svgo 4.1 (Node)
 
-Same process, both multipass, ms per call (`node packages/compare/wasm-speed.mjs`,
-requires `scripts/build-wasm.sh` and `pnpm install`):
-
-| file | svgo.mbt wasm-gc | svgo-js | ratio |
-| --- | ---: | ---: | ---: |
-| sketch-icon.svg 0.8 KB | 0.37 | 0.55 | 1.5x |
-| inkscape-drawing.svg 2 KB | 0.33 | 1.12 | 3.4x |
-| SVG_logo.svg 4 KB | 1.66 | 2.20 | 1.3x |
-| Tux.svg 50 KB | 16.0 | 16.8 | 1.1x |
-| Ghostscript_Tiger.svg 68 KB | 47.4 | 53.8 | 1.1x |
-| World map 85 KB | 66.8 | 83.1 | 1.2x |
-
-Those wasm numbers predate the optimization round above; rerun
-`node packages/compare/wasm-speed.mjs` for current values (the table in the README and
-on the site is refreshed from the harness output).
+Same-process wasm-gc vs svgo-js timings are maintained in [`svgo/README.mbt.md`](../README.mbt.md#performance) and refreshed from `node packages/compare/wasm-speed.mjs` (requires `scripts/build-wasm.sh` and `pnpm install`).
 
 ## Methodology notes
 

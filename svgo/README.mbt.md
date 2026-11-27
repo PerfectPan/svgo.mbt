@@ -49,7 +49,7 @@ npx @rivus/svgo icons -r -o dist                # a directory, recursively
 # installed (npm i -g @rivus/svgo) the command is `svgo-mbt`
 ```
 
-**MoonBit** (mooncakes.io library; requires moonc ≥ 0.10.19 — run `moon upgrade` if `moon check` reports an undefined `Int32` type):
+**MoonBit** (mooncakes.io library; requires moonc ≥ 0.10.19, verified warning-free on 1.0.0-rc1 — run `moon upgrade` if `moon check` fails):
 
 ```bash
 moon add PerfectPan/svgo
@@ -203,10 +203,10 @@ Between 1.7× and 4.8× depending on the file, 3.6× at the median over the ten 
 
 | Artifact | Runs on | Checked by |
 | --- | --- | --- |
-| `@rivus/svgo` (wasm-gc) | Node 24+, Bun 1.4+, Deno 2 (tested with 2.9); Chrome 130+, Firefox 134+, Safari 18.4+ | CI runs the 330-case fixture suite through the shipped wasm under Node, Bun and Deno on every push |
+| `@rivus/svgo` (wasm-gc) | Node 24+, Bun 1.4+, Deno 2 (tested with 2.9); Chrome 130+, Firefox 134+, Safari 18.4+ | CI runs the 331-case fixture suite through the shipped wasm under Node, Bun and Deno on every push |
 | `svgo-mbt` CLI, Node build | the same runtimes, via `npx` / `bunx` / `deno run -A` | same suite plus a CLI smoke test |
-| `svgo-mbt` native binary | linux x86_64, linux arm64, macOS arm64 from [GitHub releases](https://github.com/PerfectPan/svgo.mbt/releases); any other platform with `moon build --target native --release app/cli` | built by `binaries.yml` on each release |
-| `PerfectPan/svgo` MoonBit library | targets wasm-gc, js and native; moonc ≥ 0.10.19 (`moon upgrade`; CI installs the latest release) | `moon test` on js and native in CI |
+| `svgo-mbt` native binary | linux x86_64, linux arm64, macOS arm64 from [GitHub releases](https://github.com/PerfectPan/svgo.mbt/releases); any other platform with `moon build --target native --release` | built by `binaries.yml` on each release |
+| `PerfectPan/svgo` MoonBit library | targets wasm-gc, js and native; moonc ≥ 0.10.19, verified on 1.0.0-rc1 (`moon upgrade`; CI installs the latest release) | `moon test` on js and native in CI |
 
 The wasm needs an engine with WebAssembly GC and JS String Builtins (imported string constants). Older engines fail at instantiate rather than at runtime: Node 22 and 23 report `Import module="_"`, Bun 1.2 reports `import wasm:js-string:length must be an object`. This cannot be polyfilled from JavaScript because `fromCharCodeArray` takes a wasm-gc array. The optimizer itself does no I/O; the loader fetches the wasm over `http(s)` and reads `file:` URLs through `node:fs`, which Bun and Deno provide.
 
@@ -239,7 +239,7 @@ scripts/verify.sh            # check, fmt, .mbti drift, fixtures, tests on js / 
 scripts/verify.sh --full     # + wasm build, sizes vs svgo-js, resvg pixel diff, speed (needs pnpm install)
 ```
 
-Runs unit tests, svgo's own fixture suite, resvg pixel diff, and byte-for-byte corpus checks. Details and developer guides: [docs/ARCHITECTURE.md](https://github.com/PerfectPan/svgo.mbt/blob/main/docs/ARCHITECTURE.md), [CONTRIBUTING.md](https://github.com/PerfectPan/svgo.mbt/blob/main/CONTRIBUTING.md), [AGENTS.md](https://github.com/PerfectPan/svgo.mbt/blob/main/AGENTS.md).
+Runs unit tests, svgo's own fixture suite, resvg pixel diff, and byte-for-byte corpus checks. Details and developer guides: [docs/architecture/overview.md](https://github.com/PerfectPan/svgo.mbt/blob/main/docs/architecture/overview.md), [CONTRIBUTING.md](https://github.com/PerfectPan/svgo.mbt/blob/main/CONTRIBUTING.md), [AGENTS.md](https://github.com/PerfectPan/svgo.mbt/blob/main/AGENTS.md).
 
 ## License
 

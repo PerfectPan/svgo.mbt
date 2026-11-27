@@ -16,9 +16,10 @@ gh extension install PerfectPan/gh-repo-checks                    # review check
 ./scripts/install-git-hooks.sh                                    # pre-commit hook, see "Local Git hooks"
 ```
 
-The code requires moonc ≥ 0.10.19 (it uses the `Int32` names and the
-`#derive(...)` attribute syntax). If `moon check` fails with undefined
-`Int32`, run `moon upgrade`.
+The code requires moonc ≥ 0.10.19 and is verified warning-free on moonc
+1.0.0-rc1 (it uses `Int32`, `#derive(...)`, `Set::insert`, and
+`Buffer::write_bytesview`). If `moon check` fails on older syntax or warns
+about deprecated methods, run `moon upgrade`.
 
 Use Node.js 26.x from 26.13.1 onward for development. The root
 `devEngines.runtime` range selects the Node.js version for CI, Pages and releases.
@@ -49,9 +50,9 @@ Most changes need only a clear PR description (`## Summary` and `## Validation`)
 1. Draft a plan from [`docs/plans/0000-template.md`](docs/plans/0000-template.md) only when triggered by the [Change Design Gate](#change-design-gate). Keep `Status: blocked` while a material scope, interface, data, or rollout decision is unresolved.
 2. Review the goals, boundaries, and key decisions before implementing; update an active plan mid-flight only when remaining multi-PR or multi-session work still needs re-alignment.
 3. Implement within that scope, adding evidence for each acceptance criterion (fixtures, tests, `scripts/verify.sh --full` output, benchmark numbers) and updating current-state docs in the same change.
-4. Retire the plan in its final delivery PR as soon as its code scope lands on the default branch; move deferred manual checks and future polish to issues rather than keeping the plan open. Follow [`docs/AGENTS.md` §4](docs/AGENTS.md#4-retiring-a-plan) (migrating lasting constraints into [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), [`AGENTS.md`](AGENTS.md) invariants, tests, or `Why:` comments).
+4. Retire the plan in its final delivery PR as soon as its code scope lands on the default branch; move deferred manual checks and future polish to issues rather than keeping the plan open. Follow [`docs/AGENTS.md` §4](docs/AGENTS.md#4-retiring-a-plan) (migrating lasting constraints into [`docs/architecture/overview.md`](docs/architecture/overview.md), [`AGENTS.md`](AGENTS.md) invariants, tests, or `Why:` comments).
 
-[`docs/plans/`](docs/plans/) holds active Plans only while non-trivial work is in flight. Copy [`0000-template.md`](docs/plans/0000-template.md) and keep only the sections that apply. State the problem, goals, non-goals, boundaries, rejected alternatives, failure/rollback behavior, and verification; a file list alone is not a design. Keep unknown owners, dates, and interfaces marked "unconfirmed". A plan may make feature-specific technical decisions, but it cannot silently override `docs/ARCHITECTURE.md` or the invariants in `AGENTS.md`. This repository does not keep an RFC directory.
+[`docs/plans/`](docs/plans/) holds active Plans only while non-trivial work is in flight. Copy [`0000-template.md`](docs/plans/0000-template.md) and keep only the sections that apply. State the problem, goals, non-goals, boundaries, rejected alternatives, failure/rollback behavior, and verification; a file list alone is not a design. Keep unknown owners, dates, and interfaces marked "unconfirmed". A plan may make feature-specific technical decisions, but it cannot silently override `docs/architecture/overview.md` or the invariants in `AGENTS.md`. This repository does not keep an RFC directory.
 
 ## Adding or changing a plugin
 
@@ -82,15 +83,14 @@ Most changes need only a clear PR description (`## Summary` and `## Validation`)
    we do not pass yet are listed in `upstream/KNOWN_FAILURES.txt` and generated
    as expected failures. When your change makes one pass, the test tells you to
    delete its line; do that in the same commit. Never add a line without a
-   reason comment. Cases that need plugin params (`preserve`, `force`, ...)
-   are generated as skipped tests until params exist.
+   reason comment. Upstream plugin params are passed through as JSON.
 
-2. **Implement** in the matching `svgo/plugins/*.mbt` file as a value:
+2. **Implement** in the matching `svgo/plugins/*.mbt` file as a package-private value:
 
    ```moonbit
    ///|
    /// One line on what is removed or rewritten and why it is safe.
-   pub let my_plugin : Plugin = {
+   let my_plugin : Plugin = {
      name: "svgoName",
      description: "shown by --list and the playground",
      run: (doc, ctx) => {
@@ -115,8 +115,8 @@ Most changes need only a clear PR description (`## Summary` and `## Validation`)
    shape of document, then `scripts/verify.sh --full`: the render diff must
    stay at zero pixels. Rendering fidelity beats bytes saved.
 
-5. `moon fmt && moon info`, commit the `.mbti` changes, update the README
-   plugin table.
+5. `moon fmt && moon info`, commit the `.mbti` changes, update the
+   `svgo/README.mbt.md` plugin table.
 
 ## Performance work
 
